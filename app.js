@@ -1,32 +1,40 @@
+function criarCampo(containerId, placeholder) {
+  const container = document.getElementById(containerId);
+
+  const wrapper = document.createElement("div");
+  wrapper.style.display = "flex";
+  wrapper.style.gap = "8px";
+  wrapper.style.marginBottom = "8px";
+
+  const input = document.createElement("input");
+  input.placeholder = placeholder;
+  input.style.flex = "1";
+
+  const remover = document.createElement("button");
+  remover.textContent = "❌";
+  remover.onclick = () => wrapper.remove();
+
+  wrapper.appendChild(input);
+  wrapper.appendChild(remover);
+  container.appendChild(wrapper);
+}
+
+// FILAS
 function adicionarFilaCampo() {
-  console.log("Adicionar fila clicado");
-
-  const container = document.getElementById("listaFilas");
-
-  const input = document.createElement("input");
-  input.placeholder = "Nome da fila (ex: Suporte)";
-
-  container.appendChild(input);
+  criarCampo("listaFilas", "Nome da fila (ex: Suporte)");
 }
 
+// URAS
 function adicionarURACampo() {
-  console.log("Adicionar URA clicado");
-
-  const container = document.getElementById("listaURAs");
-
-  const input = document.createElement("input");
-  input.placeholder = "Nome da URA (ex: URA Atendimento)";
-
-  container.appendChild(input);
+  criarCampo("listaURAs", "Nome da URA (ex: URA Atendimento)");
 }
 
+// EXPLORAR
 async function explorar() {
-  console.log("Explorar clicado");
-
   const dados = {};
 
   const filas = document.querySelectorAll("#listaFilas input");
-  if (filas[0]?.value) {
+  if (filas.length > 0 && filas[0].value) {
     dados.fila = {
       tipo: "fila",
       nome: filas[0].value
@@ -34,17 +42,19 @@ async function explorar() {
   }
 
   const uras = document.querySelectorAll("#listaURAs input");
-  if (uras[0]?.value) {
+  if (uras.length > 0 && uras[0].value) {
     dados.ura = {
       tipo: "ura",
       principal: uras[0].value
     };
   }
 
+  const payload = { dados };
+
   const res = await fetch("https://caderno-api.onrender.com/explorar", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ dados })
+    body: JSON.stringify(payload)
   });
 
   const json = await res.json();
