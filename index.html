@@ -9,35 +9,31 @@
 
 <h1>Caderno de Parâmetros</h1>
 
-<!-- FILAS -->
 <div class="card">
   <h2>Filas</h2>
-
   <div id="listaFilas">
     <input placeholder="Nome da fila (ex: Suporte)" />
   </div>
-
-  <button onclick="adicionarFilaCampo()">+ Adicionar outra fila</button>
+  <button type="button" onclick="adicionarFilaCampo()">+ Adicionar outra fila</button>
 </div>
 
-<!-- URAS -->
 <div class="card">
   <h2>URAs</h2>
-
   <div id="listaURAs">
     <input placeholder="Nome da URA (ex: URA Atendimento)" />
   </div>
-
-  <button onclick="adicionarURACampo()">+ Adicionar URA</button>
+  <button type="button" onclick="adicionarURACampo()">+ Adicionar URA</button>
 </div>
 
-<br />
+<br>
 
-<button onclick="explorar()">Explorar</button>
+<button type="button" onclick="explorar()">Explorar</button>
 
 <h2>Resultado</h2>
 <pre id="resultado"></pre>
 
+<!-- ⚠️ TEM QUE SER O ÚLTIMO ELEMENTO -->
 <script src="app.js"></script>
+
 </body>
 </html>
