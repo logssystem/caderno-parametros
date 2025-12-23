@@ -26,7 +26,7 @@
 async function explorar() {
   const payload = document.getElementById("payload").value;
 
-  const res = await fetch("http://127.0.0.1:8000/explorar", {
+  const res = await fetch("https://caderno-api.onrender.com/explorar", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: payload
@@ -40,3 +40,4 @@ async function explorar() {
 
 </body>
 </html>
+
