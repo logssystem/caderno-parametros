@@ -1,96 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Caderno de Parâmetros – MVP</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-    }
-    textarea {
-      width: 100%;
-      height: 200px;
-      font-family: monospace;
-    }
-    button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-    pre {
-      background: #f4f4f4;
-      padding: 15px;
-      margin-top: 20px;
-      white-space: pre-wrap;
-    }
-    .loading {
-      color: orange;
-      font-weight: bold;
-    }
-    .error {
-      color: red;
-      font-weight: bold;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<h2>Caderno de Parâmetros – MVP</h2>
+<h1>Caderno de Parâmetros</h1>
 
-<p>1️⃣ Cole o JSON<br>
-2️⃣ Clique em <b>Explorar</b><br>
-3️⃣ Veja a resposta da API real</p>
+<div class="card">
+  <h2>Adicionar Fila</h2>
+  <input id="filaNome" placeholder="Nome da fila (ex: Suporte)" />
+</div>
 
-<textarea id="payload">
-{
-  "dados": {
-    "fila": {
-      "nome": "Suporte"
-    },
-    "ura": {
-      "principal": "URA Atendimento"
-    }
-  }
-}
-</textarea>
+<div class="card">
+  <h2>Adicionar URA</h2>
+  <input id="uraNome" placeholder="Nome da URA" />
+</div>
 
-<br>
 <button onclick="explorar()">Explorar</button>
 
+<h2>Resultado</h2>
 <pre id="resultado"></pre>
 
-<script>
-async function explorar() {
-  const resultado = document.getElementById("resultado");
-  resultado.className = "loading";
-  resultado.textContent = "⏳ Acordando a API e processando...";
-
-  try {
-    const res = await fetch("https://caderno-api.onrender.com/explorar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: document.getElementById("payload").value
-    });
-
-    if (!res.ok) {
-      throw new Error("Erro HTTP " + res.status);
-    }
-
-    const data = await res.json();
-    resultado.className = "";
-    resultado.textContent = JSON.stringify(data, null, 2);
-
-  } catch (err) {
-    resultado.className = "error";
-    resultado.textContent =
-      "❌ Erro ao chamar a API.\n\n" + err.message +
-      "\n\n(se for a primeira vez, aguarde e tente novamente)";
-  }
-}
-</script>
-
+<script src="app.js"></script>
 </body>
 </html>
-
-
