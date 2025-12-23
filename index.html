@@ -5,23 +5,20 @@
   <title>Caderno de Parâmetros – MVP</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
 <h1>Caderno de Parâmetros</h1>
 
 <div class="card">
   <h2>Filas</h2>
-  <div id="listaFilas">
-    <input placeholder="Nome da fila (ex: Suporte)" />
-  </div>
+  <div id="listaFilas"></div>
   <button type="button" onclick="adicionarFilaCampo()">+ Adicionar outra fila</button>
 </div>
 
 <div class="card">
   <h2>URAs</h2>
-  <div id="listaURAs">
-    <input placeholder="Nome da URA (ex: URA Atendimento)" />
-  </div>
+  <div id="listaURAs"></div>
   <button type="button" onclick="adicionarURACampo()">+ Adicionar URA</button>
 </div>
 
@@ -32,7 +29,7 @@
 <h2>Resultado</h2>
 <pre id="resultado"></pre>
 
-<!-- ⚠️ TEM QUE SER O ÚLTIMO ELEMENTO -->
+<!-- ⚠️ SCRIPT SEMPRE NO FINAL -->
 <script src="app.js"></script>
 
 </body>
