@@ -10,16 +10,15 @@
 <h1>Caderno de Parâmetros</h1>
 
 <div class="card">
-  <h2>Adicionar Fila</h2>
-  <input id="filaNome" placeholder="Nome da fila (ex: Suporte)" />
-  <button onclick="adicionarFila()">Adicionar Fila</button>
+  <h2>Adicionar Filas</h2>
+
+  <div id="listaFilas">
+    <input placeholder="Nome da fila (ex: Suporte)" />
+  </div>
+
+  <button onclick="adicionarFilaCampo()">+ Adicionar outra fila</button>
 </div>
 
-<div class="card">
-  <h2>Adicionar URA</h2>
-  <input id="uraNome" placeholder="Nome da URA" />
-  <button onclick="adicionarURA()">Adicionar URA</button>
-</div>
 
 
 <button onclick="explorar()">Explorar</button>
@@ -30,5 +29,6 @@
 <script src="app.js"></script>
 </body>
 </html>
+
 
 
