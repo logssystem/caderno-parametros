@@ -1,8 +1,6 @@
-// ===============================
-// Adicionar campos dinâmicos
-// ===============================
-
 function adicionarFilaCampo() {
+  console.log("Adicionar fila clicado");
+
   const container = document.getElementById("listaFilas");
 
   const input = document.createElement("input");
@@ -12,6 +10,8 @@ function adicionarFilaCampo() {
 }
 
 function adicionarURACampo() {
+  console.log("Adicionar URA clicado");
+
   const container = document.getElementById("listaURAs");
 
   const input = document.createElement("input");
@@ -20,47 +20,34 @@ function adicionarURACampo() {
   container.appendChild(input);
 }
 
-// ===============================
-// Explorar (envia para API)
-// ===============================
-
 async function explorar() {
+  console.log("Explorar clicado");
+
   const dados = {};
 
-  // FILA (usa a primeira preenchida)
   const filas = document.querySelectorAll("#listaFilas input");
-  for (const input of filas) {
-    if (input.value) {
-      dados.fila = {
-        tipo: "fila",
-        nome: input.value
-      };
-      break;
-    }
+  if (filas[0]?.value) {
+    dados.fila = {
+      tipo: "fila",
+      nome: filas[0].value
+    };
   }
 
-  // URA (usa a primeira preenchida)
   const uras = document.querySelectorAll("#listaURAs input");
-  for (const input of uras) {
-    if (input.value) {
-      dados.ura = {
-        tipo: "ura",
-        principal: input.value
-      };
-      break;
-    }
+  if (uras[0]?.value) {
+    dados.ura = {
+      tipo: "ura",
+      principal: uras[0].value
+    };
   }
-
-  const payload = { dados };
 
   const res = await fetch("https://caderno-api.onrender.com/explorar", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+    body: JSON.stringify({ dados })
   });
 
   const json = await res.json();
-
   document.getElementById("resultado").textContent =
     JSON.stringify(json, null, 2);
 }
