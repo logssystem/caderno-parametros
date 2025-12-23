@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Caderno de Parâmetros</title>
+</head>
+<body>
+
+<h2>Caderno de Parâmetros – MVP</h2>
+
+<textarea id="payload" style="width:100%;height:200px;">
+{
+  "dados": {
+    "fila": { "nome": "Suporte" },
+    "ura": { "principal": "URA Atendimento" }
+  }
+}
+</textarea>
+
+<br><br>
+<button onclick="explorar()">Explorar</button>
+
+<pre id="resultado"></pre>
+
+<script>
+async function explorar() {
+  const payload = document.getElementById("payload").value;
+
+  const res = await fetch("http://127.0.0.1:8000/explorar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: payload
+  });
+
+  const data = await res.json();
+  document.getElementById("resultado").textContent =
+    JSON.stringify(data, null, 2);
+}
+</script>
+
+</body>
+</html>
