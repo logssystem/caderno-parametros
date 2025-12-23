@@ -1,26 +1,27 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Dict, Any, List
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://logssystem.github.io",
-        "http://localhost:5500"
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.get("/")
-def root():
-    return {"status": "ok"}
+class Caderno(BaseModel):
+    dados: Dict[str, Any]
 
 @app.post("/explorar")
-def explorar(payload: dict):
+def explorar(caderno: Caderno):
+    blocos = []
+    conexoes = []
+
+    for nome_bloco, conteudo in caderno.dados.items():
+        blocos.append({
+            "id": nome_bloco,
+            "tipo": nome_bloco,
+            "conteudo": conteudo
+        })
+
     return {
         "status": "ok",
-        "recebido": payload
+        "total_blocos": len(blocos),
+        "blocos": blocos,
+        "conexoes": conexoes
     }
