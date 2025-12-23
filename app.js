@@ -2,36 +2,42 @@ const LIMITE = 10;
 
 function adicionarFilaCampo() {
   const container = document.getElementById("listaFilas");
-  const total = container.querySelectorAll("input").length;
-
-  if (total >= LIMITE) {
+  if (container.querySelectorAll(".campo").length >= LIMITE) {
     alert("Máximo de 10 filas permitido");
     return;
   }
-
-  container.appendChild(criarCampo("Nome da fila (ex: Suporte)"));
+  container.appendChild(criarCampo("fila", "Nome da fila (ex: Suporte)"));
 }
 
 function adicionarURACampo() {
   const container = document.getElementById("listaURAs");
-  const total = container.querySelectorAll("input").length;
-
-  if (total >= LIMITE) {
+  if (container.querySelectorAll(".campo").length >= LIMITE) {
     alert("Máximo de 10 URAs permitido");
     return;
   }
-
-  container.appendChild(criarCampo("Nome da URA (ex: URA Atendimento)"));
+  container.appendChild(criarCampo("ura", "Nome da URA (ex: URA Atendimento)"));
 }
 
-function criarCampo(placeholder) {
+function criarCampo(tipo, placeholder) {
   const wrapper = document.createElement("div");
+  wrapper.className = "campo";
   wrapper.style.display = "flex";
-  wrapper.style.gap = "6px";
+  wrapper.style.alignItems = "center";
+  wrapper.style.gap = "8px";
   wrapper.style.marginBottom = "6px";
 
   const input = document.createElement("input");
   input.placeholder = placeholder;
+
+  const label = document.createElement("label");
+  label.style.fontSize = "12px";
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = true;
+
+  label.appendChild(checkbox);
+  label.append(" Usar como submenu");
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
@@ -39,6 +45,7 @@ function criarCampo(placeholder) {
   btn.onclick = () => wrapper.remove();
 
   wrapper.appendChild(input);
+  wrapper.appendChild(label);
   wrapper.appendChild(btn);
 
   return wrapper;
@@ -46,32 +53,32 @@ function criarCampo(placeholder) {
 
 async function explorar() {
   const dados = {};
-
-  // FILAS
-  const filasInputs = document.querySelectorAll("#listaFilas input");
   let filaIndex = 1;
+  let uraIndex = 1;
 
-  filasInputs.forEach(input => {
-    const nome = input.value.trim();
+  document.querySelectorAll("#listaFilas .campo").forEach(campo => {
+    const nome = campo.querySelector("input").value.trim();
+    const submenu = campo.querySelector("input[type=checkbox]").checked;
+
     if (nome && filaIndex <= LIMITE) {
       dados[`fila_${filaIndex}`] = {
         tipo: "fila",
-        nome: nome
+        nome,
+        submenu
       };
       filaIndex++;
     }
   });
 
-  // URAs
-  const urasInputs = document.querySelectorAll("#listaURAs input");
-  let uraIndex = 1;
+  document.querySelectorAll("#listaURAs .campo").forEach(campo => {
+    const nome = campo.querySelector("input").value.trim();
+    const submenu = campo.querySelector("input[type=checkbox]").checked;
 
-  urasInputs.forEach(input => {
-    const nome = input.value.trim();
     if (nome && uraIndex <= LIMITE) {
       dados[`ura_${uraIndex}`] = {
         tipo: "ura",
-        principal: nome
+        principal: nome,
+        submenu
       };
       uraIndex++;
     }
@@ -84,18 +91,13 @@ async function explorar() {
 
   const payload = { dados };
 
-  try {
-    const res = await fetch("https://caderno-api.onrender.com/explorar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+  const res = await fetch("https://caderno-api.onrender.com/explorar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
 
-    const json = await res.json();
-    document.getElementById("resultado").textContent =
-      JSON.stringify(json, null, 2);
-  } catch (err) {
-    alert("Erro ao chamar a API");
-    console.error(err);
-  }
+  const json = await res.json();
+  document.getElementById("resultado").textContent =
+    JSON.stringify(json, null, 2);
 }
