@@ -1,23 +1,18 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import Dict, Any, List
-
-app = FastAPI()
-
-class Caderno(BaseModel):
-    dados: Dict[str, Any]
+from cadernos.explorer import detectar_conexoes
 
 @app.post("/explorar")
-def explorar(caderno: Caderno):
-    blocos = []
-    conexoes = []
+def explorar(payload: dict):
+    dados = payload.get("dados", {})
 
-    for nome_bloco, conteudo in caderno.dados.items():
+    blocos = []
+    for bloco_id, bloco in dados.items():
         blocos.append({
-            "id": nome_bloco,
-            "tipo": nome_bloco,
-            "conteudo": conteudo
+            "id": bloco_id,
+            "tipo": bloco.get("tipo"),
+            "dados": {k: v for k, v in bloco.items() if k != "tipo"}
         })
+
+    conexoes = detectar_conexoes(dados)
 
     return {
         "status": "ok",
