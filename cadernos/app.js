@@ -1,8 +1,7 @@
 // ===============================
-// Caderno de Parâmetros – app.js
+// Adicionar campos dinâmicos
 // ===============================
 
-// Cria novo campo de FILA
 function adicionarFilaCampo() {
   const container = document.getElementById("listaFilas");
 
@@ -12,7 +11,6 @@ function adicionarFilaCampo() {
   container.appendChild(input);
 }
 
-// Cria novo campo de URA
 function adicionarURACampo() {
   const container = document.getElementById("listaURAs");
 
@@ -22,30 +20,35 @@ function adicionarURACampo() {
   container.appendChild(input);
 }
 
-// Envia dados para a API
+// ===============================
+// Explorar (envia para API)
+// ===============================
+
 async function explorar() {
   const dados = {};
 
-  // ===============================
-  // FILAS
-  // ===============================
-  const filasInputs = document.querySelectorAll("#listaFilas input");
-  if (filasInputs.length > 0 && filasInputs[0].value) {
-    dados.fila = {
-      tipo: "fila",
-      nome: filasInputs[0].value
-    };
+  // FILA (usa a primeira preenchida)
+  const filas = document.querySelectorAll("#listaFilas input");
+  for (const input of filas) {
+    if (input.value) {
+      dados.fila = {
+        tipo: "fila",
+        nome: input.value
+      };
+      break;
+    }
   }
 
-  // ===============================
-  // URAS
-  // ===============================
-  const urasInputs = document.querySelectorAll("#listaURAs input");
-  if (urasInputs.length > 0 && urasInputs[0].value) {
-    dados.ura = {
-      tipo: "ura",
-      principal: urasInputs[0].value
-    };
+  // URA (usa a primeira preenchida)
+  const uras = document.querySelectorAll("#listaURAs input");
+  for (const input of uras) {
+    if (input.value) {
+      dados.ura = {
+        tipo: "ura",
+        principal: input.value
+      };
+      break;
+    }
   }
 
   const payload = { dados };
