@@ -1,20 +1,5 @@
 let dados = {};
 
-function adicionarFila() {
-  const nome = document.getElementById("filaNome").value;
-  if (!nome) {
-    alert("Informe o nome da fila");
-    return;
-  }
-
-  dados.fila = {
-    tipo: "fila",
-    nome: nome
-  };
-
-  alert("Fila adicionada!");
-}
-
 function adicionarURA() {
   const nome = document.getElementById("uraNome").value;
   if (!nome) {
@@ -42,4 +27,13 @@ async function explorar() {
   const json = await res.json();
   document.getElementById("resultado").textContent =
     JSON.stringify(json, null, 2);
+}
+
+function adicionarFilaCampo() {
+  const container = document.getElementById("listaFilas");
+
+  const input = document.createElement("input");
+  input.placeholder = "Nome da fila (ex: Suporte)";
+
+  container.appendChild(input);
 }
