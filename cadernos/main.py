@@ -1,3 +1,4 @@
+from fastapi.middleware.cors import CORSMiddleware
 from cadernos.explorer import detectar_conexoes
 
 @app.post("/explorar")
