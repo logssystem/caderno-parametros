@@ -4,50 +4,53 @@ function criarCampo(containerId, placeholder) {
   const wrapper = document.createElement("div");
   wrapper.style.display = "flex";
   wrapper.style.gap = "8px";
-  wrapper.style.marginBottom = "8px";
+  wrapper.style.marginBottom = "6px";
 
   const input = document.createElement("input");
   input.placeholder = placeholder;
   input.style.flex = "1";
 
-  const remover = document.createElement("button");
-  remover.textContent = "❌";
-  remover.onclick = () => wrapper.remove();
+  const btnRemover = document.createElement("button");
+  btnRemover.textContent = "❌";
+  btnRemover.type = "button";
+  btnRemover.onclick = () => wrapper.remove();
 
   wrapper.appendChild(input);
-  wrapper.appendChild(remover);
+  wrapper.appendChild(btnRemover);
   container.appendChild(wrapper);
 }
 
-// FILAS
 function adicionarFilaCampo() {
   criarCampo("listaFilas", "Nome da fila (ex: Suporte)");
 }
 
-// URAS
 function adicionarURACampo() {
   criarCampo("listaURAs", "Nome da URA (ex: URA Atendimento)");
 }
 
-// EXPLORAR
 async function explorar() {
-  const dados = {};
+  const dados = {
+    filas: [],
+    uras: []
+  };
 
-  const filas = document.querySelectorAll("#listaFilas input");
-  if (filas.length > 0 && filas[0].value) {
-    dados.fila = {
-      tipo: "fila",
-      nome: filas[0].value
-    };
-  }
+  document.querySelectorAll("#listaFilas input").forEach(input => {
+    if (input.value.trim()) {
+      dados.filas.push({
+        tipo: "fila",
+        nome: input.value.trim()
+      });
+    }
+  });
 
-  const uras = document.querySelectorAll("#listaURAs input");
-  if (uras.length > 0 && uras[0].value) {
-    dados.ura = {
-      tipo: "ura",
-      principal: uras[0].value
-    };
-  }
+  document.querySelectorAll("#listaURAs input").forEach(input => {
+    if (input.value.trim()) {
+      dados.uras.push({
+        tipo: "ura",
+        principal: input.value.trim()
+      });
+    }
+  });
 
   const payload = { dados };
 
@@ -61,3 +64,7 @@ async function explorar() {
   document.getElementById("resultado").textContent =
     JSON.stringify(json, null, 2);
 }
+
+// cria 1 campo inicial de cada ao carregar
+adicionarFilaCampo();
+adicionarURACampo();
