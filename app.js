@@ -1,6 +1,6 @@
 const LIMITE = 10;
 
-/* ====== MAPA DE LISTAS ====== */
+/* listas */
 const listas = {
   usuario_web: "listaUsuariosWeb",
   entrada: "listaEntradas",
@@ -10,7 +10,7 @@ const listas = {
   agente: "listaAgentes"
 };
 
-/* ====== ADICIONAR CAMPOS PADRÃO ====== */
+/* adicionar campo padrão */
 function adicionarCampo(tipo) {
   const container = document.getElementById(listas[tipo]);
   if (container.querySelectorAll(".campo").length >= LIMITE) {
@@ -20,18 +20,13 @@ function adicionarCampo(tipo) {
   container.appendChild(criarCampo(tipo));
 }
 
-/* ====== CAMPO PADRÃO COM DESCRIÇÃO ====== */
+/* criar campo com descrição */
 function criarCampo(tipo) {
   const wrapper = document.createElement("div");
-  wrapper.className = "campo";
-  wrapper.style.flexDirection = "column";
-  wrapper.style.alignItems = "flex-start";
+  wrapper.className = "campo campo-descricao";
 
-  /* linha principal */
   const linha = document.createElement("div");
-  linha.style.display = "flex";
-  linha.style.alignItems = "center";
-  linha.style.gap = "8px";
+  linha.className = "linha-principal";
 
   const input = document.createElement("input");
   input.type = "text";
@@ -44,11 +39,9 @@ function criarCampo(tipo) {
 
   linha.append(input, btn);
 
-  /* descrição */
   const descricao = document.createElement("textarea");
   descricao.placeholder = "Descrição (opcional)";
 
-  /* não utilizar */
   const label = document.createElement("label");
   const chk = document.createElement("input");
   chk.type = "checkbox";
@@ -68,7 +61,7 @@ function criarCampo(tipo) {
   return wrapper;
 }
 
-/* ====== RAMAIS (SEM DESCRIÇÃO) ====== */
+/* ramais com range */
 function adicionarRamal() {
   const container = document.getElementById("listaRamais");
   if (container.querySelectorAll(".campo").length >= LIMITE) {
@@ -96,35 +89,33 @@ function adicionarRamal() {
   container.appendChild(wrapper);
 }
 
-/* ====== EXPORT ====== */
+/* export */
 function explorar() {
   const dados = {};
 
-  /* campos padrão */
   Object.keys(listas).forEach(tipo => {
     dados[tipo] = [];
     document.querySelectorAll(`#${listas[tipo]} .campo`).forEach(campo => {
       const input = campo.querySelector("input[type=text]");
-      const textarea = campo.querySelector("textarea");
+      const descricao = campo.querySelector("textarea");
       const chk = campo.querySelector("input[type=checkbox]");
 
       if (input && !chk.checked && input.value.trim()) {
         dados[tipo].push({
           nome: input.value.trim(),
-          descricao: textarea.value.trim()
+          descricao: descricao.value.trim()
         });
       }
     });
   });
 
-  /* ramais */
   dados.ramais = [];
   document.querySelectorAll("#listaRamais .campo").forEach(campo => {
-    const inputs = campo.querySelectorAll("input[type=number]");
-    if (inputs.length < 2) return;
+    const nums = campo.querySelectorAll("input[type=number]");
+    if (nums.length < 2) return;
 
-    const base = parseInt(inputs[0].value);
-    const qtd = parseInt(inputs[1].value);
+    const base = parseInt(nums[0].value);
+    const qtd = parseInt(nums[1].value);
 
     if (!isNaN(base) && !isNaN(qtd) && qtd > 0) {
       for (let i = 1; i <= qtd; i++) {
