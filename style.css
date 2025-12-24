@@ -2,7 +2,7 @@ body {
   font-family: Arial, sans-serif;
 }
 
-/* CARD (se já existir, pode manter o seu) */
+/* card */
 .card {
   border: 1px solid #ddd;
   padding: 16px;
@@ -10,7 +10,7 @@ body {
   width: 520px;
 }
 
-/* LINHA DO CAMPO */
+/* linha do campo */
 .campo {
   display: flex;
   align-items: center;
@@ -18,10 +18,10 @@ body {
   margin-bottom: 10px;
 }
 
-/* INPUT GRANDE – ESTILO FORMULÁRIO */
+/* input grande */
 .campo input[type="text"] {
-  width: 360px;      /* largura do campo */
-  height: 44px;      /* altura tipo input moderno */
+  width: 360px;
+  height: 44px;
   padding: 0 12px;
   font-size: 14px;
   border: 1px solid #dcdcdc;
@@ -29,12 +29,11 @@ body {
   outline: none;
 }
 
-/* FOCO */
 .campo input[type="text"]:focus {
   border-color: #4a90e2;
 }
 
-/* CHECKBOX */
+/* checkbox */
 .campo label {
   font-size: 13px;
   display: flex;
@@ -43,7 +42,7 @@ body {
   white-space: nowrap;
 }
 
-/* BOTÃO REMOVER (X) */
+/* botão remover */
 .campo button {
   width: 32px;
   height: 32px;
@@ -57,13 +56,23 @@ body {
   background: #f2f2f2;
 }
 
-/* BOTÃO + */
+/* botão + */
+.card-actions {
+  margin-top: 8px;
+}
+
 .btn-add {
   width: 44px;
   height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   border-radius: 6px;
   border: 1px dashed #aaa;
   background: #fff;
+
   font-size: 26px;
   font-weight: 500;
   cursor: pointer;
