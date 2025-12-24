@@ -20,7 +20,7 @@ function adicionarCampo(tipo) {
   container.appendChild(criarCampo(tipo));
 }
 
-/* ====== CAMPO PADRÃO ====== */
+/* ====== CAMPO PADRÃO (INPUT + NÃO UTILIZAR) ====== */
 function criarCampo(tipo) {
   const wrapper = document.createElement("div");
   wrapper.className = "campo";
@@ -49,7 +49,7 @@ function criarCampo(tipo) {
   return wrapper;
 }
 
-/* ====== RAMAIS COM RANGE ====== */
+/* ====== RAMAIS COM RANGE + PREVIEW ====== */
 function adicionarRamal() {
   const container = document.getElementById("listaRamais");
   if (container.querySelectorAll(".campo").length >= LIMITE) {
@@ -68,38 +68,68 @@ function adicionarRamal() {
   range.type = "number";
   range.placeholder = "Range (ex: 5)";
 
+  const preview = document.createElement("div");
+  preview.className = "preview-ramais";
+  preview.textContent = "Gerados: —";
+
+  function atualizarPreview() {
+    const base = parseInt(ramalInicial.value);
+    const qtd = parseInt(range.value);
+
+    if (isNaN(base) || isNaN(qtd) || qtd <= 0) {
+      preview.textContent = "Gerados: —";
+      return;
+    }
+
+    const ramais = [];
+    for (let i = 1; i <= qtd; i++) {
+      ramais.push(base + i);
+    }
+
+    preview.innerHTML = `Gerados: <span>${ramais.join(", ")}</span>`;
+  }
+
+  ramalInicial.addEventListener("input", atualizarPreview);
+  range.addEventListener("input", atualizarPreview);
+
   const btn = document.createElement("button");
   btn.textContent = "✖";
   btn.type = "button";
   btn.onclick = () => wrapper.remove();
 
   wrapper.append(ramalInicial, range, btn);
+  wrapper.appendChild(preview);
   container.appendChild(wrapper);
 }
 
-/* ====== EXPORT ====== */
+/* ====== EXPORT / EXPLORAR ====== */
 function explorar() {
   const dados = {};
 
+  /* CAMPOS PADRÃO */
   Object.keys(listas).forEach(tipo => {
     dados[tipo] = [];
     document.querySelectorAll(`#${listas[tipo]} .campo`).forEach(campo => {
       const input = campo.querySelector("input[type=text]");
       const chk = campo.querySelector("input[type=checkbox]");
+
       if (input && !chk.checked && input.value.trim()) {
         dados[tipo].push(input.value.trim());
       }
     });
   });
 
-  /* RAMAIS */
+  /* RAMAIS (USA A MESMA LÓGICA DO PREVIEW) */
   dados.ramais = [];
   document.querySelectorAll("#listaRamais .campo").forEach(campo => {
-    const base = parseInt(campo.children[0].value);
-    const range = parseInt(campo.children[1].value);
+    const inputs = campo.querySelectorAll("input[type=number]");
+    if (inputs.length < 2) return;
 
-    if (!isNaN(base) && !isNaN(range)) {
-      for (let i = 1; i <= range; i++) {
+    const base = parseInt(inputs[0].value);
+    const qtd = parseInt(inputs[1].value);
+
+    if (!isNaN(base) && !isNaN(qtd) && qtd > 0) {
+      for (let i = 1; i <= qtd; i++) {
         dados.ramais.push(base + i);
       }
     }
