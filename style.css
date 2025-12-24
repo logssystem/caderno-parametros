@@ -1,91 +1,73 @@
-/* =========================
-   RESET
-========================= */
+/* RESET */
 * {
   box-sizing: border-box;
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  min-height: 100%;
-}
-
-/* =========================
-   FUNDO EXTERNO (CINZA ESCURO)
-========================= */
 body {
+  margin: 0;
   font-family: "Inter", Arial, sans-serif;
-  background: #2f3a43; /* 🔥 CINZA ESCURO (IGUAL AO EXEMPLO) */
-  color: #333;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-/* =========================
-   MOLDURA CENTRAL
-========================= */
-.app-frame {
-  width: 100%;
-  max-width: 900px;
-  margin: 32px auto;
-  background: #ffffff;
-  border-radius: 14px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 12px 32px rgba(0,0,0,0.25);
-  overflow: hidden;
+  background: #f5f7fa;
+  color: #2d3436;
 }
 
 /* =========================
    HEADER
 ========================= */
 .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: 72px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  padding: 0 32px;
+}
+
+.header-left {
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
-  padding: 20px 32px;
-  background: #f1f3f5;
-  border-bottom: 1px solid #dcdfe4;
 }
 
 .app-logo {
-  position: absolute;
-  left: 32px;
-  height: 42px;
+  height: 40px;
+}
+
+.header-center {
+  display: flex;
+  justify-content: center;
 }
 
 .app-title {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
-  color: #222;
 }
 
 /* =========================
    CONTEÚDO
 ========================= */
 .form-container {
-  max-width: 820px;
-  margin: 0 auto;
-  padding: 24px 16px 32px;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 16px 60px;
 }
 
 /* =========================
-   CARD
+   CARDS
 ========================= */
 .card {
   background: #ffffff;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 20px 24px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.05);
 }
 
 .card h2 {
   margin: 0 0 12px;
   font-size: 18px;
-  font-weight: 600;
 }
 
 /* =========================
@@ -105,9 +87,9 @@ body {
 .campo-descricao input,
 .campo-descricao textarea {
   width: 100%;
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid #d9dce1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #dfe3e8;
   font-size: 14px;
 }
 
@@ -117,7 +99,7 @@ body {
 }
 
 /* =========================
-   NÃO UTILIZADO (BONITO)
+   NÃO UTILIZADO
 ========================= */
 .nao-utilizado {
   display: inline-flex;
@@ -126,26 +108,13 @@ body {
   margin-top: 6px;
   padding: 6px 10px;
   font-size: 13px;
-  background: #f4f6f8;
+  background: #f1f3f5;
   border-radius: 6px;
-  width: fit-content;
   cursor: pointer;
 }
 
 .nao-utilizado input {
-  accent-color: #4a90e2;
-}
-
-/* =========================
-   CARD DESABILITADO
-========================= */
-.card-disabled {
-  opacity: 0.55;
-  background: #f3f4f6;
-}
-
-.card-disabled .btn-add {
-  display: none;
+  accent-color: #c6ff00;
 }
 
 /* =========================
@@ -155,51 +124,33 @@ body {
   margin-top: 10px;
   width: 44px;
   height: 44px;
-  border-radius: 8px;
-  border: 2px dashed #c6cbd3;
-  background: #fff;
-  font-size: 24px;
+  border-radius: 10px;
+  border: 2px dashed #cfd4dc;
+  background: #ffffff;
+  font-size: 22px;
   cursor: pointer;
 }
 
 .btn-add:hover {
-  border-color: #4a90e2;
-  color: #4a90e2;
+  border-color: #c6ff00;
+  color: #111;
 }
 
 .btn-explorar {
   display: block;
-  margin: 40px auto 16px;
-  padding: 14px 40px;
+  margin: 40px auto 24px;
+  padding: 14px 42px;
   font-size: 15px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: none;
-  background: #4a90e2;
-  color: #fff;
+  background: #c6ff00;
+  color: #111;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .btn-explorar:hover {
-  background: #357abd;
-}
-
-/* =========================
-   RESUMO
-========================= */
-#resumoCard ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-#resumoCard li {
-  padding: 6px 0;
-  font-size: 14px;
-  border-bottom: 1px dashed #e5e7eb;
-}
-
-#resumoCard li:last-child {
-  border-bottom: none;
+  filter: brightness(0.95);
 }
 
 /* =========================
@@ -209,7 +160,7 @@ pre {
   background: #0f172a;
   color: #e5e7eb;
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 13px;
   overflow-x: auto;
 }
