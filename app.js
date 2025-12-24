@@ -33,7 +33,7 @@ function adicionarURACampo() {
   container.appendChild(criarCampo("ura"));
 }
 
-/* ====== CRIA UM CAMPO ====== */
+/* ====== CRIA UM CAMPO (INPUT + DATALIST) ====== */
 function criarCampo(tipo) {
   const wrapper = document.createElement("div");
   wrapper.className = "campo";
@@ -42,20 +42,27 @@ function criarCampo(tipo) {
   wrapper.style.gap = "8px";
   wrapper.style.marginBottom = "6px";
 
-  /* SELECT */
-  const select = document.createElement("select");
+  /* INPUT */
+  const input = document.createElement("input");
+  input.setAttribute("list", `${tipo}-lista`);
+  input.placeholder = "Selecione ou digite";
 
-  select.innerHTML = `
-    <option value="">Selecione</option>
-    <option value="__NOT_USED__">Não será utilizado</option>
-  `;
+  /* DATALIST */
+  const datalist = document.createElement("datalist");
+  datalist.id = `${tipo}-lista`;
 
+  // opção não utilizar
+  const optNaoUsar = document.createElement("option");
+  optNaoUsar.value = "__NOT_USED__";
+  optNaoUsar.label = "Não será utilizado";
+  datalist.appendChild(optNaoUsar);
+
+  // opções disponíveis
   const lista = tipo === "fila" ? FILAS_DISPONIVEIS : URAS_DISPONIVEIS;
   lista.forEach(item => {
     const opt = document.createElement("option");
     opt.value = item;
-    opt.textContent = item;
-    select.appendChild(opt);
+    datalist.appendChild(opt);
   });
 
   /* SUBMENU */
@@ -69,9 +76,9 @@ function criarCampo(tipo) {
   label.appendChild(checkbox);
   label.append(" Usar como submenu");
 
-  /* DESABILITA SUBMENU SE NÃO UTILIZAR */
-  select.addEventListener("change", () => {
-    if (select.value === "__NOT_USED__" || select.value === "") {
+  /* REGRA: NÃO UTILIZADO */
+  input.addEventListener("input", () => {
+    if (input.value === "__NOT_USED__") {
       checkbox.checked = false;
       checkbox.disabled = true;
     } else {
@@ -85,7 +92,8 @@ function criarCampo(tipo) {
   btn.type = "button";
   btn.onclick = () => wrapper.remove();
 
-  wrapper.appendChild(select);
+  wrapper.appendChild(input);
+  wrapper.appendChild(datalist);
   wrapper.appendChild(label);
   wrapper.appendChild(btn);
 
@@ -98,36 +106,40 @@ async function explorar() {
   let filaIndex = 1;
   let uraIndex = 1;
 
+  /* FILAS */
   document.querySelectorAll("#listaFilas .campo").forEach(campo => {
-    const select = campo.querySelector("select");
-    const submenu = campo.querySelector("input[type=checkbox]").checked;
+    const input = campo.querySelector("input[list]");
+    const checkbox = campo.querySelector("input[type=checkbox]");
+    const submenu = checkbox.checked;
 
     if (
-      select.value &&
-      select.value !== "__NOT_USED__" &&
+      input.value &&
+      input.value !== "__NOT_USED__" &&
       filaIndex <= LIMITE
     ) {
       dados[`fila_${filaIndex}`] = {
         tipo: "fila",
-        nome: select.value,
+        nome: input.value,
         submenu
       };
       filaIndex++;
     }
   });
 
+  /* URAS */
   document.querySelectorAll("#listaURAs .campo").forEach(campo => {
-    const select = campo.querySelector("select");
-    const submenu = campo.querySelector("input[type=checkbox]").checked;
+    const input = campo.querySelector("input[list]");
+    const checkbox = campo.querySelector("input[type=checkbox]");
+    const submenu = checkbox.checked;
 
     if (
-      select.value &&
-      select.value !== "__NOT_USED__" &&
+      input.value &&
+      input.value !== "__NOT_USED__" &&
       uraIndex <= LIMITE
     ) {
       dados[`ura_${uraIndex}`] = {
         tipo: "ura",
-        principal: select.value,
+        principal: input.value,
         submenu
       };
       uraIndex++;
