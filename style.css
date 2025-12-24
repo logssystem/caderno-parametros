@@ -10,6 +10,23 @@ body {
   width: 520px;
 }
 
+/* descrição */
+textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  resize: vertical;
+  outline: none;
+}
+
+textarea:focus {
+  border-color: #4a90e2;
+}
+
 /* linha do campo */
 .campo {
   display: flex;
@@ -19,7 +36,8 @@ body {
 }
 
 /* input grande */
-.campo input[type="text"] {
+.campo input[type="text"],
+.campo input[type="number"] {
   width: 360px;
   height: 44px;
   padding: 0 12px;
@@ -29,7 +47,7 @@ body {
   outline: none;
 }
 
-.campo input[type="text"]:focus {
+.campo input:focus {
   border-color: #4a90e2;
 }
 
