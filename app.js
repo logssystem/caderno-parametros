@@ -19,7 +19,7 @@ function adicionarURACampo() {
   container.appendChild(criarCampo("ura"));
 }
 
-/* ====== CRIA UM CAMPO (INPUT LIVRE + NÃO UTILIZAR) ====== */
+/* ====== CRIA UM CAMPO (SÓ INPUT + NÃO UTILIZAR + REMOVER) ====== */
 function criarCampo(tipo) {
   const wrapper = document.createElement("div");
   wrapper.className = "campo";
@@ -55,7 +55,7 @@ function criarCampo(tipo) {
     }
   });
 
-  /* REMOVER */
+  /* BOTÃO REMOVER */
   const btn = document.createElement("button");
   btn.textContent = "✖";
   btn.type = "button";
