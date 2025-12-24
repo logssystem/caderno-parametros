@@ -157,3 +157,27 @@ pre {
   font-size: 13px;
   overflow-x: auto;
 }
+
+/* FUNDO EXTERNO */
+body {
+  background: #e5e7eb;
+}
+
+/* MOLDURA CENTRAL */
+.app-frame {
+  max-width: 900px;
+  margin: 32px auto;          /* ⬅️ ISSO mantém centralizado */
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+/* GARANTIA DE CENTRALIZAÇÃO INTERNA */
+.app-header,
+.form-container {
+  margin-left: auto;
+  margin-right: auto;
+}
+
