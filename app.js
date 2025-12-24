@@ -1,7 +1,8 @@
-console.log("APP.JS CARREGADO - VERSAO FINAL");
+console.log("APP.JS CARREGADO - VERSÃO FINAL ESTÁVEL");
 
 const LIMITE = 10;
 
+/* MAPEAMENTO DAS LISTAS */
 const listas = {
   usuario_web: "listaUsuariosWeb",
   entrada: "listaEntradas",
@@ -11,44 +12,58 @@ const listas = {
   agente: "listaAgentes"
 };
 
-/* ADICIONAR CAMPOS */
+/* =========================
+   ADICIONAR CAMPO PADRÃO
+========================= */
 window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
   if (!container) return;
 
-  if (container.querySelectorAll(".campo-descricao").length >= LIMITE) {
-    alert("Limite máximo atingido");
+  const total = container.querySelectorAll(".campo-descricao").length;
+  if (total >= LIMITE) {
+    alert("Limite máximo de 10 itens atingido");
     return;
   }
 
   container.appendChild(criarCampo(tipo));
 };
 
-/* ADICIONAR RAMAL */
+/* =========================
+   ADICIONAR RAMAL (RANGE)
+========================= */
 window.adicionarRamal = function () {
   const container = document.getElementById("listaRamais");
   if (!container) return;
+
+  const total = container.querySelectorAll(".campo").length;
+  if (total >= LIMITE) {
+    alert("Limite máximo de 10 ranges atingido");
+    return;
+  }
 
   const wrapper = document.createElement("div");
   wrapper.className = "campo";
 
   const ini = document.createElement("input");
   ini.type = "number";
-  ini.placeholder = "Ramal inicial";
+  ini.placeholder = "Ramal inicial (ex: 2000)";
 
   const qtd = document.createElement("input");
   qtd.type = "number";
-  qtd.placeholder = "Range";
+  qtd.placeholder = "Range (ex: 5)";
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
+  btn.type = "button";
   btn.onclick = () => wrapper.remove();
 
   wrapper.append(ini, qtd, btn);
   container.appendChild(wrapper);
 };
 
-/* CRIAR CAMPO PADRÃO */
+/* =========================
+   CRIAR CAMPO COM DESCRIÇÃO
+========================= */
 function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo campo-descricao";
@@ -57,10 +72,12 @@ function criarCampo(tipo) {
   linha.className = "linha-principal";
 
   const input = document.createElement("input");
+  input.type = "text";
   input.placeholder = `Digite ${tipo.replace("_", " ")}`;
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
+  btn.type = "button";
   btn.onclick = () => wrap.remove();
 
   linha.append(input, btn);
@@ -74,47 +91,92 @@ function criarCampo(tipo) {
   const chk = document.createElement("input");
   chk.type = "checkbox";
 
-  chk.onchange = () => {
-    input.disabled = chk.checked;
-    desc.disabled = chk.checked;
-    wrap.closest(".card").classList.toggle("card-disabled", chk.checked);
-    if (chk.checked) {
+  chk.addEventListener("change", () => {
+    const disabled = chk.checked;
+    input.disabled = disabled;
+    desc.disabled = disabled;
+
+    if (disabled) {
       input.value = "";
       desc.value = "";
+      wrap.style.opacity = "0.55";
+    } else {
+      wrap.style.opacity = "1";
     }
-  };
+  });
 
   label.append(chk, " Não será utilizado");
-  wrap.append(linha, desc, label);
 
+  wrap.append(linha, desc, label);
   return wrap;
 }
 
-/* EXPLORAR + RESUMO */
+/* =========================
+   EXPLORAR / EXPORTAR
+========================= */
 window.explorar = function () {
   const dados = {};
-  const resumo = [];
 
+  /* CAMPOS PADRÃO */
   Object.keys(listas).forEach(tipo => {
-    const campos = document.querySelectorAll(`#${listas[tipo]} .campo-descricao`);
-    let ativos = 0;
+    dados[tipo] = [];
 
-    campos.forEach(c => {
-      const input = c.querySelector("input[type=text]");
-      const chk = c.querySelector("input[type=checkbox]");
-      if (!chk.checked && input.value.trim()) ativos++;
-    });
+    document
+      .querySelectorAll(`#${listas[tipo]} .campo-descricao`)
+      .forEach(campo => {
+        const input = campo.querySelector("input[type=text]");
+        const desc = campo.querySelector("textarea");
+        const chk = campo.querySelector("input[type=checkbox]");
 
-    resumo.push(
-      `<li><strong>${tipo}:</strong> ${
-        ativos ? ativos + " ativo(s)" : "Não utilizado"
-      }</li>`
-    );
+        if (!chk.checked && input.value.trim()) {
+          dados[tipo].push({
+            nome: input.value.trim(),
+            descricao: desc.value.trim()
+          });
+        }
+      });
   });
 
-  document.getElementById("resumoLista").innerHTML = resumo.join("");
-  document.getElementById("resumoCard").style.display = "block";
+  /* RAMAIS */
+  dados.ramais = [];
 
+  document.querySelectorAll("#listaRamais .campo").forEach(campo => {
+    const inputs = campo.querySelectorAll("input[type=number]");
+    if (inputs.length < 2) return;
+
+    const base = parseInt(inputs[0].value);
+    const range = parseInt(inputs[1].value);
+
+    if (!isNaN(base) && !isNaN(range) && range > 0) {
+      for (let i = 1; i <= range; i++) {
+        dados.ramais.push(base + i);
+      }
+    }
+  });
+
+  /* RESULTADO FINAL */
   document.getElementById("resultado").textContent =
-    JSON.stringify({ resumo }, null, 2);
+    JSON.stringify(dados, null, 2);
 };
+
+/* =========================
+   MODO ESCURO
+========================= */
+const toggleTheme = document.getElementById("toggleTheme");
+
+if (toggleTheme) {
+  const savedTheme = localStorage.getItem("theme");
+
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark");
+    toggleTheme.textContent = "☀️";
+  }
+
+  toggleTheme.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    const isDark = document.body.classList.contains("dark");
+
+    toggleTheme.textContent = isDark ? "☀️" : "🌙";
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  });
+}
