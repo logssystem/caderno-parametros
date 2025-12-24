@@ -1,19 +1,5 @@
 const LIMITE = 10;
 
-/* ====== DADOS MOCK (DEPOIS PODE VIR DE API) ====== */
-const FILAS_DISPONIVEIS = [
-  "Suporte",
-  "Financeiro",
-  "Comercial",
-  "Cobrança"
-];
-
-const URAS_DISPONIVEIS = [
-  "URA Atendimento",
-  "URA Financeiro",
-  "URA Comercial"
-];
-
 /* ====== ADICIONAR CAMPOS ====== */
 function adicionarFilaCampo() {
   const container = document.getElementById("listaFilas");
@@ -33,7 +19,7 @@ function adicionarURACampo() {
   container.appendChild(criarCampo("ura"));
 }
 
-/* ====== CRIA UM CAMPO (INPUT + DATALIST) ====== */
+/* ====== CRIA UM CAMPO (INPUT LIVRE) ====== */
 function criarCampo(tipo) {
   const wrapper = document.createElement("div");
   wrapper.className = "campo";
@@ -42,47 +28,45 @@ function criarCampo(tipo) {
   wrapper.style.gap = "8px";
   wrapper.style.marginBottom = "6px";
 
-  /* INPUT */
+  /* INPUT LIVRE */
   const input = document.createElement("input");
-  input.setAttribute("list", `${tipo}-lista`);
-  input.placeholder = "Selecione ou digite";
+  input.type = "text";
+  input.placeholder =
+    tipo === "fila"
+      ? "Digite o nome da fila"
+      : "Digite o nome da URA";
 
-  /* DATALIST */
-  const datalist = document.createElement("datalist");
-  datalist.id = `${tipo}-lista`;
+  /* CHECKBOX NÃO UTILIZAR */
+  const labelNaoUsar = document.createElement("label");
+  labelNaoUsar.style.fontSize = "12px";
 
-  // opção não utilizar
-  const optNaoUsar = document.createElement("option");
-  optNaoUsar.value = "__NOT_USED__";
-  optNaoUsar.label = "Não será utilizado";
-  datalist.appendChild(optNaoUsar);
+  const checkboxNaoUsar = document.createElement("input");
+  checkboxNaoUsar.type = "checkbox";
 
-  // opções disponíveis
-  const lista = tipo === "fila" ? FILAS_DISPONIVEIS : URAS_DISPONIVEIS;
-  lista.forEach(item => {
-    const opt = document.createElement("option");
-    opt.value = item;
-    datalist.appendChild(opt);
-  });
+  labelNaoUsar.appendChild(checkboxNaoUsar);
+  labelNaoUsar.append(" Não será utilizado");
 
   /* SUBMENU */
-  const label = document.createElement("label");
-  label.style.fontSize = "12px";
+  const labelSubmenu = document.createElement("label");
+  labelSubmenu.style.fontSize = "12px";
 
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.checked = true;
+  const checkboxSubmenu = document.createElement("input");
+  checkboxSubmenu.type = "checkbox";
+  checkboxSubmenu.checked = true;
 
-  label.appendChild(checkbox);
-  label.append(" Usar como submenu");
+  labelSubmenu.appendChild(checkboxSubmenu);
+  labelSubmenu.append(" Usar como submenu");
 
-  /* REGRA: NÃO UTILIZADO */
-  input.addEventListener("input", () => {
-    if (input.value === "__NOT_USED__") {
-      checkbox.checked = false;
-      checkbox.disabled = true;
+  /* REGRAS */
+  checkboxNaoUsar.addEventListener("change", () => {
+    if (checkboxNaoUsar.checked) {
+      input.value = "";
+      input.disabled = true;
+      checkboxSubmenu.checked = false;
+      checkboxSubmenu.disabled = true;
     } else {
-      checkbox.disabled = false;
+      input.disabled = false;
+      checkboxSubmenu.disabled = false;
     }
   });
 
@@ -93,8 +77,8 @@ function criarCampo(tipo) {
   btn.onclick = () => wrapper.remove();
 
   wrapper.appendChild(input);
-  wrapper.appendChild(datalist);
-  wrapper.appendChild(label);
+  wrapper.appendChild(labelNaoUsar);
+  wrapper.appendChild(labelSubmenu);
   wrapper.appendChild(btn);
 
   return wrapper;
@@ -108,18 +92,14 @@ async function explorar() {
 
   /* FILAS */
   document.querySelectorAll("#listaFilas .campo").forEach(campo => {
-    const input = campo.querySelector("input[list]");
-    const checkbox = campo.querySelector("input[type=checkbox]");
-    const submenu = checkbox.checked;
+    const input = campo.querySelector("input[type=text]");
+    const naoUsar = campo.querySelectorAll("input[type=checkbox]")[0];
+    const submenu = campo.querySelectorAll("input[type=checkbox]")[1].checked;
 
-    if (
-      input.value &&
-      input.value !== "__NOT_USED__" &&
-      filaIndex <= LIMITE
-    ) {
+    if (!naoUsar.checked && input.value.trim() && filaIndex <= LIMITE) {
       dados[`fila_${filaIndex}`] = {
         tipo: "fila",
-        nome: input.value,
+        nome: input.value.trim(),
         submenu
       };
       filaIndex++;
@@ -128,18 +108,14 @@ async function explorar() {
 
   /* URAS */
   document.querySelectorAll("#listaURAs .campo").forEach(campo => {
-    const input = campo.querySelector("input[list]");
-    const checkbox = campo.querySelector("input[type=checkbox]");
-    const submenu = checkbox.checked;
+    const input = campo.querySelector("input[type=text]");
+    const naoUsar = campo.querySelectorAll("input[type=checkbox]")[0];
+    const submenu = campo.querySelectorAll("input[type=checkbox]")[1].checked;
 
-    if (
-      input.value &&
-      input.value !== "__NOT_USED__" &&
-      uraIndex <= LIMITE
-    ) {
+    if (!naoUsar.checked && input.value.trim() && uraIndex <= LIMITE) {
       dados[`ura_${uraIndex}`] = {
         tipo: "ura",
-        principal: input.value,
+        principal: input.value.trim(),
         submenu
       };
       uraIndex++;
