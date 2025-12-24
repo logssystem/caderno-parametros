@@ -39,7 +39,7 @@ body {
   padding: 0 16px;
 }
 
-/* CARD (ITEM DA LISTA) */
+/* CARD */
 .card {
   background: #ffffff;
   border-radius: 10px;
@@ -51,6 +51,74 @@ body {
 .card h2 {
   margin: 0 0 12px;
   font-size: 18px;
+}
+
+/* CAMPOS */
+.campo-descricao {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* INPUTS */
+.campo-descricao input[type="text"],
+.campo-descricao input[type="number"] {
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid #d9dce1;
+  font-size: 14px;
+}
+
+/* DESCRIÇÃO */
+.campo-descricao textarea {
+  height: 56px;
+  padding: 8px 10px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid #d9dce1;
+  resize: none;
+}
+
+/* ===== AJUSTE DEFINITIVO DO "NÃO SERÁ UTILIZADO" ===== */
+.campo-descricao label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 6px;
+  padding: 6px 10px;
+
+  font-size: 13px;
+  color: #555;
+
+  background: #f4f6f8;
+  border-radius: 6px;
+  width: fit-content;
+  cursor: pointer;
+}
+
+/* CHECKBOX */
+.campo-descricao input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #4a90e2;
+}
+
+/* BOTÃO REMOVER (X) */
+.campo-descricao button {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  background: #f2f3f5;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.campo-descricao button:hover {
+  background: #e0e2e6;
 }
 
 /* BOTÃO + */
@@ -95,15 +163,4 @@ pre {
   border-radius: 8px;
   font-size: 13px;
   overflow-x: auto;
-}
-
-/* AJUSTE DO CAMPO DESCRIÇÃO */
-.campo-descricao textarea {
-  margin-top: 6px;
-  margin-bottom: 6px;
-}
-
-/* AFASTAR CHECKBOX DA DESCRIÇÃO */
-.campo-descricao label {
-  margin-top: 6px;
 }
