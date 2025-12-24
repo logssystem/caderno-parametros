@@ -200,3 +200,26 @@ pre {
   cursor: pointer;
 }
 
+/* RESUMO DO CENÁRIO */
+#resumoCard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#resumoCard li {
+  padding: 6px 0;
+  font-size: 14px;
+  color: #374151;
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+#resumoCard li:last-child {
+  border-bottom: none;
+}
+
+#resumoCard strong {
+  font-weight: 600;
+}
+
+
