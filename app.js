@@ -20,7 +20,7 @@ function adicionarCampo(tipo) {
   container.appendChild(criarCampo(tipo));
 }
 
-/* ====== CAMPO PADRÃO (INPUT + NÃO UTILIZAR) ====== */
+/* ====== CAMPO PADRÃO ====== */
 function criarCampo(tipo) {
   const wrapper = document.createElement("div");
   wrapper.className = "campo";
@@ -35,10 +35,10 @@ function criarCampo(tipo) {
   label.appendChild(chk);
   label.append(" Não será utilizado");
 
-  chk.addEventListener("change", () => {
+  chk.onchange = () => {
     input.disabled = chk.checked;
     if (chk.checked) input.value = "";
-  });
+  };
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
@@ -49,7 +49,7 @@ function criarCampo(tipo) {
   return wrapper;
 }
 
-/* ====== RAMAIS COM RANGE (SEM PREVIEW) ====== */
+/* ====== RAMAIS (SEM PREVIEW, SEM TEXTO) ====== */
 function adicionarRamal() {
   const container = document.getElementById("listaRamais");
   if (container.querySelectorAll(".campo").length >= LIMITE) {
@@ -77,24 +77,21 @@ function adicionarRamal() {
   container.appendChild(wrapper);
 }
 
-/* ====== EXPORT / EXPLORAR ====== */
+/* ====== EXPORT ====== */
 function explorar() {
   const dados = {};
 
-  /* CAMPOS PADRÃO */
   Object.keys(listas).forEach(tipo => {
     dados[tipo] = [];
     document.querySelectorAll(`#${listas[tipo]} .campo`).forEach(campo => {
       const input = campo.querySelector("input[type=text]");
       const chk = campo.querySelector("input[type=checkbox]");
-
       if (input && !chk.checked && input.value.trim()) {
         dados[tipo].push(input.value.trim());
       }
     });
   });
 
-  /* RAMAIS (GERADOS APENAS NO EXPORT) */
   dados.ramais = [];
   document.querySelectorAll("#listaRamais .campo").forEach(campo => {
     const inputs = campo.querySelectorAll("input[type=number]");
