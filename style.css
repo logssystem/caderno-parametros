@@ -164,3 +164,14 @@ pre {
   font-size: 13px;
   overflow-x: auto;
 }
+
+/* =========================
+   LOGO ESTILO SITE ZRA
+========================= */
+.app-logo {
+  height: 36px;        /* altura controlada */
+  width: auto;         /* mantém proporção */
+  max-width: 160px;    /* deixa a logo mais larga */
+  object-fit: contain;
+}
+
