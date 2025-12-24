@@ -230,3 +230,59 @@ pre {
 #resumoCard li:last-child {
   border-bottom: none;
 }
+
+/* FUNDO GERAL */
+body {
+  background: #eef1f4; /* cinza claro elegante */
+}
+
+/* HEADER */
+.app-header {
+  background: #eef1f4;
+  border-bottom: 1px solid #d9dde3;
+  padding: 20px 0;
+  margin-bottom: 32px;
+}
+
+/* CONTAINER CENTRAL */
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+/* TÍTULO CENTRAL */
+.header-center {
+  text-align: center;
+}
+
+.app-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* LOGO À DIREITA */
+.header-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.app-logo {
+  height: 56px; /* LOGO MAIOR */
+  width: auto;
+}
+
+/* CENTRALIZA TODO O CONTEÚDO */
+.caderno-grid,
+h2,
+pre,
+button[onclick="explorar()"] {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
