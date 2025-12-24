@@ -10,45 +10,64 @@
 
 <h1>Caderno de Parâmetros</h1>
 
+<!-- FILAS -->
 <div class="card">
   <h2>Filas</h2>
   <div id="listaFilas"></div>
-
   <div class="card-actions">
-    <button
-      type="button"
-      class="btn-add"
-      onclick="adicionarFilaCampo()"
-      title="Adicionar fila"
-    >
-      +
-    </button>
+    <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
   </div>
 </div>
 
+<!-- URAS -->
 <div class="card">
   <h2>URAs</h2>
   <div id="listaURAs"></div>
-
   <div class="card-actions">
-    <button
-      type="button"
-      class="btn-add"
-      onclick="adicionarURACampo()"
-      title="Adicionar URA"
-    >
-      +
-    </button>
+    <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
   </div>
 </div>
 
-<div style="margin-top: 16px;">
-  <button type="button" onclick="explorar()">Explorar</button>
+<!-- NUMEROS DE ENTRADA -->
+<div class="card">
+  <h2>Números de Entrada</h2>
+  <div id="listaEntradas"></div>
+  <div class="card-actions">
+    <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
+  </div>
 </div>
 
-<h2>Resultado</h2>
+<!-- AGENTES -->
+<div class="card">
+  <h2>Agentes</h2>
+  <div id="listaAgentes"></div>
+  <div class="card-actions">
+    <button class="btn-add" onclick="adicionarCampo('agente')">+</button>
+  </div>
+</div>
+
+<!-- GRUPO DE RING -->
+<div class="card">
+  <h2>Grupo de Ring</h2>
+  <div id="listaRings"></div>
+  <div class="card-actions">
+    <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
+  </div>
+</div>
+
+<!-- RAMAIS -->
+<div class="card">
+  <h2>Ramais (Range)</h2>
+  <div id="listaRamais"></div>
+  <div class="card-actions">
+    <button class="btn-add" onclick="adicionarRamal()">+</button>
+  </div>
+</div>
+
+<button onclick="explorar()">Explorar</button>
+
 <pre id="resultado"></pre>
 
 <script src="app.js"></script>
 </body>
-</html>
+<
