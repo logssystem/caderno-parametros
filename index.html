@@ -8,7 +8,13 @@
 
 <body>
 
-<h1>Caderno de Parâmetros</h1>
+<!-- HEADER -->
+<header class="app-header">
+  <div class="header-left">
+    <img src="./assets/logo.png" alt="Logo" class="app-logo" />
+    <span class="app-title">Caderno de Parâmetros</span>
+  </div>
+</header>
 
 <!-- GRID 2 COLUNAS -->
 <div class="caderno-grid">
@@ -48,7 +54,7 @@
   <!-- COLUNA DIREITA -->
   <div>
 
-    <!-- URAS -->
+    <!-- URAs -->
     <div class="card">
       <h2>URAs</h2>
       <div id="listaURAs"></div>
@@ -88,7 +94,10 @@
 
 </div>
 
-<button onclick="explorar()">Explorar</button>
+<!-- AÇÃO FINAL -->
+<div style="margin: 24px;">
+  <button onclick="explorar()">Explorar</button>
+</div>
 
 <h2>Resultado</h2>
 <pre id="resultado"></pre>
