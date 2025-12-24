@@ -1,12 +1,27 @@
 const LIMITE = 10;
 
+/* ====== DADOS MOCK (DEPOIS PODE VIR DE API) ====== */
+const FILAS_DISPONIVEIS = [
+  "Suporte",
+  "Financeiro",
+  "Comercial",
+  "Cobrança"
+];
+
+const URAS_DISPONIVEIS = [
+  "URA Atendimento",
+  "URA Financeiro",
+  "URA Comercial"
+];
+
+/* ====== ADICIONAR CAMPOS ====== */
 function adicionarFilaCampo() {
   const container = document.getElementById("listaFilas");
   if (container.querySelectorAll(".campo").length >= LIMITE) {
     alert("Máximo de 10 filas permitido");
     return;
   }
-  container.appendChild(criarCampo("fila", "Nome da fila (ex: Suporte)"));
+  container.appendChild(criarCampo("fila"));
 }
 
 function adicionarURACampo() {
@@ -15,10 +30,11 @@ function adicionarURACampo() {
     alert("Máximo de 10 URAs permitido");
     return;
   }
-  container.appendChild(criarCampo("ura", "Nome da URA (ex: URA Atendimento)"));
+  container.appendChild(criarCampo("ura"));
 }
 
-function criarCampo(tipo, placeholder) {
+/* ====== CRIA UM CAMPO ====== */
+function criarCampo(tipo) {
   const wrapper = document.createElement("div");
   wrapper.className = "campo";
   wrapper.style.display = "flex";
@@ -26,9 +42,23 @@ function criarCampo(tipo, placeholder) {
   wrapper.style.gap = "8px";
   wrapper.style.marginBottom = "6px";
 
-  const input = document.createElement("input");
-  input.placeholder = placeholder;
+  /* SELECT */
+  const select = document.createElement("select");
 
+  select.innerHTML = `
+    <option value="">Selecione</option>
+    <option value="__NOT_USED__">Não será utilizado</option>
+  `;
+
+  const lista = tipo === "fila" ? FILAS_DISPONIVEIS : URAS_DISPONIVEIS;
+  lista.forEach(item => {
+    const opt = document.createElement("option");
+    opt.value = item;
+    opt.textContent = item;
+    select.appendChild(opt);
+  });
+
+  /* SUBMENU */
   const label = document.createElement("label");
   label.style.fontSize = "12px";
 
@@ -39,31 +69,47 @@ function criarCampo(tipo, placeholder) {
   label.appendChild(checkbox);
   label.append(" Usar como submenu");
 
+  /* DESABILITA SUBMENU SE NÃO UTILIZAR */
+  select.addEventListener("change", () => {
+    if (select.value === "__NOT_USED__" || select.value === "") {
+      checkbox.checked = false;
+      checkbox.disabled = true;
+    } else {
+      checkbox.disabled = false;
+    }
+  });
+
+  /* REMOVER */
   const btn = document.createElement("button");
   btn.textContent = "✖";
   btn.type = "button";
   btn.onclick = () => wrapper.remove();
 
-  wrapper.appendChild(input);
+  wrapper.appendChild(select);
   wrapper.appendChild(label);
   wrapper.appendChild(btn);
 
   return wrapper;
 }
 
+/* ====== EXPORT / EXPLORAR ====== */
 async function explorar() {
   const dados = {};
   let filaIndex = 1;
   let uraIndex = 1;
 
   document.querySelectorAll("#listaFilas .campo").forEach(campo => {
-    const nome = campo.querySelector("input").value.trim();
+    const select = campo.querySelector("select");
     const submenu = campo.querySelector("input[type=checkbox]").checked;
 
-    if (nome && filaIndex <= LIMITE) {
+    if (
+      select.value &&
+      select.value !== "__NOT_USED__" &&
+      filaIndex <= LIMITE
+    ) {
       dados[`fila_${filaIndex}`] = {
         tipo: "fila",
-        nome,
+        nome: select.value,
         submenu
       };
       filaIndex++;
@@ -71,13 +117,17 @@ async function explorar() {
   });
 
   document.querySelectorAll("#listaURAs .campo").forEach(campo => {
-    const nome = campo.querySelector("input").value.trim();
+    const select = campo.querySelector("select");
     const submenu = campo.querySelector("input[type=checkbox]").checked;
 
-    if (nome && uraIndex <= LIMITE) {
+    if (
+      select.value &&
+      select.value !== "__NOT_USED__" &&
+      uraIndex <= LIMITE
+    ) {
       dados[`ura_${uraIndex}`] = {
         tipo: "ura",
-        principal: nome,
+        principal: select.value,
         submenu
       };
       uraIndex++;
