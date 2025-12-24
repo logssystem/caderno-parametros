@@ -1,3 +1,5 @@
+console.log("APP.JS CARREGADO"); // <<< DEBUG VISUAL
+
 const LIMITE = 10;
 
 /* listas */
@@ -10,22 +12,97 @@ const listas = {
   agente: "listaAgentes"
 };
 
-/* adicionar campo padrão */
-function adicionarCampo(tipo) {
+/* ===== FUNÇÕES NO ESCOPO GLOBAL ===== */
+window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
+  if (!container) {
+    alert("Container não encontrado: " + tipo);
+    return;
+  }
 
-  // conta apenas campos deste tipo
   const total = container.querySelectorAll(".campo-descricao").length;
-
   if (total >= LIMITE) {
     alert("Limite máximo de 10 itens atingido");
     return;
   }
 
   container.appendChild(criarCampo(tipo));
-}
+};
 
-/* criar campo com descrição */
+window.adicionarRamal = function () {
+  const container = document.getElementById("listaRamais");
+  if (!container) {
+    alert("Container de ramais não encontrado");
+    return;
+  }
+
+  const total = container.querySelectorAll(".campo").length;
+  if (total >= LIMITE) {
+    alert("Limite máximo de 10 ranges atingido");
+    return;
+  }
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "campo";
+
+  const ramalInicial = document.createElement("input");
+  ramalInicial.type = "number";
+  ramalInicial.placeholder = "Ramal inicial (ex: 2000)";
+
+  const range = document.createElement("input");
+  range.type = "number";
+  range.placeholder = "Range (ex: 5)";
+
+  const btn = document.createElement("button");
+  btn.textContent = "✖";
+  btn.type = "button";
+  btn.onclick = () => wrapper.remove();
+
+  wrapper.append(ramalInicial, range, btn);
+  container.appendChild(wrapper);
+};
+
+window.explorar = function () {
+  const dados = {};
+
+  Object.keys(listas).forEach(tipo => {
+    dados[tipo] = [];
+    document
+      .querySelectorAll(`#${listas[tipo]} .campo-descricao`)
+      .forEach(campo => {
+        const input = campo.querySelector("input[type=text]");
+        const descricao = campo.querySelector("textarea");
+        const chk = campo.querySelector("input[type=checkbox]");
+
+        if (input && !chk.checked && input.value.trim()) {
+          dados[tipo].push({
+            nome: input.value.trim(),
+            descricao: descricao.value.trim()
+          });
+        }
+      });
+  });
+
+  dados.ramais = [];
+  document.querySelectorAll("#listaRamais .campo").forEach(campo => {
+    const nums = campo.querySelectorAll("input[type=number]");
+    if (nums.length < 2) return;
+
+    const base = parseInt(nums[0].value);
+    const qtd = parseInt(nums[1].value);
+
+    if (!isNaN(base) && !isNaN(qtd) && qtd > 0) {
+      for (let i = 1; i <= qtd; i++) {
+        dados.ramais.push(base + i);
+      }
+    }
+  });
+
+  document.getElementById("resultado").textContent =
+    JSON.stringify(dados, null, 2);
+};
+
+/* ===== FUNÇÃO INTERNA ===== */
 function criarCampo(tipo) {
   const wrapper = document.createElement("div");
   wrapper.className = "campo campo-descricao";
@@ -64,75 +141,4 @@ function criarCampo(tipo) {
 
   wrapper.append(linha, descricao, label);
   return wrapper;
-}
-
-/* ramais com range */
-function adicionarRamal() {
-  const container = document.getElementById("listaRamais");
-
-  // conta apenas campos de ramal
-  const total = container.querySelectorAll(".campo").length;
-
-  if (total >= LIMITE) {
-    alert("Limite máximo de 10 ranges atingido");
-    return;
-  }
-
-  const wrapper = document.createElement("div");
-  wrapper.className = "campo";
-
-  const ramalInicial = document.createElement("input");
-  ramalInicial.type = "number";
-  ramalInicial.placeholder = "Ramal inicial (ex: 2000)";
-
-  const range = document.createElement("input");
-  range.type = "number";
-  range.placeholder = "Range (ex: 5)";
-
-  const btn = document.createElement("button");
-  btn.textContent = "✖";
-  btn.type = "button";
-  btn.onclick = () => wrapper.remove();
-
-  wrapper.append(ramalInicial, range, btn);
-  container.appendChild(wrapper);
-}
-
-/* export */
-function explorar() {
-  const dados = {};
-
-  Object.keys(listas).forEach(tipo => {
-    dados[tipo] = [];
-    document.querySelectorAll(`#${listas[tipo]} .campo-descricao`).forEach(campo => {
-      const input = campo.querySelector("input[type=text]");
-      const descricao = campo.querySelector("textarea");
-      const chk = campo.querySelector("input[type=checkbox]");
-
-      if (input && !chk.checked && input.value.trim()) {
-        dados[tipo].push({
-          nome: input.value.trim(),
-          descricao: descricao.value.trim()
-        });
-      }
-    });
-  });
-
-  dados.ramais = [];
-  document.querySelectorAll("#listaRamais .campo").forEach(campo => {
-    const nums = campo.querySelectorAll("input[type=number]");
-    if (nums.length < 2) return;
-
-    const base = parseInt(nums[0].value);
-    const qtd = parseInt(nums[1].value);
-
-    if (!isNaN(base) && !isNaN(qtd) && qtd > 0) {
-      for (let i = 1; i <= qtd; i++) {
-        dados.ramais.push(base + i);
-      }
-    }
-  });
-
-  document.getElementById("resultado").textContent =
-    JSON.stringify(dados, null, 2);
 }
