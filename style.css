@@ -198,4 +198,29 @@ pre {
   border-bottom: none;
 }
 
+/* HEADER */
+.app-header {
+  background: #ffffff;
+  border-bottom: 1px solid #eaeaea;
+  padding: 14px 24px;
+  margin-bottom: 24px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-logo {
+  height: 36px;
+  width: auto;
+}
+
+.app-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #222;
+}
+
 
