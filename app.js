@@ -1,4 +1,4 @@
-console.log("APP.JS CARREGADO COM SUCESSO");
+console.log("APP.JS CARREGADO - VERSAO ESTAVEL");
 
 const LIMITE = 10;
 
@@ -26,12 +26,14 @@ window.adicionarCampo = function (tipo) {
   }
 
   container.appendChild(criarCampo(tipo));
-  atualizarResumo();
 };
 
 window.adicionarRamal = function () {
   const container = document.getElementById("listaRamais");
-  if (!container) return;
+  if (!container) {
+    console.error("Container de ramais não encontrado");
+    return;
+  }
 
   const total = container.querySelectorAll(".campo").length;
   if (total >= LIMITE) {
@@ -53,14 +55,88 @@ window.adicionarRamal = function () {
   const btn = document.createElement("button");
   btn.textContent = "✖";
   btn.type = "button";
-  btn.onclick = () => {
-    wrapper.remove();
-    atualizarResumo();
-  };
+  btn.onclick = () => wrapper.remove();
 
   wrapper.append(ramalInicial, range, btn);
   container.appendChild(wrapper);
-  atualizarResumo();
 };
 
-/* ===== EXPORT*
+/* ===== EXPORTAR ===== */
+window.explorar = function () {
+  const dados = {};
+
+  Object.keys(listas).forEach(tipo => {
+    dados[tipo] = [];
+    document
+      .querySelectorAll(`#${listas[tipo]} .campo-descricao`)
+      .forEach(campo => {
+        const input = campo.querySelector("input[type=text]");
+        const descricao = campo.querySelector("textarea");
+        const chk = campo.querySelector("input[type=checkbox]");
+
+        if (input && !chk.checked && input.value.trim()) {
+          dados[tipo].push({
+            nome: input.value.trim(),
+            descricao: descricao.value.trim()
+          });
+        }
+      });
+  });
+
+  dados.ramais = [];
+  document.querySelectorAll("#listaRamais .campo").forEach(campo => {
+    const nums = campo.querySelectorAll("input[type=number]");
+    if (nums.length < 2) return;
+
+    const base = parseInt(nums[0].value);
+    const qtd = parseInt(nums[1].value);
+
+    if (!isNaN(base) && !isNaN(qtd) && qtd > 0) {
+      for (let i = 1; i <= qtd; i++) {
+        dados.ramais.push(base + i);
+      }
+    }
+  });
+
+  document.getElementById("resultado").textContent =
+    JSON.stringify(dados, null, 2);
+};
+
+/* ===== CRIAR CAMPO PADRÃO ===== */
+function criarCampo(tipo) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "campo campo-descricao";
+
+  const linha = document.createElement("div");
+  linha.className = "linha-principal";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = `Digite ${tipo.replace("_", " ")}`;
+
+  const btn = document.createElement("button");
+  btn.textContent = "✖";
+  btn.onclick = () => wrapper.remove();
+
+  linha.append(input, btn);
+
+  const descricao = document.createElement("textarea");
+  descricao.placeholder = "Descrição (opcional)";
+
+  const label = document.createElement("label");
+  const chk = document.createElement("input");
+  chk.type = "checkbox";
+  label.append(chk, " Não será utilizado");
+
+  chk.onchange = () => {
+    input.disabled = chk.checked;
+    descricao.disabled = chk.checked;
+    if (chk.checked) {
+      input.value = "";
+      descricao.value = "";
+    }
+  };
+
+  wrapper.append(linha, descricao, label);
+  return wrapper;
+}
