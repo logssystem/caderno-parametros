@@ -13,10 +13,15 @@ const listas = {
 /* adicionar campo padrão */
 function adicionarCampo(tipo) {
   const container = document.getElementById(listas[tipo]);
-  if (container.querySelectorAll(".campo").length >= LIMITE) {
+
+  // conta apenas campos deste tipo
+  const total = container.querySelectorAll(".campo-descricao").length;
+
+  if (total >= LIMITE) {
     alert("Limite máximo de 10 itens atingido");
     return;
   }
+
   container.appendChild(criarCampo(tipo));
 }
 
@@ -64,7 +69,11 @@ function criarCampo(tipo) {
 /* ramais com range */
 function adicionarRamal() {
   const container = document.getElementById("listaRamais");
-  if (container.querySelectorAll(".campo").length >= LIMITE) {
+
+  // conta apenas campos de ramal
+  const total = container.querySelectorAll(".campo").length;
+
+  if (total >= LIMITE) {
     alert("Limite máximo de 10 ranges atingido");
     return;
   }
@@ -95,7 +104,7 @@ function explorar() {
 
   Object.keys(listas).forEach(tipo => {
     dados[tipo] = [];
-    document.querySelectorAll(`#${listas[tipo]} .campo`).forEach(campo => {
+    document.querySelectorAll(`#${listas[tipo]} .campo-descricao`).forEach(campo => {
       const input = campo.querySelector("input[type=text]");
       const descricao = campo.querySelector("textarea");
       const chk = campo.querySelector("input[type=checkbox]");
