@@ -11,19 +11,22 @@ body {
 }
 
 /* =========================
-   HEADER
+   HEADER (ESTILO ZRA)
 ========================= */
 .app-header {
   position: sticky;
   top: 0;
   z-index: 10;
-  height: 72px;
+
+  height: 96px;                 /* ⬅️ MAIS ALTO */
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
+
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  padding: 0 32px;
+
+  padding: 0 40px;
 }
 
 .header-left {
@@ -31,8 +34,12 @@ body {
   align-items: center;
 }
 
+/* 🔥 LOGO GRANDE DE VERDADE */
 .app-logo {
-  height: 40px;
+  height: 56px;                 /* ⬅️ AQUI A LOGO CRESCE */
+  width: auto;
+  max-width: 240px;             /* ⬅️ permite logo larga */
+  object-fit: contain;
 }
 
 .header-center {
@@ -41,8 +48,9 @@ body {
 }
 
 .app-title {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 600;
+  color: #111;
 }
 
 /* =========================
@@ -50,7 +58,7 @@ body {
 ========================= */
 .form-container {
   max-width: 900px;
-  margin: 40px auto;
+  margin: 48px auto;
   padding: 0 16px 60px;
 }
 
@@ -164,14 +172,3 @@ pre {
   font-size: 13px;
   overflow-x: auto;
 }
-
-/* =========================
-   LOGO ESTILO SITE ZRA
-========================= */
-.app-logo {
-  height: 36px;        /* altura controlada */
-  width: auto;         /* mantém proporção */
-  max-width: 160px;    /* deixa a logo mais larga */
-  object-fit: contain;
-}
-
