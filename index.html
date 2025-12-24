@@ -10,6 +10,15 @@
 
 <h1>Caderno de Parâmetros</h1>
 
+<!-- DESCRIÇÃO -->
+<div class="card">
+  <h2>Descrição</h2>
+  <textarea
+    id="descricao"
+    placeholder="Descreva o cenário, objetivo ou observações gerais..."
+  ></textarea>
+</div>
+
 <!-- USUÁRIOS WEB -->
 <div class="card">
   <h2>Usuários Web</h2>
@@ -19,7 +28,7 @@
   </div>
 </div>
 
-<!-- RAMAIS (MOVIDO PARA AQUI) -->
+<!-- RAMAIS -->
 <div class="card">
   <h2>Ramais (Range)</h2>
   <div id="listaRamais"></div>
@@ -75,6 +84,7 @@
 
 <button onclick="explorar()">Explorar</button>
 
+<h2>Resultado</h2>
 <pre id="resultado"></pre>
 
 <script src="app.js"></script>
