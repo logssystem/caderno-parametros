@@ -1,113 +1,107 @@
 const LIMITE = 10;
 
-/* ====== ADICIONAR CAMPOS ====== */
-function adicionarFilaCampo() {
-  const container = document.getElementById("listaFilas");
+/* ====== MAPA DE LISTAS ====== */
+const listas = {
+  fila: "listaFilas",
+  ura: "listaURAs",
+  entrada: "listaEntradas",
+  agente: "listaAgentes",
+  ring: "listaRings"
+};
+
+/* ====== ADICIONAR CAMPOS PADRÃO ====== */
+function adicionarCampo(tipo) {
+  const container = document.getElementById(listas[tipo]);
   if (container.querySelectorAll(".campo").length >= LIMITE) {
-    alert("Máximo de 10 filas permitido");
+    alert("Limite máximo atingido");
     return;
   }
-  container.appendChild(criarCampo("fila"));
+  container.appendChild(criarCampo(tipo));
 }
 
-function adicionarURACampo() {
-  const container = document.getElementById("listaURAs");
-  if (container.querySelectorAll(".campo").length >= LIMITE) {
-    alert("Máximo de 10 URAs permitido");
-    return;
-  }
-  container.appendChild(criarCampo("ura"));
-}
-
-/* ====== CRIA UM CAMPO ====== */
+/* ====== CAMPO PADRÃO ====== */
 function criarCampo(tipo) {
   const wrapper = document.createElement("div");
   wrapper.className = "campo";
 
-  /* input livre */
   const input = document.createElement("input");
   input.type = "text";
-  input.placeholder =
-    tipo === "fila"
-      ? "Digite o nome da fila"
-      : "Digite o nome da URA";
+  input.placeholder = `Digite ${tipo}`;
 
-  /* checkbox não utilizar */
-  const labelNaoUsar = document.createElement("label");
-  const checkboxNaoUsar = document.createElement("input");
-  checkboxNaoUsar.type = "checkbox";
+  const label = document.createElement("label");
+  const chk = document.createElement("input");
+  chk.type = "checkbox";
+  label.appendChild(chk);
+  label.append(" Não será utilizado");
 
-  labelNaoUsar.appendChild(checkboxNaoUsar);
-  labelNaoUsar.append(" Não será utilizado");
+  chk.onchange = () => {
+    input.disabled = chk.checked;
+    if (chk.checked) input.value = "";
+  };
 
-  checkboxNaoUsar.addEventListener("change", () => {
-    if (checkboxNaoUsar.checked) {
-      input.value = "";
-      input.disabled = true;
-    } else {
-      input.disabled = false;
-    }
-  });
-
-  /* botão remover */
   const btn = document.createElement("button");
   btn.textContent = "✖";
-  btn.type = "button";
   btn.onclick = () => wrapper.remove();
 
-  wrapper.appendChild(input);
-  wrapper.appendChild(labelNaoUsar);
-  wrapper.appendChild(btn);
-
+  wrapper.append(input, label, btn);
   return wrapper;
 }
 
-/* ====== EXPORT / EXPLORAR ====== */
-async function explorar() {
-  const dados = {};
-  let filaIndex = 1;
-  let uraIndex = 1;
-
-  document.querySelectorAll("#listaFilas .campo").forEach(campo => {
-    const input = campo.querySelector("input[type=text]");
-    const naoUsar = campo.querySelector("input[type=checkbox]");
-
-    if (!naoUsar.checked && input.value.trim() && filaIndex <= LIMITE) {
-      dados[`fila_${filaIndex}`] = {
-        tipo: "fila",
-        nome: input.value.trim()
-      };
-      filaIndex++;
-    }
-  });
-
-  document.querySelectorAll("#listaURAs .campo").forEach(campo => {
-    const input = campo.querySelector("input[type=text]");
-    const naoUsar = campo.querySelector("input[type=checkbox]");
-
-    if (!naoUsar.checked && input.value.trim() && uraIndex <= LIMITE) {
-      dados[`ura_${uraIndex}`] = {
-        tipo: "ura",
-        principal: input.value.trim()
-      };
-      uraIndex++;
-    }
-  });
-
-  if (Object.keys(dados).length === 0) {
-    alert("Adicione ao menos uma fila ou URA");
+/* ====== RAMAIS COM RANGE ====== */
+function adicionarRamal() {
+  const container = document.getElementById("listaRamais");
+  if (container.querySelectorAll(".campo").length >= LIMITE) {
+    alert("Limite máximo atingido");
     return;
   }
 
-  const payload = { dados };
+  const wrapper = document.createElement("div");
+  wrapper.className = "campo";
 
-  const res = await fetch("https://caderno-api.onrender.com/explorar", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+  const ramalInicial = document.createElement("input");
+  ramalInicial.placeholder = "Ramal inicial (ex: 2000)";
+  ramalInicial.type = "number";
+
+  const range = document.createElement("input");
+  range.placeholder = "Range (ex: 5)";
+  range.type = "number";
+
+  const btn = document.createElement("button");
+  btn.textContent = "✖";
+  btn.onclick = () => wrapper.remove();
+
+  wrapper.append(ramalInicial, range, btn);
+  container.appendChild(wrapper);
+}
+
+/* ====== EXPORT ====== */
+function explorar() {
+  const dados = {};
+
+  Object.keys(listas).forEach(tipo => {
+    dados[tipo] = [];
+    document.querySelectorAll(`#${listas[tipo]} .campo`).forEach(campo => {
+      const input = campo.querySelector("input[type=text]");
+      const chk = campo.querySelector("input[type=checkbox]");
+      if (input && !chk.checked && input.value.trim()) {
+        dados[tipo].push(input.value.trim());
+      }
+    });
   });
 
-  const json = await res.json();
+  /* RAMAIS */
+  dados.ramais = [];
+  document.querySelectorAll("#listaRamais .campo").forEach(campo => {
+    const base = parseInt(campo.children[0].value);
+    const range = parseInt(campo.children[1].value);
+
+    if (!isNaN(base) && !isNaN(range)) {
+      for (let i = 1; i <= range; i++) {
+        dados.ramais.push(base + i);
+      }
+    }
+  });
+
   document.getElementById("resultado").textContent =
-    JSON.stringify(json, null, 2);
+    JSON.stringify(dados, null, 2);
 }
