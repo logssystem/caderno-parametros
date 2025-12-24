@@ -11,24 +11,25 @@ body {
 }
 
 /* =========================
-   HEADER (ESTILO ZRA)
+   HEADER (ZRA REAL)
 ========================= */
 .app-header {
   position: sticky;
   top: 0;
   z-index: 10;
 
-  height: 96px;                 /* ⬅️ MAIS ALTO */
+  height: 120px;              /* 🔥 MAIS ALTO (igual site) */
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
 
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
   align-items: center;
 
-  padding: 0 40px;
+  padding: 0 48px;
 }
 
+/* LOGO À ESQUERDA */
 .header-left {
   display: flex;
   align-items: center;
@@ -36,19 +37,20 @@ body {
 
 /* 🔥 LOGO GRANDE DE VERDADE */
 .app-logo {
-  height: 56px;                 /* ⬅️ AQUI A LOGO CRESCE */
+  height: 72px;               /* 🔥 AGORA SIM */
   width: auto;
-  max-width: 240px;             /* ⬅️ permite logo larga */
+  max-width: 280px;           /* 🔥 largura estilo ZRA */
   object-fit: contain;
 }
 
+/* TÍTULO CENTRAL */
 .header-center {
   display: flex;
   justify-content: center;
 }
 
 .app-title {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 600;
   color: #111;
 }
@@ -58,7 +60,7 @@ body {
 ========================= */
 .form-container {
   max-width: 900px;
-  margin: 48px auto;
+  margin: 56px auto;
   padding: 0 16px 60px;
 }
 
@@ -67,10 +69,10 @@ body {
 ========================= */
 .card {
   background: #ffffff;
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+  border-radius: 14px;
+  padding: 22px 26px;
+  margin-bottom: 22px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.06);
 }
 
 .card h2 {
@@ -84,7 +86,7 @@ body {
 .campo-descricao {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .linha-principal {
@@ -114,10 +116,10 @@ body {
   align-items: center;
   gap: 8px;
   margin-top: 6px;
-  padding: 6px 10px;
+  padding: 6px 12px;
   font-size: 13px;
   background: #f1f3f5;
-  border-radius: 6px;
+  border-radius: 999px;       /* 🔥 visual mais limpo */
   cursor: pointer;
 }
 
@@ -129,10 +131,10 @@ body {
    BOTÕES
 ========================= */
 .btn-add {
-  margin-top: 10px;
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
+  margin-top: 12px;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
   border: 2px dashed #cfd4dc;
   background: #ffffff;
   font-size: 22px;
@@ -146,10 +148,10 @@ body {
 
 .btn-explorar {
   display: block;
-  margin: 40px auto 24px;
-  padding: 14px 42px;
-  font-size: 15px;
-  border-radius: 10px;
+  margin: 48px auto 24px;
+  padding: 16px 48px;
+  font-size: 16px;
+  border-radius: 12px;
   border: none;
   background: #c6ff00;
   color: #111;
