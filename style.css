@@ -10,32 +10,26 @@ body {
   width: 520px;
 }
 
-/* descrição */
-textarea {
-  width: 100%;
-  min-height: 100px;
-  padding: 12px;
-  font-size: 14px;
-  font-family: Arial, sans-serif;
-  border: 1px solid #dcdcdc;
-  border-radius: 6px;
-  resize: vertical;
-  outline: none;
-}
-
-textarea:focus {
-  border-color: #4a90e2;
-}
-
-/* linha do campo */
+/* campo padrão */
 .campo {
+  margin-bottom: 12px;
+}
+
+/* campo com descrição */
+.campo.campo-descricao {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* linha principal */
+.campo-descricao .linha-principal {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 10px;
 }
 
-/* input grande */
+/* input principal */
 .campo input[type="text"],
 .campo input[type="number"] {
   width: 360px;
@@ -51,13 +45,24 @@ textarea:focus {
   border-color: #4a90e2;
 }
 
+/* descrição pequena */
+.campo-descricao textarea {
+  width: 360px;
+  height: 48px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  resize: none;
+}
+
 /* checkbox */
 .campo label {
   font-size: 13px;
   display: flex;
   align-items: center;
   gap: 4px;
-  white-space: nowrap;
 }
 
 /* botão remover */
@@ -82,17 +87,13 @@ textarea:focus {
 .btn-add {
   width: 44px;
   height: 44px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: 6px;
   border: 1px dashed #aaa;
   background: #fff;
-
   font-size: 26px;
-  font-weight: 500;
   cursor: pointer;
 }
 
