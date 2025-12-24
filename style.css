@@ -96,3 +96,14 @@ pre {
   font-size: 13px;
   overflow-x: auto;
 }
+
+/* AJUSTE DO CAMPO DESCRIÇÃO */
+.campo-descricao textarea {
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+/* AFASTAR CHECKBOX DA DESCRIÇÃO */
+.campo-descricao label {
+  margin-top: 6px;
+}
