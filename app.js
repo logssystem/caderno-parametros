@@ -19,16 +19,12 @@ function adicionarURACampo() {
   container.appendChild(criarCampo("ura"));
 }
 
-/* ====== CRIA UM CAMPO (SÓ INPUT + NÃO UTILIZAR + REMOVER) ====== */
+/* ====== CRIA UM CAMPO ====== */
 function criarCampo(tipo) {
   const wrapper = document.createElement("div");
   wrapper.className = "campo";
-  wrapper.style.display = "flex";
-  wrapper.style.alignItems = "center";
-  wrapper.style.gap = "8px";
-  wrapper.style.marginBottom = "6px";
 
-  /* INPUT LIVRE */
+  /* input livre */
   const input = document.createElement("input");
   input.type = "text";
   input.placeholder =
@@ -36,10 +32,8 @@ function criarCampo(tipo) {
       ? "Digite o nome da fila"
       : "Digite o nome da URA";
 
-  /* CHECKBOX NÃO UTILIZAR */
+  /* checkbox não utilizar */
   const labelNaoUsar = document.createElement("label");
-  labelNaoUsar.style.fontSize = "12px";
-
   const checkboxNaoUsar = document.createElement("input");
   checkboxNaoUsar.type = "checkbox";
 
@@ -55,7 +49,7 @@ function criarCampo(tipo) {
     }
   });
 
-  /* BOTÃO REMOVER */
+  /* botão remover */
   const btn = document.createElement("button");
   btn.textContent = "✖";
   btn.type = "button";
@@ -74,7 +68,6 @@ async function explorar() {
   let filaIndex = 1;
   let uraIndex = 1;
 
-  /* FILAS */
   document.querySelectorAll("#listaFilas .campo").forEach(campo => {
     const input = campo.querySelector("input[type=text]");
     const naoUsar = campo.querySelector("input[type=checkbox]");
@@ -88,7 +81,6 @@ async function explorar() {
     }
   });
 
-  /* URAS */
   document.querySelectorAll("#listaURAs .campo").forEach(campo => {
     const input = campo.querySelector("input[type=text]");
     const naoUsar = campo.querySelector("input[type=checkbox]");
