@@ -1,5 +1,6 @@
 console.log("APP.JS CARREGADO - VERSAO ESTAVEL");
 
+/* ================== CONFIG ================== */
 const LIMITE = 10;
 
 const listas = {
@@ -11,7 +12,7 @@ const listas = {
   agente: "listaAgentes"
 };
 
-/* ===== ADICIONAR CAMPOS ===== */
+/* ================== ADICIONAR CAMPOS ================== */
 window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
   if (!container) {
@@ -28,6 +29,7 @@ window.adicionarCampo = function (tipo) {
   container.appendChild(criarCampo(tipo));
 };
 
+/* ================== ADICIONAR RAMAL ================== */
 window.adicionarRamal = function () {
   const container = document.getElementById("listaRamais");
   if (!container) {
@@ -61,12 +63,13 @@ window.adicionarRamal = function () {
   container.appendChild(wrapper);
 };
 
-/* ===== EXPORTAR ===== */
+/* ================== EXPORTAR ================== */
 window.explorar = function () {
   const dados = {};
 
   Object.keys(listas).forEach(tipo => {
     dados[tipo] = [];
+
     document
       .querySelectorAll(`#${listas[tipo]} .campo-descricao`)
       .forEach(campo => {
@@ -74,7 +77,7 @@ window.explorar = function () {
         const descricao = campo.querySelector("textarea");
         const chk = campo.querySelector("input[type=checkbox]");
 
-        if (input && !chk.checked && input.value.trim()) {
+        if (!chk.checked && input.value.trim()) {
           dados[tipo].push({
             nome: input.value.trim(),
             descricao: descricao.value.trim()
@@ -83,6 +86,7 @@ window.explorar = function () {
       });
   });
 
+  /* RAMAIS */
   dados.ramais = [];
   document.querySelectorAll("#listaRamais .campo").forEach(campo => {
     const nums = campo.querySelectorAll("input[type=number]");
@@ -102,11 +106,12 @@ window.explorar = function () {
     JSON.stringify(dados, null, 2);
 };
 
-/* ===== CRIAR CAMPO PADRÃO ===== */
+/* ================== CRIAR CAMPO PADRÃO ================== */
 function criarCampo(tipo) {
   const wrapper = document.createElement("div");
   wrapper.className = "campo campo-descricao";
 
+  /* LINHA PRINCIPAL */
   const linha = document.createElement("div");
   linha.className = "linha-principal";
 
@@ -116,33 +121,46 @@ function criarCampo(tipo) {
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
+  btn.type = "button";
   btn.onclick = () => wrapper.remove();
 
   linha.append(input, btn);
 
+  /* DESCRIÇÃO */
   const descricao = document.createElement("textarea");
   descricao.placeholder = "Descrição (opcional)";
 
+  /* CHECKBOX NÃO UTILIZADO */
   const label = document.createElement("label");
+  label.className = "nao-utilizado";
+
   const chk = document.createElement("input");
   chk.type = "checkbox";
-  label.append(chk, " Não será utilizado");
 
   chk.onchange = () => {
+    /* desabilita campos */
     input.disabled = chk.checked;
     descricao.disabled = chk.checked;
+
     if (chk.checked) {
       input.value = "";
       descricao.value = "";
     }
+
+    /* efeito visual no card */
+    toggleNaoUtilizado(chk);
   };
+
+  label.append(chk, " Não será utilizado");
 
   wrapper.append(linha, descricao, label);
   return wrapper;
 }
 
+/* ================== ESTADO VISUAL DO CARD ================== */
 function toggleNaoUtilizado(checkbox) {
   const card = checkbox.closest(".card");
+  if (!card) return;
 
   if (checkbox.checked) {
     card.classList.add("card-disabled");
@@ -150,7 +168,6 @@ function toggleNaoUtilizado(checkbox) {
     card.querySelectorAll("input, textarea").forEach(el => {
       if (el !== checkbox) el.disabled = true;
     });
-
   } else {
     card.classList.remove("card-disabled");
 
@@ -159,4 +176,3 @@ function toggleNaoUtilizado(checkbox) {
     });
   }
 }
-
