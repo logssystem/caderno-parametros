@@ -1,138 +1,102 @@
-const LIMITE = 10;
-
-/* ====== MAPA DE LISTAS ====== */
-const listas = {
-  usuario_web: "listaUsuariosWeb",
-  entrada: "listaEntradas",
-  ura: "listaURAs",
-  fila: "listaFilas",
-  ring: "listaRings",
-  agente: "listaAgentes"
-};
-
-/* ====== ADICIONAR CAMPOS PADRÃO ====== */
-function adicionarCampo(tipo) {
-  const container = document.getElementById(listas[tipo]);
-  if (container.querySelectorAll(".campo").length >= LIMITE) {
-    alert("Limite máximo de 10 itens atingido");
-    return;
-  }
-  container.appendChild(criarCampo(tipo));
+body {
+  font-family: Arial, sans-serif;
 }
 
-/* ====== CAMPO PADRÃO COM DESCRIÇÃO ====== */
-function criarCampo(tipo) {
-  const wrapper = document.createElement("div");
-  wrapper.className = "campo";
-  wrapper.style.flexDirection = "column";
-  wrapper.style.alignItems = "flex-start";
-
-  /* linha principal */
-  const linha = document.createElement("div");
-  linha.style.display = "flex";
-  linha.style.alignItems = "center";
-  linha.style.gap = "8px";
-
-  const input = document.createElement("input");
-  input.type = "text";
-  input.placeholder = `Digite ${tipo.replace("_", " ")}`;
-
-  const btn = document.createElement("button");
-  btn.textContent = "✖";
-  btn.type = "button";
-  btn.onclick = () => wrapper.remove();
-
-  linha.append(input, btn);
-
-  /* descrição */
-  const descricao = document.createElement("textarea");
-  descricao.placeholder = "Descrição (opcional)";
-
-  /* não utilizar */
-  const label = document.createElement("label");
-  const chk = document.createElement("input");
-  chk.type = "checkbox";
-  label.appendChild(chk);
-  label.append(" Não será utilizado");
-
-  chk.onchange = () => {
-    input.disabled = chk.checked;
-    descricao.disabled = chk.checked;
-    if (chk.checked) {
-      input.value = "";
-      descricao.value = "";
-    }
-  };
-
-  wrapper.append(linha, descricao, label);
-  return wrapper;
+/* card */
+.card {
+  border: 1px solid #ddd;
+  padding: 16px;
+  margin-bottom: 20px;
+  width: 520px;
 }
 
-/* ====== RAMAIS (SEM DESCRIÇÃO) ====== */
-function adicionarRamal() {
-  const container = document.getElementById("listaRamais");
-  if (container.querySelectorAll(".campo").length >= LIMITE) {
-    alert("Limite máximo de 10 ranges atingido");
-    return;
-  }
-
-  const wrapper = document.createElement("div");
-  wrapper.className = "campo";
-
-  const ramalInicial = document.createElement("input");
-  ramalInicial.type = "number";
-  ramalInicial.placeholder = "Ramal inicial (ex: 2000)";
-
-  const range = document.createElement("input");
-  range.type = "number";
-  range.placeholder = "Range (ex: 5)";
-
-  const btn = document.createElement("button");
-  btn.textContent = "✖";
-  btn.type = "button";
-  btn.onclick = () => wrapper.remove();
-
-  wrapper.append(ramalInicial, range, btn);
-  container.appendChild(wrapper);
+/* descrição */
+textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  resize: vertical;
+  outline: none;
 }
 
-/* ====== EXPORT ====== */
-function explorar() {
-  const dados = {};
+textarea:focus {
+  border-color: #4a90e2;
+}
 
-  /* campos padrão */
-  Object.keys(listas).forEach(tipo => {
-    dados[tipo] = [];
-    document.querySelectorAll(`#${listas[tipo]} .campo`).forEach(campo => {
-      const input = campo.querySelector("input[type=text]");
-      const textarea = campo.querySelector("textarea");
-      const chk = campo.querySelector("input[type=checkbox]");
+/* linha do campo */
+.campo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
 
-      if (input && !chk.checked && input.value.trim()) {
-        dados[tipo].push({
-          nome: input.value.trim(),
-          descricao: textarea.value.trim()
-        });
-      }
-    });
-  });
+/* input grande */
+.campo input[type="text"],
+.campo input[type="number"] {
+  width: 360px;
+  height: 44px;
+  padding: 0 12px;
+  font-size: 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  outline: none;
+}
 
-  /* ramais */
-  dados.ramais = [];
-  document.querySelectorAll("#listaRamais .campo").forEach(campo => {
-    const inputs = campo.querySelectorAll("input[type=number]");
-    if (inputs.length < 2) return;
+.campo input:focus {
+  border-color: #4a90e2;
+}
 
-    const base = parseInt(inputs[0].value);
-    const qtd = parseInt(inputs[1].value);
+/* checkbox */
+.campo label {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
 
-    if (!isNaN(base) && !isNaN(qtd) && qtd > 0) {
-      for (let i = 1; i <= qtd; i++) {
-        dados.ramais.push(base + i);
-      }
-    }
-  });
+/* botão remover */
+.campo button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #999;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
 
-  document.getElementById("resultado").textContent =
-    JSON.stringify(dados, null, 2);
+.campo button:hover {
+  background: #f2f2f2;
+}
+
+/* botão + */
+.card-actions {
+  margin-top: 8px;
+}
+
+.btn-add {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+  border: 1px dashed #aaa;
+  background: #fff;
+
+  font-size: 26px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-add:hover {
+  border-color: #4a90e2;
+  color: #4a90e2;
 }
