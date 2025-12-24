@@ -11,7 +11,38 @@ body {
   color: #333;
 }
 
-/* TÍTULO */
+/* ================= HEADER ================= */
+.app-header {
+  background: #ffffff;
+  border-bottom: 1px solid #e6e9ef;
+  margin-bottom: 32px;
+}
+
+.app-header .header-content {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 16px 24px;
+
+  display: flex;
+  align-items: center;
+}
+
+/* LOGO */
+.app-logo {
+  height: 56px;        /* ⬅️ ajuste o tamanho aqui */
+  width: auto;
+  object-fit: contain;
+}
+
+/* TÍTULO OPCIONAL */
+.app-title {
+  margin-left: 14px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* ================= TÍTULO PRINCIPAL ================= */
 h1 {
   margin-bottom: 32px;
   font-size: 28px;
@@ -23,7 +54,7 @@ body > * {
   max-width: 980px;
 }
 
-/* CARD */
+/* ================= CARD ================= */
 .card {
   background: #fff;
   border-radius: 10px;
@@ -32,26 +63,23 @@ body > * {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
-/* TÍTULO DO CARD */
 .card h2 {
   margin: 0 0 16px;
   font-size: 18px;
   font-weight: 600;
 }
 
-/* CAMPO BASE */
+/* ================= CAMPOS ================= */
 .campo {
   margin-bottom: 18px;
 }
 
-/* CAMPO COM DESCRIÇÃO */
 .campo.campo-descricao {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-/* LINHA PRINCIPAL */
 .campo-descricao .linha-principal {
   display: flex;
   align-items: center;
@@ -113,12 +141,11 @@ body > * {
   background: #e0e2e6;
 }
 
-/* ÁREA DO BOTÃO + */
+/* ================= BOTÃO + ================= */
 .card-actions {
   margin-top: 8px;
 }
 
-/* BOTÃO + */
 .btn-add {
   width: 44px;
   height: 44px;
@@ -138,7 +165,7 @@ body > * {
   background: rgba(74, 144, 226, 0.04);
 }
 
-/* BOTÃO EXPLORAR */
+/* ================= BOTÃO EXPLORAR ================= */
 button[onclick="explorar()"] {
   margin-top: 24px;
   padding: 12px 28px;
@@ -156,7 +183,7 @@ button[onclick="explorar()"]:hover {
   background: #357abd;
 }
 
-/* RESULTADO */
+/* ================= RESULTADO ================= */
 pre {
   background: #0f172a;
   color: #e5e7eb;
@@ -166,21 +193,27 @@ pre {
   font-size: 13px;
 }
 
-/* GRID PRINCIPAL */
+/* ================= GRID PRINCIPAL ================= */
 .caderno-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
 
-/* responsivo */
+/* RESPONSIVO */
 @media (max-width: 900px) {
   .caderno-grid {
     grid-template-columns: 1fr;
   }
+
+  .campo input[type="text"],
+  .campo input[type="number"],
+  .campo-descricao textarea {
+    width: 100%;
+  }
 }
 
-/* resumo do cenário */
+/* ================= RESUMO ================= */
 #resumoCard ul {
   list-style: none;
   padding: 0;
@@ -197,30 +230,3 @@ pre {
 #resumoCard li:last-child {
   border-bottom: none;
 }
-
-/* HEADER */
-.app-header {
-  background: #ffffff;
-  border-bottom: 1px solid #eaeaea;
-  padding: 14px 24px;
-  margin-bottom: 24px;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.app-logo {
-  height: 36px;
-  width: auto;
-}
-
-.app-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #222;
-}
-
-
