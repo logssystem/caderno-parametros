@@ -2,18 +2,19 @@ const LIMITE = 10;
 
 /* ====== MAPA DE LISTAS ====== */
 const listas = {
-  fila: "listaFilas",
-  ura: "listaURAs",
+  usuario_web: "listaUsuariosWeb",
   entrada: "listaEntradas",
-  agente: "listaAgentes",
-  ring: "listaRings"
+  ura: "listaURAs",
+  fila: "listaFilas",
+  ring: "listaRings",
+  agente: "listaAgentes"
 };
 
 /* ====== ADICIONAR CAMPOS PADRÃO ====== */
 function adicionarCampo(tipo) {
   const container = document.getElementById(listas[tipo]);
   if (container.querySelectorAll(".campo").length >= LIMITE) {
-    alert("Limite máximo atingido");
+    alert("Limite máximo de 10 itens atingido");
     return;
   }
   container.appendChild(criarCampo(tipo));
@@ -26,7 +27,7 @@ function criarCampo(tipo) {
 
   const input = document.createElement("input");
   input.type = "text";
-  input.placeholder = `Digite ${tipo}`;
+  input.placeholder = `Digite ${tipo.replace("_", " ")}`;
 
   const label = document.createElement("label");
   const chk = document.createElement("input");
@@ -34,13 +35,14 @@ function criarCampo(tipo) {
   label.appendChild(chk);
   label.append(" Não será utilizado");
 
-  chk.onchange = () => {
+  chk.addEventListener("change", () => {
     input.disabled = chk.checked;
     if (chk.checked) input.value = "";
-  };
+  });
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
+  btn.type = "button";
   btn.onclick = () => wrapper.remove();
 
   wrapper.append(input, label, btn);
@@ -51,7 +53,7 @@ function criarCampo(tipo) {
 function adicionarRamal() {
   const container = document.getElementById("listaRamais");
   if (container.querySelectorAll(".campo").length >= LIMITE) {
-    alert("Limite máximo atingido");
+    alert("Limite máximo de 10 ranges atingido");
     return;
   }
 
@@ -59,15 +61,16 @@ function adicionarRamal() {
   wrapper.className = "campo";
 
   const ramalInicial = document.createElement("input");
-  ramalInicial.placeholder = "Ramal inicial (ex: 2000)";
   ramalInicial.type = "number";
+  ramalInicial.placeholder = "Ramal inicial (ex: 2000)";
 
   const range = document.createElement("input");
-  range.placeholder = "Range (ex: 5)";
   range.type = "number";
+  range.placeholder = "Range (ex: 5)";
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
+  btn.type = "button";
   btn.onclick = () => wrapper.remove();
 
   wrapper.append(ramalInicial, range, btn);
