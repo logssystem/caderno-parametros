@@ -1,8 +1,7 @@
-console.log("APP.JS CARREGADO"); // <<< DEBUG VISUAL
+console.log("APP.JS CARREGADO COM SUCESSO");
 
 const LIMITE = 10;
 
-/* listas */
 const listas = {
   usuario_web: "listaUsuariosWeb",
   entrada: "listaEntradas",
@@ -12,11 +11,10 @@ const listas = {
   agente: "listaAgentes"
 };
 
-/* ===== FUNÇÕES NO ESCOPO GLOBAL ===== */
 window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
   if (!container) {
-    alert("Container não encontrado: " + tipo);
+    console.error("Container não encontrado:", tipo);
     return;
   }
 
@@ -31,10 +29,7 @@ window.adicionarCampo = function (tipo) {
 
 window.adicionarRamal = function () {
   const container = document.getElementById("listaRamais");
-  if (!container) {
-    alert("Container de ramais não encontrado");
-    return;
-  }
+  if (!container) return;
 
   const total = container.querySelectorAll(".campo").length;
   if (total >= LIMITE) {
@@ -67,20 +62,18 @@ window.explorar = function () {
 
   Object.keys(listas).forEach(tipo => {
     dados[tipo] = [];
-    document
-      .querySelectorAll(`#${listas[tipo]} .campo-descricao`)
-      .forEach(campo => {
-        const input = campo.querySelector("input[type=text]");
-        const descricao = campo.querySelector("textarea");
-        const chk = campo.querySelector("input[type=checkbox]");
+    document.querySelectorAll(`#${listas[tipo]} .campo-descricao`).forEach(campo => {
+      const input = campo.querySelector("input[type=text]");
+      const descricao = campo.querySelector("textarea");
+      const chk = campo.querySelector("input[type=checkbox]");
 
-        if (input && !chk.checked && input.value.trim()) {
-          dados[tipo].push({
-            nome: input.value.trim(),
-            descricao: descricao.value.trim()
-          });
-        }
-      });
+      if (input && !chk.checked && input.value.trim()) {
+        dados[tipo].push({
+          nome: input.value.trim(),
+          descricao: descricao.value.trim()
+        });
+      }
+    });
   });
 
   dados.ramais = [];
@@ -102,7 +95,6 @@ window.explorar = function () {
     JSON.stringify(dados, null, 2);
 };
 
-/* ===== FUNÇÃO INTERNA ===== */
 function criarCampo(tipo) {
   const wrapper = document.createElement("div");
   wrapper.className = "campo campo-descricao";
@@ -116,7 +108,6 @@ function criarCampo(tipo) {
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
-  btn.type = "button";
   btn.onclick = () => wrapper.remove();
 
   linha.append(input, btn);
@@ -127,8 +118,7 @@ function criarCampo(tipo) {
   const label = document.createElement("label");
   const chk = document.createElement("input");
   chk.type = "checkbox";
-  label.appendChild(chk);
-  label.append(" Não será utilizado");
+  label.append(chk, " Não será utilizado");
 
   chk.onchange = () => {
     input.disabled = chk.checked;
