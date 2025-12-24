@@ -165,3 +165,18 @@ pre {
   overflow-x: auto;
   font-size: 13px;
 }
+
+/* GRID PRINCIPAL */
+.caderno-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+/* responsivo */
+@media (max-width: 900px) {
+  .caderno-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
