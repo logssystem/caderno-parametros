@@ -32,7 +32,7 @@ body {
   font-weight: 600;
 }
 
-/* CONTAINER CENTRAL */
+/* CONTAINER */
 .form-container {
   max-width: 820px;
   margin: 32px auto;
@@ -60,68 +60,54 @@ body {
   gap: 6px;
 }
 
-/* INPUTS */
-.campo-descricao input[type="text"],
-.campo-descricao input[type="number"] {
-  height: 42px;
-  padding: 0 12px;
+.linha-principal {
+  display: flex;
+  gap: 10px;
+}
+
+.campo-descricao input,
+.campo-descricao textarea {
+  width: 100%;
+  padding: 8px 10px;
   border-radius: 6px;
   border: 1px solid #d9dce1;
   font-size: 14px;
 }
 
-/* DESCRIÇÃO */
 .campo-descricao textarea {
   height: 56px;
-  padding: 8px 10px;
-  font-size: 13px;
-  border-radius: 6px;
-  border: 1px solid #d9dce1;
   resize: none;
 }
 
-/* ===== AJUSTE DEFINITIVO DO "NÃO SERÁ UTILIZADO" ===== */
-.campo-descricao label {
+/* NÃO UTILIZADO */
+.nao-utilizado {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-
   margin-top: 6px;
   padding: 6px 10px;
-
   font-size: 13px;
-  color: #555;
-
   background: #f4f6f8;
   border-radius: 6px;
   width: fit-content;
   cursor: pointer;
 }
 
-/* CHECKBOX */
-.campo-descricao input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
+.nao-utilizado input {
   accent-color: #4a90e2;
 }
 
-/* BOTÃO REMOVER (X) */
-.campo-descricao button {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  border: none;
-  background: #f2f3f5;
-  cursor: pointer;
-  font-size: 16px;
+/* CARD DESABILITADO */
+.card.card-disabled {
+  opacity: 0.55;
+  background: #f3f4f6;
 }
 
-.campo-descricao button:hover {
-  background: #e0e2e6;
+.card.card-disabled .btn-add {
+  display: none;
 }
 
-/* BOTÃO + */
+/* BOTÕES */
 .btn-add {
   margin-top: 8px;
   width: 44px;
@@ -133,12 +119,6 @@ body {
   cursor: pointer;
 }
 
-.btn-add:hover {
-  border-color: #4a90e2;
-  color: #4a90e2;
-}
-
-/* BOTÃO FINAL */
 .btn-explorar {
   display: block;
   margin: 40px auto;
@@ -151,8 +131,21 @@ body {
   cursor: pointer;
 }
 
-.btn-explorar:hover {
-  background: #357abd;
+/* RESUMO */
+#resumoCard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#resumoCard li {
+  padding: 6px 0;
+  font-size: 14px;
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+#resumoCard li:last-child {
+  border-bottom: none;
 }
 
 /* RESULTADO */
@@ -164,62 +157,3 @@ pre {
   font-size: 13px;
   overflow-x: auto;
 }
-
-/* CARD DESABILITADO */
-.card.card-disabled {
-  opacity: 0.55;
-  background: #f3f4f6;
-}
-
-/* BLOQUEAR CAMPOS */
-.card.card-disabled input,
-.card.card-disabled textarea,
-.card.card-disabled select {
-  pointer-events: none;
-  background: #e9ecef;
-}
-
-/* ESCONDER BOTÃO + */
-.card.card-disabled .btn-add {
-  display: none;
-}
-
-/* CHECKBOX MAIS BONITO */
-.campo-descricao .nao-utilizado {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  font-size: 13px;
-  color: #444;
-}
-
-.campo-descricao .nao-utilizado input {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}
-
-/* RESUMO DO CENÁRIO */
-#resumoCard ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-#resumoCard li {
-  padding: 6px 0;
-  font-size: 14px;
-  color: #374151;
-  border-bottom: 1px dashed #e5e7eb;
-}
-
-#resumoCard li:last-child {
-  border-bottom: none;
-}
-
-#resumoCard strong {
-  font-weight: 600;
-}
-
-
