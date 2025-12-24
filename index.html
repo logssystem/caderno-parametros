@@ -14,31 +14,37 @@
   <h2>Filas</h2>
   <div id="listaFilas"></div>
 
-  <button
-    type="button"
-    class="btn-add"
-    onclick="adicionarFilaCampo()"
-  >
-    +
-  </button>
+  <div class="card-actions">
+    <button
+      type="button"
+      class="btn-add"
+      onclick="adicionarFilaCampo()"
+      title="Adicionar fila"
+    >
+      +
+    </button>
+  </div>
 </div>
 
 <div class="card">
   <h2>URAs</h2>
   <div id="listaURAs"></div>
 
-  <button
-    type="button"
-    class="btn-add"
-    onclick="adicionarURACampo()"
-  >
-    +
-  </button>
+  <div class="card-actions">
+    <button
+      type="button"
+      class="btn-add"
+      onclick="adicionarURACampo()"
+      title="Adicionar URA"
+    >
+      +
+    </button>
+  </div>
 </div>
-  
-<br>
 
-<button type="button" onclick="explorar()">Explorar</button>
+<div style="margin-top: 16px;">
+  <button type="button" onclick="explorar()">Explorar</button>
+</div>
 
 <h2>Resultado</h2>
 <pre id="resultado"></pre>
@@ -46,4 +52,3 @@
 <script src="app.js"></script>
 </body>
 </html>
-
