@@ -1,25 +1,39 @@
-/* RESET */
+/* =========================
+   RESET
+========================= */
 * {
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+/* =========================
+   FUNDO EXTERNO (CINZA ESCURO)
+========================= */
+body {
   font-family: "Inter", Arial, sans-serif;
-  background: #e5e7eb; /* fundo externo cinza */
+  background: #2f3a43; /* 🔥 CINZA ESCURO (IGUAL AO EXEMPLO) */
   color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 /* =========================
    MOLDURA CENTRAL
 ========================= */
 .app-frame {
+  width: 100%;
   max-width: 900px;
   margin: 32px auto;
   background: #ffffff;
   border-radius: 14px;
   border: 1px solid #e5e7eb;
-  box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.25);
   overflow: hidden;
 }
 
@@ -45,6 +59,7 @@ body {
 .app-title {
   font-size: 24px;
   font-weight: 600;
+  color: #222;
 }
 
 /* =========================
@@ -70,6 +85,7 @@ body {
 .card h2 {
   margin: 0 0 12px;
   font-size: 18px;
+  font-weight: 600;
 }
 
 /* =========================
@@ -101,7 +117,7 @@ body {
 }
 
 /* =========================
-   NÃO UTILIZADO
+   NÃO UTILIZADO (BONITO)
 ========================= */
 .nao-utilizado {
   display: inline-flex;
@@ -120,7 +136,9 @@ body {
   accent-color: #4a90e2;
 }
 
-/* CARD DESABILITADO */
+/* =========================
+   CARD DESABILITADO
+========================= */
 .card-disabled {
   opacity: 0.55;
   background: #f3f4f6;
