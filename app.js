@@ -140,3 +140,23 @@ function criarCampo(tipo) {
   wrapper.append(linha, descricao, label);
   return wrapper;
 }
+
+function toggleNaoUtilizado(checkbox) {
+  const card = checkbox.closest(".card");
+
+  if (checkbox.checked) {
+    card.classList.add("card-disabled");
+
+    card.querySelectorAll("input, textarea").forEach(el => {
+      if (el !== checkbox) el.disabled = true;
+    });
+
+  } else {
+    card.classList.remove("card-disabled");
+
+    card.querySelectorAll("input, textarea").forEach(el => {
+      el.disabled = false;
+    });
+  }
+}
+
