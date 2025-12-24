@@ -132,3 +132,22 @@ function criarCampo(tipo) {
   wrapper.append(linha, descricao, label);
   return wrapper;
 }
+
+/* resumo do cenário */
+#resumoCard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#resumoCard li {
+  font-size: 14px;
+  padding: 6px 0;
+  color: #444;
+  border-bottom: 1px dashed #eee;
+}
+
+#resumoCard li:last-child {
+  border-bottom: none;
+}
+
