@@ -19,7 +19,7 @@ function adicionarURACampo() {
   container.appendChild(criarCampo("ura"));
 }
 
-/* ====== CRIA UM CAMPO (INPUT LIVRE) ====== */
+/* ====== CRIA UM CAMPO (INPUT LIVRE + NÃO UTILIZAR) ====== */
 function criarCampo(tipo) {
   const wrapper = document.createElement("div");
   wrapper.className = "campo";
@@ -46,27 +46,12 @@ function criarCampo(tipo) {
   labelNaoUsar.appendChild(checkboxNaoUsar);
   labelNaoUsar.append(" Não será utilizado");
 
-  /* SUBMENU */
-  const labelSubmenu = document.createElement("label");
-  labelSubmenu.style.fontSize = "12px";
-
-  const checkboxSubmenu = document.createElement("input");
-  checkboxSubmenu.type = "checkbox";
-  checkboxSubmenu.checked = true;
-
-  labelSubmenu.appendChild(checkboxSubmenu);
-  labelSubmenu.append(" Usar como submenu");
-
-  /* REGRAS */
   checkboxNaoUsar.addEventListener("change", () => {
     if (checkboxNaoUsar.checked) {
       input.value = "";
       input.disabled = true;
-      checkboxSubmenu.checked = false;
-      checkboxSubmenu.disabled = true;
     } else {
       input.disabled = false;
-      checkboxSubmenu.disabled = false;
     }
   });
 
@@ -78,7 +63,6 @@ function criarCampo(tipo) {
 
   wrapper.appendChild(input);
   wrapper.appendChild(labelNaoUsar);
-  wrapper.appendChild(labelSubmenu);
   wrapper.appendChild(btn);
 
   return wrapper;
@@ -93,14 +77,12 @@ async function explorar() {
   /* FILAS */
   document.querySelectorAll("#listaFilas .campo").forEach(campo => {
     const input = campo.querySelector("input[type=text]");
-    const naoUsar = campo.querySelectorAll("input[type=checkbox]")[0];
-    const submenu = campo.querySelectorAll("input[type=checkbox]")[1].checked;
+    const naoUsar = campo.querySelector("input[type=checkbox]");
 
     if (!naoUsar.checked && input.value.trim() && filaIndex <= LIMITE) {
       dados[`fila_${filaIndex}`] = {
         tipo: "fila",
-        nome: input.value.trim(),
-        submenu
+        nome: input.value.trim()
       };
       filaIndex++;
     }
@@ -109,14 +91,12 @@ async function explorar() {
   /* URAS */
   document.querySelectorAll("#listaURAs .campo").forEach(campo => {
     const input = campo.querySelector("input[type=text]");
-    const naoUsar = campo.querySelectorAll("input[type=checkbox]")[0];
-    const submenu = campo.querySelectorAll("input[type=checkbox]")[1].checked;
+    const naoUsar = campo.querySelector("input[type=checkbox]");
 
     if (!naoUsar.checked && input.value.trim() && uraIndex <= LIMITE) {
       dados[`ura_${uraIndex}`] = {
         tipo: "ura",
-        principal: input.value.trim(),
-        submenu
+        principal: input.value.trim()
       };
       uraIndex++;
     }
