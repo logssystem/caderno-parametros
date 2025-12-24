@@ -1,6 +1,5 @@
-console.log("APP.JS CARREGADO - VERSAO ESTAVEL");
+console.log("APP.JS CARREGADO - VERSAO FINAL");
 
-/* ================== CONFIG ================== */
 const LIMITE = 10;
 
 const listas = {
@@ -12,125 +11,63 @@ const listas = {
   agente: "listaAgentes"
 };
 
-/* ================== ADICIONAR CAMPOS ================== */
+/* ADICIONAR CAMPOS */
 window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
-  if (!container) {
-    console.error("Container não encontrado:", tipo);
-    return;
-  }
+  if (!container) return;
 
-  const total = container.querySelectorAll(".campo-descricao").length;
-  if (total >= LIMITE) {
-    alert("Limite máximo de 10 itens atingido");
+  if (container.querySelectorAll(".campo-descricao").length >= LIMITE) {
+    alert("Limite máximo atingido");
     return;
   }
 
   container.appendChild(criarCampo(tipo));
 };
 
-/* ================== ADICIONAR RAMAL ================== */
+/* ADICIONAR RAMAL */
 window.adicionarRamal = function () {
   const container = document.getElementById("listaRamais");
-  if (!container) {
-    console.error("Container de ramais não encontrado");
-    return;
-  }
-
-  const total = container.querySelectorAll(".campo").length;
-  if (total >= LIMITE) {
-    alert("Limite máximo de 10 ranges atingido");
-    return;
-  }
+  if (!container) return;
 
   const wrapper = document.createElement("div");
   wrapper.className = "campo";
 
-  const ramalInicial = document.createElement("input");
-  ramalInicial.type = "number";
-  ramalInicial.placeholder = "Ramal inicial (ex: 2000)";
+  const ini = document.createElement("input");
+  ini.type = "number";
+  ini.placeholder = "Ramal inicial";
 
-  const range = document.createElement("input");
-  range.type = "number";
-  range.placeholder = "Range (ex: 5)";
+  const qtd = document.createElement("input");
+  qtd.type = "number";
+  qtd.placeholder = "Range";
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
-  btn.type = "button";
   btn.onclick = () => wrapper.remove();
 
-  wrapper.append(ramalInicial, range, btn);
+  wrapper.append(ini, qtd, btn);
   container.appendChild(wrapper);
 };
 
-/* ================== EXPORTAR ================== */
-window.explorar = function () {
-  const dados = {};
-
-  Object.keys(listas).forEach(tipo => {
-    dados[tipo] = [];
-
-    document
-      .querySelectorAll(`#${listas[tipo]} .campo-descricao`)
-      .forEach(campo => {
-        const input = campo.querySelector("input[type=text]");
-        const descricao = campo.querySelector("textarea");
-        const chk = campo.querySelector("input[type=checkbox]");
-
-        if (!chk.checked && input.value.trim()) {
-          dados[tipo].push({
-            nome: input.value.trim(),
-            descricao: descricao.value.trim()
-          });
-        }
-      });
-  });
-
-  /* RAMAIS */
-  dados.ramais = [];
-  document.querySelectorAll("#listaRamais .campo").forEach(campo => {
-    const nums = campo.querySelectorAll("input[type=number]");
-    if (nums.length < 2) return;
-
-    const base = parseInt(nums[0].value);
-    const qtd = parseInt(nums[1].value);
-
-    if (!isNaN(base) && !isNaN(qtd) && qtd > 0) {
-      for (let i = 1; i <= qtd; i++) {
-        dados.ramais.push(base + i);
-      }
-    }
-  });
-
-  document.getElementById("resultado").textContent =
-    JSON.stringify(dados, null, 2);
-};
-
-/* ================== CRIAR CAMPO PADRÃO ================== */
+/* CRIAR CAMPO PADRÃO */
 function criarCampo(tipo) {
-  const wrapper = document.createElement("div");
-  wrapper.className = "campo campo-descricao";
+  const wrap = document.createElement("div");
+  wrap.className = "campo campo-descricao";
 
-  /* LINHA PRINCIPAL */
   const linha = document.createElement("div");
   linha.className = "linha-principal";
 
   const input = document.createElement("input");
-  input.type = "text";
   input.placeholder = `Digite ${tipo.replace("_", " ")}`;
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
-  btn.type = "button";
-  btn.onclick = () => wrapper.remove();
+  btn.onclick = () => wrap.remove();
 
   linha.append(input, btn);
 
-  /* DESCRIÇÃO */
-  const descricao = document.createElement("textarea");
-  descricao.placeholder = "Descrição (opcional)";
+  const desc = document.createElement("textarea");
+  desc.placeholder = "Descrição (opcional)";
 
-  /* CHECKBOX NÃO UTILIZADO */
   const label = document.createElement("label");
   label.className = "nao-utilizado";
 
@@ -138,41 +75,46 @@ function criarCampo(tipo) {
   chk.type = "checkbox";
 
   chk.onchange = () => {
-    /* desabilita campos */
     input.disabled = chk.checked;
-    descricao.disabled = chk.checked;
-
+    desc.disabled = chk.checked;
+    wrap.closest(".card").classList.toggle("card-disabled", chk.checked);
     if (chk.checked) {
       input.value = "";
-      descricao.value = "";
+      desc.value = "";
     }
-
-    /* efeito visual no card */
-    toggleNaoUtilizado(chk);
   };
 
   label.append(chk, " Não será utilizado");
+  wrap.append(linha, desc, label);
 
-  wrapper.append(linha, descricao, label);
-  return wrapper;
+  return wrap;
 }
 
-/* ================== ESTADO VISUAL DO CARD ================== */
-function toggleNaoUtilizado(checkbox) {
-  const card = checkbox.closest(".card");
-  if (!card) return;
+/* EXPLORAR + RESUMO */
+window.explorar = function () {
+  const dados = {};
+  const resumo = [];
 
-  if (checkbox.checked) {
-    card.classList.add("card-disabled");
+  Object.keys(listas).forEach(tipo => {
+    const campos = document.querySelectorAll(`#${listas[tipo]} .campo-descricao`);
+    let ativos = 0;
 
-    card.querySelectorAll("input, textarea").forEach(el => {
-      if (el !== checkbox) el.disabled = true;
+    campos.forEach(c => {
+      const input = c.querySelector("input[type=text]");
+      const chk = c.querySelector("input[type=checkbox]");
+      if (!chk.checked && input.value.trim()) ativos++;
     });
-  } else {
-    card.classList.remove("card-disabled");
 
-    card.querySelectorAll("input, textarea").forEach(el => {
-      el.disabled = false;
-    });
-  }
-}
+    resumo.push(
+      `<li><strong>${tipo}:</strong> ${
+        ativos ? ativos + " ativo(s)" : "Não utilizado"
+      }</li>`
+    );
+  });
+
+  document.getElementById("resumoLista").innerHTML = resumo.join("");
+  document.getElementById("resumoCard").style.display = "block";
+
+  document.getElementById("resultado").textContent =
+    JSON.stringify({ resumo }, null, 2);
+};
