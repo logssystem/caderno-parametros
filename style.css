@@ -1,34 +1,75 @@
-/* wrapper do campo */
-.campo select {
-  width: 260px;
-  padding: 8px 36px 8px 8px;
+body {
+  font-family: Arial, sans-serif;
+}
+
+/* CARD (se já existir, pode manter o seu) */
+.card {
+  border: 1px solid #ddd;
+  padding: 16px;
+  margin-bottom: 20px;
+  width: 520px;
+}
+
+/* LINHA DO CAMPO */
+.campo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+/* INPUT GRANDE – ESTILO FORMULÁRIO */
+.campo input[type="text"] {
+  width: 360px;      /* largura do campo */
+  height: 44px;      /* altura tipo input moderno */
+  padding: 0 12px;
   font-size: 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  outline: none;
+}
+
+/* FOCO */
+.campo input[type="text"]:focus {
+  border-color: #4a90e2;
+}
+
+/* CHECKBOX */
+.campo label {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+/* BOTÃO REMOVER (X) */
+.campo button {
+  width: 32px;
+  height: 32px;
   border: 1px solid #999;
   border-radius: 4px;
-  background-color: #fff;
-
-  /* remove estilo nativo */
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
+  background: #fff;
   cursor: pointer;
 }
 
-/* cria a seta manualmente */
-.campo {
-  position: relative;
+.campo button:hover {
+  background: #f2f2f2;
 }
 
-.campo::after {
-  content: "";
-  position: absolute;
-  right: 48px; /* ajusta por causa do botão X */
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
+/* BOTÃO + */
+.btn-add {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  border: 1px dashed #aaa;
+  background: #fff;
+  font-size: 26px;
+  font-weight: 500;
+  cursor: pointer;
+}
 
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 6px solid #555;
+.btn-add:hover {
+  border-color: #4a90e2;
+  color: #4a90e2;
 }
