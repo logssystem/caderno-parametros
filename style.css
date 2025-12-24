@@ -164,3 +164,39 @@ pre {
   font-size: 13px;
   overflow-x: auto;
 }
+
+/* CARD DESABILITADO */
+.card.card-disabled {
+  opacity: 0.55;
+  background: #f3f4f6;
+}
+
+/* BLOQUEAR CAMPOS */
+.card.card-disabled input,
+.card.card-disabled textarea,
+.card.card-disabled select {
+  pointer-events: none;
+  background: #e9ecef;
+}
+
+/* ESCONDER BOTÃO + */
+.card.card-disabled .btn-add {
+  display: none;
+}
+
+/* CHECKBOX MAIS BONITO */
+.campo-descricao .nao-utilizado {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #444;
+}
+
+.campo-descricao .nao-utilizado input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
