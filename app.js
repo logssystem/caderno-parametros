@@ -49,7 +49,7 @@ function criarCampo(tipo) {
   return wrapper;
 }
 
-/* ====== RAMAIS COM RANGE + PREVIEW ====== */
+/* ====== RAMAIS COM RANGE (SEM PREVIEW) ====== */
 function adicionarRamal() {
   const container = document.getElementById("listaRamais");
   if (container.querySelectorAll(".campo").length >= LIMITE) {
@@ -68,37 +68,12 @@ function adicionarRamal() {
   range.type = "number";
   range.placeholder = "Range (ex: 5)";
 
-  const preview = document.createElement("div");
-  preview.className = "preview-ramais";
-  preview.textContent = "Gerados: —";
-
-  function atualizarPreview() {
-    const base = parseInt(ramalInicial.value);
-    const qtd = parseInt(range.value);
-
-    if (isNaN(base) || isNaN(qtd) || qtd <= 0) {
-      preview.textContent = "Gerados: —";
-      return;
-    }
-
-    const ramais = [];
-    for (let i = 1; i <= qtd; i++) {
-      ramais.push(base + i);
-    }
-
-    preview.innerHTML = `Gerados: <span>${ramais.join(", ")}</span>`;
-  }
-
-  ramalInicial.addEventListener("input", atualizarPreview);
-  range.addEventListener("input", atualizarPreview);
-
   const btn = document.createElement("button");
   btn.textContent = "✖";
   btn.type = "button";
   btn.onclick = () => wrapper.remove();
 
   wrapper.append(ramalInicial, range, btn);
-  wrapper.appendChild(preview);
   container.appendChild(wrapper);
 }
 
@@ -119,7 +94,7 @@ function explorar() {
     });
   });
 
-  /* RAMAIS (USA A MESMA LÓGICA DO PREVIEW) */
+  /* RAMAIS (GERADOS APENAS NO EXPORT) */
   dados.ramais = [];
   document.querySelectorAll("#listaRamais .campo").forEach(campo => {
     const inputs = campo.querySelectorAll("input[type=number]");
