@@ -18,71 +18,58 @@
     <h1 class="app-title">Caderno de Parâmetros</h1>
   </div>
 
-  <button id="toggleTheme" class="theme-toggle" title="Alternar tema">
-    🌙
-  </button>
+  <button id="toggleTheme" class="theme-toggle" title="Alternar tema">🌙</button>
 </header>
 
 <!-- CONTEÚDO PRINCIPAL -->
 <main class="form-container">
 
-  <!-- USUÁRIOS WEB -->
   <section class="card">
     <h2>Usuários Web</h2>
-    <div id="listaUsuariosWeb" class="lista-campos"></div>
+    <div id="listaUsuariosWeb"></div>
     <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
   </section>
 
-  <!-- RAMAIS -->
   <section class="card">
     <h2>Ramais (Range)</h2>
-    <div id="listaRamais" class="lista-campos"></div>
+    <div id="listaRamais"></div>
     <button class="btn-add" onclick="adicionarRamal()">+</button>
   </section>
 
-  <!-- ENTRADAS -->
   <section class="card">
     <h2>Números de Entrada</h2>
-    <div id="listaEntradas" class="lista-campos"></div>
+    <div id="listaEntradas"></div>
     <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
   </section>
 
-  <!-- URAS -->
   <section class="card">
     <h2>URAs</h2>
-    <div id="listaURAs" class="lista-campos"></div>
+    <div id="listaURAs"></div>
     <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
   </section>
 
-  <!-- FILAS -->
   <section class="card">
     <h2>Filas</h2>
-    <div id="listaFilas" class="lista-campos"></div>
+    <div id="listaFilas"></div>
     <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
   </section>
 
-  <!-- RING -->
   <section class="card">
     <h2>Grupo de Ring</h2>
-    <div id="listaRings" class="lista-campos"></div>
+    <div id="listaRings"></div>
     <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
   </section>
 
-  <!-- AGENTES -->
   <section class="card">
     <h2>Agentes</h2>
-    <div id="listaAgentes" class="lista-campos"></div>
+    <div id="listaAgentes"></div>
     <button class="btn-add" onclick="adicionarCampo('agente')">+</button>
   </section>
 
-  <!-- AÇÃO -->
   <button class="btn-explorar" onclick="explorar()">Explorar</button>
 
-  <!-- RESULTADO -->
-  <section class="card resultado-card">
-    <h2>Resultado</h2>
-    <pre id="resultado"></pre>
-  </section>
+  <h2>Resultado</h2>
+  <pre id="resultado"></pre>
 
 </main>
 
