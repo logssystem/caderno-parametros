@@ -91,13 +91,26 @@ function criarCampo(tipo) {
 
   linha.append(input, btn);
 
-  /* SENHA – SOMENTE PARA USUÁRIO WEB */
+  /* 🔐 SENHA – SOMENTE PARA USUÁRIO WEB */
   let senhaInput = null;
   if (tipo === "usuario_web") {
     senhaInput = document.createElement("input");
     senhaInput.type = "password";
     senhaInput.placeholder = "Senha do usuário";
     senhaInput.className = "campo-senha";
+
+    /* 🔥 AJUSTE AUTOMÁTICO DE LARGURA */
+    senhaInput.addEventListener("input", () => {
+      const len = senhaInput.value.length;
+
+      if (len > 12) {
+        senhaInput.style.width = "100%";
+      } else if (len > 8) {
+        senhaInput.style.width = "75%";
+      } else {
+        senhaInput.style.width = "50%";
+      }
+    });
   }
 
   const desc = document.createElement("textarea");
