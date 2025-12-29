@@ -43,7 +43,7 @@
 
 /* Ativo */
 .toggle-label input:checked + .toggle-slider {
-  background: #dc3545;
+  background: #dc3545; /* vermelho suave */
 }
 
 .toggle-label input:checked + .toggle-slider::before {
