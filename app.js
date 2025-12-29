@@ -91,6 +91,9 @@ function criarCampo(tipo) {
   const chk = document.createElement("input");
   chk.type = "checkbox";
 
+  const text = document.createElement("span");
+  text.textContent = "Não será utilizado";
+
   chk.addEventListener("change", () => {
     const disabled = chk.checked;
     input.disabled = disabled;
@@ -105,9 +108,9 @@ function criarCampo(tipo) {
     }
   });
 
-  label.append(chk, " Não será utilizado");
-
+  label.append(chk, text);
   wrap.append(linha, desc, label);
+
   return wrap;
 }
 
@@ -117,7 +120,6 @@ function criarCampo(tipo) {
 window.explorar = function () {
   const dados = {};
 
-  /* CAMPOS PADRÃO */
   Object.keys(listas).forEach(tipo => {
     dados[tipo] = [];
 
@@ -137,9 +139,7 @@ window.explorar = function () {
       });
   });
 
-  /* RAMAIS */
   dados.ramais = [];
-
   document.querySelectorAll("#listaRamais .campo").forEach(campo => {
     const inputs = campo.querySelectorAll("input[type=number]");
     if (inputs.length < 2) return;
@@ -154,7 +154,6 @@ window.explorar = function () {
     }
   });
 
-  /* RESULTADO FINAL */
   document.getElementById("resultado").textContent =
     JSON.stringify(dados, null, 2);
 };
