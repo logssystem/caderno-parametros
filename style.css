@@ -217,3 +217,19 @@ pre {
   font-size: 13px;
   overflow-x: auto;
 }
+
+/* =========================
+   CARD DESATIVADO
+========================= */
+.card.card-disabled {
+  opacity: 0.55;
+  pointer-events: none; /* bloqueia interações */
+}
+
+.card.card-disabled .nao-utilizado {
+  pointer-events: auto; /* mantém checkbox clicável */
+}
+
+.card.card-disabled .btn-add {
+  display: none; /* esconde o botão + */
+}
