@@ -1,15 +1,14 @@
-/* Wrapper do toggle */
+/* Wrapper do toggle (não interfere no layout) */
 .campo-toggle {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
+  display: block;
+  margin-top: 6px;
 }
 
 /* Label do toggle */
 .toggle-label {
-  display: inline-flex;
+  display: inline-flex;          /* NÃO ocupa linha inteira */
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -24,31 +23,32 @@
 
 /* Corpo do switch */
 .toggle-slider {
-  width: 44px;
-  height: 24px;
+  width: 38px;                   /* menor = menos impacto */
+  height: 20px;
   background: var(--border-color);
   border-radius: 999px;
   position: relative;
-  transition: background 0.25s ease;
+  flex-shrink: 0;                /* NÃO quebra flex pai */
+  transition: background 0.2s ease;
 }
 
 /* Bolinha */
 .toggle-slider::before {
   content: "";
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   background: var(--card-bg, #fff);
   border-radius: 50%;
   position: absolute;
-  top: 3px;
-  left: 3px;
-  transition: transform 0.25s ease, background 0.25s ease;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 
-/* Hover */
+/* Hover (leve) */
 .toggle-label:hover .toggle-slider {
-  filter: brightness(1.05);
+  filter: brightness(1.03);
 }
 
 /* Ativo */
@@ -57,11 +57,11 @@
 }
 
 .toggle-label input:checked + .toggle-slider::before {
-  transform: translateX(20px);
+  transform: translateX(18px);
 }
 
-/* Foco (acessibilidade) */
+/* Foco (sem quebrar layout) */
 .toggle-label input:focus-visible + .toggle-slider {
-  outline: 2px solid var(--primary-color, #0d6efd);
+  outline: 1px solid var(--primary-color, #0d6efd);
   outline-offset: 2px;
 }
