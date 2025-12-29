@@ -1,91 +1,67 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <title>Caderno de Parâmetros</title>
-  <link rel="stylesheet" href="./style.css" />
-</head>
+/* Wrapper do toggle */
+.campo-toggle {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
 
-<body>
+/* Label do toggle */
+.toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  color: var(--text-color);
+}
 
-<!-- HEADER -->
-<header class="app-header">
-  <div class="header-left">
-    <img src="./assets/image.png" alt="Logo ZRA" class="app-logo" />
-  </div>
+/* Esconde o checkbox real */
+.toggle-label input {
+  display: none;
+}
 
-  <div class="header-center">
-    <h1 class="app-title">Caderno de Parâmetros</h1>
-  </div>
+/* Corpo do switch */
+.toggle-slider {
+  width: 44px;
+  height: 24px;
+  background: var(--border-color);
+  border-radius: 999px;
+  position: relative;
+  transition: background 0.25s ease;
+}
 
-  <button id="toggleTheme" class="theme-toggle" title="Alternar tema">
-    🌙
-  </button>
-</header>
+/* Bolinha */
+.toggle-slider::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: var(--card-bg, #fff);
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.25s ease, background 0.25s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
 
-<!-- CONTEÚDO PRINCIPAL -->
-<main class="form-container">
+/* Hover */
+.toggle-label:hover .toggle-slider {
+  filter: brightness(1.05);
+}
 
-  <!-- USUÁRIOS WEB -->
-  <section class="card">
-    <h2>Usuários Web</h2>
-    <div id="listaUsuariosWeb" class="lista-campos"></div>
-    <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
-  </section>
+/* Ativo */
+.toggle-label input:checked + .toggle-slider {
+  background: var(--danger-color, #dc3545);
+}
 
-  <!-- RAMAIS -->
-  <section class="card">
-    <h2>Ramais (Range)</h2>
-    <div id="listaRamais" class="lista-campos"></div>
-    <button class="btn-add" onclick="adicionarRamal()">+</button>
-  </section>
+.toggle-label input:checked + .toggle-slider::before {
+  transform: translateX(20px);
+}
 
-  <!-- ENTRADAS -->
-  <section class="card">
-    <h2>Números de Entrada</h2>
-    <div id="listaEntradas" class="lista-campos"></div>
-    <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
-  </section>
-
-  <!-- URAS -->
-  <section class="card">
-    <h2>URAs</h2>
-    <div id="listaURAs" class="lista-campos"></div>
-    <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
-  </section>
-
-  <!-- FILAS -->
-  <section class="card">
-    <h2>Filas</h2>
-    <div id="listaFilas" class="lista-campos"></div>
-    <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
-  </section>
-
-  <!-- RING -->
-  <section class="card">
-    <h2>Grupo de Ring</h2>
-    <div id="listaRings" class="lista-campos"></div>
-    <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
-  </section>
-
-  <!-- AGENTES -->
-  <section class="card">
-    <h2>Agentes</h2>
-    <div id="listaAgentes" class="lista-campos"></div>
-    <button class="btn-add" onclick="adicionarCampo('agente')">+</button>
-  </section>
-
-  <!-- AÇÃO -->
-  <button class="btn-explorar" onclick="explorar()">Explorar</button>
-
-  <!-- RESULTADO -->
-  <section class="card resultado-card">
-    <h2>Resultado</h2>
-    <pre id="resultado"></pre>
-  </section>
-
-</main>
-
-<script src="./app.js"></script>
-</body>
-</html>
+/* Foco (acessibilidade) */
+.toggle-label input:focus-visible + .toggle-slider {
+  outline: 2px solid var(--primary-color, #0d6efd);
+  outline-offset: 2px;
+}
