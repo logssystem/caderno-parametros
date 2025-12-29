@@ -73,7 +73,7 @@ function criarCampo(tipo) {
 
   const input = document.createElement("input");
   input.type = "text";
-  input.placeholder = `Digite ${tipo.replace("_", " ")}`;
+  input.placeholder = Digite ${tipo.replace("_", " ")};
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
@@ -117,11 +117,12 @@ function criarCampo(tipo) {
 window.explorar = function () {
   const dados = {};
 
+  /* CAMPOS PADRÃO */
   Object.keys(listas).forEach(tipo => {
     dados[tipo] = [];
 
     document
-      .querySelectorAll(`#${listas[tipo]} .campo-descricao`)
+      .querySelectorAll(#${listas[tipo]} .campo-descricao)
       .forEach(campo => {
         const input = campo.querySelector("input[type=text]");
         const desc = campo.querySelector("textarea");
@@ -136,6 +137,7 @@ window.explorar = function () {
       });
   });
 
+  /* RAMAIS */
   dados.ramais = [];
 
   document.querySelectorAll("#listaRamais .campo").forEach(campo => {
@@ -152,6 +154,7 @@ window.explorar = function () {
     }
   });
 
+  /* RESULTADO FINAL */
   document.getElementById("resultado").textContent =
     JSON.stringify(dados, null, 2);
 };
