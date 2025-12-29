@@ -49,7 +49,7 @@ function criarCampo(tipo) {
       ["11 caracteres", v => v.length >= 11],
       ["1 letra maiúscula", v => /[A-Z]/.test(v)],
       ["1 número", v => /\d/.test(v)],
-      ["1 especial", v => /[^A-Za-z0-9]/.test(v)]
+      ["pelo menos um caractere especial (como @, #, $, etc.)", v => /[^A-Za-z0-9]/.test(v)]
     ];
 
     senhaInput.addEventListener("input", () => {
