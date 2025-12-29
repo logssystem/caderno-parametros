@@ -233,3 +233,13 @@ pre {
 .card.card-disabled .btn-add {
   display: none; /* esconde o botão + */
 }
+
+/* =========================
+   CAMPO DE SENHA – USUÁRIO WEB
+========================= */
+.campo-senha {
+  width: 50%;                 /* começa menor */
+  min-width: 220px;           /* tamanho mínimo confortável */
+  max-width: 100%;            /* pode crescer até o limite */
+  transition: width 0.2s ease;
+}
