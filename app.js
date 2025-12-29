@@ -203,3 +203,43 @@ if (toggleTheme) {
     localStorage.setItem("theme", isDark ? "dark" : "light");
   });
 }
+
+/* =========================
+   EXPLORAR / EXPORTAR
+========================= */
+window.explorar = function () {
+  const dados = {};
+
+  Object.keys(listas).forEach(tipo => {
+    dados[tipo] = [];
+
+    const container = document.getElementById(listas[tipo]);
+    if (!container) return;
+
+    container.querySelectorAll(".campo-descricao").forEach(campo => {
+      const chk = campo.querySelector("input[type=checkbox]");
+      if (chk && chk.checked) return;
+
+      const nomeInput = campo.querySelector("input[type=text]");
+      const desc = campo.querySelector("textarea");
+
+      if (!nomeInput || !nomeInput.value.trim()) return;
+
+      const item = {
+        nome: nomeInput.value.trim(),
+        descricao: desc ? desc.value.trim() : ""
+      };
+
+      // senha apenas para usuário web
+      if (tipo === "usuario_web") {
+        const senha = campo.querySelector(".campo-senha");
+        item.senha = senha ? senha.value : "";
+      }
+
+      dados[tipo].push(item);
+    });
+  });
+
+  document.getElementById("resultado").textContent =
+    JSON.stringify(dados, null, 2);
+};
