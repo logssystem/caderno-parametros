@@ -90,27 +90,43 @@ function criarCampo(tipo) {
   btn.onclick = () => wrap.remove();
 
   linha.append(input, btn);
+  wrap.append(linha);
 
   /* 🔐 SENHA – SOMENTE PARA USUÁRIO WEB */
   let senhaInput = null;
+
   if (tipo === "usuario_web") {
+    const senhaWrap = document.createElement("div");
+    senhaWrap.style.display = "flex";
+    senhaWrap.style.alignItems = "center";
+    senhaWrap.style.gap = "8px";
+
     senhaInput = document.createElement("input");
-    senhaInput.type = "password";
+    senhaInput.type = "text"; // começa visível
     senhaInput.placeholder = "Senha do usuário";
     senhaInput.className = "campo-senha";
+    senhaInput.style.width = "50%";
 
-    /* 🔥 AJUSTE AUTOMÁTICO DE LARGURA */
+    // ajuste automático de largura
     senhaInput.addEventListener("input", () => {
       const len = senhaInput.value.length;
-
-      if (len > 12) {
-        senhaInput.style.width = "100%";
-      } else if (len > 8) {
-        senhaInput.style.width = "75%";
-      } else {
-        senhaInput.style.width = "50%";
-      }
+      if (len > 12) senhaInput.style.width = "100%";
+      else if (len > 8) senhaInput.style.width = "75%";
+      else senhaInput.style.width = "50%";
     });
+
+    // botão mostrar / ocultar
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.textContent = "👁️";
+    toggle.title = "Mostrar / Ocultar senha";
+
+    toggle.addEventListener("click", () => {
+      senhaInput.type = senhaInput.type === "password" ? "text" : "password";
+    });
+
+    senhaWrap.append(senhaInput, toggle);
+    wrap.append(senhaWrap);
   }
 
   const desc = document.createElement("textarea");
@@ -148,12 +164,6 @@ function criarCampo(tipo) {
   });
 
   label.append(chk, text);
-
-  /* MONTAGEM FINAL */
-  wrap.append(linha);
-
-  if (senhaInput) wrap.append(senhaInput);
-
   wrap.append(desc, label);
 
   return wrap;
@@ -191,7 +201,7 @@ window.explorar = function () {
       });
   });
 
-  /* RAMAIS */
+  // RAMAIS
   dados.ramais = [];
   document.querySelectorAll("#listaRamais .campo").forEach(campo => {
     const inputs = campo.querySelectorAll("input[type=number]");
