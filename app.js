@@ -1,7 +1,13 @@
-console.log("APP.JS CARREGADO - VERSÃO FINAL");
+console.log("APP.JS CARREGADO - VERSÃO FINAL 600+");
 
-const LIMITE = 10;
+/* =========================
+   CONFIGURAÇÕES
+========================= */
+const LIMITE = 600;
 
+/* =========================
+   MAPEAMENTO DAS LISTAS
+========================= */
 const listas = {
   usuario_web: "listaUsuariosWeb",
   entrada: "listaEntradas",
@@ -11,71 +17,117 @@ const listas = {
   agente: "listaAgentes"
 };
 
+/* CONTADORES (EVITA querySelector pesado) */
+const contadores = {
+  usuario_web: 0,
+  entrada: 0,
+  ura: 0,
+  fila: 0,
+  ring: 0,
+  agente: 0
+};
+
+/* =========================
+   ADICIONAR CAMPO
+========================= */
 window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
   if (!container) return;
 
-  if (container.querySelectorAll(".campo-descricao").length >= LIMITE) {
-    mostrarToast("Limite máximo de 10 itens atingido", true);
+  if (contadores[tipo] >= LIMITE) {
+    mostrarToast(`Limite máximo de ${LIMITE} itens atingido`, true);
     return;
   }
 
-  container.appendChild(criarCampo(tipo));
+  const campo = criarCampo(tipo);
+  container.appendChild(campo);
+  contadores[tipo]++;
 };
 
+/* =========================
+   CRIAR CAMPO
+========================= */
 function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
+  wrap.style.marginBottom = "18px"; // 🔥 espaçamento entre campos
 
   const linha = document.createElement("div");
   linha.className = "linha-principal";
 
   const nome = document.createElement("input");
+  nome.type = "text";
   nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
   btn.type = "button";
-  btn.onclick = () => wrap.remove();
+  btn.onclick = () => {
+    wrap.remove();
+    contadores[tipo]--;
+  };
 
   linha.append(nome, btn);
   wrap.append(linha);
 
-  let senhaInput, regrasBox;
+  /* =========================
+     SENHA – SOMENTE USUÁRIO WEB
+  ========================= */
+  let senhaInput = null;
+  let regrasBox = null;
+  let senhaValidaAtual = false;
 
   if (tipo === "usuario_web") {
     senhaInput = document.createElement("input");
+    senhaInput.type = "text";
     senhaInput.className = "campo-senha";
     senhaInput.placeholder = "Senha do usuário";
+    senhaInput.style.width = "50%";
 
     regrasBox = document.createElement("div");
     regrasBox.className = "regras-senha";
 
-    const regras = [
-      ["pelo menos 11 caracteres", v => v.length >= 11],
-      ["pelo menos uma letra maiúscula", v => /[A-Z]/.test(v)],
-      ["pelo menos um número", v => /\d/.test(v)],
-      ["pelo menos um caractere especial (como @, #, $, etc.)", v => /[^A-Za-z0-9]/.test(v)]
-    ];
-
     senhaInput.addEventListener("input", () => {
+      const v = senhaInput.value;
       regrasBox.innerHTML = "";
       senhaInput.classList.remove("senha-invalida");
+      senhaValidaAtual = false;
 
-      const valor = senhaInput.value;
+      if (v.length < 11) {
+        regrasBox.innerHTML = regraErro("A senha deve ter pelo menos 11 caracteres.");
+        marcarErro();
+        return;
+      }
 
-      for (let [txt, fn] of regras) {
-        if (!fn(valor)) {
-          regrasBox.innerHTML = `<div class="regra-erro">A senha deve conter ${txt}.</div>`;
-          senhaInput.classList.add("senha-invalida");
-          ajustarLargura(senhaInput, valor.length);
-          return;
-        }
+      if (!/[A-Z]/.test(v)) {
+        regrasBox.innerHTML = regraErro("A senha deve conter pelo menos uma letra maiúscula.");
+        marcarErro();
+        return;
+      }
+
+      if (!/\d/.test(v)) {
+        regrasBox.innerHTML = regraErro("A senha deve conter pelo menos um número.");
+        marcarErro();
+        return;
+      }
+
+      if (!/[^A-Za-z0-9]/.test(v)) {
+        regrasBox.innerHTML = regraErro(
+          "A senha deve conter pelo menos um caractere especial (como @, #, $, etc.)."
+        );
+        marcarErro();
+        return;
       }
 
       regrasBox.innerHTML = `<div class="regra-ok">A senha é segura!</div>`;
-      ajustarLargura(senhaInput, valor.length);
+      senhaValidaAtual = true;
+      ajustarLarguraSenha(senhaInput, v.length);
     });
+
+    function marcarErro() {
+      senhaInput.classList.add("senha-invalida");
+      ajustarLarguraSenha(senhaInput, senhaInput.value.length);
+    }
 
     wrap.append(senhaInput, regrasBox);
   }
@@ -84,74 +136,119 @@ function criarCampo(tipo) {
   desc.placeholder = "Descrição (opcional)";
   wrap.append(desc);
 
+  /* =========================
+     VALIDAÇÃO NA EXPORTAÇÃO
+  ========================= */
+  wrap.validarSenha = () => {
+    if (!senhaInput) return true;
+    return senhaValidaAtual;
+  };
+
+  wrap.getSenha = () => (senhaInput ? senhaInput.value : "");
+
   return wrap;
 }
 
-function ajustarLargura(input, len) {
+/* =========================
+   AJUSTE DE LARGURA DA SENHA
+========================= */
+function ajustarLarguraSenha(input, len) {
   input.style.width =
-    len > 12 ? "100%" : len > 8 ? "75%" : "50%";
+    len > 14 ? "100%" :
+    len > 10 ? "75%" :
+    "50%";
 }
 
-function senhaValida(v) {
-  return (
-    v.length >= 11 &&
-    /[A-Z]/.test(v) &&
-    /\d/.test(v) &&
-    /[^A-Za-z0-9]/.test(v)
-  );
-}
-
+/* =========================
+   EXPORTAR / EXPLORAR
+========================= */
 window.explorar = function () {
-  let erro = false;
   const dados = {};
+  let erroSenha = false;
 
   Object.keys(listas).forEach(tipo => {
     dados[tipo] = [];
+    const container = document.getElementById(listas[tipo]);
+    if (!container) return;
 
-    document
-      .getElementById(listas[tipo])
-      .querySelectorAll(".campo-descricao")
-      .forEach(c => {
-        const nome = c.querySelector("input")?.value;
-        if (!nome) return;
+    container.querySelectorAll(".campo-descricao").forEach(campo => {
+      const nome = campo.querySelector("input[type=text]")?.value;
+      if (!nome) return;
 
-        const item = { nome };
+      if (tipo === "usuario_web" && !campo.validarSenha()) {
+        erroSenha = true;
+      }
 
-        if (tipo === "usuario_web") {
-          const senha = c.querySelector(".campo-senha").value;
-          if (!senhaValida(senha)) erro = true;
-          item.senha = senha;
-        }
+      const item = {
+        nome,
+        descricao: campo.querySelector("textarea")?.value || ""
+      };
 
-        dados[tipo].push(item);
-      });
+      if (tipo === "usuario_web") {
+        item.senha = campo.getSenha();
+      }
+
+      dados[tipo].push(item);
+    });
   });
 
-  if (erro) {
-    mostrarToast("Existe senha inválida. Corrija antes de continuar.", true);
+  if (erroSenha) {
+    mostrarToast(
+      "Existe senha inválida. Corrija antes de exportar.",
+      true
+    );
     return;
   }
 
   document.getElementById("resultado").textContent =
     JSON.stringify(dados, null, 2);
 
-  mostrarToast("Atualização completa");
+  mostrarToast("Exportação realizada com sucesso!");
 };
 
-/* TOAST */
+/* =========================
+   TOAST (CANTO DIREITO)
+========================= */
 function mostrarToast(msg, error = false) {
-  const t = document.getElementById("toastGlobal");
-  document.getElementById("toastMessage").textContent = msg;
-  t.className = "toast show" + (error ? " error" : "");
-  setTimeout(() => t.classList.remove("show"), 4000);
+  const toast = document.getElementById("toastGlobal");
+  const txt = document.getElementById("toastMessage");
+
+  txt.textContent = msg;
+  toast.className = "toast show" + (error ? " error" : "");
+
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 4000);
 }
 
-function fecharToast() {
+window.fecharToast = function () {
   document.getElementById("toastGlobal").classList.remove("show");
+};
+
+/* =========================
+   MODO ESCURO
+========================= */
+const toggleTheme = document.getElementById("toggleTheme");
+
+if (toggleTheme) {
+  const saved = localStorage.getItem("theme");
+  if (saved === "dark") {
+    document.body.classList.add("dark");
+    toggleTheme.textContent = "☀️";
+  }
+
+  toggleTheme.onclick = () => {
+    document.body.classList.toggle("dark");
+    const isDark = document.body.classList.contains("dark");
+    toggleTheme.textContent = isDark ? "☀️" : "🌙";
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  };
 }
 
-/* TEMA */
-const toggleTheme = document.getElementById("toggleTheme");
-toggleTheme.onclick = () => {
-  document.body.classList.toggle("dark");
-};
+/* =========================
+   HELPERS
+========================= */
+function regraErro(texto) {
+  return `<div class="regra-erro">${texto}</div>`;
+}
