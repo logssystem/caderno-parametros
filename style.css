@@ -316,3 +316,41 @@ pre {
 body.dark .toast {
   background: #16a34a;
 }
+
+/* =========================
+   SENHA INVÁLIDA (FEEDBACK)
+========================= */
+.senha-invalida {
+  border: 2px solid #ff3b3b !important;
+  box-shadow: 0 0 0 2px rgba(255, 59, 59, 0.25);
+}
+
+/* =========================
+   REGRAS DE SENHA
+========================= */
+.regra-erro {
+  background: #ff3b3b;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.regra-ok {
+  background: #16db65;
+  color: #111;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+/* Dark mode compatível */
+body.dark .regra-erro {
+  background: #ef4444;
+}
+
+body.dark .regra-ok {
+  background: #22c55e;
+}
