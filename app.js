@@ -61,13 +61,14 @@ function criarCampo(tipo) {
 
   if (tipo === "usuario_web") {
     senhaInput = document.createElement("input");
-    senhaInput.type = "text"; // 👁 senha visível
+    senhaInput.type = "text"; // senha visível
     senhaInput.placeholder = "Senha do usuário";
     senhaInput.className = "campo-senha";
     senhaInput.style.width = "50%";
 
     regrasBox = document.createElement("div");
     regrasBox.className = "regras-senha";
+    regrasBox.style.display = "none";
 
     const regras = {
       tamanho: criarRegra("A senha deve ter pelo menos 11 caracteres."),
@@ -88,6 +89,15 @@ function criarCampo(tipo) {
     senhaInput.addEventListener("input", () => {
       const v = senhaInput.value;
 
+      if (!v) {
+        regrasBox.style.display = "none";
+        regras.segura.style.display = "none";
+        senhaInput.style.width = "50%";
+        return;
+      }
+
+      regrasBox.style.display = "block";
+
       const okTamanho = v.length >= 11;
       const okMaiuscula = /[A-Z]/.test(v);
       const okNumero = /\d/.test(v);
@@ -101,7 +111,7 @@ function criarCampo(tipo) {
       const tudoOk = okTamanho && okMaiuscula && okNumero && okEspecial;
       regras.segura.style.display = tudoOk ? "block" : "none";
 
-      // 🔥 ajuste automático de largura
+      /* ajuste automático de largura */
       senhaInput.style.width =
         v.length > 12 ? "100%" : v.length > 8 ? "75%" : "50%";
     });
@@ -192,7 +202,7 @@ window.explorar = function () {
 };
 
 /* =========================
-   MODO ESCURO (RESTAURADO)
+   MODO ESCURO
 ========================= */
 const toggleTheme = document.getElementById("toggleTheme");
 
@@ -208,8 +218,8 @@ if (toggleTheme) {
 
   toggleTheme.addEventListener("click", () => {
     document.body.classList.toggle("dark");
-
     const isDark = document.body.classList.contains("dark");
+
     toggleTheme.textContent = isDark ? "☀️" : "🌙";
     localStorage.setItem("theme", isDark ? "dark" : "light");
   });
