@@ -190,3 +190,27 @@ window.explorar = function () {
   document.getElementById("resultado").textContent =
     JSON.stringify(dados, null, 2);
 };
+
+/* =========================
+   MODO ESCURO (RESTAURADO)
+========================= */
+const toggleTheme = document.getElementById("toggleTheme");
+
+if (toggleTheme) {
+  const savedTheme = localStorage.getItem("theme");
+
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark");
+    toggleTheme.textContent = "☀️";
+  } else {
+    toggleTheme.textContent = "🌙";
+  }
+
+  toggleTheme.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+
+    const isDark = document.body.classList.contains("dark");
+    toggleTheme.textContent = isDark ? "☀️" : "🌙";
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  });
+}
