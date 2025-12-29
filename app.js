@@ -53,7 +53,9 @@ function criarCampo(tipo) {
 
   linha.append(input, btn);
 
-  /* ========= SENHA ========= */
+  /* =========================
+     SENHA – FLUXO EM ETAPAS
+  ========================= */
   let senhaInput, regrasBox, regras;
 
   if (tipo === "usuario_web") {
@@ -86,41 +88,46 @@ function criarCampo(tipo) {
     senhaInput.addEventListener("input", () => {
       const v = senhaInput.value;
 
-      // reset
+      // esconder tudo inicialmente
+      Object.values(regras).forEach(r => (r.style.display = "none"));
       regrasBox.style.display = v ? "block" : "none";
-      regras.maiuscula.style.display = "none";
-      regras.numero.style.display = "none";
-      regras.especial.style.display = "none";
-      regras.segura.style.display = "none";
 
-      const okTamanho = v.length >= 11;
-      setRegra(regras.tamanho, okTamanho);
-
-      if (!okTamanho) return;
-
-      regras.maiuscula.style.display = "block";
-      const okMaiuscula = /[A-Z]/.test(v);
-      setRegra(regras.maiuscula, okMaiuscula);
-
-      if (!okMaiuscula) return;
-
-      regras.numero.style.display = "block";
-      const okNumero = /\d/.test(v);
-      setRegra(regras.numero, okNumero);
-
-      if (!okNumero) return;
-
-      regras.especial.style.display = "block";
-      const okEspecial = /[^A-Za-z0-9]/.test(v);
-      setRegra(regras.especial, okEspecial);
-
-      if (okEspecial) {
-        regras.segura.style.display = "block";
+      // etapa 1 – tamanho
+      if (v.length < 11) {
+        regras.tamanho.style.display = "block";
+        setRegra(regras.tamanho, false);
+        ajustarLarguraSenha(v.length);
+        return;
       }
 
-      // largura dinâmica
-      senhaInput.style.width =
-        v.length > 12 ? "100%" : v.length > 8 ? "75%" : "50%";
+      // etapa 2 – maiúscula
+      if (!/[A-Z]/.test(v)) {
+        regras.maiuscula.style.display = "block";
+        setRegra(regras.maiuscula, false);
+        ajustarLarguraSenha(v.length);
+        return;
+      }
+
+      // etapa 3 – número
+      if (!/\d/.test(v)) {
+        regras.numero.style.display = "block";
+        setRegra(regras.numero, false);
+        ajustarLarguraSenha(v.length);
+        return;
+      }
+
+      // etapa 4 – especial
+      if (!/[^A-Za-z0-9]/.test(v)) {
+        regras.especial.style.display = "block";
+        setRegra(regras.especial, false);
+        ajustarLarguraSenha(v.length);
+        return;
+      }
+
+      // etapa final – segura
+      regras.segura.style.display = "block";
+      setRegra(regras.segura, true);
+      ajustarLarguraSenha(v.length);
     });
   }
 
@@ -158,13 +165,24 @@ function criarCampo(tipo) {
 }
 
 /* =========================
+   AJUSTE DE LARGURA DA SENHA
+========================= */
+function ajustarLarguraSenha(len) {
+  const campo = document.querySelector(".campo-senha:last-of-type");
+  if (!campo) return;
+
+  campo.style.width =
+    len > 12 ? "100%" : len > 8 ? "75%" : "50%";
+}
+
+/* =========================
    HELPERS
 ========================= */
 function criarRegra(texto, verde = false) {
   const div = document.createElement("div");
   div.textContent = texto;
   div.className = verde ? "regra-ok" : "regra-erro";
-  div.style.display = verde ? "none" : "block";
+  div.style.display = "none";
   return div;
 }
 
