@@ -73,7 +73,7 @@ function criarCampo(tipo) {
 
   const input = document.createElement("input");
   input.type = "text";
-  input.placeholder = Digite ${tipo.replace("_", " ")};
+  input.placeholder = `Digite ${tipo.replace("_", " ")}`;
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
@@ -122,7 +122,7 @@ window.explorar = function () {
     dados[tipo] = [];
 
     document
-      .querySelectorAll(#${listas[tipo]} .campo-descricao)
+      .querySelectorAll(`#${listas[tipo]} .campo-descricao`)
       .forEach(campo => {
         const input = campo.querySelector("input[type=text]");
         const desc = campo.querySelector("textarea");
@@ -175,6 +175,7 @@ if (toggleTheme) {
   toggleTheme.addEventListener("click", () => {
     document.body.classList.toggle("dark");
     const isDark = document.body.classList.contains("dark");
+
     toggleTheme.textContent = isDark ? "☀️" : "🌙";
     localStorage.setItem("theme", isDark ? "dark" : "light");
   });
