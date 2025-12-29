@@ -2,7 +2,9 @@ console.log("APP.JS CARREGADO - VERSÃO FINAL ESTÁVEL");
 
 const LIMITE = 10;
 
-/* MAPEAMENTO DAS LISTAS */
+/* =========================
+   MAPEAMENTO DAS LISTAS
+========================= */
 const listas = {
   usuario_web: "listaUsuariosWeb",
   entrada: "listaEntradas",
@@ -19,6 +21,9 @@ window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
   if (!container) return;
 
+  const card = container.closest(".card");
+  if (card && card.classList.contains("card-disabled")) return;
+
   const total = container.querySelectorAll(".campo-descricao").length;
   if (total >= LIMITE) {
     alert("Limite máximo de 10 itens atingido");
@@ -34,6 +39,9 @@ window.adicionarCampo = function (tipo) {
 window.adicionarRamal = function () {
   const container = document.getElementById("listaRamais");
   if (!container) return;
+
+  const card = container.closest(".card");
+  if (card && card.classList.contains("card-disabled")) return;
 
   const total = container.querySelectorAll(".campo").length;
   if (total >= LIMITE) {
@@ -95,16 +103,23 @@ function criarCampo(tipo) {
   text.textContent = "Não será utilizado";
 
   chk.addEventListener("change", () => {
-    const disabled = chk.checked;
-    input.disabled = disabled;
-    desc.disabled = disabled;
+    const card = wrap.closest(".card");
 
-    if (disabled) {
+    if (chk.checked) {
+      card.classList.add("card-disabled");
+
+      card.querySelectorAll("input, textarea, button").forEach(el => {
+        if (el !== chk) el.disabled = true;
+      });
+
       input.value = "";
       desc.value = "";
-      wrap.style.opacity = "0.55";
     } else {
-      wrap.style.opacity = "1";
+      card.classList.remove("card-disabled");
+
+      card.querySelectorAll("input, textarea, button").forEach(el => {
+        el.disabled = false;
+      });
     }
   });
 
