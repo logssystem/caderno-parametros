@@ -243,3 +243,25 @@ pre {
   max-width: 100%;            /* pode crescer até o limite */
   transition: width 0.2s ease;
 }
+
+.regras-senha {
+  margin-top: 8px;
+}
+
+.regra-erro {
+  background: #ff3b3b;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.regra-ok {
+  background: #16db65;
+  color: #111;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
