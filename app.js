@@ -24,8 +24,7 @@ window.adicionarCampo = function (tipo) {
   const card = container.closest(".card");
   if (card && card.classList.contains("card-disabled")) return;
 
-  const total = container.querySelectorAll(".campo-descricao").length;
-  if (total >= LIMITE) {
+  if (container.querySelectorAll(".campo-descricao").length >= LIMITE) {
     alert("Limite máximo de 10 itens atingido");
     return;
   }
@@ -34,44 +33,7 @@ window.adicionarCampo = function (tipo) {
 };
 
 /* =========================
-   ADICIONAR RAMAL (RANGE)
-========================= */
-window.adicionarRamal = function () {
-  const container = document.getElementById("listaRamais");
-  if (!container) return;
-
-  const card = container.closest(".card");
-  if (card && card.classList.contains("card-disabled")) return;
-
-  const total = container.querySelectorAll(".campo").length;
-  if (total >= LIMITE) {
-    alert("Limite máximo de 10 ranges atingido");
-    return;
-  }
-
-  const wrapper = document.createElement("div");
-  wrapper.className = "campo";
-
-  const ini = document.createElement("input");
-  ini.type = "number";
-  ini.placeholder = "Ramal inicial (ex: 2000)";
-
-  const qtd = document.createElement("input");
-  qtd.type = "number";
-  qtd.placeholder = "Range (ex: 5)";
-
-  const btn = document.createElement("button");
-  btn.textContent = "✖";
-  btn.type = "button";
-  btn.onclick = () => wrapper.remove();
-
-  wrapper.append(ini, qtd, btn);
-  container.appendChild(wrapper);
-};
-
-/* =========================
-   CRIAR CAMPO COM DESCRIÇÃO
-   + SENHA (USUÁRIO WEB)
+   CRIAR CAMPO
 ========================= */
 function criarCampo(tipo) {
   const wrap = document.createElement("div");
@@ -90,43 +52,59 @@ function criarCampo(tipo) {
   btn.onclick = () => wrap.remove();
 
   linha.append(input, btn);
-  wrap.append(linha);
 
-  /* 🔐 SENHA – SOMENTE PARA USUÁRIO WEB */
+  /* =========================
+     SENHA (USUÁRIO WEB)
+  ========================= */
   let senhaInput = null;
+  let regrasBox = null;
 
   if (tipo === "usuario_web") {
-    const senhaWrap = document.createElement("div");
-    senhaWrap.style.display = "flex";
-    senhaWrap.style.alignItems = "center";
-    senhaWrap.style.gap = "8px";
-
     senhaInput = document.createElement("input");
-    senhaInput.type = "text"; // começa visível
+    senhaInput.type = "text"; // 👁 senha visível
     senhaInput.placeholder = "Senha do usuário";
     senhaInput.className = "campo-senha";
     senhaInput.style.width = "50%";
 
-    // ajuste automático de largura
+    regrasBox = document.createElement("div");
+    regrasBox.className = "regras-senha";
+
+    const regras = {
+      tamanho: criarRegra("A senha deve ter pelo menos 11 caracteres."),
+      maiuscula: criarRegra("A senha deve conter pelo menos uma letra maiúscula."),
+      numero: criarRegra("A senha deve conter pelo menos um número."),
+      especial: criarRegra("A senha deve conter pelo menos um caractere especial (como @, #, $, etc.)."),
+      segura: criarRegra("A senha é segura!", true)
+    };
+
+    regrasBox.append(
+      regras.tamanho,
+      regras.maiuscula,
+      regras.numero,
+      regras.especial,
+      regras.segura
+    );
+
     senhaInput.addEventListener("input", () => {
-      const len = senhaInput.value.length;
-      if (len > 12) senhaInput.style.width = "100%";
-      else if (len > 8) senhaInput.style.width = "75%";
-      else senhaInput.style.width = "50%";
+      const v = senhaInput.value;
+
+      const okTamanho = v.length >= 11;
+      const okMaiuscula = /[A-Z]/.test(v);
+      const okNumero = /\d/.test(v);
+      const okEspecial = /[^A-Za-z0-9]/.test(v);
+
+      setRegra(regras.tamanho, okTamanho);
+      setRegra(regras.maiuscula, okMaiuscula);
+      setRegra(regras.numero, okNumero);
+      setRegra(regras.especial, okEspecial);
+
+      const tudoOk = okTamanho && okMaiuscula && okNumero && okEspecial;
+      regras.segura.style.display = tudoOk ? "block" : "none";
+
+      // 🔥 ajuste automático de largura
+      senhaInput.style.width =
+        v.length > 12 ? "100%" : v.length > 8 ? "75%" : "50%";
     });
-
-    // botão mostrar / ocultar
-    const toggle = document.createElement("button");
-    toggle.type = "button";
-    toggle.textContent = "👁️";
-    toggle.title = "Mostrar / Ocultar senha";
-
-    toggle.addEventListener("click", () => {
-      senhaInput.type = senhaInput.type === "password" ? "text" : "password";
-    });
-
-    senhaWrap.append(senhaInput, toggle);
-    wrap.append(senhaWrap);
   }
 
   const desc = document.createElement("textarea");
@@ -138,39 +116,52 @@ function criarCampo(tipo) {
   const chk = document.createElement("input");
   chk.type = "checkbox";
 
-  const text = document.createElement("span");
-  text.textContent = "Não será utilizado";
-
   chk.addEventListener("change", () => {
     const card = wrap.closest(".card");
 
     if (chk.checked) {
       card.classList.add("card-disabled");
-
       card.querySelectorAll("input, textarea, button").forEach(el => {
         if (el !== chk) el.disabled = true;
       });
-
       input.value = "";
       desc.value = "";
       if (senhaInput) senhaInput.value = "";
     } else {
       card.classList.remove("card-disabled");
-
       card.querySelectorAll("input, textarea, button").forEach(el => {
         el.disabled = false;
       });
     }
   });
 
-  label.append(chk, text);
+  label.append(chk, " Não será utilizado");
+
+  /* MONTAGEM */
+  wrap.append(linha);
+  if (senhaInput) wrap.append(senhaInput, regrasBox);
   wrap.append(desc, label);
 
   return wrap;
 }
 
 /* =========================
-   EXPLORAR / EXPORTAR
+   HELPERS DE REGRA
+========================= */
+function criarRegra(texto, verde = false) {
+  const div = document.createElement("div");
+  div.textContent = texto;
+  div.className = verde ? "regra-ok" : "regra-erro";
+  div.style.display = verde ? "none" : "block";
+  return div;
+}
+
+function setRegra(el, ok) {
+  el.className = ok ? "regra-ok" : "regra-erro";
+}
+
+/* =========================
+   EXPLORAR
 ========================= */
 window.explorar = function () {
   const dados = {};
@@ -178,67 +169,24 @@ window.explorar = function () {
   Object.keys(listas).forEach(tipo => {
     dados[tipo] = [];
 
-    document
-      .querySelectorAll(`#${listas[tipo]} .campo-descricao`)
-      .forEach(campo => {
-        const input = campo.querySelector("input[type=text]");
-        const desc = campo.querySelector("textarea");
-        const chk = campo.querySelector("input[type=checkbox]");
+    document.querySelectorAll(`#${listas[tipo]} .campo-descricao`).forEach(campo => {
+      const input = campo.querySelector("input[type=text]");
+      const desc = campo.querySelector("textarea");
+      const chk = campo.querySelector("input[type=checkbox]");
 
-        if (!chk.checked && input.value.trim()) {
-          const item = {
-            nome: input.value.trim(),
-            descricao: desc.value.trim()
-          };
+      if (!chk.checked && input.value.trim()) {
+        const item = { nome: input.value.trim(), descricao: desc.value.trim() };
 
-          if (tipo === "usuario_web") {
-            const senha = campo.querySelector(".campo-senha");
-            item.senha = senha ? senha.value : "";
-          }
-
-          dados[tipo].push(item);
+        if (tipo === "usuario_web") {
+          const senha = campo.querySelector(".campo-senha");
+          item.senha = senha ? senha.value : "";
         }
-      });
-  });
 
-  // RAMAIS
-  dados.ramais = [];
-  document.querySelectorAll("#listaRamais .campo").forEach(campo => {
-    const inputs = campo.querySelectorAll("input[type=number]");
-    if (inputs.length < 2) return;
-
-    const base = parseInt(inputs[0].value);
-    const range = parseInt(inputs[1].value);
-
-    if (!isNaN(base) && !isNaN(range) && range > 0) {
-      for (let i = 1; i <= range; i++) {
-        dados.ramais.push(base + i);
+        dados[tipo].push(item);
       }
-    }
+    });
   });
 
   document.getElementById("resultado").textContent =
     JSON.stringify(dados, null, 2);
 };
-
-/* =========================
-   MODO ESCURO
-========================= */
-const toggleTheme = document.getElementById("toggleTheme");
-
-if (toggleTheme) {
-  const savedTheme = localStorage.getItem("theme");
-
-  if (savedTheme === "dark") {
-    document.body.classList.add("dark");
-    toggleTheme.textContent = "☀️";
-  }
-
-  toggleTheme.addEventListener("click", () => {
-    document.body.classList.toggle("dark");
-    const isDark = document.body.classList.contains("dark");
-
-    toggleTheme.textContent = isDark ? "☀️" : "🌙";
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-  });
-}
