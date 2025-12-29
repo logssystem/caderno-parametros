@@ -1,30 +1,51 @@
-/* ================================
-   CAMPO "NÃO SERÁ UTILIZADO"
-   (AJUSTE MINIMO E SEGURO)
-================================ */
+.campo-toggle {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
 
-/* Container do checkbox + texto */
-.nao-utilizado {
+.toggle-label {
   display: flex;
   align-items: center;
-  justify-content: flex-end; /* mantém do lado direito como sempre foi */
-  gap: 6px;
-
-  margin-top: 6px;
-  padding-right: 6px;
-
-  font-size: 13px;
-  font-weight: 400;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
   color: var(--text-color);
 }
 
-/* Checkbox padrão (sem customização visual) */
-.nao-utilizado input[type="checkbox"] {
-  margin: 0;
-  cursor: pointer;
+/* Esconde o checkbox */
+.toggle-label input {
+  display: none;
 }
 
-/* Campo desativado (quando marcado) */
-.campo.desativado {
-  opacity: 0.55;
+/* Base do switch */
+.toggle-slider {
+  width: 42px;
+  height: 22px;
+  background: var(--border-color);
+  border-radius: 20px;
+  position: relative;
+  transition: 0.3s;
+}
+
+/* Bolinha */
+.toggle-slider::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: 0.3s;
+}
+
+/* Ativo */
+.toggle-label input:checked + .toggle-slider {
+  background: #dc3545;
+}
+
+.toggle-label input:checked + .toggle-slider::before {
+  transform: translateX(20px);
 }
