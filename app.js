@@ -15,14 +15,14 @@ const listas = {
 };
 
 /* =========================
-   ADICIONAR CAMPO PADRÃO
+   ADICIONAR CAMPO
 ========================= */
 window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
   if (!container) return;
 
   const card = container.closest(".card");
-  if (card && card.classList.contains("card-disabled")) return;
+  if (card?.classList.contains("card-disabled")) return;
 
   if (container.querySelectorAll(".campo-descricao").length >= LIMITE) {
     alert("Limite máximo de 10 itens atingido");
@@ -53,15 +53,12 @@ function criarCampo(tipo) {
 
   linha.append(input, btn);
 
-  /* =========================
-     SENHA (USUÁRIO WEB)
-  ========================= */
-  let senhaInput = null;
-  let regrasBox = null;
+  /* ========= SENHA ========= */
+  let senhaInput, regrasBox, regras;
 
   if (tipo === "usuario_web") {
     senhaInput = document.createElement("input");
-    senhaInput.type = "text"; // senha visível
+    senhaInput.type = "text";
     senhaInput.placeholder = "Senha do usuário";
     senhaInput.className = "campo-senha";
     senhaInput.style.width = "50%";
@@ -70,7 +67,7 @@ function criarCampo(tipo) {
     regrasBox.className = "regras-senha";
     regrasBox.style.display = "none";
 
-    const regras = {
+    regras = {
       tamanho: criarRegra("A senha deve ter pelo menos 11 caracteres."),
       maiuscula: criarRegra("A senha deve conter pelo menos uma letra maiúscula."),
       numero: criarRegra("A senha deve conter pelo menos um número."),
@@ -89,29 +86,39 @@ function criarCampo(tipo) {
     senhaInput.addEventListener("input", () => {
       const v = senhaInput.value;
 
-      if (!v) {
-        regrasBox.style.display = "none";
-        regras.segura.style.display = "none";
-        senhaInput.style.width = "50%";
-        return;
-      }
-
-      regrasBox.style.display = "block";
+      // reset
+      regrasBox.style.display = v ? "block" : "none";
+      regras.maiuscula.style.display = "none";
+      regras.numero.style.display = "none";
+      regras.especial.style.display = "none";
+      regras.segura.style.display = "none";
 
       const okTamanho = v.length >= 11;
-      const okMaiuscula = /[A-Z]/.test(v);
-      const okNumero = /\d/.test(v);
-      const okEspecial = /[^A-Za-z0-9]/.test(v);
-
       setRegra(regras.tamanho, okTamanho);
+
+      if (!okTamanho) return;
+
+      regras.maiuscula.style.display = "block";
+      const okMaiuscula = /[A-Z]/.test(v);
       setRegra(regras.maiuscula, okMaiuscula);
+
+      if (!okMaiuscula) return;
+
+      regras.numero.style.display = "block";
+      const okNumero = /\d/.test(v);
       setRegra(regras.numero, okNumero);
+
+      if (!okNumero) return;
+
+      regras.especial.style.display = "block";
+      const okEspecial = /[^A-Za-z0-9]/.test(v);
       setRegra(regras.especial, okEspecial);
 
-      const tudoOk = okTamanho && okMaiuscula && okNumero && okEspecial;
-      regras.segura.style.display = tudoOk ? "block" : "none";
+      if (okEspecial) {
+        regras.segura.style.display = "block";
+      }
 
-      /* ajuste automático de largura */
+      // largura dinâmica
       senhaInput.style.width =
         v.length > 12 ? "100%" : v.length > 8 ? "75%" : "50%";
     });
@@ -129,20 +136,15 @@ function criarCampo(tipo) {
   chk.addEventListener("change", () => {
     const card = wrap.closest(".card");
 
-    if (chk.checked) {
-      card.classList.add("card-disabled");
-      card.querySelectorAll("input, textarea, button").forEach(el => {
-        if (el !== chk) el.disabled = true;
-      });
-      input.value = "";
-      desc.value = "";
-      if (senhaInput) senhaInput.value = "";
-    } else {
-      card.classList.remove("card-disabled");
-      card.querySelectorAll("input, textarea, button").forEach(el => {
-        el.disabled = false;
-      });
-    }
+    card.classList.toggle("card-disabled", chk.checked);
+
+    card.querySelectorAll("input, textarea, button").forEach(el => {
+      if (el !== chk) el.disabled = chk.checked;
+    });
+
+    input.value = "";
+    desc.value = "";
+    if (senhaInput) senhaInput.value = "";
   });
 
   label.append(chk, " Não será utilizado");
@@ -156,7 +158,7 @@ function criarCampo(tipo) {
 }
 
 /* =========================
-   HELPERS DE REGRA
+   HELPERS
 ========================= */
 function criarRegra(texto, verde = false) {
   const div = document.createElement("div");
@@ -169,37 +171,6 @@ function criarRegra(texto, verde = false) {
 function setRegra(el, ok) {
   el.className = ok ? "regra-ok" : "regra-erro";
 }
-
-/* =========================
-   EXPLORAR
-========================= */
-window.explorar = function () {
-  const dados = {};
-
-  Object.keys(listas).forEach(tipo => {
-    dados[tipo] = [];
-
-    document.querySelectorAll(`#${listas[tipo]} .campo-descricao`).forEach(campo => {
-      const input = campo.querySelector("input[type=text]");
-      const desc = campo.querySelector("textarea");
-      const chk = campo.querySelector("input[type=checkbox]");
-
-      if (!chk.checked && input.value.trim()) {
-        const item = { nome: input.value.trim(), descricao: desc.value.trim() };
-
-        if (tipo === "usuario_web") {
-          const senha = campo.querySelector(".campo-senha");
-          item.senha = senha ? senha.value : "";
-        }
-
-        dados[tipo].push(item);
-      }
-    });
-  });
-
-  document.getElementById("resultado").textContent =
-    JSON.stringify(dados, null, 2);
-};
 
 /* =========================
    MODO ESCURO
