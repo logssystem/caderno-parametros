@@ -18,9 +18,7 @@
     <h1 class="app-title">Caderno de Parâmetros</h1>
   </div>
 
-  <button id="toggleTheme" class="theme-toggle" title="Alternar tema">
-    🌙
-  </button>
+  <button id="toggleTheme" class="theme-toggle" title="Alternar tema">🌙</button>
 </header>
 
 <!-- CONTEÚDO -->
@@ -30,11 +28,6 @@
     <h2>Usuários Web</h2>
     <div id="listaUsuariosWeb"></div>
     <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
-  </section>
-
-  <section class="card">
-    <h2>Ramais (Range)</h2>
-    <div id="listaRamais"></div>
   </section>
 
   <section class="card">
@@ -74,9 +67,9 @@
 
 </main>
 
-<!-- TOAST -->
-<div id="toastSucesso" class="toast">
-  <span>Senha válida e segura</span>
+<!-- TOAST GLOBAL -->
+<div id="toastGlobal" class="toast">
+  <span id="toastMessage"></span>
   <button onclick="fecharToast()">×</button>
 </div>
 
