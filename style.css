@@ -65,15 +65,31 @@ body {
   background: var(--card-bg);
   border-radius: 14px;
   padding: 22px 26px;
-  margin-bottom: 22px;
+  margin-bottom: 28px; /* 🔥 MAIS RESPIRO ENTRE CARDS */
   box-shadow: 0 10px 28px rgba(0,0,0,0.06);
 }
 
-.card h2 { margin-bottom: 12px; }
+.card h2 { margin-bottom: 16px; }
 
 /* CAMPOS */
-.campo-descricao { display: flex; flex-direction: column; gap: 10px; }
-.linha-principal { display: flex; gap: 10px; }
+.campo-descricao {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;          /* 🔥 AFASTAMENTO ENTRE CAMPOS */
+  padding-bottom: 16px;         /* 🔥 RESPIRO VISUAL */
+  border-bottom: 1px dashed var(--border);
+}
+
+.campo-descricao:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.linha-principal {
+  display: flex;
+  gap: 10px;
+}
 
 input, textarea {
   width: 100%;
@@ -84,7 +100,10 @@ input, textarea {
   color: var(--text);
 }
 
-textarea { resize: none; height: 56px; }
+textarea {
+  resize: none;
+  height: 56px;
+}
 
 /* SENHA */
 .campo-senha {
@@ -116,6 +135,7 @@ textarea { resize: none; height: 56px; }
 
 /* BOTÕES */
 .btn-add {
+  margin-top: 20px; /* 🔥 MAIS AFASTADO DOS CAMPOS */
   width: 46px;
   height: 46px;
   border-radius: 12px;
@@ -126,7 +146,7 @@ textarea { resize: none; height: 56px; }
 }
 
 .btn-explorar {
-  margin: 48px auto;
+  margin: 56px auto;
   padding: 16px 48px;
   border-radius: 12px;
   background: var(--accent);
