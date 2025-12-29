@@ -43,7 +43,7 @@ body {
 }
 
 /* =========================
-   HEADER (NORMAL – NÃO FIXO)
+   HEADER (NÃO FIXO)
 ========================= */
 .app-header {
   position: static;
@@ -58,7 +58,6 @@ body {
   padding: 0 48px;
 }
 
-/* LOGO */
 .header-left {
   display: flex;
   align-items: center;
@@ -71,7 +70,6 @@ body {
   object-fit: contain;
 }
 
-/* TÍTULO */
 .header-center {
   display: flex;
   justify-content: center;
@@ -148,21 +146,31 @@ body {
 }
 
 /* =========================
-   NÃO UTILIZADO
+   NÃO SERÁ UTILIZADO (AJUSTADO)
 ========================= */
 .nao-utilizado {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 6px 14px;
+  font-size: 13px;
+  background: var(--chip-bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 6px;
-  padding: 6px 12px;
-  font-size: 13px;
-  background: var(--chip-bg);
-  border-radius: 999px;
   cursor: pointer;
+  transition: border 0.2s ease, background 0.2s ease;
+}
+
+.nao-utilizado:hover {
+  border-color: var(--accent);
 }
 
 .nao-utilizado input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
   accent-color: var(--accent);
 }
 
