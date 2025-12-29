@@ -71,6 +71,7 @@ window.adicionarRamal = function () {
 
 /* =========================
    CRIAR CAMPO COM DESCRIÇÃO
+   + SENHA (USUÁRIO WEB)
 ========================= */
 function criarCampo(tipo) {
   const wrap = document.createElement("div");
@@ -89,6 +90,15 @@ function criarCampo(tipo) {
   btn.onclick = () => wrap.remove();
 
   linha.append(input, btn);
+
+  /* SENHA – SOMENTE PARA USUÁRIO WEB */
+  let senhaInput = null;
+  if (tipo === "usuario_web") {
+    senhaInput = document.createElement("input");
+    senhaInput.type = "password";
+    senhaInput.placeholder = "Senha do usuário";
+    senhaInput.className = "campo-senha";
+  }
 
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
@@ -114,6 +124,7 @@ function criarCampo(tipo) {
 
       input.value = "";
       desc.value = "";
+      if (senhaInput) senhaInput.value = "";
     } else {
       card.classList.remove("card-disabled");
 
@@ -124,7 +135,13 @@ function criarCampo(tipo) {
   });
 
   label.append(chk, text);
-  wrap.append(linha, desc, label);
+
+  /* MONTAGEM FINAL */
+  wrap.append(linha);
+
+  if (senhaInput) wrap.append(senhaInput);
+
+  wrap.append(desc, label);
 
   return wrap;
 }
@@ -146,14 +163,22 @@ window.explorar = function () {
         const chk = campo.querySelector("input[type=checkbox]");
 
         if (!chk.checked && input.value.trim()) {
-          dados[tipo].push({
+          const item = {
             nome: input.value.trim(),
             descricao: desc.value.trim()
-          });
+          };
+
+          if (tipo === "usuario_web") {
+            const senha = campo.querySelector(".campo-senha");
+            item.senha = senha ? senha.value : "";
+          }
+
+          dados[tipo].push(item);
         }
       });
   });
 
+  /* RAMAIS */
   dados.ramais = [];
   document.querySelectorAll("#listaRamais .campo").forEach(campo => {
     const inputs = campo.querySelectorAll("input[type=number]");
