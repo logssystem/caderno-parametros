@@ -14,7 +14,11 @@ const listas = {
 window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
   if (!container) return;
-  if (container.children.length >= LIMITE) return;
+
+  if (container.querySelectorAll(".campo-descricao").length >= LIMITE) {
+    mostrarToast("Limite máximo de 10 itens atingido", true);
+    return;
+  }
 
   container.appendChild(criarCampo(tipo));
 };
@@ -31,6 +35,7 @@ function criarCampo(tipo) {
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
+  btn.type = "button";
   btn.onclick = () => wrap.remove();
 
   linha.append(nome, btn);
@@ -44,11 +49,12 @@ function criarCampo(tipo) {
     senhaInput.placeholder = "Senha do usuário";
 
     regrasBox = document.createElement("div");
+    regrasBox.className = "regras-senha";
 
     const regras = [
-      ["11 caracteres", v => v.length >= 11],
-      ["1 letra maiúscula", v => /[A-Z]/.test(v)],
-      ["1 número", v => /\d/.test(v)],
+      ["pelo menos 11 caracteres", v => v.length >= 11],
+      ["pelo menos uma letra maiúscula", v => /[A-Z]/.test(v)],
+      ["pelo menos um número", v => /\d/.test(v)],
       ["pelo menos um caractere especial (como @, #, $, etc.)", v => /[^A-Za-z0-9]/.test(v)]
     ];
 
@@ -60,14 +66,14 @@ function criarCampo(tipo) {
 
       for (let [txt, fn] of regras) {
         if (!fn(valor)) {
-          regrasBox.innerHTML = `<div class="regra-erro">A senha deve conter ${txt}</div>`;
+          regrasBox.innerHTML = `<div class="regra-erro">A senha deve conter ${txt}.</div>`;
           senhaInput.classList.add("senha-invalida");
           ajustarLargura(senhaInput, valor.length);
           return;
         }
       }
 
-      regrasBox.innerHTML = `<div class="regra-ok">Senha segura</div>`;
+      regrasBox.innerHTML = `<div class="regra-ok">A senha é segura!</div>`;
       ajustarLargura(senhaInput, valor.length);
     });
 
@@ -82,11 +88,17 @@ function criarCampo(tipo) {
 }
 
 function ajustarLargura(input, len) {
-  input.style.width = len > 12 ? "100%" : len > 8 ? "75%" : "50%";
+  input.style.width =
+    len > 12 ? "100%" : len > 8 ? "75%" : "50%";
 }
 
 function senhaValida(v) {
-  return v.length >= 11 && /[A-Z]/.test(v) && /\d/.test(v) && /[^A-Za-z0-9]/.test(v);
+  return (
+    v.length >= 11 &&
+    /[A-Z]/.test(v) &&
+    /\d/.test(v) &&
+    /[^A-Za-z0-9]/.test(v)
+  );
 }
 
 window.explorar = function () {
@@ -95,7 +107,10 @@ window.explorar = function () {
 
   Object.keys(listas).forEach(tipo => {
     dados[tipo] = [];
-    document.getElementById(listas[tipo]).querySelectorAll(".campo-descricao")
+
+    document
+      .getElementById(listas[tipo])
+      .querySelectorAll(".campo-descricao")
       .forEach(c => {
         const nome = c.querySelector("input")?.value;
         if (!nome) return;
