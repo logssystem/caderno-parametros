@@ -3,82 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <title>Caderno de Parâmetros</title>
-
-  <!-- CSS COMENTADO PARA TESTE -->
-  <!-- <link rel="stylesheet" href="./style.css" /> -->
+  <link rel="stylesheet" href="./style.css" />
 </head>
 
 <body>
 
-  <!-- HEADER -->
-  <header class="app-header">
-    <div class="header-left">
-      <img src="./assets/image.png" alt="Logo ZRA" class="app-logo" />
-    </div>
+<!-- HEADER -->
+<header class="app-header">
+  <div class="header-left">
+    <img src="./assets/image.png" alt="Logo ZRA" class="app-logo" />
+  </div>
 
-    <div class="header-center">
-      <h1 class="app-title">Caderno de Parâmetros</h1>
-    </div>
+  <div class="header-center">
+    <h1 class="app-title">Caderno de Parâmetros</h1>
+  </div>
 
-    <button id="toggleTheme" class="theme-toggle" title="Alternar tema">
-      🌙
-    </button>
-  </header>
+  <button id="toggleTheme" class="theme-toggle" title="Alternar tema">
+    🌙
+  </button>
+</header>
 
-  <!-- CONTEÚDO PRINCIPAL -->
-  <main class="form-container">
+<!-- CONTEÚDO PRINCIPAL -->
+<main class="form-container">
 
-    <section class="card">
-      <h2>Usuários Web</h2>
-      <div id="listaUsuariosWeb"></div>
-      <button class="btn-add">+</button>
-    </section>
+  <section class="card">
+    <h2>Usuários Web</h2>
+    <div id="listaUsuariosWeb"></div>
+    <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
+  </section>
 
-    <section class="card">
-      <h2>Ramais (Range)</h2>
-      <div id="listaRamais"></div>
-      <button class="btn-add">+</button>
-    </section>
+  <section class="card">
+    <h2>Ramais (Range)</h2>
+    <div id="listaRamais"></div>
+    <button class="btn-add" onclick="adicionarRamal()">+</button>
+  </section>
 
-    <section class="card">
-      <h2>Números de Entrada</h2>
-      <div id="listaEntradas"></div>
-      <button class="btn-add">+</button>
-    </section>
+  <section class="card">
+    <h2>Números de Entrada</h2>
+    <div id="listaEntradas"></div>
+    <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
+  </section>
 
-    <section class="card">
-      <h2>URAs</h2>
-      <div id="listaURAs"></div>
-      <button class="btn-add">+</button>
-    </section>
+  <section class="card">
+    <h2>URAs</h2>
+    <div id="listaURAs"></div>
+    <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
+  </section>
 
-    <section class="card">
-      <h2>Filas</h2>
-      <div id="listaFilas"></div>
-      <button class="btn-add">+</button>
-    </section>
+  <section class="card">
+    <h2>Filas</h2>
+    <div id="listaFilas"></div>
+    <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
+  </section>
 
-    <section class="card">
-      <h2>Grupo de Ring</h2>
-      <div id="listaRings"></div>
-      <button class="btn-add">+</button>
-    </section>
+  <section class="card">
+    <h2>Grupo de Ring</h2>
+    <div id="listaRings"></div>
+    <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
+  </section>
 
-    <section class="card">
-      <h2>Agentes</h2>
-      <div id="listaAgentes"></div>
-      <button class="btn-add">+</button>
-    </section>
+  <section class="card">
+    <h2>Agentes</h2>
+    <div id="listaAgentes"></div>
+    <button class="btn-add" onclick="adicionarCampo('agente')">+</button>
+  </section>
 
-    <button class="btn-explorar">Explorar</button>
+  <button class="btn-explorar" onclick="explorar()">Explorar</button>
 
-    <h2>Resultado</h2>
-    <pre id="resultado"></pre>
+  <h2>Resultado</h2>
+  <pre id="resultado"></pre>
 
-  </main>
+</main>
 
-  <!-- JS COMENTADO PARA TESTE -->
-  <!-- <script src="./app.js"></script> -->
-
+<script src="./app.js"></script>
 </body>
 </html>
