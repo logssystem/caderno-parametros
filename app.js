@@ -50,8 +50,8 @@ function criarCampo(tipo) {
 
   linha.append(input, btn);
 
-  /* ===== SENHA EM ETAPAS ===== */
-  let senhaInput, regrasBox, regras;
+  /* ===== SENHA EM ETAPAS (USUÁRIO WEB) ===== */
+  let senhaInput, regrasBox, regras, senhaValida = false;
 
   if (tipo === "usuario_web") {
     senhaInput = document.createElement("input");
@@ -76,43 +76,45 @@ function criarCampo(tipo) {
 
     senhaInput.addEventListener("input", () => {
       const v = senhaInput.value;
+      senhaValida = false;
 
       regrasBox.style.display = v ? "block" : "none";
-      Object.values(regras).forEach(r => r.style.display = "none");
+      Object.values(regras).forEach(r => (r.style.display = "none"));
+
+      senhaInput.classList.remove("senha-invalida");
 
       if (v.length < 11) {
         regras.tamanho.style.display = "block";
-        setRegra(regras.tamanho, false);
         ajustarLarguraSenha(senhaInput, v.length);
         return;
       }
 
       if (!/[A-Z]/.test(v)) {
         regras.maiuscula.style.display = "block";
-        setRegra(regras.maiuscula, false);
         ajustarLarguraSenha(senhaInput, v.length);
         return;
       }
 
       if (!/\d/.test(v)) {
         regras.numero.style.display = "block";
-        setRegra(regras.numero, false);
         ajustarLarguraSenha(senhaInput, v.length);
         return;
       }
 
       if (!/[^A-Za-z0-9]/.test(v)) {
         regras.especial.style.display = "block";
-        setRegra(regras.especial, false);
         ajustarLarguraSenha(senhaInput, v.length);
         return;
       }
 
       regras.segura.style.display = "block";
-      setRegra(regras.segura, true);
+      senhaValida = true;
       ajustarLarguraSenha(senhaInput, v.length);
       mostrarToast();
     });
+
+    // flag usada no export
+    wrap._senhaValida = () => senhaValida;
   }
 
   const desc = document.createElement("textarea");
@@ -157,10 +159,6 @@ function criarRegra(texto, verde = false) {
   return div;
 }
 
-function setRegra(el, ok) {
-  el.className = ok ? "regra-ok" : "regra-erro";
-}
-
 function ajustarLarguraSenha(input, len) {
   input.style.width =
     len > 12 ? "100%" : len > 8 ? "75%" : "50%";
@@ -171,6 +169,8 @@ function ajustarLarguraSenha(input, len) {
 ========================= */
 function mostrarToast() {
   const toast = document.getElementById("toastSucesso");
+  if (!toast) return;
+
   toast.classList.add("show");
 
   clearTimeout(toast._timer);
@@ -179,36 +179,12 @@ function mostrarToast() {
   }, 4000);
 }
 
-function fecharToast() {
-  document.getElementById("toastSucesso").classList.remove("show");
-}
-
 /* =========================
-   MODO ESCURO
-========================= */
-const toggleTheme = document.getElementById("toggleTheme");
-
-if (toggleTheme) {
-  const savedTheme = localStorage.getItem("theme");
-
-  if (savedTheme === "dark") {
-    document.body.classList.add("dark");
-    toggleTheme.textContent = "☀️";
-  }
-
-  toggleTheme.addEventListener("click", () => {
-    document.body.classList.toggle("dark");
-    const isDark = document.body.classList.contains("dark");
-    toggleTheme.textContent = isDark ? "☀️" : "🌙";
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-  });
-}
-
-/* =========================
-   EXPLORAR / EXPORTAR
+   EXPLORAR / EXPORTAR (COM BLOQUEIO)
 ========================= */
 window.explorar = function () {
   const dados = {};
+  let erroSenha = false;
 
   Object.keys(listas).forEach(tipo => {
     dados[tipo] = [];
@@ -230,16 +206,52 @@ window.explorar = function () {
         descricao: desc ? desc.value.trim() : ""
       };
 
-      // senha apenas para usuário web
       if (tipo === "usuario_web") {
-        const senha = campo.querySelector(".campo-senha");
-        item.senha = senha ? senha.value : "";
+        const senhaInput = campo.querySelector(".campo-senha");
+
+        if (!campo._senhaValida || !campo._senhaValida()) {
+          senhaInput?.classList.add("senha-invalida");
+          senhaInput?.focus();
+          erroSenha = true;
+          return;
+        }
+
+        item.senha = senhaInput.value;
       }
 
       dados[tipo].push(item);
     });
   });
 
+  if (erroSenha) {
+    alert(
+      "Existe senha inválida em Usuários Web.\n\n" +
+      "Corrija antes de exportar."
+    );
+    return;
+  }
+
   document.getElementById("resultado").textContent =
     JSON.stringify(dados, null, 2);
 };
+
+/* =========================
+   MODO ESCURO
+========================= */
+const toggleTheme = document.getElementById("toggleTheme");
+
+if (toggleTheme) {
+  const savedTheme = localStorage.getItem("theme");
+
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark");
+    toggleTheme.textContent = "☀️";
+  }
+
+  toggleTheme.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    const isDark = document.body.classList.contains("dark");
+    toggleTheme.textContent = isDark ? "☀️" : "🌙";
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  });
+}
