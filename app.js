@@ -25,7 +25,7 @@ const PERMISSOES = [
   "Super Administrador"
 ];
 
-/* 🔑 MAPA DE ATALHOS CSV */
+/* ATALHOS CSV */
 const MAPA_PERMISSOES = {
   pabx: "Administrador do Módulo de PABX",
   agente: "Agente de Call Center",
@@ -38,92 +38,69 @@ const MAPA_PERMISSOES = {
   super_admin: "Super Administrador"
 };
 
-/* ================= ADICIONAR CAMPO ================= */
+/* ADICIONAR CAMPO */
 window.adicionarCampo = function (tipo) {
-  const container = document.getElementById(listas[tipo]);
-  if (!container || container.children.length >= LIMITE) return;
-  container.appendChild(criarCampo(tipo));
+  const c = document.getElementById(listas[tipo]);
+  if (!c || c.children.length >= LIMITE) return;
+  c.appendChild(criarCampo(tipo));
 };
 
-/* ================= CRIAR CAMPO ================= */
+/* CRIAR CAMPO */
 function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  /* NOME */
-  const linhaNome = document.createElement("div");
-  linhaNome.className = "linha-principal";
+  const linha = document.createElement("div");
+  linha.className = "linha-principal";
 
   const nome = document.createElement("input");
+  nome.className = "campo-nome";
   nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
-  nome.classList.add("campo-nome");
   nome.style.width = "100%";
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
   btn.onclick = () => wrap.remove();
 
-  linhaNome.append(nome, btn);
-  wrap.append(linhaNome);
+  linha.append(nome, btn);
+  wrap.append(linha);
 
-  let emailInput, senhaInput, permissao, regras;
-  let senhaOk = false;
+  let email, senha, permissao, senhaOk = false;
 
-  /* USUÁRIO WEB */
   if (tipo === "usuario_web") {
-    const linhaCred = document.createElement("div");
-    linhaCred.className = "linha-principal";
-    linhaCred.style.gap = "12px";
-    linhaCred.style.marginTop = "12px";
+    const cred = document.createElement("div");
+    cred.className = "linha-principal";
+    cred.style.gap = "12px";
+    cred.style.marginTop = "12px";
 
-    emailInput = document.createElement("input");
-    emailInput.type = "email";
-    emailInput.placeholder = "E-mail do usuário";
-    emailInput.style.flex = "1";
+    email = document.createElement("input");
+    email.type = "email";
+    email.placeholder = "E-mail do usuário";
+    email.style.flex = "1";
 
-    senhaInput = document.createElement("input");
-    senhaInput.placeholder = "Senha do usuário";
-    senhaInput.classList.add("campo-senha");
-    senhaInput.style.flex = "1";
+    senha = document.createElement("input");
+    senha.placeholder = "Senha do usuário";
+    senha.className = "campo-senha";
+    senha.style.flex = "1";
 
-    linhaCred.append(emailInput, senhaInput);
-    wrap.append(linhaCred);
+    cred.append(email, senha);
+    wrap.append(cred);
 
     permissao = document.createElement("select");
-    permissao.classList.add("campo-permissao");
+    permissao.className = "campo-permissao";
     permissao.style.marginTop = "12px";
 
-    const opt0 = new Option("Selecione a permissão", "");
-    opt0.disabled = true;
-    opt0.selected = true;
-    permissao.appendChild(opt0);
+    permissao.append(new Option("Selecione a permissão", "", true, true));
     PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
-
     wrap.append(permissao);
 
-    regras = document.createElement("div");
-    regras.style.marginTop = "10px";
-    wrap.append(regras);
-
-    senhaInput.oninput = () => {
-      regras.innerHTML = "";
-      senhaInput.classList.remove("senha-invalida");
-      senhaOk = false;
-
-      const v = senhaInput.value;
-      if (v.length < 11) return erro("A senha deve ter pelo menos 11 caracteres.");
-      if (!/[A-Z]/.test(v)) return erro("A senha deve conter letra maiúscula.");
-      if (!/\d/.test(v)) return erro("A senha deve conter número.");
-      if (!/[^A-Za-z0-9]/.test(v)) return erro("A senha deve conter caractere especial.");
-
-      regras.innerHTML = `<div class="regra-ok">A senha é segura!</div>`;
-      senhaOk = true;
+    senha.oninput = () => {
+      senhaOk =
+        senha.value.length >= 11 &&
+        /[A-Z]/.test(senha.value) &&
+        /\d/.test(senha.value) &&
+        /[^A-Za-z0-9]/.test(senha.value);
     };
-
-    function erro(msg) {
-      senhaInput.classList.add("senha-invalida");
-      regras.innerHTML = `<div class="regra-erro">${msg}</div>`;
-    }
   }
 
   const desc = document.createElement("textarea");
@@ -131,162 +108,60 @@ function criarCampo(tipo) {
   desc.style.marginTop = "12px";
   wrap.append(desc);
 
-  wrap.validarSenha = () => (senhaInput ? senhaOk : true);
-  wrap.getNome = () => nome.value;
-  wrap.getEmail = () => emailInput?.value || "";
-  wrap.getSenha = () => senhaInput?.value || "";
-  wrap.getPermissao = () => permissao?.value || "";
-  wrap.setPermissaoAtalho = atalho => {
-    const key = atalho?.toLowerCase();
-    if (MAPA_PERMISSOES[key]) permissao.value = MAPA_PERMISSOES[key];
+  wrap.get = () => ({
+    nome: nome.value,
+    email: email?.value || "x@x",
+    senha: senha?.value || "",
+    permissao: permissao?.value || "",
+    descricao: desc.value || ""
+  });
+
+  wrap.validarSenha = () => senha ? senhaOk : true;
+  wrap.setPermissaoAtalho = a => {
+    const k = a?.toLowerCase();
+    if (MAPA_PERMISSOES[k]) permissao.value = MAPA_PERMISSOES[k];
   };
 
   return wrap;
 }
 
-/* ================= RANGE RAMAIS (CORRIGIDO) ================= */
-window.criarRangeRamais = function () {
-  const ini = Number(document.getElementById("ramalInicio")?.value);
-  const fim = Number(document.getElementById("ramalFim")?.value);
-  const container = document.getElementById("listaRings");
-
-  if (!container) return mostrarToast("Lista de ramais não encontrada", true);
-  if (!ini || !fim || fim < ini) return mostrarToast("Range inválido", true);
-
-  for (let i = ini; i <= fim; i++) {
-    if (container.children.length >= LIMITE) break;
-    const campo = criarCampo("ring");
-    campo.querySelector(".campo-nome").value = i;
-    container.appendChild(campo);
-  }
-
-  mostrarToast("Range criado com sucesso!");
-};
-
-/* ================= IMPORTAÇÃO CSV ================= */
-window.acionarImportacao = function (tipo) {
-  const input = document.getElementById(
-    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
-  );
-  if (!input) return;
-
-  input.click();
-  input.onchange = () => {
-    const file = input.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = e => processarCSV(tipo, e.target.result);
-    reader.readAsText(file);
-  };
-};
-
+/* IMPORTAÇÃO CSV */
 function processarCSV(tipo, texto) {
   const linhas = texto.split("\n").slice(1);
   const container = document.getElementById(listas[tipo]);
-  if (!container) return;
 
   linhas.forEach(l => {
-    const d = l.split(",").map(v => v.trim());
-    if (!d[0]) return;
+    const [u,e,s,p,d] = l.split(";").map(v => v?.trim());
+    if (!u) return;
 
-    const campo = criarCampo(tipo);
-    campo.querySelector(".campo-nome").value = d[0];
+    const c = criarCampo(tipo);
+    c.querySelector(".campo-nome").value = u;
 
     if (tipo === "usuario_web") {
-      if (d[1]) campo.querySelector("input[type=email]").value = d[1];
-      if (d[2]) campo.querySelector(".campo-senha").value = d[2];
-      if (d[3]) campo.setPermissaoAtalho(d[3]);
+      c.querySelector("input[type=email]").value = e || "x@x";
+      c.querySelector(".campo-senha").value = s || "";
+      if (p) c.setPermissaoAtalho(p);
     }
 
-    container.appendChild(campo);
+    c.querySelector("textarea").value = d || "";
+    container.appendChild(c);
   });
 
-  mostrarToast("Importação concluída com sucesso!");
+  mostrarToast("Importação concluída!");
 }
 
-/* ================= EXPORTAR ================= */
-window.explorar = function () {
-  const dados = {};
-  let erro = false;
-
-  Object.keys(listas).forEach(tipo => {
-    dados[tipo] = [];
-    document.getElementById(listas[tipo])
-      .querySelectorAll(".campo-descricao")
-      .forEach(c => {
-        if (tipo === "usuario_web" && !c.validarSenha()) erro = true;
-
-        const item = {
-          nome: c.getNome(),
-          descricao: c.querySelector("textarea")?.value || ""
-        };
-
-        if (tipo === "usuario_web") {
-          item.email = c.getEmail();
-          item.senha = c.getSenha();
-          item.permissao = c.getPermissao();
-        }
-
-        dados[tipo].push(item);
-      });
-  });
-
-  if (erro) return mostrarToast("Existe senha inválida.", true);
-
-  document.getElementById("resultado").textContent =
-    JSON.stringify(dados, null, 2);
-
-  mostrarToast("Exportado com sucesso!");
-};
-
-/* ================= TOAST ================= */
-function mostrarToast(msg, error = false) {
-  const t = document.getElementById("toastGlobal");
-  document.getElementById("toastMessage").textContent = msg;
-  t.className = "toast show" + (error ? " error" : "");
-  setTimeout(() => t.classList.remove("show"), 4000);
-}
-
-window.fecharToast = () =>
-  document.getElementById("toastGlobal").classList.remove("show");
-
-/* ================= TEMA ================= */
-const toggleTheme = document.getElementById("toggleTheme");
-if (toggleTheme) {
-  if (localStorage.getItem("theme") === "dark") {
-    document.body.classList.add("dark");
-    toggleTheme.textContent = "☀️";
-  }
-
-  toggleTheme.onclick = () => {
-    document.body.classList.toggle("dark");
-    const d = document.body.classList.contains("dark");
-    toggleTheme.textContent = d ? "☀️" : "🌙";
-    localStorage.setItem("theme", d ? "dark" : "light");
-  };
-}
-
-/* ================= TEMPLATE CSV USUÁRIOS WEB ================= */
+/* TEMPLATE CSV */
 window.baixarTemplateUsuarios = function () {
   const csv = [
-    "usuario,email,senha,permissao,descricao",
-    "joao.silva,joao@empresa.com,Senha@12345,pabx,Administrador principal",
-    "maria.souza,maria@empresa.com,Senha@12345,agente,Agente Call Center",
-    "carlos.lima,carlos@empresa.com,Senha@12345,supervisor,Supervisor CC",
-    "ana.crm,ana@empresa.com,Senha@12345,crm,Usuário CRM",
-    "omni.admin,omni@empresa.com,Senha@12345,omni,Administrador Omnichannel"
+    "usuario;email;senha;permissao;descricao",
+    "joao.silva;joao@empresa.com;Senha@12345;pabx;Administrador",
+    "maria.souza;maria@empresa.com;Senha@12345;agente;Agente CC",
+    "admin;x@x;Admin@2024!;super_admin;Super Admin"
   ].join("\n");
 
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-
   const a = document.createElement("a");
-  a.href = url;
+  a.href = URL.createObjectURL(blob);
   a.download = "template_usuarios_web.csv";
-  document.body.appendChild(a);
   a.click();
-
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 };
