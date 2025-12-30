@@ -189,4 +189,32 @@ select.campo-permissao {
   flex: none !important;
 }
 
+/* =====================================================
+   AJUSTE CORRETO – USUÁRIO WEB (SEM AFETAR RAMAL)
+===================================================== */
+
+/* GARANTE QUE A LINHA NÃO FORCE REDISTRIBUIÇÃO */
+.campo-descricao {
+  display: block;
+}
+
+/* CAMPO "DIGITE USUÁRIO WEB" – SEMPRE GRANDE */
+.campo-descricao .linha-principal input[type="text"] {
+  width: 100% !important;
+  flex: 1 1 auto !important;
+}
+
+/* SENHA – MENOR (EXATAMENTE COMO NA IMAGEM) */
+.campo-descricao input.campo-senha {
+  width: 280px !important;
+  max-width: 280px !important;
+  flex: 0 0 auto !important;
+}
+
+/* PERMISSÃO – MESMO TAMANHO DA SENHA */
+.campo-descricao select.campo-permissao {
+  width: 280px !important;
+  max-width: 280px !important;
+  flex: 0 0 auto !important;
+}
 
