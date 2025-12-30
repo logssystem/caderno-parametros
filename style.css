@@ -218,3 +218,24 @@ select.campo-permissao {
   flex: 0 0 auto !important;
 }
 
+/* ===== AJUSTE FINO – USUÁRIOS WEB ===== */
+
+/* container específico do usuário web */
+.campo-descricao.usuario-web .campo-usuario {
+  width: 100%;
+}
+
+.campo-descricao.usuario-web .campo-senha {
+  width: 42%;
+  min-width: 220px;
+}
+
+.campo-descricao.usuario-web .campo-permissao {
+  width: 45%;
+  min-width: 260px;
+}
+
+/* garante alinhamento limpo */
+.campo-descricao.usuario-web {
+  align-items: flex-start;
+}
