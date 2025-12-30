@@ -166,41 +166,37 @@ input, textarea, select {
 .toast.error { background: #ef4444; }
 
 /* ==================================================
-   AJUSTE GLOBAL – TAMANHO DOS CAMPOS (SEM RAMAL)
+   CORREÇÃO FINAL – USUÁRIO GRANDE / SENHA MENOR
+   (RAMAL NÃO É AFETADO)
 ================================================== */
 
-/* Linha principal mantém layout */
 .campo-descricao .linha-principal {
   display: flex;
   gap: 10px;
 }
 
-/* CAMPO "DIGITE USUÁRIO" – tamanho elegante */
-#listaUsuariosWeb .linha-principal input[type="text"] {
+/* ===== CAMPO USUÁRIO (GRANDE) ===== */
+.campo-descricao .linha-principal input[type="text"] {
   flex: 1 1 auto;
-  min-width: 420px;
+  min-width: 520px;
 }
 
-/* BOTÃO X não cresce */
+/* ===== BOTÃO X ===== */
 .campo-descricao .linha-principal button {
   flex: 0 0 auto;
 }
 
-/* 🔥 CAMPO SENHA – BEM MENOR (COMO NA IMAGEM) */
+/* ===== CAMPO SENHA (MENOR – COMO NA IMAGEM) ===== */
 .campo-senha {
-  flex: 0 0 38% !important;
-  max-width: 380px;
-  min-width: 240px;
+  flex: 0 0 32% !important;
+  max-width: 320px;
+  min-width: 220px;
 }
 
-/* PERMISSÃO proporcional à senha */
+/* ===== PERMISSÃO ALINHADA À SENHA ===== */
 .campo-permissao {
-  flex: 0 0 55%;
-  min-width: 320px;
+  flex: 0 0 48%;
+  min-width: 300px;
 }
 
-/* Espaçamento consistente */
-.campo-descricao {
-  gap: 14px;
-}
 
