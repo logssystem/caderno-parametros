@@ -1,6 +1,6 @@
 console.log("APP.JS FINAL – ESTÁVEL");
 
-/* CONFIG */
+/* ================= CONFIG ================= */
 const LIMITE = 600;
 
 const listas = {
@@ -66,7 +66,10 @@ function criarCampo(tipo) {
   linhaNome.append(nome, btn);
   wrap.append(linhaNome);
 
-  let emailInput, senhaInput, permissao, regras;
+  let emailInput = null;
+  let senhaInput = null;
+  let permissao = null;
+  let regras = null;
   let senhaOk = true;
 
   /* ================= USUÁRIO WEB (INALTERADO) ================= */
@@ -119,7 +122,7 @@ function criarCampo(tipo) {
     };
   }
 
-  /* ================= RAMAL (SENHA ADICIONADA) ================= */
+  /* ================= RAMAL (SENHA ADICIONADA – SEM QUEBRAR LAYOUT) ================= */
   if (tipo === "ring") {
     const linhaSenha = document.createElement("div");
     linhaSenha.className = "linha-principal";
@@ -134,7 +137,7 @@ function criarCampo(tipo) {
     wrap.append(linhaSenha);
 
     regras = document.createElement("div");
-    regras.style.marginTop = "10px";
+    regras.style.marginTop = "8px";
     wrap.append(regras);
 
     senhaInput.oninput = () => {
@@ -151,13 +154,13 @@ function criarCampo(tipo) {
     };
   }
 
-  /* ===== DESCRIÇÃO ===== */
+  /* ===== DESCRIÇÃO (SEMPRE POR ÚLTIMO) ===== */
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
   desc.style.marginTop = "12px";
   wrap.append(desc);
 
-  /* ===== MÉTODOS ===== */
+  /* ================= MÉTODOS ================= */
   wrap.validarSenha = () => senhaOk;
   wrap.getNome = () => nome.value;
   wrap.getEmail = () => emailInput?.value || "x@x";
@@ -190,6 +193,71 @@ window.criarRangeRamais = function () {
   }
 
   mostrarToast("Range criado com sucesso!");
+};
+
+/* ================= IMPORTAÇÃO CSV ================= */
+window.acionarImportacao = function (tipo) {
+  const input = document.getElementById(
+    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
+  );
+  if (!input) return;
+
+  input.value = "";
+  input.click();
+
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => processarCSV(tipo, e.target.result);
+    reader.readAsText(file);
+  };
+};
+
+function processarCSV(tipo, texto) {
+  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
+  if (linhas.length < 2) return mostrarToast("CSV inválido", true);
+
+  const sep = linhas[0].includes(";") ? ";" : ",";
+  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
+  const container = document.getElementById(listas[tipo]);
+
+  linhas.forEach(l => {
+    const v = l.split(sep).map(x => x.trim());
+    const d = {};
+    header.forEach((h, i) => (d[h] = v[i] || ""));
+
+    const campo = criarCampo(tipo);
+    campo.querySelector(".campo-nome").value = d.usuario || d.nome || "";
+
+    if (tipo === "usuario_web") {
+      campo.querySelector("input[type=email]").value = d.email || "x@x";
+      campo.querySelector(".campo-senha").value = d.senha || "";
+      campo.setPermissaoAtalho(d.permissao);
+    }
+
+    if (tipo === "ring") {
+      campo.querySelector(".campo-senha").value = d.senha || "";
+    }
+
+    container.appendChild(campo);
+  });
+
+  mostrarToast("Importação concluída!");
+}
+
+/* ================= TEMPLATE CSV ================= */
+window.baixarTemplateUsuarios = function () {
+  const csv = [
+    "usuario;email;senha;permissao;descricao",
+    "joao.silva;joao@empresa.com;Senha@12345;pabx;Administrador",
+  ].join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "template_usuarios_web.csv";
+  a.click();
 };
 
 /* ================= TOAST ================= */
