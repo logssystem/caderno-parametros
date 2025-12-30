@@ -189,7 +189,7 @@ input, textarea, select {
 
 /* 👉 CAMPO SENHA (METADE DO TAMANHO ATUAL) */
 #listaUsuariosWeb .campo-senha {
-  width: 40% !important;
+  width: 38% !important;
   min-width: 260px;
 }
 
