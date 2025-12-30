@@ -1,55 +1,8 @@
-console.log("APP.JS FINAL – ESTÁVEL");
-
-/* CONFIG */
-const LIMITE = 600;
-
-const listas = {
-  usuario_web: "listaUsuariosWeb",
-  entrada: "listaEntradas",
-  ura: "listaURAs",
-  fila: "listaFilas",
-  ring: "listaRings",
-  grupo_ring: "listaGrupoRing",
-  agente: "listaAgentes"
-};
-
-const PERMISSOES = [
-  "Administrador do Módulo de PABX",
-  "Agente de Call Center",
-  "Supervisor(a) de Call Center",
-  "CRM",
-  "CRM Owner",
-  "Administrador do Módulo de Omnichannel",
-  "Agente Omnichannel",
-  "Supervisor(a) Omnichannel",
-  "Super Administrador"
-];
-
-const MAPA_PERMISSOES = {
-  pabx: PERMISSOES[0],
-  agente: PERMISSOES[1],
-  supervisor: PERMISSOES[2],
-  crm: PERMISSOES[3],
-  crm_owner: PERMISSOES[4],
-  omni: PERMISSOES[5],
-  agente_omni: PERMISSOES[6],
-  super_omni: PERMISSOES[7],
-  super_admin: PERMISSOES[8]
-};
-
-/* ================= ADICIONAR CAMPO ================= */
-window.adicionarCampo = function (tipo) {
-  const container = document.getElementById(listas[tipo]);
-  if (!container || container.children.length >= LIMITE) return;
-  container.appendChild(criarCampo(tipo));
-};
-
-/* ================= CRIAR CAMPO ================= */
 function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  /* LINHA NOME */
+  /* ================= NOME ================= */
   const linhaNome = document.createElement("div");
   linhaNome.className = "linha-principal";
 
@@ -68,11 +21,12 @@ function criarCampo(tipo) {
   let emailInput = null;
   let senhaInput = null;
   let permissao = null;
+  let regras = null;
   let senhaOk = false;
 
   const precisaSenha = tipo === "usuario_web" || tipo === "ring";
 
-  /* EMAIL + SENHA */
+  /* ================= EMAIL + SENHA ================= */
   if (precisaSenha) {
     const linhaCred = document.createElement("div");
     linhaCred.className = "linha-principal";
@@ -87,42 +41,38 @@ function criarCampo(tipo) {
       linhaCred.append(emailInput);
     }
 
-    /* BLOCO SENHA (CRÍTICO PARA O LAYOUT) */
-    const blocoSenha = document.createElement("div");
-    blocoSenha.style.flex = "1";
-    blocoSenha.style.display = "flex";
-    blocoSenha.style.flexDirection = "column";
-
     senhaInput = document.createElement("input");
-    senhaInput.placeholder = "Senha";
+    senhaInput.placeholder = "Senha do usuário";
     senhaInput.classList.add("campo-senha");
+    senhaInput.style.flex = "1";
 
-    const regras = document.createElement("div");
-    regras.style.marginTop = "6px";
-
-    blocoSenha.append(senhaInput, regras);
-    linhaCred.append(blocoSenha);
+    linhaCred.append(senhaInput);
     wrap.append(linhaCred);
+
+    /* ===== REGRAS DE SENHA ===== */
+    regras = document.createElement("div");
+    regras.style.marginTop = "8px";
+    wrap.append(regras);
 
     senhaInput.oninput = () => {
       const v = senhaInput.value;
-      const okLen = v.length >= 11;
-      const okUpper = /[A-Z]/.test(v);
-      const okNum = /\d/.test(v);
-      const okSpec = /[^A-Za-z0-9]/.test(v);
+      senhaOk = false;
 
-      senhaOk = okLen && okUpper && okNum && okSpec;
+      if (v.length < 11) return regra("Mínimo de 11 caracteres");
+      if (!/[A-Z]/.test(v)) return regra("Pelo menos 1 letra maiúscula");
+      if (!/\d/.test(v)) return regra("Pelo menos 1 número");
+      if (!/[^A-Za-z0-9]/.test(v)) return regra("Pelo menos 1 caractere especial");
 
-      regras.innerHTML = `
-        <div class="${okLen ? "regra-ok" : "regra-erro"}">• Mínimo de 11 caracteres</div>
-        <div class="${okUpper ? "regra-ok" : "regra-erro"}">• Letra maiúscula</div>
-        <div class="${okNum ? "regra-ok" : "regra-erro"}">• Número</div>
-        <div class="${okSpec ? "regra-ok" : "regra-erro"}">• Caractere especial</div>
-      `;
+      regras.innerHTML = `<div class="regra-ok">Senha válida</div>`;
+      senhaOk = true;
     };
+
+    function regra(msg) {
+      regras.innerHTML = `<div class="regra-erro">${msg}</div>`;
+    }
   }
 
-  /* PERMISSÃO (SÓ USUÁRIO WEB) */
+  /* ================= PERMISSÃO (SÓ USUÁRIO WEB) ================= */
   if (tipo === "usuario_web") {
     permissao = document.createElement("select");
     permissao.classList.add("campo-permissao");
@@ -132,18 +82,18 @@ function criarCampo(tipo) {
     opt0.disabled = true;
     opt0.selected = true;
     permissao.appendChild(opt0);
-    PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
 
+    PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
     wrap.append(permissao);
   }
 
-  /* DESCRIÇÃO */
+  /* ================= DESCRIÇÃO (SEMPRE POR ÚLTIMO) ================= */
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
   desc.style.marginTop = "12px";
   wrap.append(desc);
 
-  /* MÉTODOS */
+  /* ================= MÉTODOS ================= */
   wrap.validarSenha = () => (precisaSenha ? senhaOk : true);
   wrap.getNome = () => nome.value;
   wrap.getEmail = () => emailInput?.value || "x@x";
@@ -155,41 +105,4 @@ function criarCampo(tipo) {
   };
 
   return wrap;
-}
-
-/* ================= RANGE RAMAIS ================= */
-window.criarRangeRamais = function () {
-  const ini = Number(document.getElementById("ramalInicio").value);
-  const fim = Number(document.getElementById("ramalFim").value);
-  const container = document.getElementById("listaRings");
-
-  if (!ini || !fim || fim < ini) return mostrarToast("Range inválido", true);
-
-  for (let i = ini; i <= fim; i++) {
-    if (container.children.length >= LIMITE) break;
-    const campo = criarCampo("ring");
-    campo.querySelector(".campo-nome").value = i;
-    container.appendChild(campo);
-  }
-
-  mostrarToast("Range criado com sucesso!");
-};
-
-/* ================= TOAST ================= */
-function mostrarToast(msg, error = false) {
-  const t = document.getElementById("toastGlobal");
-  document.getElementById("toastMessage").textContent = msg;
-  t.className = "toast show" + (error ? " error" : "");
-  setTimeout(() => t.classList.remove("show"), 3000);
-}
-
-window.fecharToast = () =>
-  document.getElementById("toastGlobal").classList.remove("show");
-
-/* ================= TEMA ================= */
-const toggleTheme = document.getElementById("toggleTheme");
-if (toggleTheme) {
-  toggleTheme.onclick = () => {
-    document.body.classList.toggle("dark");
-  };
 }
