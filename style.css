@@ -3,7 +3,7 @@
 /* ===== TEMA CLARO ===== */
 :root {
   --bg: #f9fafb;
-  --text: #111827;
+  --text: #1f2933;
   --header-bg: #ffffff;
   --card-bg: #ffffff;
   --border: #d1d5db;
@@ -14,46 +14,66 @@
 /* ===== TEMA ESCURO ===== */
 body.dark {
   --bg: #0b1220;
-  --text: #e5e7eb;
+  --text: #e6edf3;
   --header-bg: #0f172a;
   --card-bg: #111c33;
-  --border: #334155;
-  --field-border: #475569;
+  --border: #24304a;
+  --field-border: #334155;
 }
 
-/* BODY */
 body {
   margin: 0;
   font-family: Inter, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
-  transition: background .25s, color .25s;
+  transition: background .25s ease, color .25s ease;
 }
 
-/* HEADER */
 .app-header {
   height: 120px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   padding: 0 48px;
-  background: var(--header-bg);
-  border-bottom: 1px solid var(--border);
 }
 
 .app-logo { height: 72px; }
 .app-title { font-size: 26px; font-weight: 900; }
 
-/* CARD */
+.form-container {
+  max-width: 900px;
+  margin: 56px auto;
+  padding: 0 16px 60px;
+}
+
 .card {
   background: var(--card-bg);
   border-radius: 14px;
   padding: 24px;
   margin-bottom: 28px;
-  box-shadow: 0 12px 30px rgba(0,0,0,.08);
+  box-shadow: 0 14px 36px rgba(0,0,0,.08);
 }
 
-/* INPUTS */
+body.dark .card {
+  box-shadow: 0 14px 36px rgba(0,0,0,.55);
+}
+
+.campo-descricao {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px dashed var(--border);
+}
+
+.linha-principal {
+  display: flex;
+  gap: 10px;
+}
+
 input, textarea, select {
   width: 100%;
   padding: 11px 14px;
@@ -64,31 +84,6 @@ input, textarea, select {
   font-weight: 600;
 }
 
-/* SENHA */
-.campo-senha { width: 50%; min-width: 220px; }
-.senha-invalida { border-color: #ef4444 !important; }
-
-/* PERMISSÃO */
-.campo-permissao { width: 65%; }
-
-/* REGRAS */
-.regra-erro {
-  background: #ef4444;
-  color: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  font-weight: 800;
-}
-
-.regra-ok {
-  background: #22c55e;
-  color: #052e16;
-  padding: 10px;
-  border-radius: 8px;
-  font-weight: 800;
-}
-
-/* BOTÕES */
 .btn-add, .btn-import {
   height: 46px;
   padding: 0 18px;
@@ -108,7 +103,6 @@ input, textarea, select {
   cursor: pointer;
 }
 
-/* TOAST */
 .toast {
   position: fixed;
   top: 24px;
@@ -127,4 +121,6 @@ input, textarea, select {
   transform: translateY(0);
 }
 
-.toast.error { background: #ef4444; }
+.toast.error {
+  background: #ef4444;
+}
