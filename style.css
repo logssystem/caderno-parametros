@@ -164,3 +164,36 @@ input, textarea, select {
 
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.error { background: #ef4444; }
+
+/* ================================
+   AJUSTE FINO – USUÁRIOS WEB
+   (SEM AFETAR RAMAIS)
+================================ */
+
+/* Linha principal do usuário web */
+#listaUsuariosWeb .linha-principal {
+  align-items: center;
+}
+
+/* Campo "Digite usuário web" – MAIS LARGO */
+#listaUsuariosWeb .linha-principal input[type="text"] {
+  flex: 1 1 70%;
+}
+
+/* Campo de senha – METADE DO TAMANHO */
+#listaUsuariosWeb .campo-senha {
+  width: 35% !important;
+  min-width: 260px;
+}
+
+/* Select de permissão alinhado e proporcional */
+#listaUsuariosWeb .campo-permissao {
+  width: 50%;
+  min-width: 320px;
+}
+
+/* Mantém espaçamento elegante */
+#listaUsuariosWeb .campo-descricao {
+  gap: 14px;
+}
+
