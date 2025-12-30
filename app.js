@@ -9,6 +9,7 @@ const listas = {
   ura: "listaURAs",
   fila: "listaFilas",
   ring: "listaRings",
+  grupo_ring: "listaGrupoRing",
   agente: "listaAgentes"
 };
 
@@ -49,9 +50,9 @@ function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  /* === NOME === */
-  const linhaUsuario = document.createElement("div");
-  linhaUsuario.className = "linha-principal";
+  /* NOME */
+  const linhaNome = document.createElement("div");
+  linhaNome.className = "linha-principal";
 
   const nome = document.createElement("input");
   nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
@@ -62,15 +63,14 @@ function criarCampo(tipo) {
   btn.textContent = "✖";
   btn.onclick = () => wrap.remove();
 
-  linhaUsuario.append(nome, btn);
-  wrap.append(linhaUsuario);
+  linhaNome.append(nome, btn);
+  wrap.append(linhaNome);
 
   let emailInput, senhaInput, permissao, regras;
   let senhaOk = false;
 
-  /* === USUÁRIO WEB === */
+  /* USUÁRIO WEB */
   if (tipo === "usuario_web") {
-    /* EMAIL + SENHA */
     const linhaCred = document.createElement("div");
     linhaCred.className = "linha-principal";
     linhaCred.style.gap = "12px";
@@ -79,7 +79,6 @@ function criarCampo(tipo) {
     emailInput = document.createElement("input");
     emailInput.type = "email";
     emailInput.placeholder = "E-mail do usuário";
-    emailInput.classList.add("campo-email");
     emailInput.style.flex = "1";
 
     senhaInput = document.createElement("input");
@@ -90,7 +89,6 @@ function criarCampo(tipo) {
     linhaCred.append(emailInput, senhaInput);
     wrap.append(linhaCred);
 
-    /* PERMISSÃO */
     permissao = document.createElement("select");
     permissao.classList.add("campo-permissao");
     permissao.style.marginTop = "12px";
@@ -103,7 +101,6 @@ function criarCampo(tipo) {
 
     wrap.append(permissao);
 
-    /* REGRAS */
     regras = document.createElement("div");
     regras.style.marginTop = "10px";
     wrap.append(regras);
@@ -115,9 +112,9 @@ function criarCampo(tipo) {
 
       const v = senhaInput.value;
       if (v.length < 11) return erro("A senha deve ter pelo menos 11 caracteres.");
-      if (!/[A-Z]/.test(v)) return erro("A senha deve conter pelo menos uma letra maiúscula.");
-      if (!/\d/.test(v)) return erro("A senha deve conter pelo menos um número.");
-      if (!/[^A-Za-z0-9]/.test(v)) return erro("A senha deve conter pelo menos um caractere especial.");
+      if (!/[A-Z]/.test(v)) return erro("A senha deve conter letra maiúscula.");
+      if (!/\d/.test(v)) return erro("A senha deve conter número.");
+      if (!/[^A-Za-z0-9]/.test(v)) return erro("A senha deve conter caractere especial.");
 
       regras.innerHTML = `<div class="regra-ok">A senha é segura!</div>`;
       senhaOk = true;
@@ -129,13 +126,11 @@ function criarCampo(tipo) {
     }
   }
 
-  /* DESCRIÇÃO */
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
   desc.style.marginTop = "12px";
   wrap.append(desc);
 
-  /* HELPERS */
   wrap.validarSenha = () => (senhaInput ? senhaOk : true);
   wrap.getNome = () => nome.value;
   wrap.getEmail = () => emailInput?.value || "";
@@ -148,6 +143,25 @@ function criarCampo(tipo) {
 
   return wrap;
 }
+
+/* ================= RANGE RAMAIS (CORRIGIDO) ================= */
+window.criarRangeRamais = function () {
+  const ini = Number(document.getElementById("ramalInicio")?.value);
+  const fim = Number(document.getElementById("ramalFim")?.value);
+  const container = document.getElementById("listaRings");
+
+  if (!container) return mostrarToast("Lista de ramais não encontrada", true);
+  if (!ini || !fim || fim < ini) return mostrarToast("Range inválido", true);
+
+  for (let i = ini; i <= fim; i++) {
+    if (container.children.length >= LIMITE) break;
+    const campo = criarCampo("ring");
+    campo.querySelector(".campo-nome").value = i;
+    container.appendChild(campo);
+  }
+
+  mostrarToast("Range criado com sucesso!");
+};
 
 /* ================= IMPORTAÇÃO CSV ================= */
 window.acionarImportacao = function (tipo) {
@@ -180,7 +194,7 @@ function processarCSV(tipo, texto) {
     campo.querySelector(".campo-nome").value = d[0];
 
     if (tipo === "usuario_web") {
-      if (d[1]) campo.querySelector(".campo-email").value = d[1];
+      if (d[1]) campo.querySelector("input[type=email]").value = d[1];
       if (d[2]) campo.querySelector(".campo-senha").value = d[2];
       if (d[3]) campo.setPermissaoAtalho(d[3]);
     }
