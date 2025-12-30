@@ -22,6 +22,7 @@
 
 <main class="form-container">
 
+  <!-- USUÁRIOS WEB -->
   <section class="card">
     <h2>Usuários Web</h2>
     <div class="acoes-card">
@@ -32,15 +33,18 @@
     <div id="listaUsuariosWeb"></div>
   </section>
 
+  <!-- RAMAIS (CORRIGIDO) -->
   <section class="card">
     <h2>Ramais</h2>
     <div class="acoes-card">
+      <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
       <button class="btn-import" onclick="acionarImportacao('ramal')">📥 Importar</button>
       <input type="file" id="importRamais" accept=".csv" hidden>
     </div>
     <div id="listaRings"></div>
   </section>
 
+  <!-- OUTROS -->
   <section class="card">
     <h2>Números de Entrada</h2>
     <div id="listaEntradas"></div>
@@ -66,7 +70,6 @@
   </section>
 
   <button class="btn-explorar" onclick="explorar()">Explorar</button>
-
   <pre id="resultado"></pre>
 </main>
 
