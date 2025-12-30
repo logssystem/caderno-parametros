@@ -24,7 +24,7 @@ const PERMISSOES = [
   "Super Administrador"
 ];
 
-/* 🔑 MAPA DE ATALHOS (IMPORTAÇÃO CSV) */
+/* 🔑 MAPA DE ATALHOS (CSV) */
 const MAPA_PERMISSOES = {
   pabx: "Administrador do Módulo de PABX",
   agente: "Agente de Call Center",
@@ -64,6 +64,7 @@ function criarCampo(tipo) {
   linhaUsuario.append(nome, btn);
   wrap.append(linhaUsuario);
 
+  let emailInput = null;
   let senhaInput = null;
   let permissao = null;
   let regras = null;
@@ -71,27 +72,45 @@ function criarCampo(tipo) {
 
   /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
-    /* SENHA */
+
+    /* === LINHA EMAIL + SENHA === */
+    const linhaCredenciais = document.createElement("div");
+    linhaCredenciais.className = "linha-principal";
+    linhaCredenciais.style.gap = "12px";
+    linhaCredenciais.style.marginTop = "12px";
+
+    emailInput = document.createElement("input");
+    emailInput.type = "email";
+    emailInput.placeholder = "E-mail do usuário";
+    emailInput.style.flex = "1";
+
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do usuário";
     senhaInput.classList.add("campo-senha");
-    senhaInput.style.marginTop = "12px";
-    wrap.append(senhaInput);
+    senhaInput.style.flex = "1";
 
-    /* PERMISSÃO */
+    linhaCredenciais.append(emailInput, senhaInput);
+    wrap.append(linhaCredenciais);
+
+    /* === LINHA PERMISSÃO === */
+    const linhaPermissao = document.createElement("div");
+    linhaPermissao.className = "linha-principal";
+    linhaPermissao.style.marginTop = "12px";
+
     permissao = document.createElement("select");
     permissao.classList.add("campo-permissao");
-    permissao.style.marginTop = "12px";
+    permissao.style.width = "100%";
 
     const opt0 = new Option("Selecione a permissão", "");
     opt0.disabled = true;
     opt0.selected = true;
     permissao.appendChild(opt0);
-
     PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
-    wrap.append(permissao);
 
-    /* REGRAS */
+    linhaPermissao.append(permissao);
+    wrap.append(linhaPermissao);
+
+    /* === REGRAS DA SENHA === */
     regras = document.createElement("div");
     regras.style.marginTop = "10px";
     wrap.append(regras);
@@ -118,15 +137,16 @@ function criarCampo(tipo) {
     }
   }
 
-  /* DESCRIÇÃO */
+  /* ===== DESCRIÇÃO ===== */
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
   desc.style.marginTop = "12px";
   wrap.append(desc);
 
-  /* HELPERS */
+  /* ===== HELPERS ===== */
   wrap.validarSenha = () => (senhaInput ? senhaOk : true);
   wrap.getSenha = () => (senhaInput ? senhaInput.value : "");
+  wrap.getEmail = () => (emailInput ? emailInput.value : "");
   wrap.getPermissao = () => (permissao ? permissao.value : "");
   wrap.setPermissaoAtalho = atalho => {
     if (!permissao) return;
@@ -139,7 +159,7 @@ function criarCampo(tipo) {
   return wrap;
 }
 
-/* ================= IMPORTAÇÃO CSV (USUÁRIO WEB) ================= */
+/* ================= IMPORTAÇÃO CSV ================= */
 window.acionarImportacao = function (tipo) {
   const input = document.getElementById(
     tipo === "usuario_web" ? "importUsuarios" : "importRamais"
@@ -170,8 +190,9 @@ function processarCSV(tipo, texto) {
     campo.querySelector("input").value = dados[0];
 
     if (tipo === "usuario_web") {
-      if (dados[1]) campo.querySelector(".campo-senha").value = dados[1];
-      if (dados[2]) campo.setPermissaoAtalho(dados[2]);
+      if (dados[1]) campo.getEmail && (campo.querySelector("input[type=email]").value = dados[1]);
+      if (dados[2]) campo.querySelector(".campo-senha").value = dados[2];
+      if (dados[3]) campo.setPermissaoAtalho(dados[3]);
     }
 
     container.appendChild(campo);
@@ -201,6 +222,7 @@ window.explorar = function () {
         };
 
         if (tipo === "usuario_web") {
+          item.email = c.getEmail();
           item.senha = c.getSenha();
           item.permissao = c.getPermissao();
         }
