@@ -166,31 +166,24 @@ input, textarea, select {
 .toast.error { background: #ef4444; }
 
 /* =====================================================
-   AJUSTE FINAL – USUÁRIO GRANDE / SENHA MENOR
-   (SEM AFETAR RAMAIS)
+   AJUSTE FINAL – SENHA E PERMISSÃO MENORES
+   (USUÁRIO CONTINUA GRANDE)
 ===================================================== */
 
-/* === LINHA DO USUÁRIO (INPUT DE CIMA) === */
+/* INPUT DE USUÁRIO (CAMPO DE CIMA) */
 .campo-descricao .linha-principal input {
-  width: 100% !important;
-  max-width: none !important;
-  flex: 1 1 auto !important;
+  inline-size: 100% !important;
 }
 
-/* === BOTÃO X NÃO CRESCE === */
-.campo-descricao .linha-principal button {
-  flex: 0 0 auto;
+/* SENHA – MENOR (COMO NA IMAGEM) */
+.campo-descricao > input.campo-senha {
+  inline-size: 280px !important;
+  max-inline-size: 280px !important;
 }
 
-/* === CAMPO DE SENHA (INPUT DE BAIXO) === */
-.campo-descricao > .campo-senha {
-  width: 38% !important;
-  max-width: 360px;
-  min-width: 240px;
+/* PERMISSÃO – MESMO TAMANHO DA SENHA */
+.campo-descricao > select.campo-permissao {
+  inline-size: 280px !important;
+  max-inline-size: 280px !important;
 }
 
-/* === PERMISSÃO ALINHADA À SENHA === */
-.campo-descricao > .campo-permissao {
-  width: 38%;
-  max-width: 420px;
-}
