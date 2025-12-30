@@ -118,11 +118,11 @@ function criarCampo(tipo) {
 
       regras.innerHTML = senhaOk
         ? `<div class="regra-ok">Senha válida</div>`
-        : `<div class="regra-erro">Senha inválida</div>`;
+        : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
     };
   }
 
-  /* ===== RAMAL (REGRA VISUAL CORRIGIDA) ===== */
+  /* ===== RAMAL (COM SENHA, MESMO PADRÃO) ===== */
   if (tipo === "ring") {
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do ramal";
@@ -144,11 +144,11 @@ function criarCampo(tipo) {
 
       regras.innerHTML = senhaOk
         ? `<div class="regra-ok">Senha válida</div>`
-        : `<div class="regra-erro">Senha inválida</div>`;
+        : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
     };
   }
 
-  /* DESCRIÇÃO */
+  /* DESCRIÇÃO – SEMPRE ÚLTIMA */
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
   desc.style.marginTop = "12px";
@@ -166,6 +166,97 @@ function criarCampo(tipo) {
   };
 
   return wrap;
+}
+
+/* ================= RANGE RAMAIS ================= */
+window.criarRangeRamais = function () {
+  const ini = Number(document.getElementById("ramalInicio").value);
+  const fim = Number(document.getElementById("ramalFim").value);
+  const container = document.getElementById("listaRings");
+
+  if (!ini || !fim || fim < ini) {
+    mostrarToast("Range inválido", true);
+    return;
+  }
+
+  for (let i = ini; i <= fim; i++) {
+    if (container.children.length >= LIMITE) break;
+    const campo = criarCampo("ring");
+    campo.querySelector(".campo-nome").value = i;
+    container.appendChild(campo);
+  }
+
+  mostrarToast("Range criado com sucesso!");
+};
+
+/* ================= IMPORTAÇÃO CSV (CORRIGIDA) ================= */
+window.acionarImportacao = function (tipo) {
+  const input = document.getElementById(
+    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
+  );
+  if (!input) return;
+
+  input.value = "";
+  input.click();
+
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => processarCSV(tipo, e.target.result);
+    reader.readAsText(file);
+  };
+};
+
+function processarCSV(tipo, texto) {
+  const linhas = texto
+    .replace(/\r/g, "")
+    .split("\n")
+    .map(l => l.trim())
+    .filter(l => l);
+
+  if (linhas.length < 2) {
+    mostrarToast("CSV vazio ou inválido", true);
+    return;
+  }
+
+  const sep = linhas[0].includes(";") ? ";" : ",";
+  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
+  const container = document.getElementById(listas[tipo]);
+  let criados = 0;
+
+  linhas.forEach(l => {
+    const v = l.split(sep).map(x => x.trim());
+    const d = {};
+    header.forEach((h, i) => (d[h] = v[i] || ""));
+
+    const nome = d.usuario || d.nome;
+    if (!nome) return;
+
+    if (!d.senha) return;
+    if (tipo === "usuario_web" && !d.email) return;
+
+    const campo = criarCampo(tipo);
+    campo.querySelector(".campo-nome").value = nome;
+    campo.querySelector(".campo-senha").value = d.senha;
+
+    if (tipo === "usuario_web") {
+      campo.querySelector("input[type=email]").value = d.email;
+      campo.setPermissaoAtalho(d.permissao);
+      campo.querySelector("textarea").value = d.descricao || "";
+    }
+
+    if (tipo === "ring") {
+      campo.querySelector("textarea").value = d.descricao || "";
+    }
+
+    container.appendChild(campo);
+    criados++;
+  });
+
+  criados
+    ? mostrarToast(`${criados} registros importados com sucesso!`)
+    : mostrarToast("Nenhuma linha válida encontrada", true);
 }
 
 /* ================= TOAST ================= */
