@@ -156,9 +156,8 @@ window.criarRangeRamais = function () {
   mostrarToast("Range criado com sucesso!");
 };
 
-/* ================= IMPORTAÇÃO CSV (COLUNAS) ================= */
+/* ================= IMPORTAÇÃO CSV (ROBUSTA) ================= */
 window.acionarImportacao = function (tipo) {
-  if (!listas[tipo]) return mostrarToast("Tipo inválido", true);
   const input = document.getElementById(
     tipo === "usuario_web" ? "importUsuarios" : "importRamais"
   );
@@ -177,24 +176,27 @@ window.acionarImportacao = function (tipo) {
 };
 
 function processarCSV(tipo, texto) {
-  const linhas = texto
-    .replace(/\r/g, "")
-    .split("\n")
-    .filter(l => l.trim() !== "");
+  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
+  if (linhas.length < 2) return mostrarToast("CSV vazio ou inválido", true);
 
-  const header = linhas.shift().split(";").map(h => h.trim().toLowerCase());
+  const separador = linhas[0].includes(";") ? ";" : ",";
+  const header = linhas.shift().split(separador).map(h => h.trim().toLowerCase());
+
   const container = document.getElementById(listas[tipo]);
   if (!container) return;
 
+  let criados = 0;
+
   linhas.forEach(linha => {
-    const valores = linha.split(";").map(v => v.trim());
+    const valores = linha.split(separador).map(v => v.trim());
     const data = {};
     header.forEach((h, i) => (data[h] = valores[i] || ""));
 
-    if (!data.usuario) return;
+    const usuario = data.usuario || data["usuário"] || data.nome;
+    if (!usuario) return;
 
     const campo = criarCampo(tipo);
-    campo.querySelector(".campo-nome").value = data.usuario;
+    campo.querySelector(".campo-nome").value = usuario;
 
     if (tipo === "usuario_web") {
       campo.querySelector("input[type=email]").value = data.email || "x@x";
@@ -204,9 +206,12 @@ function processarCSV(tipo, texto) {
     }
 
     container.appendChild(campo);
+    criados++;
   });
 
-  mostrarToast("Importação CSV concluída com sucesso!");
+  criados
+    ? mostrarToast(`${criados} registros importados com sucesso!`)
+    : mostrarToast("Nenhuma linha válida encontrada", true);
 }
 
 /* ================= EXPORTAR ================= */
@@ -244,7 +249,7 @@ window.baixarTemplateUsuarios = function () {
   const csv = [
     "usuario;email;senha;permissao;descricao",
     "joao.silva;joao@empresa.com;Senha@12345;pabx;Administrador principal",
-    "maria.souza;maria@empresa.com;Senha@12345;agente;Agente Call Center"
+    "maria.souza;x@x;Senha@12345;agente;Agente Call Center"
   ].join("\n");
 
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
