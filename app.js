@@ -39,7 +39,6 @@ const MAPA_PERMISSOES = {
 
 /* ================= ADICIONAR CAMPO ================= */
 window.adicionarCampo = function (tipo) {
-  if (!listas[tipo]) return mostrarToast(`Tipo inválido: ${tipo}`, true);
   const container = document.getElementById(listas[tipo]);
   if (!container || container.children.length >= LIMITE) return;
   container.appendChild(criarCampo(tipo));
@@ -50,11 +49,12 @@ function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
+  /* NOME */
   const linhaNome = document.createElement("div");
   linhaNome.className = "linha-principal";
 
   const nome = document.createElement("input");
-  nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
+  nome.placeholder = `Digite ${tipo === "ring" ? "ramal" : tipo.replace("_", " ")}`;
   nome.classList.add("campo-nome");
   nome.style.width = "100%";
 
@@ -68,6 +68,7 @@ function criarCampo(tipo) {
   let emailInput, senhaInput, permissao, regras;
   let senhaOk = true;
 
+  /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
     const linhaCred = document.createElement("div");
     linhaCred.className = "linha-principal";
@@ -117,16 +118,29 @@ function criarCampo(tipo) {
     };
   }
 
+  /* ===== RAMAL (COM SENHA) ===== */
+  if (tipo === "ring") {
+    senhaInput = document.createElement("input");
+    senhaInput.placeholder = "Senha do ramal (opcional)";
+    senhaInput.classList.add("campo-senha");
+    senhaInput.style.marginTop = "12px";
+    wrap.append(senhaInput);
+  }
+
+  /* DESCRIÇÃO */
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
   desc.style.marginTop = "12px";
   wrap.append(desc);
 
+  /* HELPERS */
   wrap.validarSenha = () => senhaOk;
   wrap.getNome = () => nome.value;
   wrap.getEmail = () => emailInput?.value || "x@x";
   wrap.getSenha = () => senhaInput?.value || "";
   wrap.getPermissao = () => permissao?.value || "";
+  wrap.getDescricao = () => desc.value;
+
   wrap.setPermissaoAtalho = atalho => {
     const key = atalho?.toLowerCase();
     if (MAPA_PERMISSOES[key]) permissao.value = MAPA_PERMISSOES[key];
@@ -135,28 +149,7 @@ function criarCampo(tipo) {
   return wrap;
 }
 
-/* ================= RANGE RAMAIS ================= */
-window.criarRangeRamais = function () {
-  const ini = Number(document.getElementById("ramalInicio").value);
-  const fim = Number(document.getElementById("ramalFim").value);
-  const container = document.getElementById("listaRings");
-
-  if (!ini || !fim || fim < ini) {
-    mostrarToast("Range inválido", true);
-    return;
-  }
-
-  for (let i = ini; i <= fim; i++) {
-    if (container.children.length >= LIMITE) break;
-    const campo = criarCampo("ring");
-    campo.querySelector(".campo-nome").value = i;
-    container.appendChild(campo);
-  }
-
-  mostrarToast("Range criado com sucesso!");
-};
-
-/* ================= IMPORTAÇÃO CSV (ROBUSTA) ================= */
+/* ================= IMPORTAÇÃO CSV ================= */
 window.acionarImportacao = function (tipo) {
   const input = document.getElementById(
     tipo === "usuario_web" ? "importUsuarios" : "importRamais"
@@ -177,87 +170,43 @@ window.acionarImportacao = function (tipo) {
 
 function processarCSV(tipo, texto) {
   const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
-  if (linhas.length < 2) return mostrarToast("CSV vazio ou inválido", true);
+  if (linhas.length < 2) return mostrarToast("CSV inválido", true);
 
-  const separador = linhas[0].includes(";") ? ";" : ",";
-  const header = linhas.shift().split(separador).map(h => h.trim().toLowerCase());
-
+  const sep = linhas[0].includes(";") ? ";" : ",";
+  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
   const container = document.getElementById(listas[tipo]);
-  if (!container) return;
 
-  let criados = 0;
+  let count = 0;
 
   linhas.forEach(linha => {
-    const valores = linha.split(separador).map(v => v.trim());
+    const valores = linha.split(sep).map(v => v.trim());
     const data = {};
     header.forEach((h, i) => (data[h] = valores[i] || ""));
 
-    const usuario = data.usuario || data["usuário"] || data.nome;
-    if (!usuario) return;
+    const nome = data.usuario || data.ramal || data.nome;
+    if (!nome) return;
 
     const campo = criarCampo(tipo);
-    campo.querySelector(".campo-nome").value = usuario;
+    campo.querySelector(".campo-nome").value = nome;
 
     if (tipo === "usuario_web") {
       campo.querySelector("input[type=email]").value = data.email || "x@x";
       campo.querySelector(".campo-senha").value = data.senha || "";
       campo.setPermissaoAtalho(data.permissao);
-      campo.querySelector("textarea").value = data.descricao || "";
     }
 
+    if (tipo === "ring") {
+      campo.querySelector(".campo-senha").value = data.senha || "";
+    }
+
+    campo.querySelector("textarea").value = data.descricao || "";
+
     container.appendChild(campo);
-    criados++;
+    count++;
   });
 
-  criados
-    ? mostrarToast(`${criados} registros importados com sucesso!`)
-    : mostrarToast("Nenhuma linha válida encontrada", true);
+  mostrarToast(`${count} registros importados com sucesso!`);
 }
-
-/* ================= EXPORTAR ================= */
-window.explorar = function () {
-  const dados = {};
-
-  Object.keys(listas).forEach(tipo => {
-    dados[tipo] = [];
-    document.getElementById(listas[tipo])
-      .querySelectorAll(".campo-descricao")
-      .forEach(c => {
-        if (tipo === "usuario_web" && !c.validarSenha()) return;
-
-        const item = {
-          nome: c.getNome(),
-          descricao: c.querySelector("textarea")?.value || ""
-        };
-
-        if (tipo === "usuario_web") {
-          item.email = c.getEmail();
-          item.senha = c.getSenha();
-          item.permissao = c.getPermissao();
-        }
-
-        dados[tipo].push(item);
-      });
-  });
-
-  document.getElementById("resultado").textContent =
-    JSON.stringify(dados, null, 2);
-};
-
-/* ================= TEMPLATE CSV ================= */
-window.baixarTemplateUsuarios = function () {
-  const csv = [
-    "usuario;email;senha;permissao;descricao",
-    "joao.silva;joao@empresa.com;Senha@12345;pabx;Administrador principal",
-    "maria.souza;x@x;Senha@12345;agente;Agente Call Center"
-  ].join("\n");
-
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "template_usuarios_web.csv";
-  a.click();
-};
 
 /* ================= TOAST ================= */
 function mostrarToast(msg, error = false) {
@@ -273,7 +222,5 @@ window.fecharToast = () =>
 /* ================= TEMA ================= */
 const toggleTheme = document.getElementById("toggleTheme");
 if (toggleTheme) {
-  toggleTheme.onclick = () => {
-    document.body.classList.toggle("dark");
-  };
+  toggleTheme.onclick = () => document.body.classList.toggle("dark");
 }
