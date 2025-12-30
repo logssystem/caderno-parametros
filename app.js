@@ -28,7 +28,6 @@ const PERMISSOES = [
 window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
   if (!container || container.children.length >= LIMITE) return;
-
   container.appendChild(criarCampo(tipo));
 };
 
@@ -37,28 +36,19 @@ function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  /* 🔥 só usuários web recebem essa classe extra */
-  if (tipo === "usuario_web") {
-    wrap.classList.add("usuario-web");
-  }
-
-  const linha = document.createElement("div");
-  linha.className = "linha-principal";
+  /* ===== LINHA USUÁRIO ===== */
+  const linhaUsuario = document.createElement("div");
+  linhaUsuario.className = "linha-principal";
 
   const nome = document.createElement("input");
   nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
-
-  /* 🔥 campo do usuário continua GRANDE */
-  if (tipo === "usuario_web") {
-    nome.classList.add("campo-usuario");
-  }
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
   btn.onclick = () => wrap.remove();
 
-  linha.append(nome, btn);
-  wrap.append(linha);
+  linhaUsuario.append(nome, btn);
+  wrap.append(linhaUsuario);
 
   let senhaInput = null;
   let permissao = null;
@@ -67,12 +57,21 @@ function criarCampo(tipo) {
 
   /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
-    // SENHA (MENOR)
+    /* --- LINHA SENHA --- */
+    const linhaSenha = document.createElement("div");
+    linhaSenha.className = "linha-principal";
+
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do usuário";
     senhaInput.classList.add("campo-senha");
 
-    // PERMISSÃO (MENOR)
+    linhaSenha.appendChild(senhaInput);
+    wrap.appendChild(linhaSenha);
+
+    /* --- LINHA PERMISSÃO --- */
+    const linhaPermissao = document.createElement("div");
+    linhaPermissao.className = "linha-principal";
+
     permissao = document.createElement("select");
     permissao.classList.add("campo-permissao");
 
@@ -83,6 +82,10 @@ function criarCampo(tipo) {
 
     PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
 
+    linhaPermissao.appendChild(permissao);
+    wrap.appendChild(linhaPermissao);
+
+    /* --- REGRAS --- */
     regras = document.createElement("div");
 
     senhaInput.oninput = () => {
@@ -106,13 +109,15 @@ function criarCampo(tipo) {
       regras.innerHTML = `<div class="regra-erro">${msg}</div>`;
     }
 
-    wrap.append(senhaInput, permissao, regras);
+    wrap.appendChild(regras);
   }
 
+  /* ===== DESCRIÇÃO ===== */
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
   wrap.append(desc);
 
+  /* HELPERS */
   wrap.validarSenha = () => (senhaInput ? senhaOk : true);
   wrap.getSenha = () => (senhaInput ? senhaInput.value : "");
   wrap.getPermissao = () => (permissao ? permissao.value : "");
@@ -167,7 +172,8 @@ window.explorar = function () {
 
   Object.keys(listas).forEach(tipo => {
     dados[tipo] = [];
-    document.getElementById(listas[tipo]).querySelectorAll(".campo-descricao")
+    document.getElementById(listas[tipo])
+      .querySelectorAll(".campo-descricao")
       .forEach(c => {
         const nome = c.querySelector("input")?.value;
         if (!nome) return;
