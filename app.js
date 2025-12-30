@@ -65,28 +65,62 @@ function criarCampo(tipo) {
   linhaNome.append(nome, btn);
   wrap.append(linhaNome);
 
-  let emailInput, senhaInput, permissao, regras;
-  let senhaOk = true;
+  let emailInput = null;
+  let senhaInput = null;
+  let permissao = null;
+  let regras = null;
+  let senhaOk = false;
 
-  if (tipo === "usuario_web") {
+  const precisaSenha = tipo === "usuario_web" || tipo === "ring";
+
+  /* EMAIL + SENHA (usuário web e ramal) */
+  if (precisaSenha) {
     const linhaCred = document.createElement("div");
     linhaCred.className = "linha-principal";
     linhaCred.style.gap = "12px";
     linhaCred.style.marginTop = "12px";
 
-    emailInput = document.createElement("input");
-    emailInput.type = "email";
-    emailInput.placeholder = "E-mail do usuário";
-    emailInput.style.flex = "1";
+    if (tipo === "usuario_web") {
+      emailInput = document.createElement("input");
+      emailInput.type = "email";
+      emailInput.placeholder = "E-mail do usuário";
+      emailInput.style.flex = "1";
+      linhaCred.append(emailInput);
+    }
 
     senhaInput = document.createElement("input");
-    senhaInput.placeholder = "Senha do usuário";
+    senhaInput.placeholder = "Senha";
     senhaInput.classList.add("campo-senha");
     senhaInput.style.flex = "1";
 
-    linhaCred.append(emailInput, senhaInput);
+    linhaCred.append(senhaInput);
     wrap.append(linhaCred);
 
+    regras = document.createElement("div");
+    regras.style.marginTop = "8px";
+    wrap.append(regras);
+
+    senhaInput.oninput = () => {
+      const v = senhaInput.value;
+      regras.innerHTML = "";
+      senhaOk = false;
+
+      if (v.length < 11) return regra("Mínimo de 11 caracteres");
+      if (!/[A-Z]/.test(v)) return regra("Pelo menos 1 letra maiúscula");
+      if (!/\d/.test(v)) return regra("Pelo menos 1 número");
+      if (!/[^A-Za-z0-9]/.test(v)) return regra("Pelo menos 1 caractere especial");
+
+      regras.innerHTML = `<div class="regra-ok">Senha válida</div>`;
+      senhaOk = true;
+    };
+
+    function regra(msg) {
+      regras.innerHTML = `<div class="regra-erro">${msg}</div>`;
+    }
+  }
+
+  /* PERMISSÃO (somente usuário web) */
+  if (tipo === "usuario_web") {
     permissao = document.createElement("select");
     permissao.classList.add("campo-permissao");
     permissao.style.marginTop = "12px";
@@ -98,23 +132,6 @@ function criarCampo(tipo) {
     PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
 
     wrap.append(permissao);
-
-    regras = document.createElement("div");
-    regras.style.marginTop = "10px";
-    wrap.append(regras);
-
-    senhaInput.oninput = () => {
-      const v = senhaInput.value;
-      senhaOk =
-        v.length >= 11 &&
-        /[A-Z]/.test(v) &&
-        /\d/.test(v) &&
-        /[^A-Za-z0-9]/.test(v);
-
-      regras.innerHTML = senhaOk
-        ? `<div class="regra-ok">Senha válida</div>`
-        : `<div class="regra-erro">Senha inválida</div>`;
-    };
   }
 
   const desc = document.createElement("textarea");
@@ -122,7 +139,7 @@ function criarCampo(tipo) {
   desc.style.marginTop = "12px";
   wrap.append(desc);
 
-  wrap.validarSenha = () => senhaOk;
+  wrap.validarSenha = () => (precisaSenha ? senhaOk : true);
   wrap.getNome = () => nome.value;
   wrap.getEmail = () => emailInput?.value || "x@x";
   wrap.getSenha = () => senhaInput?.value || "";
@@ -156,7 +173,7 @@ window.criarRangeRamais = function () {
   mostrarToast("Range criado com sucesso!");
 };
 
-/* ================= IMPORTAÇÃO CSV (ROBUSTA) ================= */
+/* ================= IMPORTAÇÃO CSV ================= */
 window.acionarImportacao = function (tipo) {
   const input = document.getElementById(
     tipo === "usuario_web" ? "importUsuarios" : "importRamais"
@@ -177,87 +194,37 @@ window.acionarImportacao = function (tipo) {
 
 function processarCSV(tipo, texto) {
   const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
-  if (linhas.length < 2) return mostrarToast("CSV vazio ou inválido", true);
+  if (linhas.length < 2) return;
 
-  const separador = linhas[0].includes(";") ? ";" : ",";
-  const header = linhas.shift().split(separador).map(h => h.trim().toLowerCase());
-
+  const sep = linhas[0].includes(";") ? ";" : ",";
+  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
   const container = document.getElementById(listas[tipo]);
-  if (!container) return;
 
-  let criados = 0;
+  linhas.forEach(l => {
+    const v = l.split(sep).map(x => x.trim());
+    const d = {};
+    header.forEach((h, i) => (d[h] = v[i] || ""));
 
-  linhas.forEach(linha => {
-    const valores = linha.split(separador).map(v => v.trim());
-    const data = {};
-    header.forEach((h, i) => (data[h] = valores[i] || ""));
-
-    const usuario = data.usuario || data["usuário"] || data.nome;
-    if (!usuario) return;
+    if (!d.usuario && !d.nome) return;
 
     const campo = criarCampo(tipo);
-    campo.querySelector(".campo-nome").value = usuario;
+    campo.querySelector(".campo-nome").value = d.usuario || d.nome;
 
     if (tipo === "usuario_web") {
-      campo.querySelector("input[type=email]").value = data.email || "x@x";
-      campo.querySelector(".campo-senha").value = data.senha || "";
-      campo.setPermissaoAtalho(data.permissao);
-      campo.querySelector("textarea").value = data.descricao || "";
+      campo.querySelector("input[type=email]").value = d.email || "x@x";
+      campo.querySelector(".campo-senha").value = d.senha || "";
+      campo.setPermissaoAtalho(d.permissao);
+    }
+
+    if (tipo === "ring") {
+      campo.querySelector(".campo-senha").value = d.senha || "";
     }
 
     container.appendChild(campo);
-    criados++;
   });
 
-  criados
-    ? mostrarToast(`${criados} registros importados com sucesso!`)
-    : mostrarToast("Nenhuma linha válida encontrada", true);
+  mostrarToast("Importação concluída!");
 }
-
-/* ================= EXPORTAR ================= */
-window.explorar = function () {
-  const dados = {};
-
-  Object.keys(listas).forEach(tipo => {
-    dados[tipo] = [];
-    document.getElementById(listas[tipo])
-      .querySelectorAll(".campo-descricao")
-      .forEach(c => {
-        if (tipo === "usuario_web" && !c.validarSenha()) return;
-
-        const item = {
-          nome: c.getNome(),
-          descricao: c.querySelector("textarea")?.value || ""
-        };
-
-        if (tipo === "usuario_web") {
-          item.email = c.getEmail();
-          item.senha = c.getSenha();
-          item.permissao = c.getPermissao();
-        }
-
-        dados[tipo].push(item);
-      });
-  });
-
-  document.getElementById("resultado").textContent =
-    JSON.stringify(dados, null, 2);
-};
-
-/* ================= TEMPLATE CSV ================= */
-window.baixarTemplateUsuarios = function () {
-  const csv = [
-    "usuario;email;senha;permissao;descricao",
-    "joao.silva;joao@empresa.com;Senha@12345;pabx;Administrador principal",
-    "maria.souza;x@x;Senha@12345;agente;Agente Call Center"
-  ].join("\n");
-
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "template_usuarios_web.csv";
-  a.click();
-};
 
 /* ================= TOAST ================= */
 function mostrarToast(msg, error = false) {
