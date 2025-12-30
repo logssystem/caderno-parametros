@@ -27,6 +27,7 @@ body {
   font-family: Inter, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
+  font-weight: 500; /* 🔥 base mais legível */
 }
 
 /* HEADER */
@@ -41,7 +42,12 @@ body {
 }
 
 .app-logo { height: 72px; }
-.app-title { font-size: 26px; font-weight: 600; }
+
+.app-title {
+  font-size: 26px;
+  font-weight: 700; /* 🔥 título forte */
+  letter-spacing: 0.3px;
+}
 
 .theme-toggle {
   background: none;
@@ -49,6 +55,7 @@ body {
   font-size: 20px;
   cursor: pointer;
   color: var(--text);
+  font-weight: 600;
 }
 
 /* CONTEÚDO */
@@ -65,6 +72,13 @@ body {
   padding: 22px 26px;
   margin-bottom: 28px;
   box-shadow: 0 10px 28px rgba(0,0,0,0.06);
+}
+
+.card h2 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 700; /* 🔥 hierarquia clara */
+  letter-spacing: 0.2px;
 }
 
 /* CAMPOS */
@@ -86,13 +100,23 @@ body {
   gap: 10px;
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
   width: 100%;
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid var(--field-border);
   background: transparent;
   color: var(--text);
+  font-size: 14px;
+  font-weight: 600; /* 🔥 texto do campo mais claro */
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af;
+  font-weight: 500;
 }
 
 /* SENHA */
@@ -100,10 +124,12 @@ input, textarea, select {
   width: 50%;
   min-width: 220px;
   transition: width 0.2s ease;
+  font-weight: 700; /* 🔥 destaque */
 }
 
 .senha-invalida {
   border: 2px solid #ef4444 !important;
+  box-shadow: 0 0 0 2px rgba(239,68,68,0.25);
 }
 
 /* PERMISSÃO */
@@ -111,6 +137,7 @@ input, textarea, select {
   width: 65%;
   min-width: 260px;
   cursor: pointer;
+  font-weight: 600;
 }
 
 /* REGRAS */
@@ -120,6 +147,8 @@ input, textarea, select {
   padding: 8px 12px;
   border-radius: 6px;
   font-size: 13px;
+  font-weight: 700; /* 🔥 leitura imediata */
+  letter-spacing: 0.2px;
 }
 
 .regra-ok {
@@ -128,6 +157,8 @@ input, textarea, select {
   padding: 8px 12px;
   border-radius: 6px;
   font-size: 13px;
+  font-weight: 700; /* 🔥 */
+  letter-spacing: 0.2px;
 }
 
 /* BOTÕES */
@@ -140,6 +171,7 @@ input, textarea, select {
   background: transparent;
   font-size: 22px;
   cursor: pointer;
+  font-weight: 700;
 }
 
 .btn-explorar {
@@ -147,7 +179,8 @@ input, textarea, select {
   padding: 16px 48px;
   border-radius: 12px;
   background: var(--accent);
-  font-weight: 600;
+  font-weight: 800; /* 🔥 CTA forte */
+  letter-spacing: 0.4px;
   cursor: pointer;
 }
 
@@ -157,6 +190,8 @@ pre {
   color: #e5e7eb;
   padding: 16px;
   border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 /* TOAST */
@@ -172,10 +207,13 @@ pre {
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
   display: flex;
   justify-content: space-between;
+  align-items: center;
   opacity: 0;
   transform: translateY(-10px);
   pointer-events: none;
   transition: 0.3s;
+  font-weight: 700; /* 🔥 mensagem clara */
+  letter-spacing: 0.3px;
 }
 
 .toast.show {
@@ -193,5 +231,6 @@ pre {
   border: none;
   color: #fff;
   font-size: 20px;
+  font-weight: 800;
   cursor: pointer;
 }
