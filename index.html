@@ -8,7 +8,6 @@
 
 <body>
 
-<!-- HEADER -->
 <header class="app-header">
   <div class="header-left">
     <img src="./assets/image.png" alt="Logo ZRA" class="app-logo" />
@@ -18,18 +17,37 @@
     <h1 class="app-title">Caderno de Parâmetros</h1>
   </div>
 
-  <button id="toggleTheme" class="theme-toggle" title="Alternar tema">🌙</button>
+  <button id="toggleTheme" class="theme-toggle">🌙</button>
 </header>
 
-<!-- CONTEÚDO -->
 <main class="form-container">
 
+  <!-- USUÁRIOS WEB -->
   <section class="card">
     <h2>Usuários Web</h2>
+
+    <div class="acoes-card">
+      <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
+      <button class="btn-import" onclick="acionarImportacao('usuario_web')">📥 Importar</button>
+      <input type="file" id="importUsuarios" accept=".csv" hidden>
+    </div>
+
     <div id="listaUsuariosWeb"></div>
-    <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
   </section>
 
+  <!-- RAMAIS -->
+  <section class="card">
+    <h2>Ramais</h2>
+
+    <div class="acoes-card">
+      <button class="btn-import" onclick="acionarImportacao('ramal')">📥 Importar</button>
+      <input type="file" id="importRamais" accept=".csv" hidden>
+    </div>
+
+    <div id="listaRings"></div>
+  </section>
+
+  <!-- OUTROS -->
   <section class="card">
     <h2>Números de Entrada</h2>
     <div id="listaEntradas"></div>
@@ -49,12 +67,6 @@
   </section>
 
   <section class="card">
-    <h2>Grupo de Ring</h2>
-    <div id="listaRings"></div>
-    <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
-  </section>
-
-  <section class="card">
     <h2>Agentes</h2>
     <div id="listaAgentes"></div>
     <button class="btn-add" onclick="adicionarCampo('agente')">+</button>
@@ -62,12 +74,9 @@
 
   <button class="btn-explorar" onclick="explorar()">Explorar</button>
 
-  <h2>Resultado</h2>
   <pre id="resultado"></pre>
-
 </main>
 
-<!-- TOAST GLOBAL -->
 <div id="toastGlobal" class="toast">
   <span id="toastMessage"></span>
   <button onclick="fecharToast()">×</button>
