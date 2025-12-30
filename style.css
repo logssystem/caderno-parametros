@@ -1,8 +1,8 @@
 * { box-sizing: border-box; }
 
-/* ===== TEMA CLARO ===== */
+/* ===== CLARO ===== */
 :root {
-  --bg: #f9fafb;
+  --bg: #f5f7fa;
   --text: #1f2933;
   --header-bg: #ffffff;
   --card-bg: #ffffff;
@@ -11,7 +11,7 @@
   --accent: #c6ff00;
 }
 
-/* ===== TEMA ESCURO ===== */
+/* ===== ESCURO ===== */
 body.dark {
   --bg: #0b1220;
   --text: #e6edf3;
@@ -21,34 +21,39 @@ body.dark {
   --field-border: #334155;
 }
 
-/* BODY */
 body {
   margin: 0;
   font-family: Inter, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
-  transition: background .25s ease, color .25s ease;
+  transition: 0.3s;
 }
 
 /* HEADER */
 .app-header {
   height: 120px;
-  background: var(--header-bg);
-  border-bottom: 1px solid var(--border);
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   padding: 0 48px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
 }
 
 .app-logo { height: 72px; }
-.app-title { font-size: 26px; font-weight: 900; }
+.app-title { font-size: 26px; font-weight: 800; }
+
+.theme-toggle {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
 
 /* CONTEÚDO */
 .form-container {
   max-width: 900px;
   margin: 56px auto;
-  padding: 0 16px 60px;
 }
 
 /* CARD */
@@ -57,20 +62,25 @@ body {
   border-radius: 14px;
   padding: 24px;
   margin-bottom: 28px;
-  box-shadow: 0 14px 36px rgba(0,0,0,.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,.2);
 }
 
-body.dark .card {
-  box-shadow: 0 14px 36px rgba(0,0,0,.55);
+.card h2 { margin-bottom: 16px; }
+
+/* AÇÕES */
+.acoes-card {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 /* CAMPOS */
 .campo-descricao {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 22px;
-  padding-bottom: 18px;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
   border-bottom: 1px dashed var(--border);
 }
 
@@ -80,33 +90,59 @@ body.dark .card {
 }
 
 /* INPUTS */
-input,
-textarea,
-select {
-  width: 100%;
-  padding: 11px 14px;
+input, textarea, select {
+  padding: 10px 12px;
   border-radius: 8px;
-  border: 1.5px solid var(--field-border);
+  border: 1px solid var(--field-border);
   background: var(--card-bg);
   color: var(--text);
   font-weight: 600;
 }
 
+/* SENHA */
+.campo-senha {
+  width: 50%;
+  min-width: 220px;
+}
+
+.senha-invalida {
+  border: 2px solid #ef4444 !important;
+}
+
+/* PERMISSÃO */
+.campo-permissao {
+  width: 65%;
+}
+
+/* REGRAS */
+.regra-erro {
+  background: #ef4444;
+  color: #fff;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.regra-ok {
+  background: #22c55e;
+  color: #052e16;
+  padding: 8px;
+  border-radius: 6px;
+}
+
 /* BOTÕES */
-.btn-add,
-.btn-import {
-  height: 46px;
-  padding: 0 18px;
-  border-radius: 12px;
+.btn-add, .btn-import {
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 10px;
   border: 2px dashed var(--border);
   background: transparent;
-  font-weight: 800;
   cursor: pointer;
+  font-weight: 800;
 }
 
 .btn-explorar {
-  margin: 48px auto;
-  padding: 18px 52px;
+  margin: 40px auto;
+  padding: 16px 40px;
   border-radius: 14px;
   background: var(--accent);
   font-weight: 900;
@@ -117,20 +153,14 @@ select {
   position: fixed;
   top: 24px;
   right: 24px;
-  padding: 18px 22px;
+  padding: 16px 22px;
   background: #22c55e;
-  border-radius: 14px;
+  border-radius: 12px;
   font-weight: 800;
   opacity: 0;
   transform: translateY(-10px);
-  transition: .3s;
+  transition: 0.3s;
 }
 
-.toast.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.toast.error {
-  background: #ef4444;
-}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.error { background: #ef4444; }
