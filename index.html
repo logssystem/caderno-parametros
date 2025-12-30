@@ -8,64 +8,54 @@
 
 <body>
 
-<!-- HEADER -->
 <header class="app-header">
   <div class="header-left">
     <img src="./assets/image.png" alt="Logo ZRA" class="app-logo" />
   </div>
-
   <div class="header-center">
     <h1 class="app-title">Caderno de Parâmetros</h1>
   </div>
-
   <button id="toggleTheme" class="theme-toggle">🌙</button>
 </header>
 
-<!-- CONTEÚDO -->
 <main class="form-container">
 
   <!-- USUÁRIOS WEB -->
   <section class="card">
     <h2>Usuários Web</h2>
-
     <div class="acoes-card">
       <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
       <button class="btn-import" onclick="acionarImportacao('usuario_web')">📥 Importar</button>
       <button class="btn-import" onclick="baixarTemplateUsuarios()">📥 Baixar template CSV</button>
       <input type="file" id="importUsuarios" accept=".csv" hidden>
     </div>
-
     <div id="listaUsuariosWeb"></div>
   </section>
 
   <!-- RAMAIS -->
   <section class="card">
     <h2>Ramais (Range)</h2>
-
     <div class="acoes-card">
       <input id="ramalInicio" type="number" placeholder="Ramal inicial">
       <input id="ramalFim" type="number" placeholder="Ramal final">
       <button class="btn-add" onclick="criarRangeRamais()">Criar range</button>
     </div>
-
     <div class="acoes-card">
       <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
-      <!-- 🔴 CORRIGIDO: ring (não ramal) -->
       <button class="btn-import" onclick="acionarImportacao('ring')">📥 Importar</button>
       <input type="file" id="importRamais" accept=".csv" hidden>
     </div>
-
     <div id="listaRings"></div>
   </section>
 
-  <!-- NÚMEROS DE ENTRADA -->
+  <!-- ENTRADAS -->
   <section class="card">
     <h2>Números de Entrada</h2>
     <div id="listaEntradas"></div>
     <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
   </section>
 
-  <!-- URAs -->
+  <!-- URAS -->
   <section class="card">
     <h2>URAs</h2>
     <div id="listaURAs"></div>
@@ -79,7 +69,7 @@
     <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
   </section>
 
-  <!-- GRUPO DE RING -->
+  <!-- GRUPO RING -->
   <section class="card">
     <h2>Grupo de Ring</h2>
     <div id="listaGrupoRing"></div>
@@ -95,10 +85,8 @@
 
   <button class="btn-explorar" onclick="explorar()">Explorar</button>
   <pre id="resultado"></pre>
-
 </main>
 
-<!-- TOAST -->
 <div id="toastGlobal" class="toast">
   <span id="toastMessage"></span>
   <button onclick="fecharToast()">×</button>
