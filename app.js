@@ -36,12 +36,13 @@ function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  /* ===== LINHA USUÁRIO ===== */
+  /* ===== LINHA USUÁRIO (ÚNICA FLEX) ===== */
   const linhaUsuario = document.createElement("div");
   linhaUsuario.className = "linha-principal";
 
   const nome = document.createElement("input");
   nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
+  nome.style.width = "100%";
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
@@ -57,36 +58,31 @@ function criarCampo(tipo) {
 
   /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
-    /* --- LINHA SENHA --- */
-    const linhaSenha = document.createElement("div");
-    linhaSenha.className = "linha-principal";
 
+    /* SENHA (FORA DO FLEX) */
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do usuário";
     senhaInput.classList.add("campo-senha");
+    senhaInput.style.marginTop = "12px";
+    wrap.append(senhaInput);
 
-    linhaSenha.appendChild(senhaInput);
-    wrap.appendChild(linhaSenha);
-
-    /* --- LINHA PERMISSÃO --- */
-    const linhaPermissao = document.createElement("div");
-    linhaPermissao.className = "linha-principal";
-
+    /* PERMISSÃO (FORA DO FLEX) */
     permissao = document.createElement("select");
     permissao.classList.add("campo-permissao");
+    permissao.style.marginTop = "12px";
 
     const opt0 = new Option("Selecione a permissão", "");
     opt0.disabled = true;
     opt0.selected = true;
     permissao.appendChild(opt0);
-
     PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
 
-    linhaPermissao.appendChild(permissao);
-    wrap.appendChild(linhaPermissao);
+    wrap.append(permissao);
 
-    /* --- REGRAS --- */
+    /* REGRAS */
     regras = document.createElement("div");
+    regras.style.marginTop = "10px";
+    wrap.append(regras);
 
     senhaInput.oninput = () => {
       regras.innerHTML = "";
@@ -108,13 +104,12 @@ function criarCampo(tipo) {
       senhaInput.classList.add("senha-invalida");
       regras.innerHTML = `<div class="regra-erro">${msg}</div>`;
     }
-
-    wrap.appendChild(regras);
   }
 
   /* ===== DESCRIÇÃO ===== */
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
+  desc.style.marginTop = "12px";
   wrap.append(desc);
 
   /* HELPERS */
@@ -157,6 +152,7 @@ window.criarRangeRamais = function () {
 
     const desc = document.createElement("textarea");
     desc.placeholder = "Descrição (opcional)";
+    desc.style.marginTop = "12px";
     wrap.append(desc);
 
     container.appendChild(wrap);
