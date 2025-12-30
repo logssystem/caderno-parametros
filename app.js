@@ -5,9 +5,6 @@ console.log("APP.JS CARREGADO - VERSÃO FINAL 600+");
 ========================= */
 const LIMITE = 600;
 
-/* =========================
-   MAPEAMENTO DAS LISTAS
-========================= */
 const listas = {
   usuario_web: "listaUsuariosWeb",
   entrada: "listaEntradas",
@@ -17,7 +14,7 @@ const listas = {
   agente: "listaAgentes"
 };
 
-/* CONTADORES (EVITA querySelector pesado) */
+/* CONTADORES */
 const contadores = {
   usuario_web: 0,
   entrada: 0,
@@ -26,6 +23,19 @@ const contadores = {
   ring: 0,
   agente: 0
 };
+
+/* PERMISSÕES */
+const PERMISSOES_USUARIO = [
+  "Administrador do Módulo de PABX",
+  "Agente de Call Center",
+  "Supervisor(a) de Call Center",
+  "CRM",
+  "CRM Owner",
+  "Administrador do Módulo de Omnichannel",
+  "Agente Omnichannel",
+  "Supervisor(a) Omnichannel",
+  "Super Administrador"
+];
 
 /* =========================
    ADICIONAR CAMPO
@@ -50,7 +60,6 @@ window.adicionarCampo = function (tipo) {
 function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
-  wrap.style.marginBottom = "18px"; // 🔥 espaçamento entre campos
 
   const linha = document.createElement("div");
   linha.className = "linha-principal";
@@ -70,19 +79,18 @@ function criarCampo(tipo) {
   linha.append(nome, btn);
   wrap.append(linha);
 
-  /* =========================
-     SENHA – SOMENTE USUÁRIO WEB
-  ========================= */
+  /* ===== USUÁRIO WEB ===== */
   let senhaInput = null;
   let regrasBox = null;
+  let permissaoSelect = null;
   let senhaValidaAtual = false;
 
   if (tipo === "usuario_web") {
+    /* SENHA */
     senhaInput = document.createElement("input");
     senhaInput.type = "text";
     senhaInput.className = "campo-senha";
     senhaInput.placeholder = "Senha do usuário";
-    senhaInput.style.width = "50%";
 
     regrasBox = document.createElement("div");
     regrasBox.className = "regras-senha";
@@ -94,28 +102,19 @@ function criarCampo(tipo) {
       senhaValidaAtual = false;
 
       if (v.length < 11) {
-        regrasBox.innerHTML = regraErro("A senha deve ter pelo menos 11 caracteres.");
-        marcarErro();
+        erroSenha("A senha deve ter pelo menos 11 caracteres.");
         return;
       }
-
       if (!/[A-Z]/.test(v)) {
-        regrasBox.innerHTML = regraErro("A senha deve conter pelo menos uma letra maiúscula.");
-        marcarErro();
+        erroSenha("A senha deve conter pelo menos uma letra maiúscula.");
         return;
       }
-
       if (!/\d/.test(v)) {
-        regrasBox.innerHTML = regraErro("A senha deve conter pelo menos um número.");
-        marcarErro();
+        erroSenha("A senha deve conter pelo menos um número.");
         return;
       }
-
       if (!/[^A-Za-z0-9]/.test(v)) {
-        regrasBox.innerHTML = regraErro(
-          "A senha deve conter pelo menos um caractere especial (como @, #, $, etc.)."
-        );
-        marcarErro();
+        erroSenha("A senha deve conter pelo menos um caractere especial (como @, #, $, etc.).");
         return;
       }
 
@@ -124,33 +123,46 @@ function criarCampo(tipo) {
       ajustarLarguraSenha(senhaInput, v.length);
     });
 
-    function marcarErro() {
+    function erroSenha(msg) {
+      regrasBox.innerHTML = `<div class="regra-erro">${msg}</div>`;
       senhaInput.classList.add("senha-invalida");
       ajustarLarguraSenha(senhaInput, senhaInput.value.length);
     }
 
-    wrap.append(senhaInput, regrasBox);
+    /* PERMISSÃO */
+    permissaoSelect = document.createElement("select");
+    permissaoSelect.className = "campo-permissao";
+
+    const optDefault = document.createElement("option");
+    optDefault.textContent = "Selecione a permissão";
+    optDefault.disabled = true;
+    optDefault.selected = true;
+    permissaoSelect.appendChild(optDefault);
+
+    PERMISSOES_USUARIO.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p;
+      opt.textContent = p;
+      permissaoSelect.appendChild(opt);
+    });
+
+    wrap.append(senhaInput, permissaoSelect, regrasBox);
   }
 
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
   wrap.append(desc);
 
-  /* =========================
-     VALIDAÇÃO NA EXPORTAÇÃO
-  ========================= */
-  wrap.validarSenha = () => {
-    if (!senhaInput) return true;
-    return senhaValidaAtual;
-  };
-
+  /* HELPERS POR CAMPO */
+  wrap.validarSenha = () => (senhaInput ? senhaValidaAtual : true);
   wrap.getSenha = () => (senhaInput ? senhaInput.value : "");
+  wrap.getPermissao = () => (permissaoSelect ? permissaoSelect.value : "");
 
   return wrap;
 }
 
 /* =========================
-   AJUSTE DE LARGURA DA SENHA
+   AJUSTE LARGURA SENHA
 ========================= */
 function ajustarLarguraSenha(input, len) {
   input.style.width =
@@ -160,7 +172,7 @@ function ajustarLarguraSenha(input, len) {
 }
 
 /* =========================
-   EXPORTAR / EXPLORAR
+   EXPORTAR
 ========================= */
 window.explorar = function () {
   const dados = {};
@@ -186,6 +198,7 @@ window.explorar = function () {
 
       if (tipo === "usuario_web") {
         item.senha = campo.getSenha();
+        item.permissao = campo.getPermissao();
       }
 
       dados[tipo].push(item);
@@ -193,10 +206,7 @@ window.explorar = function () {
   });
 
   if (erroSenha) {
-    mostrarToast(
-      "Existe senha inválida. Corrija antes de exportar.",
-      true
-    );
+    mostrarToast("Existe senha inválida. Corrija antes de exportar.", true);
     return;
   }
 
@@ -207,7 +217,7 @@ window.explorar = function () {
 };
 
 /* =========================
-   TOAST (CANTO DIREITO)
+   TOAST
 ========================= */
 function mostrarToast(msg, error = false) {
   const toast = document.getElementById("toastGlobal");
@@ -217,9 +227,7 @@ function mostrarToast(msg, error = false) {
   toast.className = "toast show" + (error ? " error" : "");
 
   clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => {
-    toast.classList.remove("show");
-  }, 4000);
+  toast._timer = setTimeout(() => toast.classList.remove("show"), 4000);
 }
 
 window.fecharToast = function () {
@@ -227,7 +235,7 @@ window.fecharToast = function () {
 };
 
 /* =========================
-   MODO ESCURO
+   TEMA
 ========================= */
 const toggleTheme = document.getElementById("toggleTheme");
 
@@ -244,11 +252,4 @@ if (toggleTheme) {
     toggleTheme.textContent = isDark ? "☀️" : "🌙";
     localStorage.setItem("theme", isDark ? "dark" : "light");
   };
-}
-
-/* =========================
-   HELPERS
-========================= */
-function regraErro(texto) {
-  return `<div class="regra-erro">${texto}</div>`;
 }
