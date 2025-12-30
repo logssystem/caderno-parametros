@@ -8,7 +8,6 @@
   --card-bg: #ffffff;
   --border: #e5e7eb;
   --field-border: #dfe3e8;
-  --chip-bg: #f1f3f5;
   --accent: #c6ff00;
 }
 
@@ -20,10 +19,9 @@ body.dark {
   --card-bg: #111827;
   --border: #1f2937;
   --field-border: #374151;
-  --chip-bg: #1f2937;
-  --accent: #c6ff00;
 }
 
+/* BODY */
 body {
   margin: 0;
   font-family: Inter, Arial, sans-serif;
@@ -65,25 +63,22 @@ body {
   background: var(--card-bg);
   border-radius: 14px;
   padding: 22px 26px;
-  margin-bottom: 28px; /* 🔥 MAIS RESPIRO ENTRE CARDS */
+  margin-bottom: 28px;
   box-shadow: 0 10px 28px rgba(0,0,0,0.06);
 }
-
-.card h2 { margin-bottom: 16px; }
 
 /* CAMPOS */
 .campo-descricao {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;          /* 🔥 AFASTAMENTO ENTRE CAMPOS */
-  padding-bottom: 16px;         /* 🔥 RESPIRO VISUAL */
+  gap: 12px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
   border-bottom: 1px dashed var(--border);
 }
 
 .campo-descricao:last-child {
   border-bottom: none;
-  padding-bottom: 0;
 }
 
 .linha-principal {
@@ -91,18 +86,13 @@ body {
   gap: 10px;
 }
 
-input, textarea {
+input, textarea, select {
   width: 100%;
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid var(--field-border);
   background: transparent;
   color: var(--text);
-}
-
-textarea {
-  resize: none;
-  height: 56px;
 }
 
 /* SENHA */
@@ -113,7 +103,14 @@ textarea {
 }
 
 .senha-invalida {
-  border: 2px solid #ff3b3b !important;
+  border: 2px solid #ef4444 !important;
+}
+
+/* PERMISSÃO */
+.campo-permissao {
+  width: 65%;
+  min-width: 260px;
+  cursor: pointer;
 }
 
 /* REGRAS */
@@ -135,7 +132,7 @@ textarea {
 
 /* BOTÕES */
 .btn-add {
-  margin-top: 20px; /* 🔥 MAIS AFASTADO DOS CAMPOS */
+  margin-top: 20px;
   width: 46px;
   height: 46px;
   border-radius: 12px;
@@ -187,7 +184,9 @@ pre {
   pointer-events: auto;
 }
 
-.toast.error { background: #ef4444; }
+.toast.error {
+  background: #ef4444;
+}
 
 .toast button {
   background: none;
