@@ -1,3 +1,7 @@
+aça o seguinte corrija tudo e me mande 
+
+js
+
 console.log("APP.JS FINAL 600+ COM IMPORTAÇÃO");
 
 /* =========================
@@ -269,4 +273,290 @@ if (toggleTheme) {
     toggleTheme.textContent = isDark ? "☀️" : "🌙";
     localStorage.setItem("theme", isDark ? "dark" : "light");
   });
+}
+
+html
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Caderno de Parâmetros</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+
+<header class="app-header">
+  <div class="header-left">
+    <img src="./assets/image.png" alt="Logo ZRA" class="app-logo" />
+  </div>
+
+  <div class="header-center">
+    <h1 class="app-title">Caderno de Parâmetros</h1>
+  </div>
+
+  <button id="toggleTheme" class="theme-toggle">🌙</button>
+</header>
+
+<main class="form-container">
+
+  <!-- USUÁRIOS WEB -->
+  <section class="card">
+    <h2>Usuários Web</h2>
+
+    <div class="acoes-card">
+      <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
+      <button class="btn-import" onclick="acionarImportacao('usuario_web')">📥 Importar</button>
+      <input type="file" id="importUsuarios" accept=".csv" hidden>
+    </div>
+
+    <div id="listaUsuariosWeb"></div>
+  </section>
+
+  <!-- RAMAIS -->
+  <section class="card">
+    <h2>Ramais</h2>
+
+    <div class="acoes-card">
+      <button class="btn-import" onclick="acionarImportacao('ramal')">📥 Importar</button>
+      <input type="file" id="importRamais" accept=".csv" hidden>
+    </div>
+
+    <div id="listaRings"></div>
+  </section>
+
+  <!-- OUTROS -->
+  <section class="card">
+    <h2>Números de Entrada</h2>
+    <div id="listaEntradas"></div>
+    <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
+  </section>
+
+  <section class="card">
+    <h2>URAs</h2>
+    <div id="listaURAs"></div>
+    <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
+  </section>
+
+  <section class="card">
+    <h2>Filas</h2>
+    <div id="listaFilas"></div>
+    <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
+  </section>
+
+  <section class="card">
+    <h2>Agentes</h2>
+    <div id="listaAgentes"></div>
+    <button class="btn-add" onclick="adicionarCampo('agente')">+</button>
+  </section>
+
+  <button class="btn-explorar" onclick="explorar()">Explorar</button>
+
+  <pre id="resultado"></pre>
+</main>
+
+<div id="toastGlobal" class="toast">
+  <span id="toastMessage"></span>
+  <button onclick="fecharToast()">×</button>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>
+
+css
+
+* { box-sizing: border-box; }
+
+/* ===== TEMA CLARO ===== */
+:root {
+  --bg: #f9fafb;
+  --text: #1f2933;
+  --header-bg: #ffffff;
+  --card-bg: #ffffff;
+  --border: #d1d5db;
+  --field-border: #cbd5e1;
+  --accent: #c6ff00;
+}
+
+/* ===== TEMA ESCURO ===== */
+body.dark {
+  --bg: #0b1220;
+  --text: #e6edf3;
+  --header-bg: #0f172a;
+  --card-bg: #111c33;
+  --border: #24304a;
+  --field-border: #334155;
+}
+
+/* BODY */
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-weight: 500;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* HEADER */
+.app-header {
+  height: 120px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 0 48px;
+}
+
+.app-logo { height: 72px; }
+.app-title { font-size: 26px; font-weight: 900; }
+
+/* CONTEÚDO */
+.form-container {
+  max-width: 900px;
+  margin: 56px auto;
+  padding: 0 16px 60px;
+}
+
+/* CARD */
+.card {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 14px 36px rgba(0,0,0,0.08);
+}
+
+body.dark .card {
+  box-shadow: 0 14px 36px rgba(0,0,0,0.55);
+}
+
+.card h2 {
+  font-weight: 900;
+  margin-bottom: 16px;
+}
+
+/* CAMPOS */
+.campo-descricao {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px dashed var(--border);
+}
+
+.linha-principal {
+  display: flex;
+  gap: 10px;
+}
+
+/* INPUTS – SEM COR FIXA */
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--field-border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  transition: border 0.2s ease, background 0.2s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* SENHA */
+.campo-senha {
+  width: 50%;
+  min-width: 220px;
+  transition: width 0.2s ease;
+}
+
+.senha-invalida {
+  border: 2px solid #ef4444 !important;
+  box-shadow: 0 0 0 2px rgba(239,68,68,0.25);
+}
+
+/* PERMISSÃO */
+.campo-permissao {
+  width: 65%;
+  min-width: 260px;
+}
+
+/* REGRAS */
+.regra-erro {
+  background: #ef4444;
+  color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.regra-ok {
+  background: #22c55e;
+  color: #052e16;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+/* BOTÕES */
+.btn-add,
+.btn-import {
+  height: 46px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 2px dashed var(--border);
+  background: transparent;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btn-explorar {
+  margin: 48px auto;
+  padding: 18px 52px;
+  border-radius: 14px;
+  background: var(--accent);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+/* RESULTADO */
+pre {
+  background: #020617;
+  color: #e5e7eb;
+  padding: 18px;
+  border-radius: 12px;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  padding: 18px 22px;
+  background: #22c55e;
+  border-radius: 14px;
+  font-weight: 800;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: 0.3s;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.error {
+  background: #ef4444;
 }
