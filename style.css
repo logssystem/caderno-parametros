@@ -1,28 +1,27 @@
-aça ai a alteração por gentileza
-
 * { box-sizing: border-box; }
 
-/* ===== TEMA CLARO ===== */
+/* ===== TEMA CLARO – MAIS CONTRASTE ===== */
 :root {
-  --bg: #f9fafb;
-  --text: #1f2933;
+  --bg: #eef2f7;                 /* fundo mais visível */
+  --text: #0f172a;               /* texto bem escuro */
   --header-bg: #ffffff;
   --card-bg: #ffffff;
-  --border: #d1d5db;
-  --field-border: #cbd5e1;
+  --border: #cbd5e1;             /* borda mais marcada */
+  --field-border: #94a3b8;       /* inputs mais visíveis */
   --accent: #c6ff00;
 }
 
-/* ===== TEMA ESCURO ===== */
+/* ===== TEMA ESCURO – CONFORTÁVEL ===== */
 body.dark {
   --bg: #0b1220;
   --text: #e6edf3;
   --header-bg: #0f172a;
   --card-bg: #111c33;
   --border: #24304a;
-  --field-border: #334155;
+  --field-border: #475569;
 }
 
+/* BODY */
 body {
   margin: 0;
   font-family: Inter, Arial, sans-serif;
@@ -43,7 +42,12 @@ body {
 }
 
 .app-logo { height: 72px; }
-.app-title { font-size: 26px; font-weight: 900; }
+
+.app-title {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+}
 
 /* CONTEÚDO */
 .form-container {
@@ -58,7 +62,12 @@ body {
   border-radius: 14px;
   padding: 24px;
   margin-bottom: 28px;
-  box-shadow: 0 14px 36px rgba(0,0,0,0.08);
+  border: 1px solid var(--border);        /* 🔥 define melhor */
+  box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+}
+
+body.dark .card {
+  box-shadow: 0 14px 36px rgba(0,0,0,0.55);
 }
 
 .card h2 {
@@ -88,26 +97,76 @@ body {
   gap: 10px;
 }
 
-input, textarea, select {
+/* INPUTS */
+input,
+textarea,
+select {
+  width: 100%;
   padding: 11px 14px;
   border-radius: 8px;
-  border: 1px solid var(--field-border);
+  border: 1.5px solid var(--field-border); /* 🔥 mais contraste */
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 14px;
   font-weight: 600;
 }
 
+body.dark input,
+body.dark textarea,
+body.dark select {
+  background: #0f172a;
+  color: #e6edf3;
+  border-color: var(--field-border);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #64748b;                /* 🔥 placeholder legível */
+  font-weight: 500;
+}
+
 /* SENHA */
-.campo-senha { width: 50%; min-width: 220px; }
-.senha-invalida { border: 2px solid #ef4444; }
+.campo-senha {
+  width: 50%;
+  min-width: 220px;
+  transition: width 0.2s ease;
+  font-weight: 700;
+}
+
+.senha-invalida {
+  border: 2px solid #ef4444 !important;
+  box-shadow: 0 0 0 2px rgba(239,68,68,0.25);
+}
 
 /* PERMISSÃO */
-.campo-permissao { width: 65%; }
+.campo-permissao {
+  width: 65%;
+  min-width: 260px;
+  font-weight: 700;
+}
 
 /* REGRAS */
-.regra-erro { background: #ef4444; color: #fff; padding: 10px; border-radius: 8px; font-weight: 800; }
-.regra-ok { background: #22c55e; color: #052e16; padding: 10px; border-radius: 8px; font-weight: 800; }
+.regra-erro {
+  background: #ef4444;
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.regra-ok {
+  background: #22c55e;
+  color: #052e16;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
 
 /* BOTÕES */
-.btn-add, .btn-import {
+.btn-add,
+.btn-import {
   height: 46px;
   padding: 0 18px;
   border-radius: 12px;
@@ -115,6 +174,12 @@ input, textarea, select {
   background: transparent;
   font-weight: 800;
   cursor: pointer;
+  color: var(--text);
+}
+
+.btn-add:hover,
+.btn-import:hover {
+  border-color: var(--accent);
 }
 
 .btn-explorar {
@@ -123,6 +188,8 @@ input, textarea, select {
   border-radius: 14px;
   background: var(--accent);
   font-weight: 900;
+  letter-spacing: 0.4px;
+  cursor: pointer;
 }
 
 /* TOAST */
@@ -132,12 +199,21 @@ input, textarea, select {
   right: 24px;
   padding: 18px 22px;
   background: #22c55e;
+  color: #052e16;
   border-radius: 14px;
   font-weight: 800;
+  box-shadow: 0 12px 34px rgba(0,0,0,0.25);
   opacity: 0;
   transform: translateY(-10px);
   transition: 0.3s;
 }
 
-.toast.show { opacity: 1; transform: translateY(0); }
-.toast.error { background: #ef4444; }
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.error {
+  background: #ef4444;
+  color: #ffffff;
+}
