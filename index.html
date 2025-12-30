@@ -8,6 +8,7 @@
 
 <body>
 
+<!-- HEADER -->
 <header class="app-header">
   <div class="header-left">
     <img src="./assets/image.png" alt="Logo ZRA" class="app-logo" />
@@ -20,6 +21,7 @@
   <button id="toggleTheme" class="theme-toggle">🌙</button>
 </header>
 
+<!-- CONTEÚDO -->
 <main class="form-container">
 
   <!-- USUÁRIOS WEB -->
@@ -35,12 +37,20 @@
     <div id="listaUsuariosWeb"></div>
   </section>
 
-  <!-- RAMAIS -->
+  <!-- RAMAIS (COM RANGE) -->
   <section class="card">
-    <h2>Ramais</h2>
+    <h2>Ramais (Range)</h2>
 
+    <!-- RANGE -->
     <div class="acoes-card">
-      <button class="btn-add" onclick="adicionarCampo('ramal')">+</button>
+      <input id="ramalInicio" type="number" placeholder="Ramal inicial">
+      <input id="ramalFim" type="number" placeholder="Ramal final">
+      <button class="btn-add" onclick="criarRangeRamais()">Criar range</button>
+    </div>
+
+    <!-- AÇÕES -->
+    <div class="acoes-card">
+      <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
       <button class="btn-import" onclick="acionarImportacao('ramal')">📥 Importar</button>
       <input type="file" id="importRamais" accept=".csv" hidden>
     </div>
@@ -55,7 +65,7 @@
     <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
   </section>
 
-  <!-- URAS -->
+  <!-- URAs -->
   <section class="card">
     <h2>URAs</h2>
     <div id="listaURAs"></div>
@@ -83,11 +93,13 @@
     <button class="btn-add" onclick="adicionarCampo('agente')">+</button>
   </section>
 
+  <!-- EXPORTAR -->
   <button class="btn-explorar" onclick="explorar()">Explorar</button>
 
   <pre id="resultado"></pre>
 </main>
 
+<!-- TOAST -->
 <div id="toastGlobal" class="toast">
   <span id="toastMessage"></span>
   <button onclick="fecharToast()">×</button>
