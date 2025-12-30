@@ -104,19 +104,16 @@ function criarCampo(tipo) {
     wrap.append(regras);
 
     senhaInput.oninput = () => {
-      senhaOk = false;
       const v = senhaInput.value;
-      if (
+      senhaOk =
         v.length >= 11 &&
         /[A-Z]/.test(v) &&
         /\d/.test(v) &&
-        /[^A-Za-z0-9]/.test(v)
-      ) {
-        regras.innerHTML = `<div class="regra-ok">Senha válida</div>`;
-        senhaOk = true;
-      } else {
-        regras.innerHTML = `<div class="regra-erro">Senha inválida</div>`;
-      }
+        /[^A-Za-z0-9]/.test(v);
+
+      regras.innerHTML = senhaOk
+        ? `<div class="regra-ok">Senha válida</div>`
+        : `<div class="regra-erro">Senha inválida</div>`;
     };
   }
 
@@ -150,6 +147,7 @@ window.criarRangeRamais = function () {
   }
 
   for (let i = ini; i <= fim; i++) {
+    if (container.children.length >= LIMITE) break;
     const campo = criarCampo("ring");
     campo.querySelector(".campo-nome").value = i;
     container.appendChild(campo);
@@ -158,7 +156,7 @@ window.criarRangeRamais = function () {
   mostrarToast("Range criado com sucesso!");
 };
 
-/* ================= IMPORTAÇÃO ================= */
+/* ================= IMPORTAÇÃO CSV (COLUNAS) ================= */
 window.acionarImportacao = function (tipo) {
   if (!listas[tipo]) return mostrarToast("Tipo inválido", true);
   const input = document.getElementById(
@@ -179,26 +177,36 @@ window.acionarImportacao = function (tipo) {
 };
 
 function processarCSV(tipo, texto) {
-  const linhas = texto.split("\n").slice(1);
-  const container = document.getElementById(listas[tipo]);
+  const linhas = texto
+    .replace(/\r/g, "")
+    .split("\n")
+    .filter(l => l.trim() !== "");
 
-  linhas.forEach(l => {
-    const d = l.split(",").map(v => v.trim());
-    if (!d[0]) return;
+  const header = linhas.shift().split(";").map(h => h.trim().toLowerCase());
+  const container = document.getElementById(listas[tipo]);
+  if (!container) return;
+
+  linhas.forEach(linha => {
+    const valores = linha.split(";").map(v => v.trim());
+    const data = {};
+    header.forEach((h, i) => (data[h] = valores[i] || ""));
+
+    if (!data.usuario) return;
 
     const campo = criarCampo(tipo);
-    campo.querySelector(".campo-nome").value = d[0];
+    campo.querySelector(".campo-nome").value = data.usuario;
 
     if (tipo === "usuario_web") {
-      campo.querySelector("input[type=email]").value = d[1] || "x@x";
-      campo.querySelector(".campo-senha").value = d[2] || "";
-      campo.setPermissaoAtalho(d[3]);
+      campo.querySelector("input[type=email]").value = data.email || "x@x";
+      campo.querySelector(".campo-senha").value = data.senha || "";
+      campo.setPermissaoAtalho(data.permissao);
+      campo.querySelector("textarea").value = data.descricao || "";
     }
 
     container.appendChild(campo);
   });
 
-  mostrarToast("Importação concluída!");
+  mostrarToast("Importação CSV concluída com sucesso!");
 }
 
 /* ================= EXPORTAR ================= */
@@ -234,9 +242,9 @@ window.explorar = function () {
 /* ================= TEMPLATE CSV ================= */
 window.baixarTemplateUsuarios = function () {
   const csv = [
-    "usuario,email,senha,permissao,descricao",
-    "joao.silva,joao@empresa.com,Senha@12345,pabx,Administrador",
-    "maria.souza,maria@empresa.com,Senha@12345,agente,Agente CC"
+    "usuario;email;senha;permissao;descricao",
+    "joao.silva;joao@empresa.com;Senha@12345;pabx;Administrador principal",
+    "maria.souza;maria@empresa.com;Senha@12345;agente;Agente Call Center"
   ].join("\n");
 
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
