@@ -24,7 +24,7 @@ const PERMISSOES = [
   "Super Administrador"
 ];
 
-/* 🔑 MAPA DE ATALHOS (CSV) */
+/* 🔑 MAPA DE ATALHOS CSV */
 const MAPA_PERMISSOES = {
   pabx: "Administrador do Módulo de PABX",
   agente: "Agente de Call Center",
@@ -49,12 +49,13 @@ function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  /* ===== LINHA USUÁRIO ===== */
+  /* === NOME === */
   const linhaUsuario = document.createElement("div");
   linhaUsuario.className = "linha-principal";
 
   const nome = document.createElement("input");
   nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
+  nome.classList.add("campo-nome");
   nome.style.width = "100%";
 
   const btn = document.createElement("button");
@@ -64,24 +65,21 @@ function criarCampo(tipo) {
   linhaUsuario.append(nome, btn);
   wrap.append(linhaUsuario);
 
-  let emailInput = null;
-  let senhaInput = null;
-  let permissao = null;
-  let regras = null;
+  let emailInput, senhaInput, permissao, regras;
   let senhaOk = false;
 
-  /* ===== USUÁRIO WEB ===== */
+  /* === USUÁRIO WEB === */
   if (tipo === "usuario_web") {
-
-    /* === LINHA EMAIL + SENHA === */
-    const linhaCredenciais = document.createElement("div");
-    linhaCredenciais.className = "linha-principal";
-    linhaCredenciais.style.gap = "12px";
-    linhaCredenciais.style.marginTop = "12px";
+    /* EMAIL + SENHA */
+    const linhaCred = document.createElement("div");
+    linhaCred.className = "linha-principal";
+    linhaCred.style.gap = "12px";
+    linhaCred.style.marginTop = "12px";
 
     emailInput = document.createElement("input");
     emailInput.type = "email";
     emailInput.placeholder = "E-mail do usuário";
+    emailInput.classList.add("campo-email");
     emailInput.style.flex = "1";
 
     senhaInput = document.createElement("input");
@@ -89,17 +87,13 @@ function criarCampo(tipo) {
     senhaInput.classList.add("campo-senha");
     senhaInput.style.flex = "1";
 
-    linhaCredenciais.append(emailInput, senhaInput);
-    wrap.append(linhaCredenciais);
+    linhaCred.append(emailInput, senhaInput);
+    wrap.append(linhaCred);
 
-    /* === LINHA PERMISSÃO === */
-    const linhaPermissao = document.createElement("div");
-    linhaPermissao.className = "linha-principal";
-    linhaPermissao.style.marginTop = "12px";
-
+    /* PERMISSÃO */
     permissao = document.createElement("select");
     permissao.classList.add("campo-permissao");
-    permissao.style.width = "100%";
+    permissao.style.marginTop = "12px";
 
     const opt0 = new Option("Selecione a permissão", "");
     opt0.disabled = true;
@@ -107,10 +101,9 @@ function criarCampo(tipo) {
     permissao.appendChild(opt0);
     PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
 
-    linhaPermissao.append(permissao);
-    wrap.append(linhaPermissao);
+    wrap.append(permissao);
 
-    /* === REGRAS DA SENHA === */
+    /* REGRAS */
     regras = document.createElement("div");
     regras.style.marginTop = "10px";
     wrap.append(regras);
@@ -124,8 +117,7 @@ function criarCampo(tipo) {
       if (v.length < 11) return erro("A senha deve ter pelo menos 11 caracteres.");
       if (!/[A-Z]/.test(v)) return erro("A senha deve conter pelo menos uma letra maiúscula.");
       if (!/\d/.test(v)) return erro("A senha deve conter pelo menos um número.");
-      if (!/[^A-Za-z0-9]/.test(v))
-        return erro("A senha deve conter pelo menos um caractere especial.");
+      if (!/[^A-Za-z0-9]/.test(v)) return erro("A senha deve conter pelo menos um caractere especial.");
 
       regras.innerHTML = `<div class="regra-ok">A senha é segura!</div>`;
       senhaOk = true;
@@ -137,23 +129,21 @@ function criarCampo(tipo) {
     }
   }
 
-  /* ===== DESCRIÇÃO ===== */
+  /* DESCRIÇÃO */
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
   desc.style.marginTop = "12px";
   wrap.append(desc);
 
-  /* ===== HELPERS ===== */
+  /* HELPERS */
   wrap.validarSenha = () => (senhaInput ? senhaOk : true);
-  wrap.getSenha = () => (senhaInput ? senhaInput.value : "");
-  wrap.getEmail = () => (emailInput ? emailInput.value : "");
-  wrap.getPermissao = () => (permissao ? permissao.value : "");
+  wrap.getNome = () => nome.value;
+  wrap.getEmail = () => emailInput?.value || "";
+  wrap.getSenha = () => senhaInput?.value || "";
+  wrap.getPermissao = () => permissao?.value || "";
   wrap.setPermissaoAtalho = atalho => {
-    if (!permissao) return;
     const key = atalho?.toLowerCase();
-    if (MAPA_PERMISSOES[key]) {
-      permissao.value = MAPA_PERMISSOES[key];
-    }
+    if (MAPA_PERMISSOES[key]) permissao.value = MAPA_PERMISSOES[key];
   };
 
   return wrap;
@@ -182,17 +172,17 @@ function processarCSV(tipo, texto) {
   const container = document.getElementById(listas[tipo]);
   if (!container) return;
 
-  linhas.forEach(linha => {
-    const dados = linha.split(",").map(v => v.trim());
-    if (!dados[0]) return;
+  linhas.forEach(l => {
+    const d = l.split(",").map(v => v.trim());
+    if (!d[0]) return;
 
     const campo = criarCampo(tipo);
-    campo.querySelector("input").value = dados[0];
+    campo.querySelector(".campo-nome").value = d[0];
 
     if (tipo === "usuario_web") {
-      if (dados[1]) campo.getEmail && (campo.querySelector("input[type=email]").value = dados[1]);
-      if (dados[2]) campo.querySelector(".campo-senha").value = dados[2];
-      if (dados[3]) campo.setPermissaoAtalho(dados[3]);
+      if (d[1]) campo.querySelector(".campo-email").value = d[1];
+      if (d[2]) campo.querySelector(".campo-senha").value = d[2];
+      if (d[3]) campo.setPermissaoAtalho(d[3]);
     }
 
     container.appendChild(campo);
@@ -211,13 +201,10 @@ window.explorar = function () {
     document.getElementById(listas[tipo])
       .querySelectorAll(".campo-descricao")
       .forEach(c => {
-        const nome = c.querySelector("input")?.value;
-        if (!nome) return;
-
         if (tipo === "usuario_web" && !c.validarSenha()) erro = true;
 
         const item = {
-          nome,
+          nome: c.getNome(),
           descricao: c.querySelector("textarea")?.value || ""
         };
 
@@ -231,10 +218,7 @@ window.explorar = function () {
       });
   });
 
-  if (erro) {
-    mostrarToast("Existe senha inválida.", true);
-    return;
-  }
+  if (erro) return mostrarToast("Existe senha inválida.", true);
 
   document.getElementById("resultado").textContent =
     JSON.stringify(dados, null, 2);
