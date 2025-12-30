@@ -8,7 +8,6 @@
 
 <body>
 
-<!-- HEADER -->
 <header class="app-header">
   <div class="header-left">
     <img src="./assets/image.png" alt="Logo ZRA" class="app-logo" />
@@ -21,7 +20,6 @@
   <button id="toggleTheme" class="theme-toggle">🌙</button>
 </header>
 
-<!-- CONTEÚDO -->
 <main class="form-container">
 
   <!-- USUÁRIOS WEB -->
@@ -38,18 +36,16 @@
     <div id="listaUsuariosWeb"></div>
   </section>
 
-  <!-- RAMAIS (COM RANGE) -->
+  <!-- RAMAIS -->
   <section class="card">
     <h2>Ramais (Range)</h2>
 
-    <!-- RANGE -->
     <div class="acoes-card">
       <input id="ramalInicio" type="number" placeholder="Ramal inicial">
       <input id="ramalFim" type="number" placeholder="Ramal final">
       <button class="btn-add" onclick="criarRangeRamais()">Criar range</button>
     </div>
 
-    <!-- AÇÕES -->
     <div class="acoes-card">
       <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
       <button class="btn-import" onclick="acionarImportacao('ramal')">📥 Importar</button>
@@ -59,48 +55,10 @@
     <div id="listaRings"></div>
   </section>
 
-  <!-- NÚMEROS DE ENTRADA -->
-  <section class="card">
-    <h2>Números de Entrada</h2>
-    <div id="listaEntradas"></div>
-    <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
-  </section>
-
-  <!-- URAs -->
-  <section class="card">
-    <h2>URAs</h2>
-    <div id="listaURAs"></div>
-    <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
-  </section>
-
-  <!-- FILAS -->
-  <section class="card">
-    <h2>Filas</h2>
-    <div id="listaFilas"></div>
-    <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
-  </section>
-
-  <!-- GRUPO DE RING -->
-  <section class="card">
-    <h2>Grupo de Ring</h2>
-    <div id="listaGrupoRing"></div>
-    <button class="btn-add" onclick="adicionarCampo('grupo_ring')">+</button>
-  </section>
-
-  <!-- AGENTES -->
-  <section class="card">
-    <h2>Agentes</h2>
-    <div id="listaAgentes"></div>
-    <button class="btn-add" onclick="adicionarCampo('agente')">+</button>
-  </section>
-
-  <!-- EXPORTAR -->
   <button class="btn-explorar" onclick="explorar()">Explorar</button>
-
   <pre id="resultado"></pre>
 </main>
 
-<!-- TOAST -->
 <div id="toastGlobal" class="toast">
   <span id="toastMessage"></span>
   <button onclick="fecharToast()">×</button>
