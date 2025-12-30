@@ -165,41 +165,42 @@ input, textarea, select {
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.error { background: #ef4444; }
 
-/* =========================================
-   AJUSTE DEFINITIVO – USUÁRIOS WEB
-   (SEM AFETAR RAMAIS)
-========================================= */
+/* ==================================================
+   AJUSTE GLOBAL – TAMANHO DOS CAMPOS (SEM RAMAL)
+================================================== */
 
-/* Linha principal (usuario + botão X) */
-#listaUsuariosWeb .linha-principal {
+/* Linha principal mantém layout */
+.campo-descricao .linha-principal {
   display: flex;
   gap: 10px;
 }
 
-/* 👉 CAMPO "DIGITE USUARIO WEB" (MAIOR) */
-#listaUsuariosWeb .linha-principal > input:first-child {
-  flex: 1 1 70%;
+/* CAMPO "DIGITE USUÁRIO" – tamanho elegante */
+#listaUsuariosWeb .linha-principal input[type="text"] {
+  flex: 1 1 auto;
   min-width: 420px;
 }
 
-/* 👉 BOTÃO X NÃO ESTICA */
-#listaUsuariosWeb .linha-principal > button {
+/* BOTÃO X não cresce */
+.campo-descricao .linha-principal button {
   flex: 0 0 auto;
 }
 
-/* 👉 CAMPO SENHA (METADE DO TAMANHO ATUAL) */
-#listaUsuariosWeb .campo-senha {
-  width: 38% !important;
-  min-width: 260px;
+/* 🔥 CAMPO SENHA – BEM MENOR (COMO NA IMAGEM) */
+.campo-senha {
+  flex: 0 0 38% !important;
+  max-width: 380px;
+  min-width: 240px;
 }
 
-/* 👉 PERMISSÃO AJUSTADA */
-#listaUsuariosWeb .campo-permissao {
-  width: 55%;
+/* PERMISSÃO proporcional à senha */
+.campo-permissao {
+  flex: 0 0 55%;
   min-width: 320px;
 }
 
-/* Mantém espaçamento bonito */
-#listaUsuariosWeb .campo-descricao {
+/* Espaçamento consistente */
+.campo-descricao {
   gap: 14px;
 }
+
