@@ -21,6 +21,7 @@ body.dark {
   --field-border: #334155;
 }
 
+/* BODY */
 body {
   margin: 0;
   font-family: Inter, Arial, sans-serif;
@@ -29,6 +30,7 @@ body {
   transition: background .25s ease, color .25s ease;
 }
 
+/* HEADER */
 .app-header {
   height: 120px;
   background: var(--header-bg);
@@ -42,12 +44,14 @@ body {
 .app-logo { height: 72px; }
 .app-title { font-size: 26px; font-weight: 900; }
 
+/* CONTEÚDO */
 .form-container {
   max-width: 900px;
   margin: 56px auto;
   padding: 0 16px 60px;
 }
 
+/* CARD */
 .card {
   background: var(--card-bg);
   border-radius: 14px;
@@ -60,6 +64,7 @@ body.dark .card {
   box-shadow: 0 14px 36px rgba(0,0,0,.55);
 }
 
+/* CAMPOS */
 .campo-descricao {
   display: flex;
   flex-direction: column;
@@ -74,7 +79,10 @@ body.dark .card {
   gap: 10px;
 }
 
-input, textarea, select {
+/* INPUTS */
+input,
+textarea,
+select {
   width: 100%;
   padding: 11px 14px;
   border-radius: 8px;
@@ -84,7 +92,9 @@ input, textarea, select {
   font-weight: 600;
 }
 
-.btn-add, .btn-import {
+/* BOTÕES */
+.btn-add,
+.btn-import {
   height: 46px;
   padding: 0 18px;
   border-radius: 12px;
@@ -100,9 +110,9 @@ input, textarea, select {
   border-radius: 14px;
   background: var(--accent);
   font-weight: 900;
-  cursor: pointer;
 }
 
+/* TOAST */
 .toast {
   position: fixed;
   top: 24px;
