@@ -165,38 +165,32 @@ input, textarea, select {
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.error { background: #ef4444; }
 
-/* ==================================================
-   CORREÇÃO FINAL – USUÁRIO GRANDE / SENHA MENOR
-   (RAMAL NÃO É AFETADO)
-================================================== */
+/* =====================================================
+   AJUSTE FINAL – USUÁRIO GRANDE / SENHA MENOR
+   (SEM AFETAR RAMAIS)
+===================================================== */
 
-.campo-descricao .linha-principal {
-  display: flex;
-  gap: 10px;
+/* === LINHA DO USUÁRIO (INPUT DE CIMA) === */
+.campo-descricao .linha-principal input {
+  width: 100% !important;
+  max-width: none !important;
+  flex: 1 1 auto !important;
 }
 
-/* ===== CAMPO USUÁRIO (GRANDE) ===== */
-.campo-descricao .linha-principal input[type="text"] {
-  flex: 1 1 auto;
-  min-width: 520px;
-}
-
-/* ===== BOTÃO X ===== */
+/* === BOTÃO X NÃO CRESCE === */
 .campo-descricao .linha-principal button {
   flex: 0 0 auto;
 }
 
-/* ===== CAMPO SENHA (MENOR – COMO NA IMAGEM) ===== */
-.campo-senha {
-  flex: 0 0 32% !important;
-  max-width: 320px;
-  min-width: 220px;
+/* === CAMPO DE SENHA (INPUT DE BAIXO) === */
+.campo-descricao > .campo-senha {
+  width: 45% !important;
+  max-width: 360px;
+  min-width: 240px;
 }
 
-/* ===== PERMISSÃO ALINHADA À SENHA ===== */
-.campo-permissao {
-  flex: 0 0 48%;
-  min-width: 300px;
+/* === PERMISSÃO ALINHADA À SENHA === */
+.campo-descricao > .campo-permissao {
+  width: 55%;
+  max-width: 420px;
 }
-
-
