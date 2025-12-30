@@ -37,11 +37,21 @@ function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
+  /* 🔥 só usuários web recebem essa classe extra */
+  if (tipo === "usuario_web") {
+    wrap.classList.add("usuario-web");
+  }
+
   const linha = document.createElement("div");
   linha.className = "linha-principal";
 
   const nome = document.createElement("input");
   nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
+
+  /* 🔥 campo do usuário continua GRANDE */
+  if (tipo === "usuario_web") {
+    nome.classList.add("campo-usuario");
+  }
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
@@ -57,14 +67,20 @@ function criarCampo(tipo) {
 
   /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
+    // SENHA (MENOR)
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do usuário";
+    senhaInput.classList.add("campo-senha");
 
+    // PERMISSÃO (MENOR)
     permissao = document.createElement("select");
+    permissao.classList.add("campo-permissao");
+
     const opt0 = new Option("Selecione a permissão", "");
     opt0.disabled = true;
     opt0.selected = true;
     permissao.appendChild(opt0);
+
     PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
 
     regras = document.createElement("div");
@@ -104,7 +120,7 @@ function criarCampo(tipo) {
   return wrap;
 }
 
-/* ================= RANGE RAMAIS ================= */
+/* ================= RANGE RAMAIS (NÃO ALTERADO) ================= */
 window.criarRangeRamais = function () {
   const ini = document.getElementById("ramalInicio").value;
   const fim = document.getElementById("ramalFim").value;
@@ -158,7 +174,10 @@ window.explorar = function () {
 
         if (tipo === "usuario_web" && !c.validarSenha()) erro = true;
 
-        const item = { nome, descricao: c.querySelector("textarea")?.value || "" };
+        const item = {
+          nome,
+          descricao: c.querySelector("textarea")?.value || ""
+        };
 
         if (tipo === "usuario_web") {
           item.senha = c.getSenha();
