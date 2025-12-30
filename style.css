@@ -1,24 +1,24 @@
 * { box-sizing: border-box; }
 
-/* ===== TEMA CLARO – MAIS CONTRASTE ===== */
+/* ===== TEMA CLARO ===== */
 :root {
-  --bg: #eef2f7;                 /* fundo mais visível */
-  --text: #0f172a;               /* texto bem escuro */
+  --bg: #f9fafb;
+  --text: #1f2933;
   --header-bg: #ffffff;
   --card-bg: #ffffff;
-  --border: #cbd5e1;             /* borda mais marcada */
-  --field-border: #94a3b8;       /* inputs mais visíveis */
+  --border: #d1d5db;
+  --field-border: #cbd5e1;
   --accent: #c6ff00;
 }
 
-/* ===== TEMA ESCURO – CONFORTÁVEL ===== */
+/* ===== TEMA ESCURO ===== */
 body.dark {
   --bg: #0b1220;
   --text: #e6edf3;
   --header-bg: #0f172a;
   --card-bg: #111c33;
   --border: #24304a;
-  --field-border: #475569;
+  --field-border: #334155;
 }
 
 /* BODY */
@@ -28,26 +28,22 @@ body {
   background: var(--bg);
   color: var(--text);
   font-weight: 500;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 /* HEADER */
 .app-header {
   height: 120px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   padding: 0 48px;
-  background: var(--header-bg);
-  border-bottom: 1px solid var(--border);
 }
 
 .app-logo { height: 72px; }
-
-.app-title {
-  font-size: 26px;
-  font-weight: 900;
-  letter-spacing: 0.3px;
-}
+.app-title { font-size: 26px; font-weight: 900; }
 
 /* CONTEÚDO */
 .form-container {
@@ -62,8 +58,7 @@ body {
   border-radius: 14px;
   padding: 24px;
   margin-bottom: 28px;
-  border: 1px solid var(--border);        /* 🔥 define melhor */
-  box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.08);
 }
 
 body.dark .card {
@@ -73,13 +68,6 @@ body.dark .card {
 .card h2 {
   font-weight: 900;
   margin-bottom: 16px;
-}
-
-/* AÇÕES */
-.acoes-card {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 18px;
 }
 
 /* CAMPOS */
@@ -97,32 +85,24 @@ body.dark .card {
   gap: 10px;
 }
 
-/* INPUTS */
+/* INPUTS – SEM COR FIXA */
 input,
 textarea,
 select {
   width: 100%;
   padding: 11px 14px;
   border-radius: 8px;
-  border: 1.5px solid var(--field-border); /* 🔥 mais contraste */
-  background: #ffffff;
-  color: #0f172a;
+  border: 1.5px solid var(--field-border);
+  background: var(--card-bg);
+  color: var(--text);
   font-size: 14px;
   font-weight: 600;
-}
-
-body.dark input,
-body.dark textarea,
-body.dark select {
-  background: #0f172a;
-  color: #e6edf3;
-  border-color: var(--field-border);
+  transition: border 0.2s ease, background 0.2s ease;
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: #64748b;                /* 🔥 placeholder legível */
-  font-weight: 500;
+  color: #9ca3af;
 }
 
 /* SENHA */
@@ -130,7 +110,6 @@ textarea::placeholder {
   width: 50%;
   min-width: 220px;
   transition: width 0.2s ease;
-  font-weight: 700;
 }
 
 .senha-invalida {
@@ -142,26 +121,23 @@ textarea::placeholder {
 .campo-permissao {
   width: 65%;
   min-width: 260px;
-  font-weight: 700;
 }
 
 /* REGRAS */
 .regra-erro {
   background: #ef4444;
-  color: #ffffff;
-  padding: 10px 14px;
+  color: #fff;
+  padding: 10px;
   border-radius: 8px;
   font-weight: 800;
-  letter-spacing: 0.2px;
 }
 
 .regra-ok {
   background: #22c55e;
   color: #052e16;
-  padding: 10px 14px;
+  padding: 10px;
   border-radius: 8px;
   font-weight: 800;
-  letter-spacing: 0.2px;
 }
 
 /* BOTÕES */
@@ -174,12 +150,6 @@ textarea::placeholder {
   background: transparent;
   font-weight: 800;
   cursor: pointer;
-  color: var(--text);
-}
-
-.btn-add:hover,
-.btn-import:hover {
-  border-color: var(--accent);
 }
 
 .btn-explorar {
@@ -188,8 +158,15 @@ textarea::placeholder {
   border-radius: 14px;
   background: var(--accent);
   font-weight: 900;
-  letter-spacing: 0.4px;
   cursor: pointer;
+}
+
+/* RESULTADO */
+pre {
+  background: #020617;
+  color: #e5e7eb;
+  padding: 18px;
+  border-radius: 12px;
 }
 
 /* TOAST */
@@ -199,10 +176,8 @@ textarea::placeholder {
   right: 24px;
   padding: 18px 22px;
   background: #22c55e;
-  color: #052e16;
   border-radius: 14px;
   font-weight: 800;
-  box-shadow: 0 12px 34px rgba(0,0,0,0.25);
   opacity: 0;
   transform: translateY(-10px);
   transition: 0.3s;
@@ -215,5 +190,4 @@ textarea::placeholder {
 
 .toast.error {
   background: #ef4444;
-  color: #ffffff;
 }
