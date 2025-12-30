@@ -25,44 +25,58 @@
   <!-- USUÁRIOS WEB -->
   <section class="card">
     <h2>Usuários Web</h2>
+
     <div class="acoes-card">
       <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
       <button class="btn-import" onclick="acionarImportacao('usuario_web')">📥 Importar</button>
       <input type="file" id="importUsuarios" accept=".csv" hidden>
     </div>
+
     <div id="listaUsuariosWeb"></div>
   </section>
 
-  <!-- RAMAIS (CORRIGIDO) -->
+  <!-- RAMAIS -->
   <section class="card">
     <h2>Ramais</h2>
+
     <div class="acoes-card">
-      <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
+      <button class="btn-add" onclick="adicionarCampo('ramal')">+</button>
       <button class="btn-import" onclick="acionarImportacao('ramal')">📥 Importar</button>
       <input type="file" id="importRamais" accept=".csv" hidden>
     </div>
+
     <div id="listaRings"></div>
   </section>
 
-  <!-- OUTROS -->
+  <!-- NÚMEROS DE ENTRADA -->
   <section class="card">
     <h2>Números de Entrada</h2>
     <div id="listaEntradas"></div>
     <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
   </section>
 
+  <!-- URAS -->
   <section class="card">
     <h2>URAs</h2>
     <div id="listaURAs"></div>
     <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
   </section>
 
+  <!-- FILAS -->
   <section class="card">
     <h2>Filas</h2>
     <div id="listaFilas"></div>
     <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
   </section>
 
+  <!-- GRUPO DE RING -->
+  <section class="card">
+    <h2>Grupo de Ring</h2>
+    <div id="listaGrupoRing"></div>
+    <button class="btn-add" onclick="adicionarCampo('grupo_ring')">+</button>
+  </section>
+
+  <!-- AGENTES -->
   <section class="card">
     <h2>Agentes</h2>
     <div id="listaAgentes"></div>
@@ -70,6 +84,7 @@
   </section>
 
   <button class="btn-explorar" onclick="explorar()">Explorar</button>
+
   <pre id="resultado"></pre>
 </main>
 
