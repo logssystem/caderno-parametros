@@ -184,13 +184,13 @@ input, textarea, select {
 
 /* === CAMPO DE SENHA (INPUT DE BAIXO) === */
 .campo-descricao > .campo-senha {
-  width: 45% !important;
+  width: 38% !important;
   max-width: 360px;
   min-width: 240px;
 }
 
 /* === PERMISSÃO ALINHADA À SENHA === */
 .campo-descricao > .campo-permissao {
-  width: 55%;
+  width: 38%;
   max-width: 420px;
 }
