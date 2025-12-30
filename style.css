@@ -3,7 +3,7 @@
 /* ===== TEMA CLARO ===== */
 :root {
   --bg: #f9fafb;
-  --text: #1f2933;
+  --text: #111827;
   --header-bg: #ffffff;
   --card-bg: #ffffff;
   --border: #d1d5db;
@@ -14,11 +14,11 @@
 /* ===== TEMA ESCURO ===== */
 body.dark {
   --bg: #0b1220;
-  --text: #e6edf3;
+  --text: #e5e7eb;
   --header-bg: #0f172a;
   --card-bg: #111c33;
-  --border: #24304a;
-  --field-border: #334155;
+  --border: #334155;
+  --field-border: #475569;
 }
 
 /* BODY */
@@ -27,30 +27,22 @@ body {
   font-family: Inter, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
-  font-weight: 500;
-  transition: background 0.25s ease, color 0.25s ease;
+  transition: background .25s, color .25s;
 }
 
 /* HEADER */
 .app-header {
   height: 120px;
-  background: var(--header-bg);
-  border-bottom: 1px solid var(--border);
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   padding: 0 48px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
 }
 
 .app-logo { height: 72px; }
 .app-title { font-size: 26px; font-weight: 900; }
-
-/* CONTEÚDO */
-.form-container {
-  max-width: 900px;
-  margin: 56px auto;
-  padding: 0 16px 60px;
-}
 
 /* CARD */
 .card {
@@ -58,70 +50,26 @@ body {
   border-radius: 14px;
   padding: 24px;
   margin-bottom: 28px;
-  box-shadow: 0 14px 36px rgba(0,0,0,0.08);
+  box-shadow: 0 12px 30px rgba(0,0,0,.08);
 }
 
-body.dark .card {
-  box-shadow: 0 14px 36px rgba(0,0,0,0.55);
-}
-
-.card h2 {
-  font-weight: 900;
-  margin-bottom: 16px;
-}
-
-/* CAMPOS */
-.campo-descricao {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 22px;
-  padding-bottom: 18px;
-  border-bottom: 1px dashed var(--border);
-}
-
-.linha-principal {
-  display: flex;
-  gap: 10px;
-}
-
-/* INPUTS – SEM COR FIXA */
-input,
-textarea,
-select {
+/* INPUTS */
+input, textarea, select {
   width: 100%;
   padding: 11px 14px;
   border-radius: 8px;
   border: 1.5px solid var(--field-border);
   background: var(--card-bg);
   color: var(--text);
-  font-size: 14px;
   font-weight: 600;
-  transition: border 0.2s ease, background 0.2s ease;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #9ca3af;
 }
 
 /* SENHA */
-.campo-senha {
-  width: 50%;
-  min-width: 220px;
-  transition: width 0.2s ease;
-}
-
-.senha-invalida {
-  border: 2px solid #ef4444 !important;
-  box-shadow: 0 0 0 2px rgba(239,68,68,0.25);
-}
+.campo-senha { width: 50%; min-width: 220px; }
+.senha-invalida { border-color: #ef4444 !important; }
 
 /* PERMISSÃO */
-.campo-permissao {
-  width: 65%;
-  min-width: 260px;
-}
+.campo-permissao { width: 65%; }
 
 /* REGRAS */
 .regra-erro {
@@ -141,8 +89,7 @@ textarea::placeholder {
 }
 
 /* BOTÕES */
-.btn-add,
-.btn-import {
+.btn-add, .btn-import {
   height: 46px;
   padding: 0 18px;
   border-radius: 12px;
@@ -161,14 +108,6 @@ textarea::placeholder {
   cursor: pointer;
 }
 
-/* RESULTADO */
-pre {
-  background: #020617;
-  color: #e5e7eb;
-  padding: 18px;
-  border-radius: 12px;
-}
-
 /* TOAST */
 .toast {
   position: fixed;
@@ -180,7 +119,7 @@ pre {
   font-weight: 800;
   opacity: 0;
   transform: translateY(-10px);
-  transition: 0.3s;
+  transition: .3s;
 }
 
 .toast.show {
@@ -188,6 +127,4 @@ pre {
   transform: translateY(0);
 }
 
-.toast.error {
-  background: #ef4444;
-}
+.toast.error { background: #ef4444; }
