@@ -1,6 +1,4 @@
-console.log("APP.JS FINAL 600+ COM IMPORTAÇÃO");
-
-const LIMITE = 600;
+console.log("APP.JS FINAL");
 
 const listas = {
   usuario_web: "listaUsuariosWeb",
@@ -11,14 +9,11 @@ const listas = {
   agente: "listaAgentes"
 };
 
-/* ===== CAMPOS ===== */
+/* CAMPOS */
 window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
-  if (!container || container.children.length >= LIMITE) return;
-  container.appendChild(criarCampo(tipo));
-};
+  if (!container) return;
 
-function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
@@ -39,10 +34,10 @@ function criarCampo(tipo) {
   desc.placeholder = "Descrição (opcional)";
   wrap.append(desc);
 
-  return wrap;
-}
+  container.appendChild(wrap);
+};
 
-/* ===== EXPORTAR ===== */
+/* EXPORTAR */
 window.explorar = function () {
   const dados = {};
   Object.keys(listas).forEach(t => {
@@ -58,7 +53,7 @@ window.explorar = function () {
   mostrarToast("Exportação realizada com sucesso!");
 };
 
-/* ===== TOAST ===== */
+/* TOAST */
 function mostrarToast(msg, error = false) {
   const t = document.getElementById("toastGlobal");
   document.getElementById("toastMessage").textContent = msg;
@@ -70,17 +65,19 @@ function fecharToast() {
   document.getElementById("toastGlobal").classList.remove("show");
 }
 
-/* ===== MODO ESCURO – FIX FINAL ===== */
+/* TEMA – DEFINITIVO */
 const toggleTheme = document.getElementById("toggleTheme");
-const savedTheme = localStorage.getItem("theme");
+const saved = localStorage.getItem("theme");
 
-if (savedTheme === "dark") {
+if (saved === "dark") {
   document.body.classList.add("dark");
   toggleTheme.textContent = "☀️";
+} else {
+  toggleTheme.textContent = "🌙";
 }
 
 toggleTheme.onclick = () => {
-  const isDark = document.body.classList.toggle("dark");
-  toggleTheme.textContent = isDark ? "☀️" : "🌙";
-  localStorage.setItem("theme", isDark ? "dark" : "light");
+  const dark = document.body.classList.toggle("dark");
+  toggleTheme.textContent = dark ? "☀️" : "🌙";
+  localStorage.setItem("theme", dark ? "dark" : "light");
 };
