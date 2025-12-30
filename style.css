@@ -166,24 +166,27 @@ input, textarea, select {
 .toast.error { background: #ef4444; }
 
 /* =====================================================
-   AJUSTE FINAL – SENHA E PERMISSÃO MENORES
-   (USUÁRIO CONTINUA GRANDE)
+   AJUSTE DEFINITIVO – TAMANHO CORRETO DOS CAMPOS
+   (SEM MEXER EM RAMAL OU LAYOUT)
 ===================================================== */
 
-/* INPUT DE USUÁRIO (CAMPO DE CIMA) */
-.campo-descricao .linha-principal input {
-  inline-size: 100% !important;
+/* CAMPO USUÁRIO – CONTINUA GRANDE */
+.campo-descricao .linha-principal input[type="text"] {
+  width: 100% !important;
 }
 
-/* SENHA – MENOR (COMO NA IMAGEM) */
-.campo-descricao > input.campo-senha {
-  inline-size: 280px !important;
-  max-inline-size: 280px !important;
+/* SENHA – MENOR (EXATAMENTE COMO NA IMAGEM) */
+input.campo-senha {
+  width: 280px !important;
+  max-width: 280px !important;
+  flex: none !important;
 }
 
 /* PERMISSÃO – MESMO TAMANHO DA SENHA */
-.campo-descricao > select.campo-permissao {
-  inline-size: 280px !important;
-  max-inline-size: 280px !important;
+select.campo-permissao {
+  width: 280px !important;
+  max-width: 280px !important;
+  flex: none !important;
 }
+
 
