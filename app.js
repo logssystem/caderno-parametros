@@ -1,8 +1,5 @@
-console.log("APP.JS CARREGADO - VERSÃO FINAL 600+");
+console.log("APP.JS FINAL 600+ COM IMPORTAÇÃO");
 
-/* =========================
-   CONFIGURAÇÕES
-========================= */
 const LIMITE = 600;
 
 const listas = {
@@ -14,18 +11,7 @@ const listas = {
   agente: "listaAgentes"
 };
 
-/* CONTADORES */
-const contadores = {
-  usuario_web: 0,
-  entrada: 0,
-  ura: 0,
-  fila: 0,
-  ring: 0,
-  agente: 0
-};
-
-/* PERMISSÕES */
-const PERMISSOES_USUARIO = [
+const PERMISSOES = [
   "Administrador do Módulo de PABX",
   "Agente de Call Center",
   "Supervisor(a) de Call Center",
@@ -37,26 +23,14 @@ const PERMISSOES_USUARIO = [
   "Super Administrador"
 ];
 
-/* =========================
-   ADICIONAR CAMPO
-========================= */
+/* ========= ADICIONAR CAMPO ========= */
 window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
-  if (!container) return;
-
-  if (contadores[tipo] >= LIMITE) {
-    mostrarToast(`Limite máximo de ${LIMITE} itens atingido`, true);
-    return;
-  }
-
-  const campo = criarCampo(tipo);
-  container.appendChild(campo);
-  contadores[tipo]++;
+  if (!container || container.children.length >= LIMITE) return;
+  container.appendChild(criarCampo(tipo));
 };
 
-/* =========================
-   CRIAR CAMPO
-========================= */
+/* ========= CRIAR CAMPO ========= */
 function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
@@ -65,191 +39,104 @@ function criarCampo(tipo) {
   linha.className = "linha-principal";
 
   const nome = document.createElement("input");
-  nome.type = "text";
-  nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
+  nome.placeholder = `Digite ${tipo}`;
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
-  btn.type = "button";
-  btn.onclick = () => {
-    wrap.remove();
-    contadores[tipo]--;
-  };
+  btn.onclick = () => wrap.remove();
 
   linha.append(nome, btn);
   wrap.append(linha);
 
-  /* ===== USUÁRIO WEB ===== */
-  let senhaInput = null;
-  let regrasBox = null;
-  let permissaoSelect = null;
-  let senhaValidaAtual = false;
+  let senhaInput, regrasBox, permissao;
 
   if (tipo === "usuario_web") {
-    /* SENHA */
     senhaInput = document.createElement("input");
-    senhaInput.type = "text";
     senhaInput.className = "campo-senha";
-    senhaInput.placeholder = "Senha do usuário";
+    senhaInput.placeholder = "Senha";
+
+    permissao = document.createElement("select");
+    permissao.className = "campo-permissao";
+    PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
 
     regrasBox = document.createElement("div");
-    regrasBox.className = "regras-senha";
 
-    senhaInput.addEventListener("input", () => {
-      const v = senhaInput.value;
+    senhaInput.oninput = () => {
       regrasBox.innerHTML = "";
-      senhaInput.classList.remove("senha-invalida");
-      senhaValidaAtual = false;
+      if (senhaInput.value.length < 11)
+        regrasBox.innerHTML = `<div class="regra-erro">Mínimo 11 caracteres</div>`;
+      else
+        regrasBox.innerHTML = `<div class="regra-ok">Senha válida</div>`;
+    };
 
-      if (v.length < 11) {
-        erroSenha("A senha deve ter pelo menos 11 caracteres.");
-        return;
-      }
-      if (!/[A-Z]/.test(v)) {
-        erroSenha("A senha deve conter pelo menos uma letra maiúscula.");
-        return;
-      }
-      if (!/\d/.test(v)) {
-        erroSenha("A senha deve conter pelo menos um número.");
-        return;
-      }
-      if (!/[^A-Za-z0-9]/.test(v)) {
-        erroSenha("A senha deve conter pelo menos um caractere especial (como @, #, $, etc.).");
-        return;
-      }
-
-      regrasBox.innerHTML = `<div class="regra-ok">A senha é segura!</div>`;
-      senhaValidaAtual = true;
-      ajustarLarguraSenha(senhaInput, v.length);
-    });
-
-    function erroSenha(msg) {
-      regrasBox.innerHTML = `<div class="regra-erro">${msg}</div>`;
-      senhaInput.classList.add("senha-invalida");
-      ajustarLarguraSenha(senhaInput, senhaInput.value.length);
-    }
-
-    /* PERMISSÃO */
-    permissaoSelect = document.createElement("select");
-    permissaoSelect.className = "campo-permissao";
-
-    const optDefault = document.createElement("option");
-    optDefault.textContent = "Selecione a permissão";
-    optDefault.disabled = true;
-    optDefault.selected = true;
-    permissaoSelect.appendChild(optDefault);
-
-    PERMISSOES_USUARIO.forEach(p => {
-      const opt = document.createElement("option");
-      opt.value = p;
-      opt.textContent = p;
-      permissaoSelect.appendChild(opt);
-    });
-
-    wrap.append(senhaInput, permissaoSelect, regrasBox);
+    wrap.append(senhaInput, permissao, regrasBox);
   }
 
   const desc = document.createElement("textarea");
-  desc.placeholder = "Descrição (opcional)";
+  desc.placeholder = "Descrição";
   wrap.append(desc);
-
-  /* HELPERS POR CAMPO */
-  wrap.validarSenha = () => (senhaInput ? senhaValidaAtual : true);
-  wrap.getSenha = () => (senhaInput ? senhaInput.value : "");
-  wrap.getPermissao = () => (permissaoSelect ? permissaoSelect.value : "");
 
   return wrap;
 }
 
-/* =========================
-   AJUSTE LARGURA SENHA
-========================= */
-function ajustarLarguraSenha(input, len) {
-  input.style.width =
-    len > 14 ? "100%" :
-    len > 10 ? "75%" :
-    "50%";
-}
+/* ========= IMPORTAÇÃO ========= */
+window.acionarImportacao = function (tipo) {
+  const input = document.getElementById(tipo === "usuario_web" ? "importUsuarios" : "importRamais");
+  input.click();
 
-/* =========================
-   EXPORTAR
-========================= */
-window.explorar = function () {
-  const dados = {};
-  let erroSenha = false;
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
 
-  Object.keys(listas).forEach(tipo => {
-    dados[tipo] = [];
-    const container = document.getElementById(listas[tipo]);
-    if (!container) return;
+    const reader = new FileReader();
+    reader.onload = e => processarCSV(tipo, e.target.result);
+    reader.readAsText(file);
+  };
+};
 
-    container.querySelectorAll(".campo-descricao").forEach(campo => {
-      const nome = campo.querySelector("input[type=text]")?.value;
-      if (!nome) return;
+function processarCSV(tipo, texto) {
+  const linhas = texto.split("\n").slice(1);
 
-      if (tipo === "usuario_web" && !campo.validarSenha()) {
-        erroSenha = true;
-      }
+  linhas.forEach(l => {
+    const dados = l.split(",");
+    if (!dados[0]) return;
 
-      const item = {
-        nome,
-        descricao: campo.querySelector("textarea")?.value || ""
-      };
+    const campo = criarCampo(tipo === "ramal" ? "ring" : tipo);
+    campo.querySelector("input").value = dados[0];
 
-      if (tipo === "usuario_web") {
-        item.senha = campo.getSenha();
-        item.permissao = campo.getPermissao();
-      }
+    if (tipo === "usuario_web") {
+      campo.querySelector(".campo-senha").value = dados[1] || "";
+      campo.querySelector(".campo-permissao").value = dados[2] || "";
+    }
 
-      dados[tipo].push(item);
-    });
+    document.getElementById(listas[tipo === "ramal" ? "ring" : tipo]).appendChild(campo);
   });
 
-  if (erroSenha) {
-    mostrarToast("Existe senha inválida. Corrija antes de exportar.", true);
-    return;
-  }
+  mostrarToast("Importação concluída!");
+}
 
-  document.getElementById("resultado").textContent =
-    JSON.stringify(dados, null, 2);
+/* ========= EXPORTAR ========= */
+window.explorar = function () {
+  const dados = {};
+  Object.keys(listas).forEach(t => {
+    dados[t] = [...document.getElementById(listas[t]).children].map(c => ({
+      nome: c.querySelector("input")?.value || ""
+    }));
+  });
 
-  mostrarToast("Exportação realizada com sucesso!");
+  document.getElementById("resultado").textContent = JSON.stringify(dados, null, 2);
 };
 
-/* =========================
-   TOAST
-========================= */
+/* ========= TOAST ========= */
 function mostrarToast(msg, error = false) {
-  const toast = document.getElementById("toastGlobal");
-  const txt = document.getElementById("toastMessage");
-
-  txt.textContent = msg;
-  toast.className = "toast show" + (error ? " error" : "");
-
-  clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => toast.classList.remove("show"), 4000);
+  const t = document.getElementById("toastGlobal");
+  document.getElementById("toastMessage").textContent = msg;
+  t.className = "toast show" + (error ? " error" : "");
+  setTimeout(() => t.classList.remove("show"), 4000);
 }
 
-window.fecharToast = function () {
-  document.getElementById("toastGlobal").classList.remove("show");
-};
+window.fecharToast = () => document.getElementById("toastGlobal").classList.remove("show");
 
-/* =========================
-   TEMA
-========================= */
-const toggleTheme = document.getElementById("toggleTheme");
-
-if (toggleTheme) {
-  const saved = localStorage.getItem("theme");
-  if (saved === "dark") {
-    document.body.classList.add("dark");
-    toggleTheme.textContent = "☀️";
-  }
-
-  toggleTheme.onclick = () => {
-    document.body.classList.toggle("dark");
-    const isDark = document.body.classList.contains("dark");
-    toggleTheme.textContent = isDark ? "☀️" : "🌙";
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-  };
-}
+/* ========= TEMA ========= */
+document.getElementById("toggleTheme").onclick = () =>
+  document.body.classList.toggle("dark");
