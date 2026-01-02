@@ -276,3 +276,32 @@ if (toggleTheme) {
     document.body.classList.toggle("dark");
   };
 }
+
+/* ================= CHAT ================= */
+
+function initChat() {
+  const modo = localStorage.getItem("modo_atendimento");
+  const cardChat = document.getElementById("card-chat");
+
+  if (!cardChat) return;
+
+  // Só aparece em chat ou ambos
+  cardChat.style.display =
+    modo === "chat" || modo === "ambos" ? "block" : "none";
+
+  const chkApi = document.getElementById("chatApi");
+  const chkQr = document.getElementById("chatQr");
+  const campoApi = document.getElementById("campoApi");
+  const campoQr = document.getElementById("campoQr");
+
+  chkApi.onchange = () => {
+    campoApi.style.display = chkApi.checked ? "block" : "none";
+  };
+
+  chkQr.onchange = () => {
+    campoQr.style.display = chkQr.checked ? "block" : "none";
+  };
+}
+
+// chama após carregar
+document.addEventListener("DOMContentLoaded", initChat);
