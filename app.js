@@ -51,6 +51,17 @@ window.addEventListener("load", function () {
   }
 });
 
+/* ================= RESETAR INTRO ================= */
+function resetarIntro() {
+  localStorage.removeItem("modo_atendimento");
+
+  var intro = document.getElementById("intro-screen");
+  if (intro) {
+    intro.style.display = "flex";
+    iniciarIntro();
+  }
+}
+
 console.log("APP.JS FINAL – ESTÁVEL");
 
 /* CONFIG */
