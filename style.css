@@ -33,7 +33,7 @@ body {
 .app-header {
   height: 120px;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr auto auto;
   align-items: center;
   padding: 0 48px;
   background: var(--header-bg);
@@ -48,6 +48,17 @@ body {
   border: none;
   font-size: 20px;
   cursor: pointer;
+}
+
+/* BOTÃO VOLTAR */
+.btn-voltar-intro {
+  background: transparent;
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 800;
+  cursor: pointer;
+  margin-right: 12px;
 }
 
 /* CONTEÚDO */
@@ -100,18 +111,14 @@ input, textarea, select {
 }
 
 /* SENHA */
-.campo-senha {
-  width: 50%;
-  min-width: 220px;
-}
-
-.senha-invalida {
-  border: 2px solid #ef4444 !important;
+input.campo-senha {
+  width: 280px !important;
+  max-width: 280px !important;
 }
 
 /* PERMISSÃO */
-.campo-permissao {
-  width: 65%;
+select.campo-permissao {
+  width: 280px !important;
 }
 
 /* REGRAS */
@@ -165,81 +172,6 @@ input, textarea, select {
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.error { background: #ef4444; }
 
-/* =====================================================
-   AJUSTE DEFINITIVO – TAMANHO CORRETO DOS CAMPOS
-   (SEM MEXER EM RAMAL OU LAYOUT)
-===================================================== */
-
-/* CAMPO USUÁRIO – CONTINUA GRANDE */
-.campo-descricao .linha-principal input[type="text"] {
-  width: 100% !important;
-}
-
-/* SENHA – MENOR (EXATAMENTE COMO NA IMAGEM) */
-input.campo-senha {
-  width: 280px !important;
-  max-width: 280px !important;
-  flex: none !important;
-}
-
-/* PERMISSÃO – MESMO TAMANHO DA SENHA */
-select.campo-permissao {
-  width: 280px !important;
-  max-width: 280px !important;
-  flex: none !important;
-}
-
-/* =====================================================
-   AJUSTE CORRETO – USUÁRIO WEB (SEM AFETAR RAMAL)
-===================================================== */
-
-/* GARANTE QUE A LINHA NÃO FORCE REDISTRIBUIÇÃO */
-.campo-descricao {
-  display: block;
-}
-
-/* CAMPO "DIGITE USUÁRIO WEB" – SEMPRE GRANDE */
-.campo-descricao .linha-principal input[type="text"] {
-  width: 100% !important;
-  flex: 1 1 auto !important;
-}
-
-/* SENHA – MENOR (EXATAMENTE COMO NA IMAGEM) */
-.campo-descricao input.campo-senha {
-  width: 280px !important;
-  max-width: 280px !important;
-  flex: 0 0 auto !important;
-}
-
-/* PERMISSÃO – MESMO TAMANHO DA SENHA */
-.campo-descricao select.campo-permissao {
-  width: 280px !important;
-  max-width: 280px !important;
-  flex: 0 0 auto !important;
-}
-
-/* ===== AJUSTE FINO – USUÁRIOS WEB ===== */
-
-/* container específico do usuário web */
-.campo-descricao.usuario-web .campo-usuario {
-  width: 100%;
-}
-
-.campo-descricao.usuario-web .campo-senha {
-  width: 42%;
-  min-width: 220px;
-}
-
-.campo-descricao.usuario-web .campo-permissao {
-  width: 45%;
-  min-width: 260px;
-}
-
-/* garante alinhamento limpo */
-.campo-descricao.usuario-web {
-  align-items: flex-start;
-}
-
 /* ================= INTRO ================= */
 #intro-screen {
   position: fixed;
@@ -281,5 +213,4 @@ select.campo-permissao {
   cursor: pointer;
   border: 2px solid var(--border);
   background: transparent;
-  color: var(--text);
 }
