@@ -48,6 +48,11 @@ function mostrarApp() {
 
   if (intro) intro.style.display = "none";
   if (app) app.style.display = "block";
+
+  // 🔥 GARANTE QUE TODOS OS MENUS VOLTEM
+  document.querySelectorAll(".card").forEach(card => {
+    card.style.display = "block";
+  });
 }
 
 /* ================= BOTÕES DA INTRO ================= */
