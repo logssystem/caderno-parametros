@@ -1,6 +1,7 @@
 console.log("APP.JS FINAL – ESTÁVEL");
 
-/* CONFIG */
+/* ================= CONFIG ================= */
+
 const LIMITE = 600;
 
 const listas = {
@@ -38,14 +39,21 @@ const MAPA_PERMISSOES = {
 };
 
 /* ================= ADICIONAR CAMPO ================= */
+
 window.adicionarCampo = function (tipo) {
-  if (!listas[tipo]) return mostrarToast(`Tipo inválido: ${tipo}`, true);
+  if (!listas[tipo]) {
+    mostrarToast(`Tipo inválido: ${tipo}`, true);
+    return;
+  }
+
   const container = document.getElementById(listas[tipo]);
   if (!container || container.children.length >= LIMITE) return;
+
   container.appendChild(criarCampo(tipo));
 };
 
 /* ================= CRIAR CAMPO ================= */
+
 function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
@@ -100,29 +108,18 @@ function criarCampo(tipo) {
     opt0.disabled = true;
     opt0.selected = true;
     permissao.appendChild(opt0);
-    PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
 
+    PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
     wrap.append(permissao);
 
     regras = document.createElement("div");
     regras.style.marginTop = "10px";
     wrap.append(regras);
 
-    senhaInput.oninput = () => {
-      const v = senhaInput.value;
-      senhaOk =
-        v.length >= 11 &&
-        /[A-Z]/.test(v) &&
-        /\d/.test(v) &&
-        /[^A-Za-z0-9]/.test(v);
-
-      regras.innerHTML = senhaOk
-        ? `<div class="regra-ok">Senha válida</div>`
-        : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
-    };
+    senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
-  /* ===== RAMAL (COM SENHA, MESMO PADRÃO) ===== */
+  /* ===== RAMAL (COM SENHA) ===== */
   if (tipo === "ring") {
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do ramal";
@@ -134,25 +131,27 @@ function criarCampo(tipo) {
     regras.style.marginTop = "8px";
     wrap.append(regras);
 
-    senhaInput.oninput = () => {
-      const v = senhaInput.value;
-      senhaOk =
-        v.length >= 11 &&
-        /[A-Z]/.test(v) &&
-        /\d/.test(v) &&
-        /[^A-Za-z0-9]/.test(v);
-
-      regras.innerHTML = senhaOk
-        ? `<div class="regra-ok">Senha válida</div>`
-        : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
-    };
+    senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
-  /* DESCRIÇÃO – SEMPRE ÚLTIMA */
+  /* DESCRIÇÃO */
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
   desc.style.marginTop = "12px";
   wrap.append(desc);
+
+  function validarSenha(input, regrasEl) {
+    const v = input.value;
+    senhaOk =
+      v.length >= 11 &&
+      /[A-Z]/.test(v) &&
+      /\d/.test(v) &&
+      /[^A-Za-z0-9]/.test(v);
+
+    regrasEl.innerHTML = senhaOk
+      ? `<div class="regra-ok">Senha válida</div>`
+      : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
+  }
 
   /* MÉTODOS */
   wrap.validarSenha = () => senhaOk;
@@ -169,6 +168,7 @@ function criarCampo(tipo) {
 }
 
 /* ================= RANGE RAMAIS ================= */
+
 window.criarRangeRamais = function () {
   const ini = Number(document.getElementById("ramalInicio").value);
   const fim = Number(document.getElementById("ramalFim").value);
@@ -189,11 +189,13 @@ window.criarRangeRamais = function () {
   mostrarToast("Range criado com sucesso!");
 };
 
-/* ================= IMPORTAÇÃO CSV (CORRIGIDA) ================= */
+/* ================= IMPORTAÇÃO CSV ================= */
+
 window.acionarImportacao = function (tipo) {
   const input = document.getElementById(
     tipo === "usuario_web" ? "importUsuarios" : "importRamais"
   );
+
   if (!input) return;
 
   input.value = "";
@@ -202,6 +204,7 @@ window.acionarImportacao = function (tipo) {
   input.onchange = () => {
     const file = input.files[0];
     if (!file) return;
+
     const reader = new FileReader();
     reader.onload = e => processarCSV(tipo, e.target.result);
     reader.readAsText(file);
@@ -213,7 +216,7 @@ function processarCSV(tipo, texto) {
     .replace(/\r/g, "")
     .split("\n")
     .map(l => l.trim())
-    .filter(l => l);
+    .filter(Boolean);
 
   if (linhas.length < 2) {
     mostrarToast("CSV vazio ou inválido", true);
@@ -231,9 +234,7 @@ function processarCSV(tipo, texto) {
     header.forEach((h, i) => (d[h] = v[i] || ""));
 
     const nome = d.usuario || d.nome;
-    if (!nome) return;
-
-    if (!d.senha) return;
+    if (!nome || !d.senha) return;
     if (tipo === "usuario_web" && !d.email) return;
 
     const campo = criarCampo(tipo);
@@ -243,13 +244,9 @@ function processarCSV(tipo, texto) {
     if (tipo === "usuario_web") {
       campo.querySelector("input[type=email]").value = d.email;
       campo.setPermissaoAtalho(d.permissao);
-      campo.querySelector("textarea").value = d.descricao || "";
     }
 
-    if (tipo === "ring") {
-      campo.querySelector("textarea").value = d.descricao || "";
-    }
-
+    campo.querySelector("textarea").value = d.descricao || "";
     container.appendChild(campo);
     criados++;
   });
@@ -260,6 +257,7 @@ function processarCSV(tipo, texto) {
 }
 
 /* ================= TOAST ================= */
+
 function mostrarToast(msg, error = false) {
   const t = document.getElementById("toastGlobal");
   document.getElementById("toastMessage").textContent = msg;
@@ -271,6 +269,7 @@ window.fecharToast = () =>
   document.getElementById("toastGlobal").classList.remove("show");
 
 /* ================= TEMA ================= */
+
 const toggleTheme = document.getElementById("toggleTheme");
 if (toggleTheme) {
   toggleTheme.onclick = () => {
