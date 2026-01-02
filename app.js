@@ -1,4 +1,55 @@
+/* ================= INTRO / ONBOARDING ================= */
 
+var introMensagem =
+  "Bem-vindo ao Caderno de Parâmetros da ERA.\n\n" +
+  "Este assistente foi criado para ajudar você a organizar\n" +
+  "e documentar as configurações do seu ambiente de atendimento.\n\n" +
+  "Para continuarmos, selecione abaixo o tipo de serviço\n" +
+  "que será configurado.";
+
+var introPosicao = 0;
+var introElemento = null;
+
+function iniciarIntro() {
+  introElemento = document.getElementById("intro-text");
+  if (!introElemento) return;
+
+  introElemento.innerHTML = "";
+  introPosicao = 0;
+  digitarTexto();
+}
+
+function digitarTexto() {
+  if (introPosicao >= introMensagem.length) return;
+
+  var char = introMensagem.charAt(introPosicao);
+  introElemento.innerHTML += char === "\n" ? "<br>" : char;
+  introPosicao++;
+
+  setTimeout(digitarTexto, 30);
+}
+
+/* FUNÇÃO GLOBAL (BOTÕES) */
+function selecionarModo(modo) {
+  localStorage.setItem("modo_atendimento", modo);
+
+  var intro = document.getElementById("intro-screen");
+  if (intro) intro.style.display = "none";
+}
+
+/* AO CARREGAR A PÁGINA */
+window.addEventListener("load", function () {
+  var modoSalvo = localStorage.getItem("modo_atendimento");
+  var intro = document.getElementById("intro-screen");
+
+  if (!intro) return;
+
+  if (modoSalvo) {
+    intro.style.display = "none";
+  } else {
+    iniciarIntro();
+  }
+});
 
 console.log("APP.JS FINAL – ESTÁVEL");
 
