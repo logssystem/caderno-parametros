@@ -162,6 +162,7 @@ if (toggleTheme) {
 }
 
 console.log("APP.JS RESTAURADO E ESTÁVEL");
+
 /* CONFIG */
 const LIMITE = 600;
 
