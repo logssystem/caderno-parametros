@@ -49,9 +49,9 @@ function mostrarApp() {
   if (intro) intro.style.display = "none";
   if (app) app.style.display = "block";
 
-  // 🔥 GARANTE QUE TODOS OS MENUS VOLTEM
-  document.querySelectorAll(".card").forEach(card => {
-    card.style.display = "block";
+  // 🔥 RESET TOTAL DOS MENUS
+  document.querySelectorAll("section.card").forEach(card => {
+    card.style.display = "";
   });
 }
 
