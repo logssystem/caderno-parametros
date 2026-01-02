@@ -1,14 +1,14 @@
 /* ================= INTRO / ONBOARDING ================= */
 
-var introMensagem =
+const introMensagem =
   "Bem-vindo ao Caderno de Parâmetros da ERA.\n\n" +
   "Este assistente foi criado para ajudar você a organizar\n" +
   "e documentar as configurações do seu ambiente de atendimento.\n\n" +
   "Para continuarmos, selecione abaixo o tipo de serviço\n" +
   "que será configurado.";
 
-var introPosicao = 0;
-var introElemento = null;
+let introPosicao = 0;
+let introElemento = null;
 
 function iniciarIntro() {
   introElemento = document.getElementById("intro-text");
@@ -22,7 +22,7 @@ function iniciarIntro() {
 function digitarTexto() {
   if (introPosicao >= introMensagem.length) return;
 
-  var char = introMensagem.charAt(introPosicao);
+  const char = introMensagem.charAt(introPosicao);
   introElemento.innerHTML += char === "\n" ? "<br>" : char;
   introPosicao++;
 
@@ -35,11 +35,10 @@ function mostrarIntro() {
   const intro = document.getElementById("intro-screen");
   const app = document.getElementById("app-content");
 
+  if (intro) intro.style.display = "flex";
   if (app) app.style.display = "none";
-  if (intro) {
-    intro.style.display = "flex";
-    iniciarIntro();
-  }
+
+  iniciarIntro();
 }
 
 function mostrarApp() {
@@ -48,34 +47,26 @@ function mostrarApp() {
 
   if (intro) intro.style.display = "none";
   if (app) app.style.display = "block";
-
-  // 🔥 RESET TOTAL DOS MENUS
-  document.querySelectorAll("section.card").forEach(card => {
-    card.style.display = "";
-  });
 }
 
-/* ================= BOTÕES DA INTRO ================= */
+/* ================= BOTÕES ================= */
 
 window.selecionarModo = function (modo) {
   localStorage.setItem("modo_atendimento", modo);
   mostrarApp();
 };
 
-/* ================= VOLTAR PARA O INÍCIO ================= */
-
 window.resetarIntro = function () {
   localStorage.removeItem("modo_atendimento");
   mostrarIntro();
 };
 
-/* ================= AO CARREGAR ================= */
+/* ================= INIT ================= */
 
-window.addEventListener("load", function () {
+document.addEventListener("DOMContentLoaded", () => {
   const modoSalvo = localStorage.getItem("modo_atendimento");
   modoSalvo ? mostrarApp() : mostrarIntro();
 });
-
 
 console.log("APP.JS FINAL – ESTÁVEL");
 
@@ -136,7 +127,6 @@ function criarCampo(tipo) {
 
   const nome = document.createElement("input");
   nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
-  nome.classList.add("campo-nome");
   nome.style.width = "100%";
 
   const btn = document.createElement("button");
@@ -152,64 +142,6 @@ function criarCampo(tipo) {
   let regras = null;
   let senhaOk = true;
 
-  /* USUÁRIO WEB */
-  if (tipo === "usuario_web") {
-    const linhaCred = document.createElement("div");
-    linhaCred.className = "linha-principal";
-    linhaCred.style.gap = "12px";
-    linhaCred.style.marginTop = "12px";
-
-    emailInput = document.createElement("input");
-    emailInput.type = "email";
-    emailInput.placeholder = "E-mail do usuário";
-    emailInput.style.flex = "1";
-
-    senhaInput = document.createElement("input");
-    senhaInput.placeholder = "Senha do usuário";
-    senhaInput.classList.add("campo-senha");
-    senhaInput.style.flex = "1";
-
-    linhaCred.append(emailInput, senhaInput);
-    wrap.append(linhaCred);
-
-    permissao = document.createElement("select");
-    permissao.classList.add("campo-permissao");
-    permissao.style.marginTop = "12px";
-
-    const opt0 = new Option("Selecione a permissão", "");
-    opt0.disabled = true;
-    opt0.selected = true;
-    permissao.appendChild(opt0);
-    PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
-    wrap.append(permissao);
-
-    regras = document.createElement("div");
-    regras.style.marginTop = "10px";
-    wrap.append(regras);
-
-    senhaInput.oninput = () => validarSenha(senhaInput, regras);
-  }
-
-  /* RAMAL */
-  if (tipo === "ring") {
-    senhaInput = document.createElement("input");
-    senhaInput.placeholder = "Senha do ramal";
-    senhaInput.classList.add("campo-senha");
-    senhaInput.style.marginTop = "12px";
-    wrap.append(senhaInput);
-
-    regras = document.createElement("div");
-    regras.style.marginTop = "8px";
-    wrap.append(regras);
-
-    senhaInput.oninput = () => validarSenha(senhaInput, regras);
-  }
-
-  const desc = document.createElement("textarea");
-  desc.placeholder = "Descrição (opcional)";
-  desc.style.marginTop = "12px";
-  wrap.append(desc);
-
   function validarSenha(input, regrasEl) {
     const v = input.value;
     senhaOk =
@@ -223,15 +155,60 @@ function criarCampo(tipo) {
       : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
   }
 
+  if (tipo === "usuario_web") {
+    const linhaCred = document.createElement("div");
+    linhaCred.className = "linha-principal";
+    linhaCred.style.marginTop = "12px";
+
+    emailInput = document.createElement("input");
+    emailInput.type = "email";
+    emailInput.placeholder = "E-mail do usuário";
+
+    senhaInput = document.createElement("input");
+    senhaInput.placeholder = "Senha do usuário";
+    senhaInput.className = "campo-senha";
+
+    linhaCred.append(emailInput, senhaInput);
+    wrap.append(linhaCred);
+
+    permissao = document.createElement("select");
+    permissao.className = "campo-permissao";
+
+    const opt = new Option("Selecione a permissão", "");
+    opt.disabled = true;
+    opt.selected = true;
+    permissao.appendChild(opt);
+
+    PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
+    wrap.append(permissao);
+
+    regras = document.createElement("div");
+    wrap.append(regras);
+
+    senhaInput.oninput = () => validarSenha(senhaInput, regras);
+  }
+
+  if (tipo === "ring") {
+    senhaInput = document.createElement("input");
+    senhaInput.placeholder = "Senha do ramal";
+    senhaInput.className = "campo-senha";
+    wrap.append(senhaInput);
+
+    regras = document.createElement("div");
+    wrap.append(regras);
+
+    senhaInput.oninput = () => validarSenha(senhaInput, regras);
+  }
+
+  const desc = document.createElement("textarea");
+  desc.placeholder = "Descrição (opcional)";
+  wrap.append(desc);
+
   wrap.validarSenha = () => senhaOk;
   wrap.getNome = () => nome.value;
   wrap.getEmail = () => emailInput?.value || "";
   wrap.getSenha = () => senhaInput?.value || "";
   wrap.getPermissao = () => permissao?.value || "";
-  wrap.setPermissaoAtalho = atalho => {
-    const key = atalho?.toLowerCase();
-    if (MAPA_PERMISSOES[key]) permissao.value = MAPA_PERMISSOES[key];
-  };
 
   return wrap;
 }
@@ -261,9 +238,7 @@ window.explorar = function () {
         item.permissao = c.getPermissao();
       }
 
-      if (tipo === "ring") {
-        item.senha = c.getSenha();
-      }
+      if (tipo === "ring") item.senha = c.getSenha();
 
       dados[tipo].push(item);
     });
@@ -272,18 +247,6 @@ window.explorar = function () {
   document.getElementById("resultado").textContent =
     JSON.stringify(dados, null, 2);
 };
-
-/* ================= TOAST ================= */
-
-function mostrarToast(msg, error = false) {
-  const t = document.getElementById("toastGlobal");
-  document.getElementById("toastMessage").textContent = msg;
-  t.className = "toast show" + (error ? " error" : "");
-  setTimeout(() => t.classList.remove("show"), 3000);
-}
-
-window.fecharToast = () =>
-  document.getElementById("toastGlobal").classList.remove("show");
 
 /* ================= TEMA ================= */
 
