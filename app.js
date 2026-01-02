@@ -29,42 +29,41 @@ function digitarTexto() {
   setTimeout(digitarTexto, 30);
 }
 
-/* FUNÇÃO GLOBAL (BOTÕES) */
-function selecionarModo(modo) {
-  localStorage.setItem("modo_atendimento", modo);
+/* ================= CONTROLE DE TELAS ================= */
 
-  var intro = document.getElementById("intro-screen");
-  if (intro) intro.style.display = "none";
+function mostrarIntro() {
+  document.getElementById("intro-screen").style.display = "flex";
+  document.getElementById("app-content").style.display = "none";
+  iniciarIntro();
 }
 
-/* AO CARREGAR A PÁGINA */
+function mostrarApp() {
+  document.getElementById("intro-screen").style.display = "none";
+  document.getElementById("app-content").style.display = "block";
+}
+
+/* BOTÕES DA INTRO */
+window.selecionarModo = function (modo) {
+  localStorage.setItem("modo_atendimento", modo);
+  mostrarApp();
+};
+
+/* VOLTAR PARA O INÍCIO */
+window.resetarIntro = function () {
+  localStorage.removeItem("modo_atendimento");
+  mostrarIntro();
+};
+
+/* AO CARREGAR */
 window.addEventListener("load", function () {
   var modoSalvo = localStorage.getItem("modo_atendimento");
-  var intro = document.getElementById("intro-screen");
-
-  if (!intro) return;
-
-  if (modoSalvo) {
-    intro.style.display = "none";
-  } else {
-    iniciarIntro();
-  }
+  modoSalvo ? mostrarApp() : mostrarIntro();
 });
-
-/* ================= RESETAR INTRO ================= */
-function resetarIntro() {
-  localStorage.removeItem("modo_atendimento");
-
-  var intro = document.getElementById("intro-screen");
-  if (intro) {
-    intro.style.display = "flex";
-    iniciarIntro();
-  }
-}
 
 console.log("APP.JS FINAL – ESTÁVEL");
 
-/* CONFIG */
+/* ================= CONFIG ================= */
+
 const LIMITE = 600;
 
 const listas = {
@@ -102,19 +101,19 @@ const MAPA_PERMISSOES = {
 };
 
 /* ================= ADICIONAR CAMPO ================= */
+
 window.adicionarCampo = function (tipo) {
-  if (!listas[tipo]) return mostrarToast(`Tipo inválido: ${tipo}`, true);
   const container = document.getElementById(listas[tipo]);
   if (!container || container.children.length >= LIMITE) return;
   container.appendChild(criarCampo(tipo));
 };
 
 /* ================= CRIAR CAMPO ================= */
+
 function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  /* NOME */
   const linhaNome = document.createElement("div");
   linhaNome.className = "linha-principal";
 
@@ -136,7 +135,7 @@ function criarCampo(tipo) {
   let regras = null;
   let senhaOk = true;
 
-  /* ===== USUÁRIO WEB ===== */
+  /* USUÁRIO WEB */
   if (tipo === "usuario_web") {
     const linhaCred = document.createElement("div");
     linhaCred.className = "linha-principal";
@@ -165,28 +164,16 @@ function criarCampo(tipo) {
     opt0.selected = true;
     permissao.appendChild(opt0);
     PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
-
     wrap.append(permissao);
 
     regras = document.createElement("div");
     regras.style.marginTop = "10px";
     wrap.append(regras);
 
-    senhaInput.oninput = () => {
-      const v = senhaInput.value;
-      senhaOk =
-        v.length >= 11 &&
-        /[A-Z]/.test(v) &&
-        /\d/.test(v) &&
-        /[^A-Za-z0-9]/.test(v);
-
-      regras.innerHTML = senhaOk
-        ? `<div class="regra-ok">Senha válida</div>`
-        : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
-    };
+    senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
-  /* ===== RAMAL (COM SENHA, MESMO PADRÃO) ===== */
+  /* RAMAL */
   if (tipo === "ring") {
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do ramal";
@@ -198,27 +185,27 @@ function criarCampo(tipo) {
     regras.style.marginTop = "8px";
     wrap.append(regras);
 
-    senhaInput.oninput = () => {
-      const v = senhaInput.value;
-      senhaOk =
-        v.length >= 11 &&
-        /[A-Z]/.test(v) &&
-        /\d/.test(v) &&
-        /[^A-Za-z0-9]/.test(v);
-
-      regras.innerHTML = senhaOk
-        ? `<div class="regra-ok">Senha válida</div>`
-        : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
-    };
+    senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
-  /* DESCRIÇÃO – SEMPRE ÚLTIMA */
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
   desc.style.marginTop = "12px";
   wrap.append(desc);
 
-  /* MÉTODOS */
+  function validarSenha(input, regrasEl) {
+    const v = input.value;
+    senhaOk =
+      v.length >= 11 &&
+      /[A-Z]/.test(v) &&
+      /\d/.test(v) &&
+      /[^A-Za-z0-9]/.test(v);
+
+    regrasEl.innerHTML = senhaOk
+      ? `<div class="regra-ok">Senha válida</div>`
+      : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
+  }
+
   wrap.validarSenha = () => senhaOk;
   wrap.getNome = () => nome.value;
   wrap.getEmail = () => emailInput?.value || "";
@@ -232,98 +219,45 @@ function criarCampo(tipo) {
   return wrap;
 }
 
-/* ================= RANGE RAMAIS ================= */
-window.criarRangeRamais = function () {
-  const ini = Number(document.getElementById("ramalInicio").value);
-  const fim = Number(document.getElementById("ramalFim").value);
-  const container = document.getElementById("listaRings");
+/* ================= EXPLORAR ================= */
 
-  if (!ini || !fim || fim < ini) {
-    mostrarToast("Range inválido", true);
-    return;
-  }
+window.explorar = function () {
+  const dados = {};
 
-  for (let i = ini; i <= fim; i++) {
-    if (container.children.length >= LIMITE) break;
-    const campo = criarCampo("ring");
-    campo.querySelector(".campo-nome").value = i;
-    container.appendChild(campo);
-  }
+  Object.keys(listas).forEach(tipo => {
+    const container = document.getElementById(listas[tipo]);
+    if (!container) return;
 
-  mostrarToast("Range criado com sucesso!");
-};
+    dados[tipo] = [];
 
-/* ================= IMPORTAÇÃO CSV (CORRIGIDA) ================= */
-window.acionarImportacao = function (tipo) {
-  const input = document.getElementById(
-    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
-  );
-  if (!input) return;
+    container.querySelectorAll(".campo-descricao").forEach(c => {
+      if ((tipo === "usuario_web" || tipo === "ring") && !c.validarSenha()) return;
 
-  input.value = "";
-  input.click();
+      const item = {
+        nome: c.getNome(),
+        descricao: c.querySelector("textarea")?.value || ""
+      };
 
-  input.onchange = () => {
-    const file = input.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => processarCSV(tipo, e.target.result);
-    reader.readAsText(file);
-  };
-};
+      if (tipo === "usuario_web") {
+        item.email = c.getEmail();
+        item.senha = c.getSenha();
+        item.permissao = c.getPermissao();
+      }
 
-function processarCSV(tipo, texto) {
-  const linhas = texto
-    .replace(/\r/g, "")
-    .split("\n")
-    .map(l => l.trim())
-    .filter(l => l);
+      if (tipo === "ring") {
+        item.senha = c.getSenha();
+      }
 
-  if (linhas.length < 2) {
-    mostrarToast("CSV vazio ou inválido", true);
-    return;
-  }
-
-  const sep = linhas[0].includes(";") ? ";" : ",";
-  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
-  const container = document.getElementById(listas[tipo]);
-  let criados = 0;
-
-  linhas.forEach(l => {
-    const v = l.split(sep).map(x => x.trim());
-    const d = {};
-    header.forEach((h, i) => (d[h] = v[i] || ""));
-
-    const nome = d.usuario || d.nome;
-    if (!nome) return;
-
-    if (!d.senha) return;
-    if (tipo === "usuario_web" && !d.email) return;
-
-    const campo = criarCampo(tipo);
-    campo.querySelector(".campo-nome").value = nome;
-    campo.querySelector(".campo-senha").value = d.senha;
-
-    if (tipo === "usuario_web") {
-      campo.querySelector("input[type=email]").value = d.email;
-      campo.setPermissaoAtalho(d.permissao);
-      campo.querySelector("textarea").value = d.descricao || "";
-    }
-
-    if (tipo === "ring") {
-      campo.querySelector("textarea").value = d.descricao || "";
-    }
-
-    container.appendChild(campo);
-    criados++;
+      dados[tipo].push(item);
+    });
   });
 
-  criados
-    ? mostrarToast(`${criados} registros importados com sucesso!`)
-    : mostrarToast("Nenhuma linha válida encontrada", true);
-}
+  document.getElementById("resultado").textContent =
+    JSON.stringify(dados, null, 2);
+};
 
 /* ================= TOAST ================= */
+
 function mostrarToast(msg, error = false) {
   const t = document.getElementById("toastGlobal");
   document.getElementById("toastMessage").textContent = msg;
@@ -335,6 +269,7 @@ window.fecharToast = () =>
   document.getElementById("toastGlobal").classList.remove("show");
 
 /* ================= TEMA ================= */
+
 const toggleTheme = document.getElementById("toggleTheme");
 if (toggleTheme) {
   toggleTheme.onclick = () => {
