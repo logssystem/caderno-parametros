@@ -32,33 +32,45 @@ function digitarTexto() {
 /* ================= CONTROLE DE TELAS ================= */
 
 function mostrarIntro() {
-  document.getElementById("intro-screen").style.display = "flex";
-  document.getElementById("app-content").style.display = "none";
-  iniciarIntro();
+  const intro = document.getElementById("intro-screen");
+  const app = document.getElementById("app-content");
+
+  if (app) app.style.display = "none";
+  if (intro) {
+    intro.style.display = "flex";
+    iniciarIntro();
+  }
 }
 
 function mostrarApp() {
-  document.getElementById("intro-screen").style.display = "none";
-  document.getElementById("app-content").style.display = "block";
+  const intro = document.getElementById("intro-screen");
+  const app = document.getElementById("app-content");
+
+  if (intro) intro.style.display = "none";
+  if (app) app.style.display = "block";
 }
 
-/* BOTÕES DA INTRO */
+/* ================= BOTÕES DA INTRO ================= */
+
 window.selecionarModo = function (modo) {
   localStorage.setItem("modo_atendimento", modo);
   mostrarApp();
 };
 
-/* VOLTAR PARA O INÍCIO */
+/* ================= VOLTAR PARA O INÍCIO ================= */
+
 window.resetarIntro = function () {
   localStorage.removeItem("modo_atendimento");
   mostrarIntro();
 };
 
-/* AO CARREGAR */
+/* ================= AO CARREGAR ================= */
+
 window.addEventListener("load", function () {
-  var modoSalvo = localStorage.getItem("modo_atendimento");
+  const modoSalvo = localStorage.getItem("modo_atendimento");
   modoSalvo ? mostrarApp() : mostrarIntro();
 });
+
 
 console.log("APP.JS FINAL – ESTÁVEL");
 
