@@ -1,3 +1,47 @@
+/* ================= INTRO ================= */
+#intro-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.intro-box {
+  background: var(--card-bg);
+  padding: 48px;
+  border-radius: 18px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+  text-align: center;
+}
+
+.intro-box h1 {
+  font-size: 22px;
+  min-height: 120px;
+  margin-bottom: 32px;
+}
+
+.intro-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.intro-actions button {
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  background: transparent;
+  color: var(--text);
+}
+
 console.log("APP.JS FINAL – ESTÁVEL");
 
 /* CONFIG */
