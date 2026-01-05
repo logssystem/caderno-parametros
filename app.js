@@ -58,7 +58,6 @@ function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  /* NOME */
   const linhaNome = document.createElement("div");
   linhaNome.className = "linha-principal";
 
@@ -80,7 +79,6 @@ function criarCampo(tipo) {
   let regras = null;
   let senhaOk = true;
 
-  /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
     const linhaCred = document.createElement("div");
     linhaCred.className = "linha-principal";
@@ -90,12 +88,10 @@ function criarCampo(tipo) {
     emailInput = document.createElement("input");
     emailInput.type = "email";
     emailInput.placeholder = "E-mail do usuário";
-    emailInput.style.flex = "1";
 
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do usuário";
     senhaInput.classList.add("campo-senha");
-    senhaInput.style.flex = "1";
 
     linhaCred.append(emailInput, senhaInput);
     wrap.append(linhaCred);
@@ -119,7 +115,6 @@ function criarCampo(tipo) {
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
-  /* ===== RAMAL (COM SENHA) ===== */
   if (tipo === "ring") {
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do ramal";
@@ -134,7 +129,6 @@ function criarCampo(tipo) {
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
-  /* DESCRIÇÃO */
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
   desc.style.marginTop = "12px";
@@ -153,16 +147,10 @@ function criarCampo(tipo) {
       : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
   }
 
-  /* MÉTODOS */
-  wrap.validarSenha = () => senhaOk;
   wrap.getNome = () => nome.value;
   wrap.getEmail = () => emailInput?.value || "";
   wrap.getSenha = () => senhaInput?.value || "";
   wrap.getPermissao = () => permissao?.value || "";
-  wrap.setPermissaoAtalho = atalho => {
-    const key = atalho?.toLowerCase();
-    if (MAPA_PERMISSOES[key]) permissao.value = MAPA_PERMISSOES[key];
-  };
 
   return wrap;
 }
@@ -189,72 +177,96 @@ window.criarRangeRamais = function () {
   mostrarToast("Range criado com sucesso!");
 };
 
-/* ================= IMPORTAÇÃO CSV ================= */
+/* ================= REGRA DE TEMPO ================= */
 
-window.acionarImportacao = function (tipo) {
-  const input = document.getElementById(
-    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
-  );
-
-  if (!input) return;
-
-  input.value = "";
-  input.click();
-
-  input.onchange = () => {
-    const file = input.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = e => processarCSV(tipo, e.target.result);
-    reader.readAsText(file);
-  };
+window.adicionarRegraTempo = function () {
+  const container = document.getElementById("listaRegrasTempo");
+  if (!container) return;
+  container.appendChild(criarRegraTempo());
 };
 
-function processarCSV(tipo, texto) {
-  const linhas = texto
-    .replace(/\r/g, "")
-    .split("\n")
-    .map(l => l.trim())
-    .filter(Boolean);
+function criarRegraTempo() {
+  const wrap = document.createElement("div");
+  wrap.className = "campo-descricao";
 
-  if (linhas.length < 2) {
-    mostrarToast("CSV vazio ou inválido", true);
-    return;
-  }
+  const nome = document.createElement("input");
+  nome.placeholder = "Nome da regra (ex: Horário Comercial)";
+  wrap.appendChild(nome);
 
-  const sep = linhas[0].includes(";") ? ";" : ",";
-  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
-  const container = document.getElementById(listas[tipo]);
-  let criados = 0;
+  const dias = [
+    "Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"
+  ];
+  const diasSelecionados = new Set();
 
-  linhas.forEach(l => {
-    const v = l.split(sep).map(x => x.trim());
-    const d = {};
-    header.forEach((h, i) => (d[h] = v[i] || ""));
+  const diasBox = document.createElement("div");
+  diasBox.style.display = "grid";
+  diasBox.style.gridTemplateColumns = "repeat(auto-fit,minmax(120px,1fr))";
+  diasBox.style.gap = "8px";
 
-    const nome = d.usuario || d.nome;
-    if (!nome || !d.senha) return;
-    if (tipo === "usuario_web" && !d.email) return;
-
-    const campo = criarCampo(tipo);
-    campo.querySelector(".campo-nome").value = nome;
-    campo.querySelector(".campo-senha").value = d.senha;
-
-    if (tipo === "usuario_web") {
-      campo.querySelector("input[type=email]").value = d.email;
-      campo.setPermissaoAtalho(d.permissao);
-    }
-
-    campo.querySelector("textarea").value = d.descricao || "";
-    container.appendChild(campo);
-    criados++;
+  dias.forEach(d => {
+    const b = document.createElement("button");
+    b.textContent = d;
+    b.onclick = () => {
+      b.classList.toggle("ativo");
+      b.classList.contains("ativo")
+        ? diasSelecionados.add(d)
+        : diasSelecionados.delete(d);
+    };
+    diasBox.appendChild(b);
   });
 
-  criados
-    ? mostrarToast(`${criados} registros importados com sucesso!`)
-    : mostrarToast("Nenhuma linha válida encontrada", true);
+  wrap.appendChild(diasBox);
+
+  const inicio = document.createElement("input");
+  inicio.type = "time";
+  const fim = document.createElement("input");
+  fim.type = "time";
+
+  wrap.append(inicio, fim);
+
+  wrap.getData = () => ({
+    nome: nome.value,
+    dias: Array.from(diasSelecionados),
+    hora_inicio: inicio.value,
+    hora_fim: fim.value
+  });
+
+  return wrap;
 }
+
+/* ================= EXPLORAR ================= */
+
+window.explorar = function () {
+  const dados = {};
+
+  dados.usuarios_web = [];
+  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(c => {
+    dados.usuarios_web.push({
+      nome: c.getNome(),
+      email: c.getEmail(),
+      senha: c.getSenha(),
+      permissao: c.getPermissao()
+    });
+  });
+
+  dados.ramais = [];
+  document.querySelectorAll("#listaRings .campo-descricao").forEach(c => {
+    dados.ramais.push({
+      ramal: c.getNome(),
+      senha: c.getSenha()
+    });
+  });
+
+  dados.regras_tempo = [];
+  document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
+    dados.regras_tempo.push(r.getData());
+  });
+
+  document.getElementById("resultado").textContent =
+    JSON.stringify(dados, null, 2);
+
+  mostrarToast("Parâmetros gerados com sucesso!");
+};
 
 /* ================= TOAST ================= */
 
@@ -272,125 +284,5 @@ window.fecharToast = () =>
 
 const toggleTheme = document.getElementById("toggleTheme");
 if (toggleTheme) {
-  toggleTheme.onclick = () => {
-    document.body.classList.toggle("dark");
-  };
-}
-
-/* ================= CHAT ================= */
-
-function initChat() {
-  const modo = localStorage.getItem("modo_atendimento");
-  const cardChat = document.getElementById("card-chat");
-
-  if (!cardChat) return;
-
-  // Só aparece em chat ou ambos
-  cardChat.style.display =
-    modo === "chat" || modo === "ambos" ? "block" : "none";
-
-  const chkApi = document.getElementById("chatApi");
-  const chkQr = document.getElementById("chatQr");
-  const campoApi = document.getElementById("campoApi");
-  const campoQr = document.getElementById("campoQr");
-
-  chkApi.onchange = () => {
-    campoApi.style.display = chkApi.checked ? "block" : "none";
-  };
-
-  chkQr.onchange = () => {
-    campoQr.style.display = chkQr.checked ? "block" : "none";
-  };
-}
-
-// chama após carregar
-document.addEventListener("DOMContentLoaded", initChat);
-
-/* ================= REGRA DE TEMPO ================= */
-
-window.adicionarRegraTempo = function () {
-  const container = document.getElementById("listaRegrasTempo");
-  if (!container) return;
-
-  container.appendChild(criarRegraTempo());
+  toggleTheme.onclick = () => document.body.classList.toggle("dark");
 };
-
-function criarRegraTempo() {
-  const wrap = document.createElement("div");
-  wrap.className = "campo-descricao";
-
-  /* NOME */
-  const nome = document.createElement("input");
-  nome.placeholder = "Nome da regra (ex: Horário Comercial)";
-  nome.style.width = "100%";
-  wrap.appendChild(nome);
-
-  /* DIAS */
-  const diasBox = document.createElement("div");
-  diasBox.style.display = "grid";
-  diasBox.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
-  diasBox.style.gap = "8px";
-  diasBox.style.marginTop = "12px";
-
-  const diasSemana = [
-    "Domingo",
-    "Segunda",
-    "Terça",
-    "Quarta",
-    "Quinta",
-    "Sexta",
-    "Sábado"
-  ];
-
-  const diasSelecionados = new Set();
-
-  diasSemana.forEach(dia => {
-    const btn = document.createElement("button");
-    btn.textContent = dia;
-    btn.className = "btn-dia";
-    btn.onclick = () => {
-      btn.classList.toggle("ativo");
-      btn.classList.contains("ativo")
-        ? diasSelecionados.add(dia)
-        : diasSelecionados.delete(dia);
-    };
-    diasBox.appendChild(btn);
-  });
-
-  wrap.appendChild(diasBox);
-
-  /* HORÁRIOS */
-  const horarios = document.createElement("div");
-  horarios.style.display = "flex";
-  horarios.style.gap = "12px";
-  horarios.style.marginTop = "12px";
-
-  const inicio = document.createElement("input");
-  inicio.type = "time";
-  inicio.title = "Hora inicial";
-
-  const fim = document.createElement("input");
-  fim.type = "time";
-  fim.title = "Hora final";
-
-  horarios.append(inicio, fim);
-  wrap.appendChild(horarios);
-
-  /* REMOVER */
-  const remover = document.createElement("button");
-  remover.textContent = "✖ Remover regra";
-  remover.style.marginTop = "12px";
-  remover.onclick = () => wrap.remove();
-  wrap.appendChild(remover);
-
-  /* EXPORTAÇÃO */
-  wrap.getData = () => ({
-    nome: nome.value,
-    dias: Array.from(diasSelecionados),
-    hora_inicio: inicio.value,
-    hora_fim: fim.value
-  });
-
-  return wrap;
-}
-
