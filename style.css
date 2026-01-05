@@ -267,3 +267,56 @@ select.campo-permissao {
   font-size: 16px;
   font-weight: 700;
 }
+
+/* ===== CHAT CARDS ===== */
+
+.chat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.chat-card {
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .25s ease;
+  user-select: none;
+}
+
+.chat-card:hover {
+  border-color: #2563eb;
+  transform: translateY(-3px);
+}
+
+.chat-card.active {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.25);
+}
+
+.chat-card img {
+  height: 48px;
+  margin-bottom: 12px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.chat-card h4 {
+  margin: 0;
+  font-weight: 800;
+}
+
+/* input whatsapp */
+.chat-input {
+  width: 100%;
+  max-width: 320px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--field-border);
+  font-size: 16px;
+  font-weight: 700;
+}
