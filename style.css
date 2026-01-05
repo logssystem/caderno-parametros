@@ -388,3 +388,20 @@ window.selecionarApi = function (el, api) {
 window.toggleCanal = function (el) {
   el.classList.toggle("active");
 };
+
+/* ================= REGRA DE TEMPO ================= */
+
+.btn-dia {
+  padding: 10px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: transparent;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-dia.ativo {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
