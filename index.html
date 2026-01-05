@@ -34,70 +34,107 @@
   <button id="toggleTheme" class="theme-toggle">🌙</button>
 </header>
 
-<!-- CONTEÚDO -->
+<!-- ================= CONTEÚDO ================= -->
 <main id="app-content" class="form-container">
 
-  <!-- USUÁRIOS WEB -->
-  <section class="card">
-    <h2>Usuários Web</h2>
-    <div class="acoes-card">
-      <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
-      <button class="btn-import" onclick="acionarImportacao('usuario_web')">📥 Importar</button>
-      <button class="btn-import" onclick="baixarTemplateUsuarios()">📥 Baixar template CSV</button>
-      <input type="file" id="importUsuarios" accept=".csv" hidden>
-    </div>
-    <div id="listaUsuariosWeb"></div>
+  <!-- ================= VOZ ================= -->
+  <section id="voz-area">
+
+    <!-- USUÁRIOS WEB -->
+    <section class="card">
+      <h2>Usuários Web</h2>
+      <div class="acoes-card">
+        <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
+        <button class="btn-import" onclick="acionarImportacao('usuario_web')">📥 Importar</button>
+        <button class="btn-import" onclick="baixarTemplateUsuarios()">📥 Baixar template CSV</button>
+        <input type="file" id="importUsuarios" accept=".csv" hidden>
+      </div>
+      <div id="listaUsuariosWeb"></div>
+    </section>
+
+    <!-- RAMAIS -->
+    <section class="card">
+      <h2>Ramais (Range)</h2>
+      <div class="acoes-card">
+        <input id="ramalInicio" type="number" placeholder="Ramal inicial">
+        <input id="ramalFim" type="number" placeholder="Ramal final">
+        <button class="btn-add" onclick="criarRangeRamais()">Criar range</button>
+      </div>
+      <div class="acoes-card">
+        <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
+        <button class="btn-import" onclick="acionarImportacao('ring')">📥 Importar</button>
+        <input type="file" id="importRamais" accept=".csv" hidden>
+      </div>
+      <div id="listaRings"></div>
+    </section>
+
+    <!-- ENTRADAS -->
+    <section class="card">
+      <h2>Números de Entrada</h2>
+      <div id="listaEntradas"></div>
+      <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
+    </section>
+
+    <!-- URAS -->
+    <section class="card">
+      <h2>URAs</h2>
+      <div id="listaURAs"></div>
+      <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
+    </section>
+
+    <!-- FILAS -->
+    <section class="card">
+      <h2>Filas</h2>
+      <div id="listaFilas"></div>
+      <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
+    </section>
+
+    <!-- GRUPO DE RING -->
+    <section class="card">
+      <h2>Grupo de Ring</h2>
+      <div id="listaGrupoRing"></div>
+      <button class="btn-add" onclick="adicionarCampo('grupo_ring')">+</button>
+    </section>
+
+    <!-- AGENTES -->
+    <section class="card">
+      <h2>Agentes</h2>
+      <div id="listaAgentes"></div>
+      <button class="btn-add" onclick="adicionarCampo('agente')">+</button>
+    </section>
+
   </section>
 
-  <!-- RAMAIS -->
-  <section class="card">
-    <h2>Ramais (Range)</h2>
-    <div class="acoes-card">
-      <input id="ramalInicio" type="number" placeholder="Ramal inicial">
-      <input id="ramalFim" type="number" placeholder="Ramal final">
-      <button class="btn-add" onclick="criarRangeRamais()">Criar range</button>
-    </div>
-    <div class="acoes-card">
-      <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
-      <button class="btn-import" onclick="acionarImportacao('ring')">📥 Importar</button>
-      <input type="file" id="importRamais" accept=".csv" hidden>
-    </div>
-    <div id="listaRings"></div>
-  </section>
+  <!-- ================= CHAT ================= -->
+  <section id="chat-area" style="display:none">
 
-  <!-- NÚMEROS DE ENTRADA -->
-  <section class="card">
-    <h2>Números de Entrada</h2>
-    <div id="listaEntradas"></div>
-    <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
-  </section>
+    <section class="card">
+      <h2>Configuração de Chat</h2>
 
-  <!-- URAS -->
-  <section class="card">
-    <h2>URAs</h2>
-    <div id="listaURAs"></div>
-    <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
-  </section>
+      <div class="chat-opcoes">
+        <h3>Tipo de Conexão</h3>
+        <button onclick="selecionarChatTipo('api')">API Oficial</button>
+        <button onclick="selecionarChatTipo('qr')">QR Code</button>
+      </div>
 
-  <!-- FILAS -->
-  <section class="card">
-    <h2>Filas</h2>
-    <div id="listaFilas"></div>
-    <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
-  </section>
+      <div id="chat-api-opcoes" style="display:none">
+        <h3>Fornecedor API Oficial</h3>
+        <button onclick="selecionarApi('gupshup')">Gupshup</button>
+        <button onclick="selecionarApi('meta360')">Meta360</button>
+      </div>
 
-  <!-- GRUPO DE RING -->
-  <section class="card">
-    <h2>Grupo de Ring</h2>
-    <div id="listaGrupoRing"></div>
-    <button class="btn-add" onclick="adicionarCampo('grupo_ring')">+</button>
-  </section>
+      <div id="chat-canais" style="display:none">
+        <h3>Canais Integrados</h3>
+        <label><input type="checkbox" value="whatsapp"> WhatsApp</label>
+        <label><input type="checkbox" value="instagram"> Instagram</label>
+        <label><input type="checkbox" value="messenger"> Messenger</label>
+        <label><input type="checkbox" value="telegram"> Telegram</label>
+        <label><input type="checkbox" value="email"> E-mail</label>
+        <label><input type="checkbox" value="googlechat"> Google Chat</label>
+      </div>
 
-  <!-- AGENTES -->
-  <section class="card">
-    <h2>Agentes</h2>
-    <div id="listaAgentes"></div>
-    <button class="btn-add" onclick="adicionarCampo('agente')">+</button>
+    </section>
+
   </section>
 
   <button class="btn-explorar" onclick="explorar()">Explorar</button>
@@ -116,4 +153,3 @@
 <script src="./chat.js"></script>
 </body>
 </html>
-
