@@ -113,40 +113,48 @@
 
     <!-- TIPO -->
     <div class="chat-section">
-      <h3>Tipo de Integração</h3>
-      <div class="chat-grid">
-        <div class="chat-card" onclick="selecionarTipoChat('api')">
-          <img src="./assets/meta.png">
-          <h4>API Oficial</h4>
-        </div>
+  <h3>Tipo de Integração</h3>
 
-        <div class="chat-card" onclick="selecionarTipoChat('qr')">
-          <img src="./assets/whatsapp.png">
-          <h4>QR Code</h4>
-        </div>
-      </div>
+  <div class="chat-grid">
+    <div class="chat-card" onclick="selecionarTipoChat(this,'api')">
+      <img src="./assets/meta.png" alt="API Oficial">
+      <h4>API Oficial</h4>
     </div>
 
-    <!-- API OFICIAL -->
-    <div id="api-oficial" class="chat-section" style="display:none">
-      <h3>Fornecedor</h3>
-      <div class="chat-grid">
-        <div class="chat-card" onclick="selecionarApi('meta')">
-          <img src="./assets/meta.png">
-          <h4>Meta</h4>
-        </div>
-
-        <div class="chat-card" onclick="selecionarApi('360')">
-          <img src="./assets/360.png">
-          <h4>360</h4>
-        </div>
-
-        <div class="chat-card" onclick="selecionarApi('gupshup')">
-          <img src="./assets/gupshup.png">
-          <h4>Gupshup</h4>
-        </div>
-      </div>
+    <div class="chat-card" onclick="selecionarTipoChat(this,'qr')">
+      <img src="./assets/whatsapp.png" alt="QR Code">
+      <h4>QR Code</h4>
     </div>
+  </div>
+</div>
+
+<!-- API OFICIAL -->
+<div id="api-oficial" class="chat-section" style="display:none">
+  <h3>Fornecedor Oficial</h3>
+
+  <div class="chat-grid">
+    <div class="chat-card" onclick="selecionarApi(this,'meta')">
+      <img src="./assets/meta.png">
+      <h4>Meta</h4>
+    </div>
+
+    <div class="chat-card" onclick="selecionarApi(this,'360')">
+      <img src="./assets/360.png">
+      <h4>360</h4>
+    </div>
+
+    <div class="chat-card" onclick="selecionarApi(this,'gupshup')">
+      <img src="./assets/gupshup.png">
+      <h4>Gupshup</h4>
+    </div>
+  </div>
+</div>
+
+<!-- QR CODE -->
+<div id="chat-qr" class="chat-section" style="display:none">
+  <h3>Número do WhatsApp</h3>
+  <input class="chat-input" placeholder="Ex: 5511999999999">
+</div>
 
     <!-- CANAIS -->
     <div id="chat-canais" class="chat-section" style="display:none">
@@ -205,4 +213,5 @@
 <script src="./chat.js"></script>
 </body>
 </html>
+
 
