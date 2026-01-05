@@ -28,93 +28,100 @@
   <button id="toggleTheme" class="theme-toggle">🌙</button>
 </header>
 
-<main id="app-content" class="form-container">
+<!-- ================= CONTEÚDO ================= -->
+<main id="app-content" class="form-container" style="display:none">
 
-<!-- ================= CHAT ================= -->
-<section id="chat-area">
-
-  <section class="card">
-    <h2>Configuração de Chat</h2>
-
-    <!-- TIPO -->
-    <div class="chat-section">
-      <h3>Tipo de Integração</h3>
-
-      <div class="chat-grid">
-        <div class="chat-card" onclick="selecionarTipoChat(this,'api')">
-          <img src="./assets/APIS.png">
-          <h4>API Oficial</h4>
-        </div>
-
-        <div class="chat-card" onclick="selecionarTipoChat(this,'qr')">
-          <img src="./assets/qrcode.png">
-          <h4>QR Code</h4>
-        </div>
-      </div>
-    </div>
-
-    <!-- API OFICIAL -->
-    <div id="api-oficial" class="chat-section" style="display:none">
-      <h3>Fornecedor Oficial</h3>
-
-      <div class="chat-grid">
-        <div class="chat-card" onclick="selecionarApi(this,'meta')">
-          <img src="./assets/Meta.png">
-          <h4>Meta</h4>
-        </div>
-
-        <div class="chat-card" onclick="selecionarApi(this,'360')">
-          <img src="./assets/360.png">
-          <h4>360 Dialog</h4>
-        </div>
-
-        <div class="chat-card" onclick="selecionarApi(this,'gupshup')">
-          <img src="./assets/gupshup.png">
-          <h4>Gupshup</h4>
-        </div>
-      </div>
-    </div>
-
-    <!-- CANAIS -->
-    <div id="chat-canais" class="chat-section" style="display:none">
-      <h3>Canais Integrados</h3>
-
-      <div class="chat-grid">
-        <div class="chat-card" onclick="toggleCanal(this)">
-          <img src="./assets/whats.png">
-          <h4>WhatsApp</h4>
-        </div>
-
-        <div class="chat-card" onclick="toggleCanal(this)">
-          <img src="./assets/instagram.png">
-          <h4>Instagram</h4>
-        </div>
-
-        <div class="chat-card" onclick="toggleCanal(this)">
-          <img src="./assets/messenger.png">
-          <h4>Messenger</h4>
-        </div>
-
-        <div class="chat-card" onclick="toggleCanal(this)">
-          <img src="./assets/telegram.png">
-          <h4>Telegram</h4>
-        </div>
-
-        <div class="chat-card" onclick="toggleCanal(this)">
-          <img src="./assets/email.png">
-          <h4>E-mail</h4>
-        </div>
-      </div>
-    </div>
-
-    <!-- QR -->
-    <div id="chat-qr" class="chat-section" style="display:none">
-      <h3>Número do WhatsApp</h3>
-      <input class="chat-input" placeholder="Ex: 5511999999999">
-    </div>
-
+  <!-- ================= VOZ ================= -->
+  <section id="voz-area" style="display:none">
+    <!-- ⚠️ NÃO REMOVER -->
+    <!-- Aqui entra TODO o conteúdo de voz (já existente no app.js) -->
   </section>
-</section>
+
+  <!-- ================= CHAT ================= -->
+  <section id="chat-area" style="display:none">
+
+    <section class="card">
+      <h2>Configuração de Chat</h2>
+
+      <!-- TIPO -->
+      <div class="chat-section">
+        <h3>Tipo de Integração</h3>
+
+        <div class="chat-grid">
+          <div class="chat-card" onclick="selecionarTipoChat(this,'api')">
+            <img src="./assets/APIS.png">
+            <h4>API Oficial</h4>
+          </div>
+
+          <div class="chat-card" onclick="selecionarTipoChat(this,'qr')">
+            <img src="./assets/qrcode.png">
+            <h4>QR Code</h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- API OFICIAL -->
+      <div id="api-oficial" class="chat-section" style="display:none">
+        <h3>Fornecedor Oficial</h3>
+
+        <div class="chat-grid">
+          <div class="chat-card" onclick="selecionarApi(this,'meta')">
+            <img src="./assets/Meta.png">
+            <h4>Meta</h4>
+          </div>
+
+          <div class="chat-card" onclick="selecionarApi(this,'360')">
+            <img src="./assets/360.png">
+            <h4>360 Dialog</h4>
+          </div>
+
+          <div class="chat-card" onclick="selecionarApi(this,'gupshup')">
+            <img src="./assets/gupshup.png">
+            <h4>Gupshup</h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- CANAIS -->
+      <div id="chat-canais" class="chat-section" style="display:none">
+        <h3>Canais Integrados</h3>
+
+        <div class="chat-grid">
+          <div class="chat-card" onclick="toggleCanal(this)">
+            <img src="./assets/whats.png">
+            <h4>WhatsApp</h4>
+          </div>
+
+          <div class="chat-card" onclick="toggleCanal(this)">
+            <img src="./assets/instagram.png">
+            <h4>Instagram</h4>
+          </div>
+
+          <div class="chat-card" onclick="toggleCanal(this)">
+            <img src="./assets/messenger.png">
+            <h4>Messenger</h4>
+          </div>
+
+          <div class="chat-card" onclick="toggleCanal(this)">
+            <img src="./assets/telegram.png">
+            <h4>Telegram</h4>
+          </div>
+
+          <div class="chat-card" onclick="toggleCanal(this)">
+            <img src="./assets/email.png">
+            <h4>E-mail</h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- QR -->
+      <div id="chat-qr" class="chat-section" style="display:none">
+        <h3>Número do WhatsApp</h3>
+        <input class="chat-input" placeholder="Ex: 5511999999999">
+      </div>
+
+    </section>
+  </section>
 
 </main>
 
@@ -123,5 +130,3 @@
 <script src="./chat.js"></script>
 </body>
 </html>
-
-
