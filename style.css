@@ -320,3 +320,27 @@ select.campo-permissao {
   font-size: 16px;
   font-weight: 700;
 }
+
+/* ===== AJUSTE FINO DAS IMAGENS DO CHAT ===== */
+
+.chat-card img {
+  height: 46px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+  margin-bottom: 14px;
+  filter: grayscale(10%);
+  transition: transform .25s ease, filter .25s ease;
+}
+
+/* efeito ao passar o mouse */
+.chat-card:hover img {
+  transform: scale(1.08);
+  filter: grayscale(0%);
+}
+
+/* quando selecionado */
+.chat-card.active img {
+  transform: scale(1.12);
+  filter: grayscale(0%);
+}
