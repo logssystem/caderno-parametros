@@ -22,172 +22,92 @@
 
 <!-- HEADER -->
 <header class="app-header">
-  <div>
-    <img src="./assets/image.png" alt="Logo ZRA" class="app-logo" />
-  </div>
-
-  <div>
-    <h1 class="app-title">Caderno de Parâmetros</h1>
-  </div>
-
+  <img src="./assets/image.png" class="app-logo" />
+  <h1 class="app-title">Caderno de Parâmetros</h1>
   <button class="btn-voltar-intro" onclick="resetarIntro()">⬅ Voltar ao início</button>
   <button id="toggleTheme" class="theme-toggle">🌙</button>
 </header>
 
-<!-- ================= CONTEÚDO ================= -->
 <main id="app-content" class="form-container">
 
-  <!-- ================= VOZ ================= -->
-  <section id="voz-area">
-
-    <!-- USUÁRIOS WEB -->
-    <section class="card">
-      <h2>Usuários Web</h2>
-      <div class="acoes-card">
-        <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
-        <button class="btn-import" onclick="acionarImportacao('usuario_web')">📥 Importar</button>
-        <button class="btn-import" onclick="baixarTemplateUsuarios()">📥 Baixar template CSV</button>
-        <input type="file" id="importUsuarios" accept=".csv" hidden>
-      </div>
-      <div id="listaUsuariosWeb"></div>
-    </section>
-
-    <!-- RAMAIS -->
-    <section class="card">
-      <h2>Ramais (Range)</h2>
-      <div class="acoes-card">
-        <input id="ramalInicio" type="number" placeholder="Ramal inicial">
-        <input id="ramalFim" type="number" placeholder="Ramal final">
-        <button class="btn-add" onclick="criarRangeRamais()">Criar range</button>
-      </div>
-      <div class="acoes-card">
-        <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
-        <button class="btn-import" onclick="acionarImportacao('ring')">📥 Importar</button>
-        <input type="file" id="importRamais" accept=".csv" hidden>
-      </div>
-      <div id="listaRings"></div>
-    </section>
-
-    <!-- ENTRADAS -->
-    <section class="card">
-      <h2>Números de Entrada</h2>
-      <div id="listaEntradas"></div>
-      <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
-    </section>
-
-    <!-- URAS -->
-    <section class="card">
-      <h2>URAs</h2>
-      <div id="listaURAs"></div>
-      <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
-    </section>
-
-    <!-- FILAS -->
-    <section class="card">
-      <h2>Filas</h2>
-      <div id="listaFilas"></div>
-      <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
-    </section>
-
-    <!-- GRUPO DE RING -->
-    <section class="card">
-      <h2>Grupo de Ring</h2>
-      <div id="listaGrupoRing"></div>
-      <button class="btn-add" onclick="adicionarCampo('grupo_ring')">+</button>
-    </section>
-
-    <!-- AGENTES -->
-    <section class="card">
-      <h2>Agentes</h2>
-      <div id="listaAgentes"></div>
-      <button class="btn-add" onclick="adicionarCampo('agente')">+</button>
-    </section>
-
-  </section>
-
-  <!-- ================= CHAT ================= -->
-  <section id="chat-area" style="display:none">
+<!-- ================= CHAT ================= -->
+<section id="chat-area">
 
   <section class="card">
     <h2>Configuração de Chat</h2>
 
     <!-- TIPO -->
     <div class="chat-section">
-  <h3>Tipo de Integração</h3>
+      <h3>Tipo de Integração</h3>
 
-  <div class="chat-grid">
-    <div class="chat-card" onclick="selecionarTipoChat(this,'api')">
-      <img src="./assets/meta.png" alt="API Oficial">
-      <h4>API Oficial</h4>
+      <div class="chat-grid">
+        <div class="chat-card" onclick="selecionarTipoChat(this,'api')">
+          <img src="./assets/APIS.png">
+          <h4>API Oficial</h4>
+        </div>
+
+        <div class="chat-card" onclick="selecionarTipoChat(this,'qr')">
+          <img src="./assets/qrcode.png">
+          <h4>QR Code</h4>
+        </div>
+      </div>
     </div>
 
-    <div class="chat-card" onclick="selecionarTipoChat(this,'qr')">
-      <img src="./assets/whatsapp.png" alt="QR Code">
-      <h4>QR Code</h4>
+    <!-- API OFICIAL -->
+    <div id="api-oficial" class="chat-section" style="display:none">
+      <h3>Fornecedor Oficial</h3>
+
+      <div class="chat-grid">
+        <div class="chat-card" onclick="selecionarApi(this,'meta')">
+          <img src="./assets/Meta.png">
+          <h4>Meta</h4>
+        </div>
+
+        <div class="chat-card" onclick="selecionarApi(this,'360')">
+          <img src="./assets/360.png">
+          <h4>360 Dialog</h4>
+        </div>
+
+        <div class="chat-card" onclick="selecionarApi(this,'gupshup')">
+          <img src="./assets/gupshup.png">
+          <h4>Gupshup</h4>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
-<!-- API OFICIAL -->
-<div id="api-oficial" class="chat-section" style="display:none">
-  <h3>Fornecedor Oficial</h3>
-
-  <div class="chat-grid">
-    <div class="chat-card" onclick="selecionarApi(this,'meta')">
-      <img src="./assets/meta.png">
-      <h4>Meta</h4>
-    </div>
-
-    <div class="chat-card" onclick="selecionarApi(this,'360')">
-      <img src="./assets/360.png">
-      <h4>360</h4>
-    </div>
-
-    <div class="chat-card" onclick="selecionarApi(this,'gupshup')">
-      <img src="./assets/gupshup.png">
-      <h4>Gupshup</h4>
-    </div>
-  </div>
-</div>
-
-<!-- QR CODE -->
-<div id="chat-qr" class="chat-section" style="display:none">
-  <h3>Número do WhatsApp</h3>
-  <input class="chat-input" placeholder="Ex: 5511999999999">
-</div>
 
     <!-- CANAIS -->
     <div id="chat-canais" class="chat-section" style="display:none">
       <h3>Canais Integrados</h3>
+
       <div class="chat-grid">
-        <div class="chat-card" onclick="toggleCanal('whatsapp')">
+        <div class="chat-card" onclick="toggleCanal(this)">
           <img src="./assets/whatsapp.png">
           <h4>WhatsApp</h4>
         </div>
 
-        <div class="chat-card" onclick="toggleCanal('instagram')">
+        <div class="chat-card" onclick="toggleCanal(this)">
           <img src="./assets/instagram.png">
           <h4>Instagram</h4>
         </div>
 
-        <div class="chat-card" onclick="toggleCanal('messenger')">
+        <div class="chat-card" onclick="toggleCanal(this)">
           <img src="./assets/messenger.png">
           <h4>Messenger</h4>
         </div>
 
-        <div class="chat-card" onclick="toggleCanal('telegram')">
+        <div class="chat-card" onclick="toggleCanal(this)">
           <img src="./assets/telegram.png">
           <h4>Telegram</h4>
         </div>
 
-        <div class="chat-card" onclick="toggleCanal('email')">
+        <div class="chat-card" onclick="toggleCanal(this)">
           <img src="./assets/email.png">
           <h4>E-mail</h4>
         </div>
       </div>
     </div>
 
-    <!-- QR CODE -->
+    <!-- QR -->
     <div id="chat-qr" class="chat-section" style="display:none">
       <h3>Número do WhatsApp</h3>
       <input class="chat-input" placeholder="Ex: 5511999999999">
@@ -196,22 +116,9 @@
   </section>
 </section>
 
-
-  <button class="btn-explorar" onclick="explorar()">Explorar</button>
-  <pre id="resultado"></pre>
-
 </main>
 
-<!-- TOAST -->
-<div id="toastGlobal" class="toast">
-  <span id="toastMessage"></span>
-  <button onclick="fecharToast()">×</button>
-</div>
-
-<script src="./app.js"></script>
 <script src="./intro.js"></script>
 <script src="./chat.js"></script>
 </body>
 </html>
-
-
