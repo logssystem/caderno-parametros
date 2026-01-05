@@ -324,13 +324,11 @@ select.campo-permissao {
 /* ===== AJUSTE FINO DAS IMAGENS DO CHAT ===== */
 
 .chat-card img {
-  height: 46px;
-  width: auto;
-  max-width: 120px;
+  height: 64px;        /* ⬅ aumentamos aqui (antes ~52px) */
+  max-width: 160px;    /* ⬅ permite logos mais largas */
   object-fit: contain;
-  margin-bottom: 14px;
-  filter: grayscale(10%);
-  transition: transform .25s ease, filter .25s ease;
+  margin-bottom: 16px;
+  transition: transform .25s ease;
 }
 
 /* efeito ao passar o mouse */
@@ -341,8 +339,7 @@ select.campo-permissao {
 
 /* quando selecionado */
 .chat-card.active img {
-  transform: scale(1.12);
-  filter: grayscale(0%);
+  transform: scale(1.18); /* antes ~1.12 */
 }
 
 .chat-card {
