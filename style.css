@@ -344,3 +344,12 @@ select.campo-permissao {
   transform: scale(1.12);
   filter: grayscale(0%);
 }
+
+.chat-card {
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
