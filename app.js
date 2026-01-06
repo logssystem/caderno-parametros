@@ -391,7 +391,8 @@ window.acionarImportacao = function (tipo) {
 };
 
 window.baixarTemplateUsuarios = function () {
-  const csv = "usuario,email,senha,permissao,descricao\n";
+  const csv = "usuario;email;senha;permissao;descricao\n";
+
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const link = document.createElement("a");
 
@@ -399,3 +400,4 @@ window.baixarTemplateUsuarios = function () {
   link.download = "template_usuarios_web.csv";
   link.click();
 };
+
