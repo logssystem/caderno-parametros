@@ -33,6 +33,7 @@ window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
   if (!container || container.children.length >= LIMITE) return;
   container.appendChild(criarCampo(tipo));
+  atualizarTodosDestinosURA();
 };
 
 /* ================= CRIAR CAMPO ================= */
@@ -48,10 +49,14 @@ function criarCampo(tipo) {
   nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
   nome.classList.add("campo-nome");
   nome.style.width = "100%";
+  nome.addEventListener("input", atualizarTodosDestinosURA);
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
-  btn.onclick = () => wrap.remove();
+  btn.onclick = () => {
+    wrap.remove();
+    atualizarTodosDestinosURA();
+  };
 
   linhaNome.append(nome, btn);
   wrap.append(linhaNome);
@@ -60,7 +65,6 @@ function criarCampo(tipo) {
   let senhaInput = null;
   let permissao = null;
   let regras = null;
-  let senhaOk = true;
 
   if (tipo === "usuario_web") {
     const linhaCred = document.createElement("div");
@@ -145,8 +149,8 @@ function criarCampo(tipo) {
 
   function validarSenha(input, regrasEl) {
     const v = input.value;
-    senhaOk = v.length >= 11 && /[A-Z]/.test(v) && /\d/.test(v) && /[^A-Za-z0-9]/.test(v);
-    regrasEl.innerHTML = senhaOk
+    const ok = v.length >= 11 && /[A-Z]/.test(v) && /\d/.test(v) && /[^A-Za-z0-9]/.test(v);
+    regrasEl.innerHTML = ok
       ? `<div class="regra-ok">Senha válida</div>`
       : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
   }
@@ -159,7 +163,7 @@ function criarCampo(tipo) {
   return wrap;
 }
 
-/* ================= OPÇÕES URA (DINÂMICAS) ================= */
+/* ================= OPÇÕES URA ================= */
 
 function criarOpcaoURA() {
   const wrap = document.createElement("div");
@@ -221,15 +225,22 @@ function atualizarDestinosURA(select) {
   select.add(new Option("Número externo", "numero"));
 }
 
+/* ========= ATUALIZA TODAS AS URAs ========= */
+
+function atualizarTodosDestinosURA() {
+  document.querySelectorAll(".opcao-ura select").forEach(select => {
+    const atual = select.value;
+    atualizarDestinosURA(select);
+    select.value = atual;
+  });
+}
+
 /* ================= REGRA DE TEMPO (PADRÃO BONITO) ================= */
 
 window.adicionarRegraTempo = function () {
   const container = document.getElementById("listaRegrasTempo");
   if (!container) return;
-
-  const regra = criarRegraTempo();
-  container.appendChild(regra);
-
+  container.appendChild(criarRegraTempo());
   atualizarTodosDestinosURA();
 };
 
@@ -244,36 +255,22 @@ function criarRegraTempo() {
   nome.addEventListener("input", atualizarTodosDestinosURA);
   wrap.appendChild(nome);
 
+  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+  const diasSelecionados = new Set();
+
   const diasBox = document.createElement("div");
   diasBox.style.display = "grid";
   diasBox.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
   diasBox.style.gap = "10px";
 
-  const diasSemana = [
-    "Domingo",
-    "Segunda",
-    "Terça",
-    "Quarta",
-    "Quinta",
-    "Sexta",
-    "Sábado"
-  ];
-
-  const diasSelecionados = new Set();
-
   diasSemana.forEach(dia => {
     const btn = document.createElement("button");
-    btn.type = "button";
     btn.textContent = dia;
     btn.className = "btn-dia";
-
     btn.onclick = () => {
       btn.classList.toggle("ativo");
-      btn.classList.contains("ativo")
-        ? diasSelecionados.add(dia)
-        : diasSelecionados.delete(dia);
+      btn.classList.contains("ativo") ? diasSelecionados.add(dia) : diasSelecionados.delete(dia);
     };
-
     diasBox.appendChild(btn);
   });
 
@@ -296,7 +293,6 @@ function criarRegraTempo() {
   const remover = document.createElement("button");
   remover.textContent = "✖ Remover regra";
   remover.style.marginTop = "12px";
-
   remover.onclick = () => {
     wrap.remove();
     atualizarTodosDestinosURA();
@@ -306,7 +302,7 @@ function criarRegraTempo() {
 
   wrap.getData = () => ({
     nome: nome.value,
-    dias: Array.from(diasSelecionados),
+    dias: [...diasSelecionados],
     hora_inicio: inicio.value,
     hora_fim: fim.value
   });
