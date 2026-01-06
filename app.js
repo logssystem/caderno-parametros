@@ -369,3 +369,33 @@ function criarRegraTempo() {
 
   return wrap;
 }
+
+window.acionarImportacao = function (tipo) {
+  const input = document.getElementById(
+    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
+  );
+
+  if (!input) return;
+
+  input.value = "";
+  input.click();
+
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => processarCSV(tipo, e.target.result);
+    reader.readAsText(file);
+  };
+};
+
+window.baixarTemplateUsuarios = function () {
+  const csv = "usuario,email,senha,permissao,descricao\n";
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+
+  link.href = URL.createObjectURL(blob);
+  link.download = "template_usuarios_web.csv";
+  link.click();
+};
