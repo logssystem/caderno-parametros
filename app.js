@@ -1,5 +1,3 @@
-faça todos os ajuste e me entregue pronto 
-
 console.log("APP.JS FINAL – ESTÁVEL");
 
 /* ================= CONFIG ================= */
