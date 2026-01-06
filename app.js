@@ -118,6 +118,34 @@ function criarCampo(tipo) {
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
+  /* ===== URA ===== */
+  if (tipo === "ura") {
+    const msg = document.createElement("textarea");
+    msg.placeholder = "Mensagem da URA (ex: Bem-vindo, digite 1 para vendas...)";
+    msg.style.marginTop = "12px";
+    wrap.append(msg);
+
+    const titulo = document.createElement("h4");
+    titulo.textContent = "Opções da URA";
+    titulo.style.marginTop = "12px";
+    wrap.append(titulo);
+
+    const listaOpcoes = document.createElement("div");
+    wrap.append(listaOpcoes);
+
+    const btnNova = document.createElement("button");
+    btnNova.textContent = "+ Nova opção";
+    btnNova.style.marginTop = "10px";
+    btnNova.onclick = () => listaOpcoes.appendChild(criarOpcaoURA());
+    wrap.append(btnNova);
+
+    wrap.getURA = () => ({
+      nome: nome.value,
+      mensagem: msg.value,
+      opcoes: [...listaOpcoes.querySelectorAll(".opcao-ura")].map(o => o.getData())
+    });
+  }
+
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
   desc.style.marginTop = "12px";
@@ -140,6 +168,42 @@ function criarCampo(tipo) {
   wrap.getEmail = () => emailInput?.value || "";
   wrap.getSenha = () => senhaInput?.value || "";
   wrap.getPermissao = () => permissao?.value || "";
+
+  return wrap;
+}
+
+/* ================= OPÇÕES URA ================= */
+
+function criarOpcaoURA() {
+  const wrap = document.createElement("div");
+  wrap.className = "opcao-ura";
+  wrap.style.display = "grid";
+  wrap.style.gridTemplateColumns = "80px 1fr 1fr auto";
+  wrap.style.gap = "8px";
+  wrap.style.marginTop = "8px";
+
+  const tecla = document.createElement("input");
+  tecla.placeholder = "Tecla";
+
+  const destino = document.createElement("select");
+  ["Fila", "URA", "Ramal", "Grupo", "Número", "Desligar"].forEach(v =>
+    destino.add(new Option(v, v))
+  );
+
+  const desc = document.createElement("input");
+  desc.placeholder = "Descrição";
+
+  const del = document.createElement("button");
+  del.textContent = "🗑";
+  del.onclick = () => wrap.remove();
+
+  wrap.append(tecla, destino, desc, del);
+
+  wrap.getData = () => ({
+    tecla: tecla.value,
+    destino: destino.value,
+    descricao: desc.value
+  });
 
   return wrap;
 }
@@ -180,23 +244,20 @@ function criarRegraTempo() {
 
   const nome = document.createElement("input");
   nome.placeholder = "Nome da regra (ex: Horário Comercial)";
-  nome.style.width = "100%";
   wrap.appendChild(nome);
+
+  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+  const diasSelecionados = new Set();
 
   const diasBox = document.createElement("div");
   diasBox.style.display = "grid";
   diasBox.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
   diasBox.style.gap = "8px";
-  diasBox.style.marginTop = "12px";
-
-  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
-  const diasSelecionados = new Set();
+  diasBox.style.marginTop = "10px";
 
   diasSemana.forEach(dia => {
     const btn = document.createElement("button");
-    btn.type = "button";
     btn.textContent = dia;
-    btn.className = "btn-dia";
     btn.onclick = () => {
       btn.classList.toggle("ativo");
       btn.classList.contains("ativo")
@@ -208,24 +269,12 @@ function criarRegraTempo() {
 
   wrap.appendChild(diasBox);
 
-  const horarios = document.createElement("div");
-  horarios.style.display = "flex";
-  horarios.style.gap = "12px";
-  horarios.style.marginTop = "12px";
-
   const inicio = document.createElement("input");
   inicio.type = "time";
   const fim = document.createElement("input");
   fim.type = "time";
 
-  horarios.append(inicio, fim);
-  wrap.appendChild(horarios);
-
-  const remover = document.createElement("button");
-  remover.textContent = "✖ Remover regra";
-  remover.style.marginTop = "12px";
-  remover.onclick = () => wrap.remove();
-  wrap.appendChild(remover);
+  wrap.append(inicio, fim);
 
   wrap.getData = () => ({
     nome: nome.value,
@@ -237,7 +286,7 @@ function criarRegraTempo() {
   return wrap;
 }
 
-/* ================= IMPORTAÇÃO CSV ================= */
+/* ================= CSV ================= */
 
 window.acionarImportacao = function (tipo) {
   const input = document.getElementById(
@@ -258,35 +307,6 @@ window.acionarImportacao = function (tipo) {
     reader.readAsText(file);
   };
 };
-
-function processarCSV(tipo, texto) {
-  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
-  if (linhas.length < 2) return;
-
-  const sep = linhas[0].includes(";") ? ";" : ",";
-  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
-  const container = document.getElementById(listas[tipo]);
-
-  linhas.forEach(l => {
-    const v = l.split(sep);
-    const d = {};
-    header.forEach((h, i) => d[h] = v[i] || "");
-
-    const campo = criarCampo(tipo);
-    campo.querySelector(".campo-nome").value = d.usuario || d.nome || "";
-
-    if (tipo === "usuario_web") {
-      campo.querySelector("input[type=email]").value = d.email || "";
-      campo.querySelector(".campo-senha").value = d.senha || "";
-    }
-
-    container.appendChild(campo);
-  });
-
-  mostrarToast("CSV importado com sucesso!");
-}
-
-/* ================= TEMPLATE CSV ================= */
 
 window.baixarTemplateUsuarios = function () {
   const csv = "usuario;email;senha;permissao;descricao\n";
@@ -323,6 +343,11 @@ window.explorar = function () {
   dados.regras_tempo = [];
   document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
     dados.regras_tempo.push(r.getData());
+  });
+
+  dados.uras = [];
+  document.querySelectorAll("#listaURAs .campo-descricao").forEach(c => {
+    if (c.getURA) dados.uras.push(c.getURA());
   });
 
   document.getElementById("resultado").textContent =
