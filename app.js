@@ -178,18 +178,23 @@ function criarRegraTempo() {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
+  /* NOME */
   const nome = document.createElement("input");
   nome.placeholder = "Nome da regra (ex: Horário Comercial)";
   nome.style.width = "100%";
   wrap.appendChild(nome);
 
+  /* DIAS */
   const diasBox = document.createElement("div");
   diasBox.style.display = "grid";
   diasBox.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
   diasBox.style.gap = "8px";
   diasBox.style.marginTop = "12px";
 
-  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+  const diasSemana = [
+    "Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"
+  ];
+
   const diasSelecionados = new Set();
 
   diasSemana.forEach(dia => {
@@ -197,17 +202,20 @@ function criarRegraTempo() {
     btn.type = "button";
     btn.textContent = dia;
     btn.className = "btn-dia";
+
     btn.onclick = () => {
       btn.classList.toggle("ativo");
       btn.classList.contains("ativo")
         ? diasSelecionados.add(dia)
         : diasSelecionados.delete(dia);
     };
+
     diasBox.appendChild(btn);
   });
 
   wrap.appendChild(diasBox);
 
+  /* HORÁRIOS */
   const horarios = document.createElement("div");
   horarios.style.display = "flex";
   horarios.style.gap = "12px";
@@ -215,18 +223,21 @@ function criarRegraTempo() {
 
   const inicio = document.createElement("input");
   inicio.type = "time";
+
   const fim = document.createElement("input");
   fim.type = "time";
 
   horarios.append(inicio, fim);
   wrap.appendChild(horarios);
 
+  /* REMOVER */
   const remover = document.createElement("button");
   remover.textContent = "✖ Remover regra";
   remover.style.marginTop = "12px";
   remover.onclick = () => wrap.remove();
   wrap.appendChild(remover);
 
+  /* EXPORTAÇÃO */
   wrap.getData = () => ({
     nome: nome.value,
     dias: Array.from(diasSelecionados),
@@ -236,6 +247,7 @@ function criarRegraTempo() {
 
   return wrap;
 }
+
 
 /* ================= IMPORTAÇÃO CSV ================= */
 
