@@ -66,6 +66,7 @@ function criarCampo(tipo) {
   let permissao = null;
   let regras = null;
 
+  /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
     const linhaCred = document.createElement("div");
     linhaCred.className = "linha-principal";
@@ -101,6 +102,7 @@ function criarCampo(tipo) {
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
+  /* ===== RAMAL ===== */
   if (tipo === "ring") {
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do ramal";
@@ -115,11 +117,20 @@ function criarCampo(tipo) {
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
+  /* ===== URA ===== */
   if (tipo === "ura") {
     const msg = document.createElement("textarea");
     msg.placeholder = "Mensagem da URA";
     msg.style.marginTop = "12px";
     wrap.append(msg);
+
+    const exemplo = document.createElement("div");
+    exemplo.textContent = "Ex: Bem-vindo à empresa ERA. Para suporte, digite 1. Para vendas, digite 2.";
+    exemplo.style.fontSize = "12px";
+    exemplo.style.opacity = "0.55";
+    exemplo.style.marginTop = "4px";
+    exemplo.style.fontStyle = "italic";
+    wrap.append(exemplo);
 
     const titulo = document.createElement("h4");
     titulo.textContent = "Opções da URA";
@@ -197,35 +208,21 @@ function criarOpcaoURA() {
   return wrap;
 }
 
+/* ========= DESTINOS ========= */
+
 function atualizarDestinosURA(select) {
   select.innerHTML = "";
   select.add(new Option("Selecione o destino", ""));
 
-  document.querySelectorAll("#listaFilas .campo-nome").forEach(f => {
-    if (f.value) select.add(new Option("Fila: " + f.value, "fila:" + f.value));
-  });
-
-  document.querySelectorAll("#listaRings .campo-nome").forEach(r => {
-    if (r.value) select.add(new Option("Ramal: " + r.value, "ramal:" + r.value));
-  });
-
-  document.querySelectorAll("#listaGrupoRing .campo-nome").forEach(g => {
-    if (g.value) select.add(new Option("Grupo: " + g.value, "grupo:" + g.value));
-  });
-
-  document.querySelectorAll("#listaURAs .campo-nome").forEach(u => {
-    if (u.value) select.add(new Option("URA: " + u.value, "ura:" + u.value));
-  });
-
-  document.querySelectorAll("#listaRegrasTempo .campo-descricao input").forEach(r => {
-    if (r.value) select.add(new Option("Regra de tempo: " + r.value, "tempo:" + r.value));
-  });
+  document.querySelectorAll("#listaFilas .campo-nome").forEach(f => f.value && select.add(new Option("Fila: " + f.value, "fila:" + f.value)));
+  document.querySelectorAll("#listaRings .campo-nome").forEach(r => r.value && select.add(new Option("Ramal: " + r.value, "ramal:" + r.value)));
+  document.querySelectorAll("#listaGrupoRing .campo-nome").forEach(g => g.value && select.add(new Option("Grupo: " + g.value, "grupo:" + g.value)));
+  document.querySelectorAll("#listaURAs .campo-nome").forEach(u => u.value && select.add(new Option("URA: " + u.value, "ura:" + u.value)));
+  document.querySelectorAll("#listaRegrasTempo .campo-descricao input").forEach(r => r.value && select.add(new Option("Regra de tempo: " + r.value, "tempo:" + r.value)));
 
   select.add(new Option("Desligar", "desligar"));
   select.add(new Option("Número externo", "numero"));
 }
-
-/* ========= ATUALIZA TODAS AS URAs ========= */
 
 function atualizarTodosDestinosURA() {
   document.querySelectorAll(".opcao-ura select").forEach(select => {
@@ -233,119 +230,4 @@ function atualizarTodosDestinosURA() {
     atualizarDestinosURA(select);
     select.value = atual;
   });
-}
-
-/* ================= REGRA DE TEMPO (PADRÃO BONITO) ================= */
-
-window.adicionarRegraTempo = function () {
-  const container = document.getElementById("listaRegrasTempo");
-  if (!container) return;
-  container.appendChild(criarRegraTempo());
-  atualizarTodosDestinosURA();
-};
-
-function criarRegraTempo() {
-  const wrap = document.createElement("div");
-  wrap.className = "campo-descricao";
-
-  const nome = document.createElement("input");
-  nome.placeholder = "Nome da regra (ex: Horário Comercial)";
-  nome.style.width = "100%";
-  nome.style.marginBottom = "12px";
-  nome.addEventListener("input", atualizarTodosDestinosURA);
-  wrap.appendChild(nome);
-
-  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
-  const diasSelecionados = new Set();
-
-  const diasBox = document.createElement("div");
-  diasBox.style.display = "grid";
-  diasBox.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
-  diasBox.style.gap = "10px";
-
-  diasSemana.forEach(dia => {
-    const btn = document.createElement("button");
-    btn.textContent = dia;
-    btn.className = "btn-dia";
-    btn.onclick = () => {
-      btn.classList.toggle("ativo");
-      btn.classList.contains("ativo") ? diasSelecionados.add(dia) : diasSelecionados.delete(dia);
-    };
-    diasBox.appendChild(btn);
-  });
-
-  wrap.appendChild(diasBox);
-
-  const horarios = document.createElement("div");
-  horarios.style.display = "flex";
-  horarios.style.gap = "12px";
-  horarios.style.marginTop = "12px";
-
-  const inicio = document.createElement("input");
-  inicio.type = "time";
-
-  const fim = document.createElement("input");
-  fim.type = "time";
-
-  horarios.append(inicio, fim);
-  wrap.appendChild(horarios);
-
-  const remover = document.createElement("button");
-  remover.textContent = "✖ Remover regra";
-  remover.style.marginTop = "12px";
-  remover.onclick = () => {
-    wrap.remove();
-    atualizarTodosDestinosURA();
-  };
-
-  wrap.appendChild(remover);
-
-  wrap.getData = () => ({
-    nome: nome.value,
-    dias: [...diasSelecionados],
-    hora_inicio: inicio.value,
-    hora_fim: fim.value
-  });
-
-  return wrap;
-}
-
-/* ================= EXPLORAR ================= */
-
-window.explorar = function () {
-  const dados = {};
-
-  dados.uras = [];
-  document.querySelectorAll("#listaURAs .campo-descricao").forEach(c => {
-    if (c.getURA) dados.uras.push(c.getURA());
-  });
-
-  dados.regras_tempo = [];
-  document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
-    dados.regras_tempo.push(r.getData());
-  });
-
-  document.getElementById("resultado").textContent =
-    JSON.stringify(dados, null, 2);
-
-  mostrarToast("Parâmetros gerados com sucesso!");
-};
-
-/* ================= TOAST ================= */
-
-function mostrarToast(msg, error = false) {
-  const t = document.getElementById("toastGlobal");
-  document.getElementById("toastMessage").textContent = msg;
-  t.className = "toast show" + (error ? " error" : "");
-  setTimeout(() => t.classList.remove("show"), 3000);
-}
-
-window.fecharToast = () =>
-  document.getElementById("toastGlobal").classList.remove("show");
-
-/* ================= TEMA ================= */
-
-const toggleTheme = document.getElementById("toggleTheme");
-if (toggleTheme) {
-  toggleTheme.onclick = () => document.body.classList.toggle("dark");
 }
