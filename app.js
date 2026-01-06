@@ -29,9 +29,14 @@ const PERMISSOES = [
 /* ================= ADICIONAR CAMPO ================= */
 
 window.adicionarCampo = function (tipo) {
-  if (!listas[tipo]) return mostrarToast(`Tipo inválido: ${tipo}`, true);
+  if (!listas[tipo]) {
+    mostrarToast(`Tipo inválido: ${tipo}`, true);
+    return;
+  }
+
   const container = document.getElementById(listas[tipo]);
   if (!container || container.children.length >= LIMITE) return;
+
   container.appendChild(criarCampo(tipo));
 };
 
@@ -62,6 +67,7 @@ function criarCampo(tipo) {
   let regras = null;
   let senhaOk = true;
 
+  /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
     const linhaCred = document.createElement("div");
     linhaCred.className = "linha-principal";
@@ -97,6 +103,7 @@ function criarCampo(tipo) {
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
+  /* ===== RAMAL ===== */
   if (tipo === "ring") {
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do ramal";
@@ -111,33 +118,6 @@ function criarCampo(tipo) {
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
-  if (tipo === "ura") {
-    const msg = document.createElement("textarea");
-    msg.placeholder = "Mensagem da URA";
-    msg.style.marginTop = "12px";
-    wrap.append(msg);
-
-    const titulo = document.createElement("h4");
-    titulo.textContent = "Opções da URA";
-    titulo.style.marginTop = "12px";
-    wrap.append(titulo);
-
-    const listaOpcoes = document.createElement("div");
-    wrap.append(listaOpcoes);
-
-    const btnNova = document.createElement("button");
-    btnNova.textContent = "+ Nova opção";
-    btnNova.style.marginTop = "10px";
-    btnNova.onclick = () => listaOpcoes.appendChild(criarOpcaoURA());
-    wrap.append(btnNova);
-
-    wrap.getURA = () => ({
-      nome: nome.value,
-      mensagem: msg.value,
-      opcoes: [...listaOpcoes.querySelectorAll(".opcao-ura")].map(o => o.getData())
-    });
-  }
-
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
   desc.style.marginTop = "12px";
@@ -145,7 +125,12 @@ function criarCampo(tipo) {
 
   function validarSenha(input, regrasEl) {
     const v = input.value;
-    senhaOk = v.length >= 11 && /[A-Z]/.test(v) && /\d/.test(v) && /[^A-Za-z0-9]/.test(v);
+    senhaOk =
+      v.length >= 11 &&
+      /[A-Z]/.test(v) &&
+      /\d/.test(v) &&
+      /[^A-Za-z0-9]/.test(v);
+
     regrasEl.innerHTML = senhaOk
       ? `<div class="regra-ok">Senha válida</div>`
       : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
@@ -159,67 +144,27 @@ function criarCampo(tipo) {
   return wrap;
 }
 
-/* ================= OPÇÕES URA (DINÂMICAS) ================= */
+/* ================= RANGE RAMAIS ================= */
 
-function criarOpcaoURA() {
-  const wrap = document.createElement("div");
-  wrap.className = "opcao-ura";
-  wrap.style.display = "grid";
-  wrap.style.gridTemplateColumns = "70px 1fr 1fr auto";
-  wrap.style.gap = "8px";
-  wrap.style.marginTop = "8px";
+window.criarRangeRamais = function () {
+  const ini = Number(document.getElementById("ramalInicio").value);
+  const fim = Number(document.getElementById("ramalFim").value);
+  const container = document.getElementById("listaRings");
 
-  const tecla = document.createElement("input");
-  tecla.placeholder = "Tecla";
+  if (!ini || !fim || fim < ini) {
+    mostrarToast("Range inválido", true);
+    return;
+  }
 
-  const destino = document.createElement("select");
-  atualizarDestinosURA(destino);
+  for (let i = ini; i <= fim; i++) {
+    if (container.children.length >= LIMITE) break;
+    const campo = criarCampo("ring");
+    campo.querySelector(".campo-nome").value = i;
+    container.appendChild(campo);
+  }
 
-  const desc = document.createElement("input");
-  desc.placeholder = "Descrição";
-
-  const del = document.createElement("button");
-  del.textContent = "🗑";
-  del.onclick = () => wrap.remove();
-
-  wrap.append(tecla, destino, desc, del);
-
-  wrap.getData = () => ({
-    tecla: tecla.value,
-    destino: destino.value,
-    descricao: desc.value
-  });
-
-  return wrap;
-}
-
-function atualizarDestinosURA(select) {
-  select.innerHTML = "";
-  select.add(new Option("Selecione o destino", ""));
-
-  document.querySelectorAll("#listaFilas .campo-nome").forEach(f => {
-    if (f.value) select.add(new Option("Fila: " + f.value, "fila:" + f.value));
-  });
-
-  document.querySelectorAll("#listaRings .campo-nome").forEach(r => {
-    if (r.value) select.add(new Option("Ramal: " + r.value, "ramal:" + r.value));
-  });
-
-  document.querySelectorAll("#listaGrupoRing .campo-nome").forEach(g => {
-    if (g.value) select.add(new Option("Grupo: " + g.value, "grupo:" + g.value));
-  });
-
-  document.querySelectorAll("#listaURAs .campo-nome").forEach(u => {
-    if (u.value) select.add(new Option("URA: " + u.value, "ura:" + u.value));
-  });
-
-  document.querySelectorAll("#listaRegrasTempo .campo-descricao input").forEach(r => {
-    if (r.value) select.add(new Option("Regra de tempo: " + r.value, "tempo:" + r.value));
-  });
-
-  select.add(new Option("Desligar", "desligar"));
-  select.add(new Option("Número externo", "numero"));
-}
+  mostrarToast("Range criado com sucesso!");
+};
 
 /* ================= REGRA DE TEMPO ================= */
 
@@ -234,55 +179,145 @@ function criarRegraTempo() {
   wrap.className = "campo-descricao";
 
   const nome = document.createElement("input");
-  nome.placeholder = "Nome da regra";
+  nome.placeholder = "Nome da regra (ex: Horário Comercial)";
+  nome.style.width = "100%";
   wrap.appendChild(nome);
-
-  const diasSemana = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
-  const diasSelecionados = new Set();
 
   const diasBox = document.createElement("div");
   diasBox.style.display = "grid";
-  diasBox.style.gridTemplateColumns = "repeat(auto-fit, minmax(80px, 1fr))";
-  diasBox.style.gap = "6px";
-  diasBox.style.marginTop = "10px";
+  diasBox.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
+  diasBox.style.gap = "8px";
+  diasBox.style.marginTop = "12px";
 
-  diasSemana.forEach(d => {
-    const b = document.createElement("button");
-    b.textContent = d;
-    b.onclick = () => {
-      b.classList.toggle("ativo");
-      b.classList.contains("ativo") ? diasSelecionados.add(d) : diasSelecionados.delete(d);
+  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+  const diasSelecionados = new Set();
+
+  diasSemana.forEach(dia => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = dia;
+    btn.className = "btn-dia";
+    btn.onclick = () => {
+      btn.classList.toggle("ativo");
+      btn.classList.contains("ativo")
+        ? diasSelecionados.add(dia)
+        : diasSelecionados.delete(dia);
     };
-    diasBox.appendChild(b);
+    diasBox.appendChild(btn);
   });
 
   wrap.appendChild(diasBox);
 
-  const ini = document.createElement("input");
-  ini.type = "time";
+  const horarios = document.createElement("div");
+  horarios.style.display = "flex";
+  horarios.style.gap = "12px";
+  horarios.style.marginTop = "12px";
+
+  const inicio = document.createElement("input");
+  inicio.type = "time";
   const fim = document.createElement("input");
   fim.type = "time";
 
-  wrap.append(ini, fim);
+  horarios.append(inicio, fim);
+  wrap.appendChild(horarios);
+
+  const remover = document.createElement("button");
+  remover.textContent = "✖ Remover regra";
+  remover.style.marginTop = "12px";
+  remover.onclick = () => wrap.remove();
+  wrap.appendChild(remover);
 
   wrap.getData = () => ({
     nome: nome.value,
-    dias: [...diasSelecionados],
-    hora_inicio: ini.value,
+    dias: Array.from(diasSelecionados),
+    hora_inicio: inicio.value,
     hora_fim: fim.value
   });
 
   return wrap;
 }
 
+/* ================= IMPORTAÇÃO CSV ================= */
+
+window.acionarImportacao = function (tipo) {
+  const input = document.getElementById(
+    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
+  );
+
+  if (!input) return;
+
+  input.value = "";
+  input.click();
+
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => processarCSV(tipo, e.target.result);
+    reader.readAsText(file);
+  };
+};
+
+function processarCSV(tipo, texto) {
+  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
+  if (linhas.length < 2) return;
+
+  const sep = linhas[0].includes(";") ? ";" : ",";
+  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
+  const container = document.getElementById(listas[tipo]);
+
+  linhas.forEach(l => {
+    const v = l.split(sep);
+    const d = {};
+    header.forEach((h, i) => d[h] = v[i] || "");
+
+    const campo = criarCampo(tipo);
+    campo.querySelector(".campo-nome").value = d.usuario || d.nome || "";
+
+    if (tipo === "usuario_web") {
+      campo.querySelector("input[type=email]").value = d.email || "";
+      campo.querySelector(".campo-senha").value = d.senha || "";
+    }
+
+    container.appendChild(campo);
+  });
+
+  mostrarToast("CSV importado com sucesso!");
+}
+
+/* ================= TEMPLATE CSV ================= */
+
+window.baixarTemplateUsuarios = function () {
+  const csv = "usuario;email;senha;permissao;descricao\n";
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "template_usuarios_web.csv";
+  link.click();
+};
+
 /* ================= EXPLORAR ================= */
 
 window.explorar = function () {
   const dados = {};
 
-  dados.uras = [];
-  document.querySelectorAll("#listaURAs .campo-descricao").forEach(c => {
-    if (c.getURA) dados.uras.push(c.getURA());
+  dados.usuarios_web = [];
+  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(c => {
+    dados.usuarios_web.push({
+      nome: c.getNome(),
+      email: c.getEmail(),
+      senha: c.getSenha(),
+      permissao: c.getPermissao()
+    });
+  });
+
+  dados.ramais = [];
+  document.querySelectorAll("#listaRings .campo-descricao").forEach(c => {
+    dados.ramais.push({
+      ramal: c.getNome(),
+      senha: c.getSenha()
+    });
   });
 
   dados.regras_tempo = [];
