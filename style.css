@@ -396,7 +396,7 @@ window.toggleCanal = function (el) {
   border-radius: 10px;
   border: 2px solid var(--border);
   background: transparent;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
 }
 
@@ -404,4 +404,21 @@ window.toggleCanal = function (el) {
   background: #2563eb;
   color: #fff;
   border-color: #2563eb;
+}
+
+/* ===== REGRAS DE TEMPO ===== */
+
+.btn-dia {
+  padding: 10px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: transparent;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btn-dia.ativo {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
 }
