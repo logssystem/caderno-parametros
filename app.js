@@ -26,18 +26,6 @@ const PERMISSOES = [
   "Super Administrador"
 ];
 
-const MAPA_PERMISSOES = {
-  pabx: PERMISSOES[0],
-  agente: PERMISSOES[1],
-  supervisor: PERMISSOES[2],
-  crm: PERMISSOES[3],
-  crm_owner: PERMISSOES[4],
-  omni: PERMISSOES[5],
-  agente_omni: PERMISSOES[6],
-  super_omni: PERMISSOES[7],
-  super_admin: PERMISSOES[8]
-};
-
 /* ================= ADICIONAR CAMPO ================= */
 
 window.adicionarCampo = function (tipo) {
@@ -79,6 +67,7 @@ function criarCampo(tipo) {
   let regras = null;
   let senhaOk = true;
 
+  /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
     const linhaCred = document.createElement("div");
     linhaCred.className = "linha-principal";
@@ -97,7 +86,6 @@ function criarCampo(tipo) {
     wrap.append(linhaCred);
 
     permissao = document.createElement("select");
-    permissao.classList.add("campo-permissao");
     permissao.style.marginTop = "12px";
 
     const opt0 = new Option("Selecione a permissão", "");
@@ -109,12 +97,13 @@ function criarCampo(tipo) {
     wrap.append(permissao);
 
     regras = document.createElement("div");
-    regras.style.marginTop = "10px";
+    regras.style.marginTop = "8px";
     wrap.append(regras);
 
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
+  /* ===== RAMAL ===== */
   if (tipo === "ring") {
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do ramal";
@@ -191,38 +180,52 @@ function criarRegraTempo() {
 
   const nome = document.createElement("input");
   nome.placeholder = "Nome da regra (ex: Horário Comercial)";
+  nome.style.width = "100%";
   wrap.appendChild(nome);
-
-  const dias = [
-    "Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"
-  ];
-  const diasSelecionados = new Set();
 
   const diasBox = document.createElement("div");
   diasBox.style.display = "grid";
-  diasBox.style.gridTemplateColumns = "repeat(auto-fit,minmax(120px,1fr))";
+  diasBox.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
   diasBox.style.gap = "8px";
+  diasBox.style.marginTop = "12px";
 
-  dias.forEach(d => {
-    const b = document.createElement("button");
-    b.textContent = d;
-    b.onclick = () => {
-      b.classList.toggle("ativo");
-      b.classList.contains("ativo")
-        ? diasSelecionados.add(d)
-        : diasSelecionados.delete(d);
+  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+  const diasSelecionados = new Set();
+
+  diasSemana.forEach(dia => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = dia;
+    btn.className = "btn-dia";
+    btn.onclick = () => {
+      btn.classList.toggle("ativo");
+      btn.classList.contains("ativo")
+        ? diasSelecionados.add(dia)
+        : diasSelecionados.delete(dia);
     };
-    diasBox.appendChild(b);
+    diasBox.appendChild(btn);
   });
 
   wrap.appendChild(diasBox);
+
+  const horarios = document.createElement("div");
+  horarios.style.display = "flex";
+  horarios.style.gap = "12px";
+  horarios.style.marginTop = "12px";
 
   const inicio = document.createElement("input");
   inicio.type = "time";
   const fim = document.createElement("input");
   fim.type = "time";
 
-  wrap.append(inicio, fim);
+  horarios.append(inicio, fim);
+  wrap.appendChild(horarios);
+
+  const remover = document.createElement("button");
+  remover.textContent = "✖ Remover regra";
+  remover.style.marginTop = "12px";
+  remover.onclick = () => wrap.remove();
+  wrap.appendChild(remover);
 
   wrap.getData = () => ({
     nome: nome.value,
@@ -233,6 +236,66 @@ function criarRegraTempo() {
 
   return wrap;
 }
+
+/* ================= IMPORTAÇÃO CSV ================= */
+
+window.acionarImportacao = function (tipo) {
+  const input = document.getElementById(
+    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
+  );
+
+  if (!input) return;
+
+  input.value = "";
+  input.click();
+
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => processarCSV(tipo, e.target.result);
+    reader.readAsText(file);
+  };
+};
+
+function processarCSV(tipo, texto) {
+  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
+  if (linhas.length < 2) return;
+
+  const sep = linhas[0].includes(";") ? ";" : ",";
+  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
+  const container = document.getElementById(listas[tipo]);
+
+  linhas.forEach(l => {
+    const v = l.split(sep);
+    const d = {};
+    header.forEach((h, i) => d[h] = v[i] || "");
+
+    const campo = criarCampo(tipo);
+    campo.querySelector(".campo-nome").value = d.usuario || d.nome || "";
+
+    if (tipo === "usuario_web") {
+      campo.querySelector("input[type=email]").value = d.email || "";
+      campo.querySelector(".campo-senha").value = d.senha || "";
+    }
+
+    container.appendChild(campo);
+  });
+
+  mostrarToast("CSV importado com sucesso!");
+}
+
+/* ================= TEMPLATE CSV ================= */
+
+window.baixarTemplateUsuarios = function () {
+  const csv = "usuario;email;senha;permissao;descricao\n";
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "template_usuarios_web.csv";
+  link.click();
+};
 
 /* ================= EXPLORAR ================= */
 
@@ -285,119 +348,4 @@ window.fecharToast = () =>
 const toggleTheme = document.getElementById("toggleTheme");
 if (toggleTheme) {
   toggleTheme.onclick = () => document.body.classList.toggle("dark");
-};
-
-/* ================= REGRA DE TEMPO ================= */
-
-window.adicionarRegraTempo = function () {
-  const container = document.getElementById("listaRegrasTempo");
-  if (!container) return;
-
-  container.appendChild(criarRegraTempo());
-};
-
-function criarRegraTempo() {
-  const wrap = document.createElement("div");
-  wrap.className = "campo-descricao";
-
-  /* NOME */
-  const nome = document.createElement("input");
-  nome.placeholder = "Nome da regra (ex: Horário Comercial)";
-  nome.style.width = "100%";
-  wrap.appendChild(nome);
-
-  /* DIAS */
-  const diasBox = document.createElement("div");
-  diasBox.style.display = "grid";
-  diasBox.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
-  diasBox.style.gap = "8px";
-  diasBox.style.marginTop = "12px";
-
-  const diasSemana = [
-    "Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"
-  ];
-
-  const diasSelecionados = new Set();
-
-  diasSemana.forEach(dia => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = dia;
-    btn.className = "btn-dia";
-
-    btn.onclick = () => {
-      btn.classList.toggle("ativo");
-      btn.classList.contains("ativo")
-        ? diasSelecionados.add(dia)
-        : diasSelecionados.delete(dia);
-    };
-
-    diasBox.appendChild(btn);
-  });
-
-  wrap.appendChild(diasBox);
-
-  /* HORÁRIOS */
-  const horarios = document.createElement("div");
-  horarios.style.display = "flex";
-  horarios.style.gap = "12px";
-  horarios.style.marginTop = "12px";
-
-  const inicio = document.createElement("input");
-  inicio.type = "time";
-
-  const fim = document.createElement("input");
-  fim.type = "time";
-
-  horarios.append(inicio, fim);
-  wrap.appendChild(horarios);
-
-  /* REMOVER */
-  const remover = document.createElement("button");
-  remover.textContent = "✖ Remover regra";
-  remover.style.marginTop = "12px";
-  remover.onclick = () => wrap.remove();
-  wrap.appendChild(remover);
-
-  /* EXPORTAÇÃO */
-  wrap.getData = () => ({
-    nome: nome.value,
-    dias: Array.from(diasSelecionados),
-    hora_inicio: inicio.value,
-    hora_fim: fim.value
-  });
-
-  return wrap;
 }
-
-window.acionarImportacao = function (tipo) {
-  const input = document.getElementById(
-    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
-  );
-
-  if (!input) return;
-
-  input.value = "";
-  input.click();
-
-  input.onchange = () => {
-    const file = input.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = e => processarCSV(tipo, e.target.result);
-    reader.readAsText(file);
-  };
-};
-
-window.baixarTemplateUsuarios = function () {
-  const csv = "usuario;email;senha;permissao;descricao\n";
-
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-
-  link.href = URL.createObjectURL(blob);
-  link.download = "template_usuarios_web.csv";
-  link.click();
-};
-
