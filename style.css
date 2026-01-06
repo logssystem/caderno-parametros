@@ -422,3 +422,86 @@ window.toggleCanal = function (el) {
   border-color: var(--accent);
   color: #000;
 }
+
+    /* ================= DARK MODE FIX ================= */
+
+body.dark {
+  --bg: #050b18;
+  --text: #e5e7eb;
+  --header-bg: #020617;
+  --card-bg: #0b1220;
+  --border: #1e293b;
+  --field-border: #334155;
+}
+
+/* textos gerais */
+body.dark,
+body.dark p,
+body.dark span,
+body.dark label,
+body.dark h1,
+body.dark h2,
+body.dark h3,
+body.dark h4 {
+  color: #e5e7eb;
+}
+
+/* títulos dos cards */
+body.dark .card h2,
+body.dark .card h3 {
+  color: #f8fafc;
+}
+
+/* inputs */
+body.dark input,
+body.dark textarea,
+body.dark select {
+  background: #020617;
+  color: #f1f5f9;
+  border-color: #334155;
+}
+
+/* placeholder */
+body.dark input::placeholder,
+body.dark textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* cards */
+body.dark .card {
+  background: linear-gradient(180deg, #0b1220, #020617);
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+}
+
+/* botões padrão */
+body.dark .btn-add,
+body.dark .btn-import,
+body.dark .btn-dia,
+body.dark .btn-voltar-intro {
+  color: #e5e7eb;
+  border-color: #334155;
+}
+
+/* botões hover */
+body.dark .btn-add:hover,
+body.dark .btn-import:hover,
+body.dark .btn-dia:hover {
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+/* chat cards */
+body.dark .chat-card {
+  background: #020617;
+  border-color: #1e293b;
+}
+
+body.dark .chat-card h4 {
+  color: #f1f5f9;
+}
+
+/* regra ativa */
+body.dark .chat-card.active {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56,189,248,.35);
+}
