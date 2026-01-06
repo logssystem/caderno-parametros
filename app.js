@@ -29,14 +29,9 @@ const PERMISSOES = [
 /* ================= ADICIONAR CAMPO ================= */
 
 window.adicionarCampo = function (tipo) {
-  if (!listas[tipo]) {
-    mostrarToast(`Tipo inválido: ${tipo}`, true);
-    return;
-  }
-
+  if (!listas[tipo]) return mostrarToast(`Tipo inválido: ${tipo}`, true);
   const container = document.getElementById(listas[tipo]);
   if (!container || container.children.length >= LIMITE) return;
-
   container.appendChild(criarCampo(tipo));
 };
 
@@ -67,7 +62,6 @@ function criarCampo(tipo) {
   let regras = null;
   let senhaOk = true;
 
-  /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
     const linhaCred = document.createElement("div");
     linhaCred.className = "linha-principal";
@@ -103,7 +97,6 @@ function criarCampo(tipo) {
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
-  /* ===== RAMAL ===== */
   if (tipo === "ring") {
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do ramal";
@@ -118,10 +111,9 @@ function criarCampo(tipo) {
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
-  /* ===== URA ===== */
   if (tipo === "ura") {
     const msg = document.createElement("textarea");
-    msg.placeholder = "Mensagem da URA (ex: Bem-vindo, digite 1 para vendas...)";
+    msg.placeholder = "Mensagem da URA";
     msg.style.marginTop = "12px";
     wrap.append(msg);
 
@@ -153,12 +145,7 @@ function criarCampo(tipo) {
 
   function validarSenha(input, regrasEl) {
     const v = input.value;
-    senhaOk =
-      v.length >= 11 &&
-      /[A-Z]/.test(v) &&
-      /\d/.test(v) &&
-      /[^A-Za-z0-9]/.test(v);
-
+    senhaOk = v.length >= 11 && /[A-Z]/.test(v) && /\d/.test(v) && /[^A-Za-z0-9]/.test(v);
     regrasEl.innerHTML = senhaOk
       ? `<div class="regra-ok">Senha válida</div>`
       : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
@@ -172,13 +159,13 @@ function criarCampo(tipo) {
   return wrap;
 }
 
-/* ================= OPÇÕES URA ================= */
+/* ================= OPÇÕES URA (DINÂMICAS) ================= */
 
 function criarOpcaoURA() {
   const wrap = document.createElement("div");
   wrap.className = "opcao-ura";
   wrap.style.display = "grid";
-  wrap.style.gridTemplateColumns = "80px 1fr 1fr auto";
+  wrap.style.gridTemplateColumns = "70px 1fr 1fr auto";
   wrap.style.gap = "8px";
   wrap.style.marginTop = "8px";
 
@@ -186,9 +173,7 @@ function criarOpcaoURA() {
   tecla.placeholder = "Tecla";
 
   const destino = document.createElement("select");
-  ["Fila", "URA", "Ramal", "Grupo", "Número", "Desligar"].forEach(v =>
-    destino.add(new Option(v, v))
-  );
+  atualizarDestinosURA(destino);
 
   const desc = document.createElement("input");
   desc.placeholder = "Descrição";
@@ -208,27 +193,33 @@ function criarOpcaoURA() {
   return wrap;
 }
 
-/* ================= RANGE RAMAIS ================= */
+function atualizarDestinosURA(select) {
+  select.innerHTML = "";
+  select.add(new Option("Selecione o destino", ""));
 
-window.criarRangeRamais = function () {
-  const ini = Number(document.getElementById("ramalInicio").value);
-  const fim = Number(document.getElementById("ramalFim").value);
-  const container = document.getElementById("listaRings");
+  document.querySelectorAll("#listaFilas .campo-nome").forEach(f => {
+    if (f.value) select.add(new Option("Fila: " + f.value, "fila:" + f.value));
+  });
 
-  if (!ini || !fim || fim < ini) {
-    mostrarToast("Range inválido", true);
-    return;
-  }
+  document.querySelectorAll("#listaRings .campo-nome").forEach(r => {
+    if (r.value) select.add(new Option("Ramal: " + r.value, "ramal:" + r.value));
+  });
 
-  for (let i = ini; i <= fim; i++) {
-    if (container.children.length >= LIMITE) break;
-    const campo = criarCampo("ring");
-    campo.querySelector(".campo-nome").value = i;
-    container.appendChild(campo);
-  }
+  document.querySelectorAll("#listaGrupoRing .campo-nome").forEach(g => {
+    if (g.value) select.add(new Option("Grupo: " + g.value, "grupo:" + g.value));
+  });
 
-  mostrarToast("Range criado com sucesso!");
-};
+  document.querySelectorAll("#listaURAs .campo-nome").forEach(u => {
+    if (u.value) select.add(new Option("URA: " + u.value, "ura:" + u.value));
+  });
+
+  document.querySelectorAll("#listaRegrasTempo .campo-descricao input").forEach(r => {
+    if (r.value) select.add(new Option("Regra de tempo: " + r.value, "tempo:" + r.value));
+  });
+
+  select.add(new Option("Desligar", "desligar"));
+  select.add(new Option("Número externo", "numero"));
+}
 
 /* ================= REGRA DE TEMPO ================= */
 
@@ -243,111 +234,60 @@ function criarRegraTempo() {
   wrap.className = "campo-descricao";
 
   const nome = document.createElement("input");
-  nome.placeholder = "Nome da regra (ex: Horário Comercial)";
+  nome.placeholder = "Nome da regra";
   wrap.appendChild(nome);
 
-  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+  const diasSemana = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
   const diasSelecionados = new Set();
 
   const diasBox = document.createElement("div");
   diasBox.style.display = "grid";
-  diasBox.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
-  diasBox.style.gap = "8px";
+  diasBox.style.gridTemplateColumns = "repeat(auto-fit, minmax(80px, 1fr))";
+  diasBox.style.gap = "6px";
   diasBox.style.marginTop = "10px";
 
-  diasSemana.forEach(dia => {
-    const btn = document.createElement("button");
-    btn.textContent = dia;
-    btn.onclick = () => {
-      btn.classList.toggle("ativo");
-      btn.classList.contains("ativo")
-        ? diasSelecionados.add(dia)
-        : diasSelecionados.delete(dia);
+  diasSemana.forEach(d => {
+    const b = document.createElement("button");
+    b.textContent = d;
+    b.onclick = () => {
+      b.classList.toggle("ativo");
+      b.classList.contains("ativo") ? diasSelecionados.add(d) : diasSelecionados.delete(d);
     };
-    diasBox.appendChild(btn);
+    diasBox.appendChild(b);
   });
 
   wrap.appendChild(diasBox);
 
-  const inicio = document.createElement("input");
-  inicio.type = "time";
+  const ini = document.createElement("input");
+  ini.type = "time";
   const fim = document.createElement("input");
   fim.type = "time";
 
-  wrap.append(inicio, fim);
+  wrap.append(ini, fim);
 
   wrap.getData = () => ({
     nome: nome.value,
-    dias: Array.from(diasSelecionados),
-    hora_inicio: inicio.value,
+    dias: [...diasSelecionados],
+    hora_inicio: ini.value,
     hora_fim: fim.value
   });
 
   return wrap;
 }
 
-/* ================= CSV ================= */
-
-window.acionarImportacao = function (tipo) {
-  const input = document.getElementById(
-    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
-  );
-
-  if (!input) return;
-
-  input.value = "";
-  input.click();
-
-  input.onchange = () => {
-    const file = input.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = e => processarCSV(tipo, e.target.result);
-    reader.readAsText(file);
-  };
-};
-
-window.baixarTemplateUsuarios = function () {
-  const csv = "usuario;email;senha;permissao;descricao\n";
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "template_usuarios_web.csv";
-  link.click();
-};
-
 /* ================= EXPLORAR ================= */
 
 window.explorar = function () {
   const dados = {};
 
-  dados.usuarios_web = [];
-  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(c => {
-    dados.usuarios_web.push({
-      nome: c.getNome(),
-      email: c.getEmail(),
-      senha: c.getSenha(),
-      permissao: c.getPermissao()
-    });
-  });
-
-  dados.ramais = [];
-  document.querySelectorAll("#listaRings .campo-descricao").forEach(c => {
-    dados.ramais.push({
-      ramal: c.getNome(),
-      senha: c.getSenha()
-    });
+  dados.uras = [];
+  document.querySelectorAll("#listaURAs .campo-descricao").forEach(c => {
+    if (c.getURA) dados.uras.push(c.getURA());
   });
 
   dados.regras_tempo = [];
   document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
     dados.regras_tempo.push(r.getData());
-  });
-
-  dados.uras = [];
-  document.querySelectorAll("#listaURAs .campo-descricao").forEach(c => {
-    if (c.getURA) dados.uras.push(c.getURA());
   });
 
   document.getElementById("resultado").textContent =
