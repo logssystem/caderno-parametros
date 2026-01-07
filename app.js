@@ -231,3 +231,85 @@ function atualizarTodosDestinosURA() {
     select.value = atual;
   });
 }
+
+/* ================= REGRA DE TEMPO (PADRÃO BONITO) ================= */
+
+window.adicionarRegraTempo = function () {
+  const container = document.getElementById("listaRegrasTempo");
+  if (!container) return;
+
+  container.appendChild(criarRegraTempo());
+  atualizarTodosDestinosURA();
+};
+
+function criarRegraTempo() {
+  const wrap = document.createElement("div");
+  wrap.className = "campo-descricao";
+
+  const nome = document.createElement("input");
+  nome.placeholder = "Nome da regra (ex: Horário Comercial)";
+  nome.style.width = "100%";
+  nome.style.marginBottom = "12px";
+  nome.addEventListener("input", atualizarTodosDestinosURA);
+  wrap.appendChild(nome);
+
+  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+  const diasSelecionados = new Set();
+
+  const diasBox = document.createElement("div");
+  diasBox.style.display = "grid";
+  diasBox.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
+  diasBox.style.gap = "10px";
+
+  diasSemana.forEach(dia => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = dia;
+    btn.className = "btn-dia";
+
+    btn.onclick = () => {
+      btn.classList.toggle("ativo");
+      btn.classList.contains("ativo")
+        ? diasSelecionados.add(dia)
+        : diasSelecionados.delete(dia);
+    };
+
+    diasBox.appendChild(btn);
+  });
+
+  wrap.appendChild(diasBox);
+
+  const horarios = document.createElement("div");
+  horarios.style.display = "flex";
+  horarios.style.gap = "12px";
+  horarios.style.marginTop = "12px";
+
+  const inicio = document.createElement("input");
+  inicio.type = "time";
+
+  const fim = document.createElement("input");
+  fim.type = "time";
+
+  horarios.append(inicio, fim);
+  wrap.appendChild(horarios);
+
+  const remover = document.createElement("button");
+  remover.textContent = "✖ Remover regra";
+  remover.style.marginTop = "12px";
+
+  remover.onclick = () => {
+    wrap.remove();
+    atualizarTodosDestinosURA();
+  };
+
+  wrap.appendChild(remover);
+
+  wrap.getData = () => ({
+    nome: nome.value,
+    dias: [...diasSelecionados],
+    hora_inicio: inicio.value,
+    hora_fim: fim.value
+  });
+
+  return wrap;
+}
