@@ -1,7 +1,7 @@
 const chatState = {
   tipo: null,
   api: null,
-  conta: null, // 👈 NOVO (cliente | era)
+  conta: null,
   canais: []
 };
 
@@ -11,43 +11,37 @@ function limparAtivos(selector) {
   );
 }
 
-/* ========== TIPO DE CHAT (API / QR) ========== */
-
+/* ========== TIPO DE CHAT ========== */
 window.selecionarTipoChat = function (el, tipo) {
   chatState.tipo = tipo;
 
   limparAtivos(".chat-section:first-of-type .chat-card");
   el.classList.add("active");
 
-  document.getElementById("api-oficial").style.display =
-    tipo === "api" ? "block" : "none";
+  document.getElementById("api-oficial").style.display = tipo === "api" ? "block" : "none";
+  document.getElementById("chat-canais").style.display = tipo === "api" ? "block" : "none";
+  document.getElementById("chat-qr").style.display = tipo === "qr" ? "block" : "none";
 
-  document.getElementById("chat-canais").style.display =
-    tipo === "api" ? "block" : "none";
-
-  document.getElementById("chat-qr").style.display =
-    tipo === "qr" ? "block" : "none";
-
-  // 👇 mostra/esconde bloco de conta
   const blocoConta = document.getElementById("bloco-conta-api");
-  if (blocoConta) {
-    blocoConta.style.display = tipo === "api" ? "block" : "none";
-  }
+  if (blocoConta) blocoConta.style.display = tipo === "api" ? "block" : "none";
 
+  chatState.api = null;
   chatState.conta = null;
+  chatState.canais = [];
+
+  limparAtivos("#api-oficial .chat-card");
   limparAtivos("#bloco-conta-api .chat-card");
+  limparAtivos("#chat-canais .chat-card");
 };
 
-/* ========== FORNECEDOR API ========== */
-
+/* ========== API ========== */
 window.selecionarApi = function (el, api) {
   chatState.api = api;
   limparAtivos("#api-oficial .chat-card");
   el.classList.add("active");
 };
 
-/* ========== CONTA DA API ========== */
-
+/* ========== CONTA ========== */
 window.selecionarContaApi = function (el, conta) {
   chatState.conta = conta;
   limparAtivos("#bloco-conta-api .chat-card");
@@ -55,11 +49,11 @@ window.selecionarContaApi = function (el, conta) {
 };
 
 /* ========== CANAIS ========== */
-
 window.toggleCanal = function (el) {
   el.classList.toggle("active");
-
   const canal = el.dataset.canal;
+
+  if (!canal) return;
 
   if (el.classList.contains("active")) {
     if (!chatState.canais.includes(canal)) {
