@@ -424,3 +424,44 @@ if (toggleTheme) {
     document.body.classList.add("dark");
   }
 }
+
+/* ================= EXPORTAÇÃO JSON ================= */
+
+window.exportarJSON = function () {
+  const dados = {};
+
+  for (const tipo in listas) {
+    const container = document.getElementById(listas[tipo]);
+    if (!container) continue;
+
+    dados[tipo] = [...container.children].map(c => ({
+      nome: c.getNome?.() || "",
+      email: c.getEmail?.() || "",
+      senha: c.getSenha?.() || "",
+      permissao: c.getPermissao?.() || "",
+      descricao: c.querySelector("textarea")?.value || ""
+    }));
+  }
+
+  // URA completa
+  dados.ura = [...document.querySelectorAll("#listaURAs .campo-descricao")]
+    .map(c => c.getURA ? c.getURA() : null)
+    .filter(Boolean);
+
+  // Regras de tempo
+  dados.regras_tempo = [...document.querySelectorAll("#listaRegrasTempo .campo-descricao")]
+    .map(r => r.getData());
+
+  // CHAT
+  if (window.chatState) {
+    dados.chat = chatState;
+  }
+
+  const blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "caderno_parametros.json";
+  link.click();
+
+  mostrarToast("JSON exportado com sucesso!");
+};
