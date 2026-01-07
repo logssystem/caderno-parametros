@@ -128,7 +128,6 @@ function criarCampo(tipo) {
     exemplo.textContent = "Ex: Bem-vindo à empresa ERA. Para suporte, digite 1. Para vendas, digite 2.";
     exemplo.style.fontSize = "12px";
     exemplo.style.opacity = "0.55";
-    exemplo.style.marginTop = "4px";
     exemplo.style.fontStyle = "italic";
     wrap.append(exemplo);
 
@@ -142,7 +141,6 @@ function criarCampo(tipo) {
 
     const btnNova = document.createElement("button");
     btnNova.textContent = "+ Nova opção";
-    btnNova.style.marginTop = "10px";
     btnNova.onclick = () => listaOpcoes.appendChild(criarOpcaoURA());
     wrap.append(btnNova);
 
@@ -155,7 +153,6 @@ function criarCampo(tipo) {
 
   const desc = document.createElement("textarea");
   desc.placeholder = "Descrição (opcional)";
-  desc.style.marginTop = "12px";
   wrap.append(desc);
 
   function validarSenha(input, regrasEl) {
@@ -182,7 +179,6 @@ function criarOpcaoURA() {
   wrap.style.display = "grid";
   wrap.style.gridTemplateColumns = "70px 1fr 1fr auto";
   wrap.style.gap = "8px";
-  wrap.style.marginTop = "8px";
 
   const tecla = document.createElement("input");
   tecla.placeholder = "Tecla";
@@ -208,7 +204,7 @@ function criarOpcaoURA() {
   return wrap;
 }
 
-/* ========= DESTINOS ========= */
+/* ================= DESTINOS ================= */
 
 function atualizarDestinosURA(select) {
   select.innerHTML = "";
@@ -218,7 +214,7 @@ function atualizarDestinosURA(select) {
   document.querySelectorAll("#listaRings .campo-nome").forEach(r => r.value && select.add(new Option("Ramal: " + r.value, "ramal:" + r.value)));
   document.querySelectorAll("#listaGrupoRing .campo-nome").forEach(g => g.value && select.add(new Option("Grupo: " + g.value, "grupo:" + g.value)));
   document.querySelectorAll("#listaURAs .campo-nome").forEach(u => u.value && select.add(new Option("URA: " + u.value, "ura:" + u.value)));
-  document.querySelectorAll("#listaRegrasTempo .campo-descricao input").forEach(r => r.value && select.add(new Option("Regra de tempo: " + r.value, "tempo:" + r.value)));
+  document.querySelectorAll("#listaRegrasTempo .campo-descricao input").forEach(r => r.value && select.add(new Option("Regra: " + r.value, "tempo:" + r.value)));
 
   select.add(new Option("Desligar", "desligar"));
   select.add(new Option("Número externo", "numero"));
@@ -232,183 +228,68 @@ function atualizarTodosDestinosURA() {
   });
 }
 
-/* ================= REGRA DE TEMPO (PADRÃO BONITO) ================= */
-
-window.adicionarRegraTempo = function () {
-  const container = document.getElementById("listaRegrasTempo");
-  if (!container) return;
-
-  container.appendChild(criarRegraTempo());
-  atualizarTodosDestinosURA();
-};
-
-function criarRegraTempo() {
-  const wrap = document.createElement("div");
-  wrap.className = "campo-descricao";
-
-  const nome = document.createElement("input");
-  nome.placeholder = "Nome da regra (ex: Horário Comercial)";
-  nome.style.width = "100%";
-  nome.style.marginBottom = "12px";
-  nome.addEventListener("input", atualizarTodosDestinosURA);
-  wrap.appendChild(nome);
-
-  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
-  const diasSelecionados = new Set();
-
-  const diasBox = document.createElement("div");
-  diasBox.style.display = "grid";
-  diasBox.style.gridTemplateColumns = "repeat(auto-fit, minmax(120px, 1fr))";
-  diasBox.style.gap = "10px";
-
-  diasSemana.forEach(dia => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = dia;
-    btn.className = "btn-dia";
-
-    btn.onclick = () => {
-      btn.classList.toggle("ativo");
-      btn.classList.contains("ativo")
-        ? diasSelecionados.add(dia)
-        : diasSelecionados.delete(dia);
-    };
-
-    diasBox.appendChild(btn);
-  });
-
-  wrap.appendChild(diasBox);
-
-  const horarios = document.createElement("div");
-  horarios.style.display = "flex";
-  horarios.style.gap = "12px";
-  horarios.style.marginTop = "12px";
-
-  const inicio = document.createElement("input");
-  inicio.type = "time";
-
-  const fim = document.createElement("input");
-  fim.type = "time";
-
-  horarios.append(inicio, fim);
-  wrap.appendChild(horarios);
-
-  const remover = document.createElement("button");
-  remover.textContent = "✖ Remover regra";
-  remover.style.marginTop = "12px";
-
-  remover.onclick = () => {
-    wrap.remove();
-    atualizarTodosDestinosURA();
-  };
-
-  wrap.appendChild(remover);
-
-  wrap.getData = () => ({
-    nome: nome.value,
-    dias: [...diasSelecionados],
-    hora_inicio: inicio.value,
-    hora_fim: fim.value
-  });
-
-  return wrap;
-}
-
 /* ================= RANGE RAMAIS ================= */
 
 window.criarRangeRamais = function () {
-  const ini = Number(document.getElementById("ramalInicio")?.value);
-  const fim = Number(document.getElementById("ramalFim")?.value);
+  const ini = Number(document.getElementById("ramalInicio").value);
+  const fim = Number(document.getElementById("ramalFim").value);
   const container = document.getElementById("listaRings");
 
-  if (!container) {
-    mostrarToast("Container de ramais não encontrado", true);
-    return;
-  }
-
-  if (!ini || !fim || fim < ini) {
-    mostrarToast("Range inválido", true);
-    return;
-  }
+  if (!ini || !fim || fim < ini) return mostrarToast("Range inválido", true);
 
   for (let i = ini; i <= fim; i++) {
-    if (container.children.length >= LIMITE) break;
-
     const campo = criarCampo("ring");
     campo.querySelector(".campo-nome").value = i;
-
     container.appendChild(campo);
   }
 
   atualizarTodosDestinosURA();
-  mostrarToast("Range de ramais criado com sucesso!");
+  mostrarToast("Range criado com sucesso!");
 };
 
-/* ================= IMPORTAÇÃO CSV ================= */
+/* ================= JSON ================= */
 
-window.acionarImportacao = function (tipo) {
-  const input = document.getElementById(
-    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
-  );
+window.explorar = function () {
+  const dados = {};
 
-  if (!input) {
-    mostrarToast("Input de importação não encontrado", true);
-    return;
-  }
+  dados.chat = window.chatState || {};
 
-  input.value = "";
-  input.click();
-
-  input.onchange = () => {
-    const file = input.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = e => processarCSV(tipo, e.target.result);
-    reader.readAsText(file);
-  };
-};
-
-function processarCSV(tipo, texto) {
-  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
-  if (linhas.length < 2) return;
-
-  const sep = linhas[0].includes(";") ? ";" : ",";
-  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
-  const container = document.getElementById(listas[tipo]);
-
-  if (!container) return;
-
-  linhas.forEach(l => {
-    const v = l.split(sep);
-    const d = {};
-    header.forEach((h, i) => d[h] = v[i] || "");
-
-    const campo = criarCampo(tipo);
-    campo.querySelector(".campo-nome").value = d.usuario || d.nome || "";
-
-    if (tipo === "usuario_web") {
-      campo.querySelector("input[type=email]").value = d.email || "";
-      campo.querySelector(".campo-senha").value = d.senha || "";
-    }
-
-    container.appendChild(campo);
+  dados.uras = [];
+  document.querySelectorAll("#listaURAs .campo-descricao").forEach(c => {
+    if (c.getURA) dados.uras.push(c.getURA());
   });
 
-  atualizarTodosDestinosURA();
-  mostrarToast("CSV importado com sucesso!");
-}
+  dados.regras_tempo = [];
+  document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
+    dados.regras_tempo.push(r.getData());
+  });
 
-/* ================= TEMPLATE CSV ================= */
+  document.getElementById("resultado").textContent =
+    JSON.stringify(dados, null, 2);
 
-window.baixarTemplateUsuarios = function () {
-  const csv = "usuario;email;senha;permissao;descricao\n";
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  window.__ultimoJSON = dados;
+
+  mostrarToast("JSON gerado com sucesso!");
+};
+
+window.exportarJSON = function () {
+  if (!window.__ultimoJSON) return mostrarToast("Gere o JSON primeiro", true);
+
+  const blob = new Blob([JSON.stringify(window.__ultimoJSON, null, 2)], { type: "application/json" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "template_usuarios_web.csv";
+  link.download = "caderno-parametros.json";
   link.click();
 };
+
+/* ================= TOAST ================= */
+
+function mostrarToast(msg, error = false) {
+  const t = document.getElementById("toastGlobal");
+  document.getElementById("toastMessage").textContent = msg;
+  t.className = "toast show" + (error ? " error" : "");
+  setTimeout(() => t.classList.remove("show"), 3000);
+}
 
 /* ================= TEMA ================= */
 
@@ -424,44 +305,3 @@ if (toggleTheme) {
     document.body.classList.add("dark");
   }
 }
-
-/* ================= EXPORTAÇÃO JSON ================= */
-
-window.exportarJSON = function () {
-  const dados = {};
-
-  for (const tipo in listas) {
-    const container = document.getElementById(listas[tipo]);
-    if (!container) continue;
-
-    dados[tipo] = [...container.children].map(c => ({
-      nome: c.getNome?.() || "",
-      email: c.getEmail?.() || "",
-      senha: c.getSenha?.() || "",
-      permissao: c.getPermissao?.() || "",
-      descricao: c.querySelector("textarea")?.value || ""
-    }));
-  }
-
-  // URA completa
-  dados.ura = [...document.querySelectorAll("#listaURAs .campo-descricao")]
-    .map(c => c.getURA ? c.getURA() : null)
-    .filter(Boolean);
-
-  // Regras de tempo
-  dados.regras_tempo = [...document.querySelectorAll("#listaRegrasTempo .campo-descricao")]
-    .map(r => r.getData());
-
-  // CHAT
-  if (window.chatState) {
-    dados.chat = chatState;
-  }
-
-  const blob = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "caderno_parametros.json";
-  link.click();
-
-  mostrarToast("JSON exportado com sucesso!");
-};
