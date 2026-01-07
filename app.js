@@ -313,3 +313,33 @@ function criarRegraTempo() {
 
   return wrap;
 }
+
+/* ================= RANGE RAMAIS ================= */
+
+window.criarRangeRamais = function () {
+  const ini = Number(document.getElementById("ramalInicio")?.value);
+  const fim = Number(document.getElementById("ramalFim")?.value);
+  const container = document.getElementById("listaRings");
+
+  if (!container) {
+    mostrarToast("Container de ramais não encontrado", true);
+    return;
+  }
+
+  if (!ini || !fim || fim < ini) {
+    mostrarToast("Range inválido", true);
+    return;
+  }
+
+  for (let i = ini; i <= fim; i++) {
+    if (container.children.length >= LIMITE) break;
+
+    const campo = criarCampo("ring");
+    campo.querySelector(".campo-nome").value = i;
+
+    container.appendChild(campo);
+  }
+
+  atualizarTodosDestinosURA();
+  mostrarToast("Range de ramais criado com sucesso!");
+};
