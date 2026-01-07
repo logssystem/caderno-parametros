@@ -154,6 +154,22 @@
           </div>
         </div>
       </div>
+      
+      <div id="bloco-conta-api" class="chat-section" style="display:none;">
+  <h3>Essa API será criada em qual conta?</h3>
+
+  <div class="chat-grid">
+    <div class="chat-card" onclick="selecionarContaApi(this, 'cliente')">
+      <h4>Conta do cliente</h4>
+      <p style="opacity:.6;font-size:13px;">API vinculada ao BM do cliente</p>
+    </div>
+
+    <div class="chat-card" onclick="selecionarContaApi(this, 'era')">
+      <h4>Conta da ERA</h4>
+      <p style="opacity:.6;font-size:13px;">API vinculada ao BM da ERA</p>
+    </div>
+  </div>
+</div>
 
       <!-- CANAIS -->
       <div id="chat-canais" class="chat-section" style="display:none">
@@ -203,5 +219,6 @@
 <script src="./chat.js"></script>
 </body>
 </html>
+
 
 
