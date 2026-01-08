@@ -120,7 +120,7 @@ function criarCampo(tipo) {
   /* ===== URA ===== */
   if (tipo === "ura") {
     const msg = document.createElement("textarea");
-    msg.placeholder = "Mensagem da URA";
+    msg.placeholder = "Mensagem da URA Ex: Olá Seja Bem Vindo a Empresa ERA selecione as opções a seguir 1 para suporte etc...";
     msg.style.marginTop = "12px";
     wrap.append(msg);
 
