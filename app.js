@@ -66,6 +66,7 @@ function criarCampo(tipo) {
   let permissao = null;
   let regras = null;
 
+  /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
     const linhaCred = document.createElement("div");
     linhaCred.className = "linha-principal";
@@ -101,6 +102,7 @@ function criarCampo(tipo) {
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
+  /* ===== RAMAL ===== */
   if (tipo === "ring") {
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do ramal";
@@ -115,6 +117,7 @@ function criarCampo(tipo) {
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
+  /* ===== URA ===== */
   if (tipo === "ura") {
     const msg = document.createElement("textarea");
     msg.placeholder = "Mensagem da URA";
@@ -161,156 +164,38 @@ function criarCampo(tipo) {
   return wrap;
 }
 
-/* ================= REGRA DE TEMPO ================= */
+/* ================= DESTINOS URA ================= */
 
-window.adicionarRegraTempo = function () {
-  const container = document.getElementById("listaRegrasTempo");
-  if (!container) return;
-  container.appendChild(criarRegraTempo());
-  atualizarTodosDestinosURA();
-};
+function atualizarDestinosURA(select) {
+  if (!select) return;
 
-function criarRegraTempo() {
-  const wrap = document.createElement("div");
-  wrap.className = "campo-descricao";
+  select.innerHTML = "";
+  select.add(new Option("Selecione o destino", ""));
 
-  const nome = document.createElement("input");
-  nome.placeholder = "Nome da regra";
-  wrap.append(nome);
+  document.querySelectorAll("#listaFilas .campo-nome").forEach(f =>
+    f.value && select.add(new Option("Fila: " + f.value, "fila:" + f.value))
+  );
 
-  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
-  const diasSelecionados = new Set();
+  document.querySelectorAll("#listaRings .campo-nome").forEach(r =>
+    r.value && select.add(new Option("Ramal: " + r.value, "ramal:" + r.value))
+  );
 
-  const diasBox = document.createElement("div");
-  diasSemana.forEach(dia => {
-    const btn = document.createElement("button");
-    btn.textContent = dia;
-    btn.className = "btn-dia";
-    btn.onclick = () => {
-      btn.classList.toggle("ativo");
-      btn.classList.contains("ativo") ? diasSelecionados.add(dia) : diasSelecionados.delete(dia);
-    };
-    diasBox.appendChild(btn);
-  });
+  document.querySelectorAll("#listaGrupoRing .campo-nome").forEach(g =>
+    g.value && select.add(new Option("Grupo: " + g.value, "grupo:" + g.value))
+  );
 
-  wrap.appendChild(diasBox);
+  document.querySelectorAll("#listaURAs .campo-nome").forEach(u =>
+    u.value && select.add(new Option("URA: " + u.value, "ura:" + u.value))
+  );
 
-  const inicio = document.createElement("input");
-  inicio.type = "time";
+  document.querySelectorAll("#listaRegrasTempo .campo-descricao input").forEach(r =>
+    r.value && select.add(new Option("Regra de tempo: " + r.value, "tempo:" + r.value))
+  );
 
-  const fim = document.createElement("input");
-  fim.type = "time";
-
-  wrap.append(inicio, fim);
-
-  wrap.getData = () => ({
-    nome: nome.value,
-    dias: [...diasSelecionados],
-    hora_inicio: inicio.value,
-    hora_fim: fim.value
-  });
-
-  return wrap;
+  select.add(new Option("Desligar", "desligar"));
+  select.add(new Option("Número externo", "numero"));
 }
 
-/* ================= JSON ================= */
-
-window.explorar = function () {
-
-  const coletar = (id, fn) =>
-    [...document.querySelectorAll(`#${id} .campo-descricao`)].map(fn).filter(Boolean);
-
-  const usuarios = coletar("listaUsuariosWeb", c => ({
-    nome: c.getNome(),
-    email: c.getEmail(),
-    senha: c.getSenha(),
-    permissao: c.getPermissao()
-  }));
-
-  const ramais = coletar("listaRings", c => ({ ramal: c.getNome(), senha: c.getSenha() }));
-  const entradas = coletar("listaEntradas", c => ({ numero: c.getNome() }));
-  const filas = coletar("listaFilas", c => ({ nome: c.getNome() }));
-  const grupos = coletar("listaGrupoRing", c => ({ nome: c.getNome() }));
-  const agentes = coletar("listaAgentes", c => ({ nome: c.getNome() }));
-
-  const uras = [];
-  document.querySelectorAll("#listaURAs .campo-descricao").forEach(c => c.getURA && uras.push(c.getURA()));
-
-  const regras = [];
-  document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => regras.push(r.getData()));
-
-  const temVoz = usuarios.length || ramais.length || entradas.length || uras.length || filas.length || grupos.length || agentes.length || regras.length;
-  const temChat = window.chatState && (chatState.tipo || chatState.api || chatState.conta || chatState.canais.length);
-
-  const dados = {};
-
-  dados.voz = temVoz ? {
-    ativo: true,
-    usuarios_web: usuarios,
-    ramais,
-    entradas,
-    uras,
-    filas,
-    grupos_ring: grupos,
-    agentes,
-    regras_tempo: regras
-  } : {
-    ativo: false,
-    mensagem: "Nenhuma configuração de voz foi informada"
-  };
-
-  dados.chat = temChat ? {
-    ativo: true,
-    tipo: chatState.tipo,
-    api: chatState.api,
-    conta: chatState.conta,
-    canais: chatState.canais
-  } : {
-    ativo: false,
-    mensagem: "Nenhuma configuração de chat foi informada"
-  };
-
-  document.getElementById("resultado").textContent = JSON.stringify(dados, null, 2);
-  window.__ultimoJSON = dados;
-
-  mostrarToast("JSON gerado com sucesso!");
-};
-
-/* ================= EXPORTAR ================= */
-
-window.exportarJSON = function () {
-  if (!window.__ultimoJSON) return mostrarToast("Gere o JSON primeiro", true);
-
-  const blob = new Blob([JSON.stringify(window.__ultimoJSON, null, 2)], { type: "application/json" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "caderno-parametros.json";
-  link.click();
-};
-
-/* ================= TOAST ================= */
-
-function mostrarToast(msg, error = false) {
-  const t = document.getElementById("toastGlobal");
-  document.getElementById("toastMessage").textContent = msg;
-  t.className = "toast show" + (error ? " error" : "");
-  setTimeout(() => t.classList.remove("show"), 3000);
-}
-
-/* ================= TEMA ================= */
-
-const toggleTheme = document.getElementById("toggleTheme");
-if (toggleTheme) {
-  toggleTheme.onclick = () => {
-    document.body.classList.toggle("dark");
-    localStorage.setItem("tema", document.body.classList.contains("dark") ? "dark" : "light");
-  };
-  if (localStorage.getItem("tema") === "dark") document.body.classList.add("dark");
-}
-
-/* ================= CORREÇÕES DE FUNÇÕES QUEBRADAS ================= */
-
-/* Evita crash quando algo chama atualizarTodosDestinosURA */
 function atualizarTodosDestinosURA() {
   document.querySelectorAll(".opcao-ura select").forEach(select => {
     const atual = select.value;
@@ -319,94 +204,7 @@ function atualizarTodosDestinosURA() {
   });
 }
 
-/* Evita crash se algum HTML antigo ainda chamar isso */
-window.criarRangeRamais = window.criarRangeRamais || function () {
-  const ini = Number(document.getElementById("ramalInicio")?.value);
-  const fim = Number(document.getElementById("ramalFim")?.value);
-  const container = document.getElementById("listaRings");
-
-  if (!container) return mostrarToast("Lista de ramais não encontrada", true);
-  if (!ini || !fim || fim < ini) return mostrarToast("Range inválido", true);
-
-  for (let i = ini; i <= fim; i++) {
-    if (container.children.length >= LIMITE) break;
-
-    const campo = criarCampo("ring");
-    campo.querySelector(".campo-nome").value = i;
-    container.appendChild(campo);
-  }
-
-  atualizarTodosDestinosURA();
-  mostrarToast("Range de ramais criado com sucesso!");
-};
-
-/* ================= IMPORTAÇÃO CSV (RESTAURADO) ================= */
-
-window.acionarImportacao = function (tipo) {
-  const input = document.getElementById(
-    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
-  );
-
-  if (!input) {
-    mostrarToast("Input de importação não encontrado", true);
-    return;
-  }
-
-  input.value = "";
-  input.click();
-
-  input.onchange = () => {
-    const file = input.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = e => processarCSV(tipo, e.target.result);
-    reader.readAsText(file);
-  };
-};
-
-function processarCSV(tipo, texto) {
-  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
-  if (linhas.length < 2) return mostrarToast("CSV vazio ou inválido", true);
-
-  const sep = linhas[0].includes(";") ? ";" : ",";
-  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
-  const container = document.getElementById(listas[tipo]);
-
-  if (!container) return;
-
-  linhas.forEach(l => {
-    const v = l.split(sep);
-    const d = {};
-    header.forEach((h, i) => d[h] = v[i] || "");
-
-    const campo = criarCampo(tipo);
-    campo.querySelector(".campo-nome").value = d.usuario || d.nome || "";
-
-    if (tipo === "usuario_web") {
-      campo.querySelector("input[type=email]").value = d.email || "";
-      campo.querySelector(".campo-senha").value = d.senha || "";
-    }
-
-    container.appendChild(campo);
-  });
-
-  atualizarTodosDestinosURA();
-  mostrarToast("CSV importado com sucesso!");
-}
-
-/* ================= TEMPLATE CSV (RESTAURADO) ================= */
-
-window.baixarTemplateUsuarios = function () {
-  const csv = "usuario;email;senha;permissao;descricao\n";
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "template_usuarios_web.csv";
-  link.click();
-};
-
-/* ================= OPÇÕES DA URA (CORREÇÃO) ================= */
+/* ================= OPÇÕES URA ================= */
 
 function criarOpcaoURA() {
   const wrap = document.createElement("div");
@@ -439,3 +237,74 @@ function criarOpcaoURA() {
 
   return wrap;
 }
+
+/* ================= IMPORTAÇÃO CSV ================= */
+
+window.acionarImportacao = function (tipo) {
+  const input = document.getElementById(
+    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
+  );
+
+  if (!input) return mostrarToast("Input de importação não encontrado", true);
+
+  input.value = "";
+  input.click();
+
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => processarCSV(tipo, e.target.result);
+    reader.readAsText(file);
+  };
+};
+
+function processarCSV(tipo, texto) {
+  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
+  if (linhas.length < 2) return mostrarToast("CSV vazio ou inválido", true);
+
+  const sep = linhas[0].includes(";") ? ";" : ",";
+  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
+  const container = document.getElementById(listas[tipo]);
+  if (!container) return;
+
+  linhas.forEach(l => {
+    const v = l.split(sep);
+    const d = {};
+    header.forEach((h, i) => d[h] = v[i] || "");
+
+    const campo = criarCampo(tipo);
+    campo.querySelector(".campo-nome").value = d.usuario || d.nome || "";
+
+    if (tipo === "usuario_web") {
+      campo.querySelector("input[type=email]").value = d.email || "";
+      campo.querySelector(".campo-senha").value = d.senha || "";
+
+      const select = campo.querySelector("select");
+      if (select && d.permissao) {
+        [...select.options].forEach(opt => {
+          if (opt.value.toLowerCase() === d.permissao.toLowerCase()) {
+            opt.selected = true;
+          }
+        });
+      }
+    }
+
+    container.appendChild(campo);
+  });
+
+  atualizarTodosDestinosURA();
+  mostrarToast("CSV importado com sucesso!");
+}
+
+/* ================= TEMPLATE CSV ================= */
+
+window.baixarTemplateUsuarios = function () {
+  const csv = "usuario;email;senha;permissao;descricao\n";
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "template_usuarios_web.csv";
+  link.click();
+};
