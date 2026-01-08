@@ -272,7 +272,7 @@ function processarCSV(tipo, texto) {
   linhas.forEach(l => {
     const v = l.split(sep);
     const d = {};
-    header.forEach((h, i) => d[h] = v[i] || "");
+    header.forEach((h, i) => d[h] = (v[i] || "").trim());
 
     const campo = criarCampo(tipo);
     campo.querySelector(".campo-nome").value = d.usuario || d.nome || "";
@@ -308,3 +308,28 @@ window.baixarTemplateUsuarios = function () {
   link.download = "template_usuarios_web.csv";
   link.click();
 };
+
+/* ================= TEMA (MODO ESCURO RESTAURADO) ================= */
+
+const toggleTheme = document.getElementById("toggleTheme");
+
+function aplicarTemaSalvo() {
+  const tema = localStorage.getItem("tema");
+  if (tema === "dark") {
+    document.body.classList.add("dark");
+  } else {
+    document.body.classList.remove("dark");
+  }
+}
+
+if (toggleTheme) {
+  toggleTheme.onclick = () => {
+    document.body.classList.toggle("dark");
+    localStorage.setItem(
+      "tema",
+      document.body.classList.contains("dark") ? "dark" : "light"
+    );
+  };
+}
+
+aplicarTemaSalvo();
