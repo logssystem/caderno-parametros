@@ -405,3 +405,37 @@ window.baixarTemplateUsuarios = function () {
   link.download = "template_usuarios_web.csv";
   link.click();
 };
+
+/* ================= OPÇÕES DA URA (CORREÇÃO) ================= */
+
+function criarOpcaoURA() {
+  const wrap = document.createElement("div");
+  wrap.className = "opcao-ura";
+  wrap.style.display = "grid";
+  wrap.style.gridTemplateColumns = "70px 1fr 1fr auto";
+  wrap.style.gap = "8px";
+  wrap.style.marginTop = "8px";
+
+  const tecla = document.createElement("input");
+  tecla.placeholder = "Tecla";
+
+  const destino = document.createElement("select");
+  atualizarDestinosURA(destino);
+
+  const desc = document.createElement("input");
+  desc.placeholder = "Descrição";
+
+  const del = document.createElement("button");
+  del.textContent = "🗑";
+  del.onclick = () => wrap.remove();
+
+  wrap.append(tecla, destino, desc, del);
+
+  wrap.getData = () => ({
+    tecla: tecla.value,
+    destino: destino.value,
+    descricao: desc.value
+  });
+
+  return wrap;
+}
