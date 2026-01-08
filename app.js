@@ -441,3 +441,33 @@ window.criarRangeRamais = function () {
   mostrarToast("Range de ramais criado com sucesso!");
 };
 
+/* ================= REPARO DE FUNÇÕES GLOBAIS ================= */
+
+/* ---- TOAST (garante que nunca fique undefined) ---- */
+if (typeof window.mostrarToast !== "function") {
+  window.mostrarToast = function (msg, error = false) {
+    const t = document.getElementById("toastGlobal");
+    const m = document.getElementById("toastMessage");
+
+    if (!t || !m) {
+      console.warn("Toast não encontrado:", msg);
+      return;
+    }
+
+    m.textContent = msg;
+    t.className = "toast show" + (error ? " error" : "");
+    setTimeout(() => t.classList.remove("show"), 3000);
+  };
+}
+
+/* ---- GERAR JSON (garante que o botão funcione) ---- */
+if (typeof window.explorar !== "function") {
+  window.explorar = function () {
+    if (typeof gerarJSON === "function") {
+      gerarJSON();
+    } else {
+      mostrarToast("Função de geração de JSON não encontrada", true);
+      console.error("explorar() não encontrou gerarJSON()");
+    }
+  };
+}
