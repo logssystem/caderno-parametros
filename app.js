@@ -333,3 +333,18 @@ if (toggleTheme) {
 }
 
 aplicarTemaSalvo();
+
+/* ================= REGRA DE TEMPO (FIX BOTÃO) ================= */
+
+window.adicionarRegraTempo = function () {
+  const container = document.getElementById("listaRegrasTempo");
+
+  if (!container) {
+    console.error("listaRegrasTempo não encontrada no DOM");
+    return mostrarToast("Lista de regras de tempo não encontrada", true);
+  }
+
+  container.appendChild(criarRegraTempo());
+  atualizarTodosDestinosURA();
+};
+
