@@ -66,7 +66,6 @@ function criarCampo(tipo) {
   let permissao = null;
   let regras = null;
 
-  /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
     const linhaCred = document.createElement("div");
     linhaCred.className = "linha-principal";
@@ -102,7 +101,6 @@ function criarCampo(tipo) {
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
-  /* ===== RAMAL ===== */
   if (tipo === "ring") {
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do ramal";
@@ -117,19 +115,11 @@ function criarCampo(tipo) {
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
-  /* ===== URA ===== */
   if (tipo === "ura") {
     const msg = document.createElement("textarea");
     msg.placeholder = "Mensagem da URA";
     msg.style.marginTop = "12px";
     wrap.append(msg);
-
-    const exemplo = document.createElement("div");
-    exemplo.textContent = "Ex: Bem-vindo à empresa ERA. Para suporte, digite 1. Para vendas, digite 2.";
-    exemplo.style.fontSize = "12px";
-    exemplo.style.opacity = "0.55";
-    exemplo.style.fontStyle = "italic";
-    wrap.append(exemplo);
 
     const titulo = document.createElement("h4");
     titulo.textContent = "Opções da URA";
@@ -171,106 +161,122 @@ function criarCampo(tipo) {
   return wrap;
 }
 
-/* ================= OPÇÕES URA ================= */
+/* ================= REGRA DE TEMPO ================= */
 
-function criarOpcaoURA() {
+window.adicionarRegraTempo = function () {
+  const container = document.getElementById("listaRegrasTempo");
+  if (!container) return;
+  container.appendChild(criarRegraTempo());
+  atualizarTodosDestinosURA();
+};
+
+function criarRegraTempo() {
   const wrap = document.createElement("div");
-  wrap.className = "opcao-ura";
-  wrap.style.display = "grid";
-  wrap.style.gridTemplateColumns = "70px 1fr 1fr auto";
-  wrap.style.gap = "8px";
+  wrap.className = "campo-descricao";
 
-  const tecla = document.createElement("input");
-  tecla.placeholder = "Tecla";
+  const nome = document.createElement("input");
+  nome.placeholder = "Nome da regra";
+  wrap.append(nome);
 
-  const destino = document.createElement("select");
-  atualizarDestinosURA(destino);
+  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+  const diasSelecionados = new Set();
 
-  const desc = document.createElement("input");
-  desc.placeholder = "Descrição";
+  const diasBox = document.createElement("div");
+  diasSemana.forEach(dia => {
+    const btn = document.createElement("button");
+    btn.textContent = dia;
+    btn.className = "btn-dia";
+    btn.onclick = () => {
+      btn.classList.toggle("ativo");
+      btn.classList.contains("ativo") ? diasSelecionados.add(dia) : diasSelecionados.delete(dia);
+    };
+    diasBox.appendChild(btn);
+  });
 
-  const del = document.createElement("button");
-  del.textContent = "🗑";
-  del.onclick = () => wrap.remove();
+  wrap.appendChild(diasBox);
 
-  wrap.append(tecla, destino, desc, del);
+  const inicio = document.createElement("input");
+  inicio.type = "time";
+
+  const fim = document.createElement("input");
+  fim.type = "time";
+
+  wrap.append(inicio, fim);
 
   wrap.getData = () => ({
-    tecla: tecla.value,
-    destino: destino.value,
-    descricao: desc.value
+    nome: nome.value,
+    dias: [...diasSelecionados],
+    hora_inicio: inicio.value,
+    hora_fim: fim.value
   });
 
   return wrap;
 }
 
-/* ================= DESTINOS ================= */
-
-function atualizarDestinosURA(select) {
-  select.innerHTML = "";
-  select.add(new Option("Selecione o destino", ""));
-
-  document.querySelectorAll("#listaFilas .campo-nome").forEach(f => f.value && select.add(new Option("Fila: " + f.value, "fila:" + f.value)));
-  document.querySelectorAll("#listaRings .campo-nome").forEach(r => r.value && select.add(new Option("Ramal: " + r.value, "ramal:" + r.value)));
-  document.querySelectorAll("#listaGrupoRing .campo-nome").forEach(g => g.value && select.add(new Option("Grupo: " + g.value, "grupo:" + g.value)));
-  document.querySelectorAll("#listaURAs .campo-nome").forEach(u => u.value && select.add(new Option("URA: " + u.value, "ura:" + u.value)));
-  document.querySelectorAll("#listaRegrasTempo .campo-descricao input").forEach(r => r.value && select.add(new Option("Regra: " + r.value, "tempo:" + r.value)));
-
-  select.add(new Option("Desligar", "desligar"));
-  select.add(new Option("Número externo", "numero"));
-}
-
-function atualizarTodosDestinosURA() {
-  document.querySelectorAll(".opcao-ura select").forEach(select => {
-    const atual = select.value;
-    atualizarDestinosURA(select);
-    select.value = atual;
-  });
-}
-
-/* ================= RANGE RAMAIS ================= */
-
-window.criarRangeRamais = function () {
-  const ini = Number(document.getElementById("ramalInicio").value);
-  const fim = Number(document.getElementById("ramalFim").value);
-  const container = document.getElementById("listaRings");
-
-  if (!ini || !fim || fim < ini) return mostrarToast("Range inválido", true);
-
-  for (let i = ini; i <= fim; i++) {
-    const campo = criarCampo("ring");
-    campo.querySelector(".campo-nome").value = i;
-    container.appendChild(campo);
-  }
-
-  atualizarTodosDestinosURA();
-  mostrarToast("Range criado com sucesso!");
-};
-
 /* ================= JSON ================= */
 
 window.explorar = function () {
+
+  const coletar = (id, fn) =>
+    [...document.querySelectorAll(`#${id} .campo-descricao`)].map(fn).filter(Boolean);
+
+  const usuarios = coletar("listaUsuariosWeb", c => ({
+    nome: c.getNome(),
+    email: c.getEmail(),
+    senha: c.getSenha(),
+    permissao: c.getPermissao()
+  }));
+
+  const ramais = coletar("listaRings", c => ({ ramal: c.getNome(), senha: c.getSenha() }));
+  const entradas = coletar("listaEntradas", c => ({ numero: c.getNome() }));
+  const filas = coletar("listaFilas", c => ({ nome: c.getNome() }));
+  const grupos = coletar("listaGrupoRing", c => ({ nome: c.getNome() }));
+  const agentes = coletar("listaAgentes", c => ({ nome: c.getNome() }));
+
+  const uras = [];
+  document.querySelectorAll("#listaURAs .campo-descricao").forEach(c => c.getURA && uras.push(c.getURA()));
+
+  const regras = [];
+  document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => regras.push(r.getData()));
+
+  const temVoz = usuarios.length || ramais.length || entradas.length || uras.length || filas.length || grupos.length || agentes.length || regras.length;
+  const temChat = window.chatState && (chatState.tipo || chatState.api || chatState.conta || chatState.canais.length);
+
   const dados = {};
 
-  dados.chat = window.chatState || {};
+  dados.voz = temVoz ? {
+    ativo: true,
+    usuarios_web: usuarios,
+    ramais,
+    entradas,
+    uras,
+    filas,
+    grupos_ring: grupos,
+    agentes,
+    regras_tempo: regras
+  } : {
+    ativo: false,
+    mensagem: "Nenhuma configuração de voz foi informada"
+  };
 
-  dados.uras = [];
-  document.querySelectorAll("#listaURAs .campo-descricao").forEach(c => {
-    if (c.getURA) dados.uras.push(c.getURA());
-  });
+  dados.chat = temChat ? {
+    ativo: true,
+    tipo: chatState.tipo,
+    api: chatState.api,
+    conta: chatState.conta,
+    canais: chatState.canais
+  } : {
+    ativo: false,
+    mensagem: "Nenhuma configuração de chat foi informada"
+  };
 
-  dados.regras_tempo = [];
-  document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
-    dados.regras_tempo.push(r.getData());
-  });
-
-  document.getElementById("resultado").textContent =
-    JSON.stringify(dados, null, 2);
-
+  document.getElementById("resultado").textContent = JSON.stringify(dados, null, 2);
   window.__ultimoJSON = dados;
 
   mostrarToast("JSON gerado com sucesso!");
 };
+
+/* ================= EXPORTAR ================= */
 
 window.exportarJSON = function () {
   if (!window.__ultimoJSON) return mostrarToast("Gere o JSON primeiro", true);
@@ -294,14 +300,10 @@ function mostrarToast(msg, error = false) {
 /* ================= TEMA ================= */
 
 const toggleTheme = document.getElementById("toggleTheme");
-
 if (toggleTheme) {
   toggleTheme.onclick = () => {
     document.body.classList.toggle("dark");
     localStorage.setItem("tema", document.body.classList.contains("dark") ? "dark" : "light");
   };
-
-  if (localStorage.getItem("tema") === "dark") {
-    document.body.classList.add("dark");
-  }
+  if (localStorage.getItem("tema") === "dark") document.body.classList.add("dark");
 }
