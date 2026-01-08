@@ -471,3 +471,98 @@ if (typeof window.explorar !== "function") {
     }
   };
 }
+
+/* ================= GERADOR OFICIAL DE JSON ================= */
+
+window.explorar = function () {
+  try {
+
+    const coletar = (id, fn) =>
+      [...document.querySelectorAll(`#${id} .campo-descricao`)]
+        .map(fn)
+        .filter(v => v && Object.values(v).some(x => x));
+
+    const usuarios = coletar("listaUsuariosWeb", c => ({
+      nome: c.getNome(),
+      email: c.getEmail(),
+      senha: c.getSenha(),
+      permissao: c.getPermissao()
+    }));
+
+    const ramais = coletar("listaRings", c => ({
+      ramal: c.getNome(),
+      senha: c.getSenha()
+    }));
+
+    const entradas = coletar("listaEntradas", c => ({
+      numero: c.getNome()
+    }));
+
+    const filas = coletar("listaFilas", c => ({
+      nome: c.getNome()
+    }));
+
+    const grupos = coletar("listaGrupoRing", c => ({
+      nome: c.getNome()
+    }));
+
+    const agentes = coletar("listaAgentes", c => ({
+      nome: c.getNome()
+    }));
+
+    const uras = [];
+    document.querySelectorAll("#listaURAs .campo-descricao").forEach(c => {
+      if (c.getURA) uras.push(c.getURA());
+    });
+
+    const regras = [];
+    document.querySelectorAll("#listaRegrasTempo .campo-descricao")
+      .forEach(r => regras.push(r.getData()));
+
+    const temVoz =
+      usuarios.length || ramais.length || entradas.length ||
+      uras.length || filas.length || grupos.length ||
+      agentes.length || regras.length;
+
+    const temChat = window.chatState &&
+      (chatState.tipo || chatState.api || chatState.conta || chatState.canais.length);
+
+    const dados = {};
+
+    dados.voz = temVoz ? {
+      ativo: true,
+      usuarios_web: usuarios,
+      ramais,
+      entradas,
+      uras,
+      filas,
+      grupos_ring: grupos,
+      agentes,
+      regras_tempo: regras
+    } : {
+      ativo: false,
+      mensagem: "Nenhuma configuração de voz foi informada"
+    };
+
+    dados.chat = temChat ? {
+      ativo: true,
+      tipo: chatState.tipo,
+      api: chatState.api,
+      conta: chatState.conta,
+      canais: chatState.canais
+    } : {
+      ativo: false,
+      mensagem: "Nenhuma configuração de chat foi informada"
+    };
+
+    const box = document.getElementById("resultado");
+    if (box) box.textContent = JSON.stringify(dados, null, 2);
+
+    window.__ultimoJSON = dados;
+    mostrarToast("JSON gerado com sucesso!");
+
+  } catch (e) {
+    console.error("ERRO AO GERAR JSON:", e);
+    mostrarToast("Erro ao gerar JSON. Veja o console.", true);
+  }
+};
