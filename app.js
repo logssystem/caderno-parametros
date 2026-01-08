@@ -307,3 +307,35 @@ if (toggleTheme) {
   };
   if (localStorage.getItem("tema") === "dark") document.body.classList.add("dark");
 }
+
+/* ================= CORREÇÕES DE FUNÇÕES QUEBRADAS ================= */
+
+/* Evita crash quando algo chama atualizarTodosDestinosURA */
+function atualizarTodosDestinosURA() {
+  document.querySelectorAll(".opcao-ura select").forEach(select => {
+    const atual = select.value;
+    atualizarDestinosURA(select);
+    select.value = atual;
+  });
+}
+
+/* Evita crash se algum HTML antigo ainda chamar isso */
+window.criarRangeRamais = window.criarRangeRamais || function () {
+  const ini = Number(document.getElementById("ramalInicio")?.value);
+  const fim = Number(document.getElementById("ramalFim")?.value);
+  const container = document.getElementById("listaRings");
+
+  if (!container) return mostrarToast("Lista de ramais não encontrada", true);
+  if (!ini || !fim || fim < ini) return mostrarToast("Range inválido", true);
+
+  for (let i = ini; i <= fim; i++) {
+    if (container.children.length >= LIMITE) break;
+
+    const campo = criarCampo("ring");
+    campo.querySelector(".campo-nome").value = i;
+    container.appendChild(campo);
+  }
+
+  atualizarTodosDestinosURA();
+  mostrarToast("Range de ramais criado com sucesso!");
+};
