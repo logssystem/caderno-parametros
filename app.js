@@ -299,3 +299,22 @@ if (toggleTheme) {
   };
   if (localStorage.getItem("tema") === "dark") document.body.classList.add("dark");
 }
+
+/* ================= EXPOR FUNÇÕES PARA O HTML (FIX GERAL) ================= */
+
+window.atualizarTodosDestinosURA = atualizarTodosDestinosURA;
+window.criarOpcaoURA = criarOpcaoURA;
+window.criarRangeRamais = criarRangeRamais;
+window.acionarImportacao = acionarImportacao;
+window.adicionarCampo = adicionarCampo;
+window.explorar = explorar;
+
+/* ---- Regra de tempo (o HTML chama isso) ---- */
+if (typeof window.adicionarRegraTempo !== "function") {
+  window.adicionarRegraTempo = function () {
+    const container = document.getElementById("listaRegrasTempo");
+    if (!container) return mostrarToast("Lista de regras não encontrada", true);
+    container.appendChild(criarRegraTempo());
+    atualizarTodosDestinosURA();
+  };
+}
