@@ -49,6 +49,7 @@ window.adicionarCampo = function (tipo) {
   container.appendChild(campo);
 
   atualizarSelectUsuariosRamal();
+  atualizarAgentes();
   atualizarTodosDestinosURA();
 };
 
@@ -71,6 +72,7 @@ function criarCampo(tipo) {
   del.onclick = () => {
     wrap.remove();
     atualizarSelectUsuariosRamal();
+    atualizarAgentes();
     atualizarTodosDestinosURA();
   };
 
@@ -96,7 +98,7 @@ function criarCampo(tipo) {
     wrap.append(email, senha, permissao);
   }
 
-  /* ===== RAMAL (COM USUÁRIO) ===== */
+  /* ===== RAMAL ===== */
   if (tipo === "ring") {
     senha = document.createElement("input");
     senha.placeholder = "Senha do ramal";
@@ -107,9 +109,15 @@ function criarCampo(tipo) {
 
     selectUsuario.onchange = () => {
       wrap.dataset.usuarioId = selectUsuario.value || "";
+      atualizarAgentes();
     };
 
     wrap.append(senha, selectUsuario);
+  }
+
+  /* ===== AGENTE ===== */
+  if (tipo === "agente") {
+    criarCampoAgente(wrap, nome);
   }
 
   /* ===== URA ===== */
@@ -145,10 +153,7 @@ function criarCampo(tipo) {
 
 function atualizarSelectUsuariosRamal() {
   const usuarios = [...document.querySelectorAll("#listaUsuariosWeb .campo-descricao")]
-    .map(c => ({
-      id: c.dataset.id,
-      nome: c.getNome()
-    }))
+    .map(c => ({ id: c.dataset.id, nome: c.getNome() }))
     .filter(u => u.nome);
 
   document.querySelectorAll("#listaRings .campo-descricao").forEach(ramal => {
@@ -163,6 +168,73 @@ function atualizarSelectUsuariosRamal() {
       if (u.id === atual) opt.selected = true;
       select.add(opt);
     });
+  });
+}
+
+/* ================= AGENTE (RAMAL OBRIGATÓRIO) ================= */
+
+function criarCampoAgente(wrap, nomeInput) {
+  const box = document.createElement("div");
+  box.style.display = "grid";
+  box.style.gridTemplateColumns = "1fr 1fr";
+  box.style.gap = "10px";
+  box.style.marginTop = "10px";
+
+  const selectUsuario = document.createElement("select");
+  const selectRamal = document.createElement("select");
+
+  function carregarUsuarios() {
+    selectUsuario.innerHTML = "";
+    selectUsuario.add(new Option("Usuário callcenter", ""));
+
+    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(c => {
+      const perm = c.getPermissao()?.toLowerCase() || "";
+      if (perm.includes("call center")) {
+        selectUsuario.add(new Option(c.getNome(), c.dataset.id));
+      }
+    });
+  }
+
+  function carregarRamais() {
+    selectRamal.innerHTML = "";
+    selectRamal.add(new Option("Ramal (obrigatório)", ""));
+
+    document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+      selectRamal.add(new Option(r.getNome(), r.dataset.id));
+    });
+  }
+
+  selectUsuario.onchange = () => {
+    const ramal = [...document.querySelectorAll("#listaRings .campo-descricao")]
+      .find(r => r.dataset.usuarioId === selectUsuario.value);
+    if (ramal) selectRamal.value = ramal.dataset.id;
+  };
+
+  wrap.getAgente = () => ({
+    nome: nomeInput.value,
+    usuarioId: selectUsuario.value || null,
+    ramalId: selectRamal.value || null
+  });
+
+  wrap.atualizarAgente = () => {
+    const u = selectUsuario.value;
+    const r = selectRamal.value;
+    carregarUsuarios();
+    carregarRamais();
+    selectUsuario.value = u;
+    selectRamal.value = r;
+  };
+
+  box.append(selectUsuario, selectRamal);
+  wrap.append(box);
+
+  carregarUsuarios();
+  carregarRamais();
+}
+
+function atualizarAgentes() {
+  document.querySelectorAll("#listaAgentes .campo-descricao").forEach(c => {
+    if (c.atualizarAgente) c.atualizarAgente();
   });
 }
 
@@ -218,6 +290,11 @@ function atualizarTodosDestinosURA() {
 
 /* ================= REGRA DE TEMPO ================= */
 
+window.adicionarRegraTempo = function () {
+  document.getElementById("listaRegrasTempo")
+    .appendChild(criarRegraTempo());
+};
+
 function criarRegraTempo() {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
@@ -245,18 +322,14 @@ function criarRegraTempo() {
   diasBox.style.marginTop = "10px";
 
   diasSemana.forEach(dia => {
-    const btnDia = document.createElement("button");
-    btnDia.textContent = dia;
-    btnDia.className = "btn-dia";
-
-    btnDia.onclick = () => {
-      btnDia.classList.toggle("ativo");
-      btnDia.classList.contains("ativo")
-        ? diasSelecionados.add(dia)
-        : diasSelecionados.delete(dia);
+    const b = document.createElement("button");
+    b.textContent = dia;
+    b.className = "btn-dia";
+    b.onclick = () => {
+      b.classList.toggle("ativo");
+      b.classList.contains("ativo") ? diasSelecionados.add(dia) : diasSelecionados.delete(dia);
     };
-
-    diasBox.appendChild(btnDia);
+    diasBox.appendChild(b);
   });
 
   wrap.appendChild(diasBox);
@@ -285,11 +358,6 @@ function criarRegraTempo() {
   return wrap;
 }
 
-window.adicionarRegraTempo = function () {
-  document.getElementById("listaRegrasTempo")
-    .appendChild(criarRegraTempo());
-};
-
 /* ================= RANGE ================= */
 
 window.criarRangeRamais = function () {
@@ -306,12 +374,15 @@ window.criarRangeRamais = function () {
   }
 
   atualizarSelectUsuariosRamal();
+  atualizarAgentes();
 };
 
 /* ================= JSON ================= */
 
 window.explorar = function () {
+
   const usuarios = [...listaUsuariosWeb.querySelectorAll(".campo-descricao")].map(c => ({
+    id: c.dataset.id,
     nome: c.getNome(),
     email: c.getEmail(),
     senha: c.getSenha(),
@@ -319,27 +390,18 @@ window.explorar = function () {
   }));
 
   const ramais = [...listaRings.querySelectorAll(".campo-descricao")].map(c => ({
+    id: c.dataset.id,
     ramal: c.getNome(),
     senha: c.getSenha(),
     usuarioId: c.dataset.usuarioId || null
   }));
 
-  const dados = { voz: { usuarios, ramais } };
+  const agentes = [...listaAgentes.querySelectorAll(".campo-descricao")]
+    .map(c => c.getAgente ? c.getAgente() : null)
+    .filter(a => a && a.nome && a.ramalId);
+
+  const dados = { voz: { usuarios, ramais, agentes } };
   resultado.textContent = JSON.stringify(dados, null, 2);
-};
-
-window.exportarJSON = function () {
-  const blob = new Blob([resultado.textContent], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "caderno_parametros.json";
-  a.click();
-};
-
-/* ================= IMPORT (stub) ================= */
-
-window.acionarImportacao = function () {
-  mostrarToast("Importação será ligada na próxima fase.");
 };
 
 /* ================= TOAST ================= */
