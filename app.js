@@ -1,4 +1,4 @@
-console.log("APP.JS ESTÁVEL - AGENTE VIA USUÁRIO");
+console.log("APP.JS BASE ESTÁVEL - FILAS COM AGENTES");
 
 /* ================= ESTADO GLOBAL ================= */
 
@@ -45,21 +45,12 @@ window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
   if (!container || container.children.length >= LIMITE) return;
 
-  if (tipo === "agente") {
-    const temAgente = [...document.querySelectorAll("#listaUsuariosWeb .campo-descricao")]
-      .some(u => u.isAgente && u.isAgente());
-
-    if (!temAgente) {
-      mostrarToast("Crie um usuário marcado como agente antes.", true);
-      return;
-    }
-  }
-
   const campo = criarCampo(tipo);
   container.appendChild(campo);
 
   atualizarSelectUsuariosRamal();
   atualizarSelectAgentes();
+  atualizarSelectAgentesFila();
   atualizarTodosDestinosURA();
 };
 
@@ -73,14 +64,9 @@ function criarCampo(tipo) {
   const linha = document.createElement("div");
   linha.className = "linha-principal";
 
-  let nome = null;
-
-  if (tipo !== "agente") {
-    nome = document.createElement("input");
-    nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
-    nome.className = "campo-nome";
-    linha.append(nome);
-  }
+  const nome = document.createElement("input");
+  nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
+  nome.className = "campo-nome";
 
   const del = document.createElement("button");
   del.textContent = "✖";
@@ -88,10 +74,11 @@ function criarCampo(tipo) {
     wrap.remove();
     atualizarSelectUsuariosRamal();
     atualizarSelectAgentes();
+    atualizarSelectAgentesFila();
     atualizarTodosDestinosURA();
   };
 
-  linha.append(del);
+  linha.append(nome, del);
   wrap.append(linha);
 
   let email = null, senha = null, permissao = null;
@@ -113,18 +100,17 @@ function criarCampo(tipo) {
 
     const boxAgente = document.createElement("label");
     boxAgente.style.display = "flex";
-    boxAgente.style.alignItems = "center";
     boxAgente.style.gap = "6px";
     boxAgente.style.marginTop = "6px";
 
     chkAgente = document.createElement("input");
     chkAgente.type = "checkbox";
-    chkAgente.onchange = atualizarSelectAgentes;
+    chkAgente.onchange = () => {
+      atualizarSelectAgentes();
+      atualizarSelectAgentesFila();
+    };
 
-    const span = document.createElement("span");
-    span.textContent = "Este usuário é agente";
-
-    boxAgente.append(chkAgente, span);
+    boxAgente.append(chkAgente, document.createTextNode(" Este usuário é agente"));
 
     wrap.append(email, senha, permissao, boxAgente);
   }
@@ -137,10 +123,7 @@ function criarCampo(tipo) {
 
     selectUsuario = document.createElement("select");
     selectUsuario.innerHTML = `<option value="">Vincular usuário (opcional)</option>`;
-    selectUsuario.onchange = () => {
-      wrap.dataset.usuarioId = selectUsuario.value || "";
-      atualizarSelectAgentes();
-    };
+    selectUsuario.onchange = () => wrap.dataset.usuarioId = selectUsuario.value || "";
 
     wrap.append(senha, selectUsuario);
   }
@@ -166,27 +149,72 @@ function criarCampo(tipo) {
     setTimeout(() => wrap.atualizarAgenteSelects(), 50);
   }
 
-  /* ===== URA ===== */
-  if (tipo === "ura") {
-    const msg = document.createElement("textarea");
-    msg.placeholder = "Mensagem da URA";
-
+  /* ===== FILA ===== */
+  if (tipo === "fila") {
+    const selectAgente = document.createElement("select");
+    const btnAdd = document.createElement("button");
     const lista = document.createElement("div");
 
-    const btn = document.createElement("button");
-    btn.textContent = "+ Nova opção";
-    btn.onclick = () => lista.appendChild(criarOpcaoURA());
+    lista.style.marginTop = "8px";
 
-    wrap.append(msg, lista, btn);
+    selectAgente.innerHTML = `<option value="">Selecione um agente</option>`;
+    btnAdd.textContent = "Adicionar agente";
 
-    wrap.getURA = () => ({
-      nome: nome.value,
-      mensagem: msg.value,
-      opcoes: [...lista.querySelectorAll(".opcao-ura")].map(o => o.getData())
-    });
+    wrap.dataset.agentes = "[]";
+
+    btnAdd.onclick = () => {
+      if (!selectAgente.value) return;
+
+      let agentes = JSON.parse(wrap.dataset.agentes);
+      if (agentes.includes(selectAgente.value)) return;
+
+      agentes.push(selectAgente.value);
+      wrap.dataset.agentes = JSON.stringify(agentes);
+      renderAgentesFila();
+    };
+
+    function renderAgentesFila() {
+      lista.innerHTML = "";
+      let agentes = JSON.parse(wrap.dataset.agentes);
+
+      agentes.forEach(id => {
+        const nomeAgente = document.querySelector(
+          `#listaAgentes .campo-descricao[data-id="${id}"] .campo-nome`
+        )?.value;
+
+        if (!nomeAgente) return;
+
+        const item = document.createElement("div");
+        item.style.display = "flex";
+        item.style.justifyContent = "space-between";
+
+        const span = document.createElement("span");
+        span.textContent = nomeAgente;
+
+        const btn = document.createElement("button");
+        btn.textContent = "🗑";
+        btn.onclick = () => {
+          wrap.dataset.agentes = JSON.stringify(
+            JSON.parse(wrap.dataset.agentes).filter(a => a !== id)
+          );
+          renderAgentesFila();
+        };
+
+        item.append(span, btn);
+        lista.appendChild(item);
+      });
+    }
+
+    wrap.atualizarFilaAgentes = () => {
+      carregarAgentesFila(selectAgente);
+      renderAgentesFila();
+    };
+
+    wrap.append(selectAgente, btnAdd, lista);
+    setTimeout(() => wrap.atualizarFilaAgentes(), 50);
   }
 
-  wrap.getNome = () => nome ? nome.value : "";
+  wrap.getNome = () => nome.value;
   wrap.getEmail = () => email?.value || "";
   wrap.getSenha = () => senha?.value || "";
   wrap.getPermissao = () => permissao?.value || "";
@@ -195,33 +223,18 @@ function criarCampo(tipo) {
   return wrap;
 }
 
-/* ================= USUÁRIOS → RAMAL ================= */
-
-function atualizarSelectUsuariosRamal() {
-  const usuarios = [...document.querySelectorAll("#listaUsuariosWeb .campo-descricao")]
-    .map(c => ({ id: c.dataset.id, nome: c.getNome() }))
-    .filter(u => u.nome);
-
-  document.querySelectorAll("#listaRings .campo-descricao").forEach(ramal => {
-    const select = ramal.querySelector("select");
-    if (!select) return;
-
-    const atual = ramal.dataset.usuarioId || "";
-    select.innerHTML = `<option value="">Vincular usuário (opcional)</option>`;
-
-    usuarios.forEach(u => {
-      const opt = new Option(u.nome, u.id);
-      if (u.id === atual) opt.selected = true;
-      select.add(opt);
-    });
-  });
-}
-
-/* ================= USUÁRIOS → AGENTES ================= */
+/* ================= AGENTES GERAIS ================= */
 
 function atualizarSelectAgentes() {
   document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
     if (a.atualizarAgenteSelects) a.atualizarAgenteSelects();
+  });
+  atualizarSelectAgentesFila();
+}
+
+function atualizarSelectAgentesFila() {
+  document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
+    if (f.atualizarFilaAgentes) f.atualizarFilaAgentes();
   });
 }
 
@@ -247,78 +260,20 @@ function carregarRamais(select, atual = "") {
   });
 }
 
-/* ================= URA ================= */
+function carregarAgentesFila(select) {
+  select.innerHTML = `<option value="">Selecione um agente</option>`;
 
-function criarOpcaoURA() {
-  const wrap = document.createElement("div");
-  wrap.className = "opcao-ura";
-
-  const tecla = document.createElement("input");
-  tecla.placeholder = "Tecla";
-
-  const destino = document.createElement("select");
-  atualizarDestinosURA(destino);
-
-  const desc = document.createElement("input");
-  desc.placeholder = "Descrição";
-
-  const del = document.createElement("button");
-  del.textContent = "🗑";
-  del.onclick = () => wrap.remove();
-
-  wrap.append(tecla, destino, desc, del);
-
-  wrap.getData = () => ({
-    tecla: tecla.value,
-    destino: destino.value,
-    descricao: desc.value
-  });
-
-  return wrap;
-}
-
-function atualizarDestinosURA(select) {
-  if (!select) return;
-  select.innerHTML = "";
-  select.add(new Option("Selecione o destino", ""));
-
-  ["listaFilas","listaRings","listaGrupoRing","listaURAs"].forEach(id => {
-    document.querySelectorAll(`#${id} .campo-nome`).forEach(i => {
-      if (i.value) select.add(new Option(i.value, `${id}:${i.value}`));
-    });
+  document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+    if (a.dataset.usuarioId && a.dataset.ramalId && a.querySelector(".campo-nome")?.value) {
+      select.add(new Option(a.querySelector(".campo-nome").value, a.dataset.id));
+    }
   });
 }
-
-function atualizarTodosDestinosURA() {
-  document.querySelectorAll(".opcao-ura select").forEach(s => {
-    const v = s.value;
-    atualizarDestinosURA(s);
-    s.value = v;
-  });
-}
-
-/* ================= RANGE ================= */
-
-window.criarRangeRamais = function () {
-  const ini = +ramalInicio.value;
-  const fim = +ramalFim.value;
-  const box = listaRings;
-
-  if (!ini || !fim || fim < ini) return mostrarToast("Range inválido", true);
-
-  for (let i = ini; i <= fim; i++) {
-    const c = criarCampo("ring");
-    c.querySelector(".campo-nome").value = i;
-    box.appendChild(c);
-  }
-
-  atualizarSelectUsuariosRamal();
-  atualizarSelectAgentes();
-};
 
 /* ================= JSON ================= */
 
 window.explorar = function () {
+
   const usuarios = [...listaUsuariosWeb.querySelectorAll(".campo-descricao")].map(c => ({
     id: c.dataset.id,
     nome: c.getNome(),
@@ -336,26 +291,17 @@ window.explorar = function () {
   }));
 
   const agentes = [...listaAgentes.querySelectorAll(".campo-descricao")].map(c => ({
+    id: c.dataset.id,
+    nome: c.getNome(),
     usuarioId: c.dataset.usuarioId || null,
     ramalId: c.dataset.ramalId || null
   }));
 
-  const dados = { voz: { usuarios, ramais, agentes } };
+  const filas = [...listaFilas.querySelectorAll(".campo-descricao")].map(f => ({
+    nome: f.querySelector(".campo-nome")?.value || "",
+    agentes: JSON.parse(f.dataset.agentes || "[]")
+  }));
+
+  const dados = { voz: { usuarios, ramais, agentes, filas } };
   resultado.textContent = JSON.stringify(dados, null, 2);
-};
-
-/* ================= TOAST ================= */
-
-function mostrarToast(msg, erro=false){
-  toastMessage.textContent = msg;
-  toastGlobal.className = "toast show" + (erro ? " error" : "");
-  setTimeout(()=>toastGlobal.classList.remove("show"),3000);
-}
-
-/* ================= TEMA ================= */
-
-if (localStorage.getItem("tema") === "dark") document.body.classList.add("dark");
-toggleTheme.onclick = () => {
-  document.body.classList.toggle("dark");
-  localStorage.setItem("tema", document.body.classList.contains("dark")?"dark":"light");
 };
