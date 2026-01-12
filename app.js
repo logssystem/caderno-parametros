@@ -1,4 +1,4 @@
-console.log("APP.JS BASE ESTÁVEL - AGENTE VIA USUÁRIO");
+console.log("APP.JS ESTÁVEL - AGENTE VIA USUÁRIO");
 
 /* ================= ESTADO GLOBAL ================= */
 
@@ -45,6 +45,16 @@ window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
   if (!container || container.children.length >= LIMITE) return;
 
+  if (tipo === "agente") {
+    const temAgente = [...document.querySelectorAll("#listaUsuariosWeb .campo-descricao")]
+      .some(u => u.isAgente && u.isAgente());
+
+    if (!temAgente) {
+      mostrarToast("Crie um usuário marcado como agente antes.", true);
+      return;
+    }
+  }
+
   const campo = criarCampo(tipo);
   container.appendChild(campo);
 
@@ -63,9 +73,14 @@ function criarCampo(tipo) {
   const linha = document.createElement("div");
   linha.className = "linha-principal";
 
-  const nome = document.createElement("input");
-  nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
-  nome.className = "campo-nome";
+  let nome = null;
+
+  if (tipo !== "agente") {
+    nome = document.createElement("input");
+    nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
+    nome.className = "campo-nome";
+    linha.append(nome);
+  }
 
   const del = document.createElement("button");
   del.textContent = "✖";
@@ -76,7 +91,7 @@ function criarCampo(tipo) {
     atualizarTodosDestinosURA();
   };
 
-  linha.append(nome, del);
+  linha.append(del);
   wrap.append(linha);
 
   let email = null, senha = null, permissao = null;
@@ -124,6 +139,7 @@ function criarCampo(tipo) {
     selectUsuario.innerHTML = `<option value="">Vincular usuário (opcional)</option>`;
     selectUsuario.onchange = () => {
       wrap.dataset.usuarioId = selectUsuario.value || "";
+      atualizarSelectAgentes();
     };
 
     wrap.append(senha, selectUsuario);
@@ -170,7 +186,7 @@ function criarCampo(tipo) {
     });
   }
 
-  wrap.getNome = () => nome.value;
+  wrap.getNome = () => nome ? nome.value : "";
   wrap.getEmail = () => email?.value || "";
   wrap.getSenha = () => senha?.value || "";
   wrap.getPermissao = () => permissao?.value || "";
@@ -320,27 +336,12 @@ window.explorar = function () {
   }));
 
   const agentes = [...listaAgentes.querySelectorAll(".campo-descricao")].map(c => ({
-    nome: c.getNome(),
     usuarioId: c.dataset.usuarioId || null,
     ramalId: c.dataset.ramalId || null
   }));
 
   const dados = { voz: { usuarios, ramais, agentes } };
   resultado.textContent = JSON.stringify(dados, null, 2);
-};
-
-window.exportarJSON = function () {
-  const blob = new Blob([resultado.textContent], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "caderno_parametros.json";
-  a.click();
-};
-
-/* ================= IMPORT (stub) ================= */
-
-window.acionarImportacao = function () {
-  mostrarToast("Importação será ligada na próxima fase.");
 };
 
 /* ================= TOAST ================= */
