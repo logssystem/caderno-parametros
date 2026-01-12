@@ -1,5 +1,3 @@
-poderia fazer essas alterações? e me passar o código so para colar.
-
 console.log("APP.JS BASE ESTÁVEL");
 
 /* ================= ESTADO GLOBAL ================= */
