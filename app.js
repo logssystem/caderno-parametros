@@ -47,6 +47,8 @@ window.adicionarCampo = function (tipo) {
 
   const campo = criarCampo(tipo);
   container.appendChild(campo);
+
+  atualizarSelectUsuariosRamal();
   atualizarTodosDestinosURA();
 };
 
@@ -68,6 +70,7 @@ function criarCampo(tipo) {
   del.textContent = "✖";
   del.onclick = () => {
     wrap.remove();
+    atualizarSelectUsuariosRamal();
     atualizarTodosDestinosURA();
   };
 
@@ -75,7 +78,9 @@ function criarCampo(tipo) {
   wrap.append(linha);
 
   let email = null, senha = null, permissao = null;
+  let selectUsuario = null;
 
+  /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
     email = document.createElement("input");
     email.placeholder = "E-mail";
@@ -91,13 +96,23 @@ function criarCampo(tipo) {
     wrap.append(email, senha, permissao);
   }
 
+  /* ===== RAMAL (COM USUÁRIO) ===== */
   if (tipo === "ring") {
     senha = document.createElement("input");
     senha.placeholder = "Senha do ramal";
     senha.className = "campo-senha";
-    wrap.append(senha);
+
+    selectUsuario = document.createElement("select");
+    selectUsuario.innerHTML = `<option value="">Vincular usuário (opcional)</option>`;
+
+    selectUsuario.onchange = () => {
+      wrap.dataset.usuarioId = selectUsuario.value || "";
+    };
+
+    wrap.append(senha, selectUsuario);
   }
 
+  /* ===== URA ===== */
   if (tipo === "ura") {
     const msg = document.createElement("textarea");
     msg.placeholder = "Mensagem da URA";
@@ -121,8 +136,34 @@ function criarCampo(tipo) {
   wrap.getEmail = () => email?.value || "";
   wrap.getSenha = () => senha?.value || "";
   wrap.getPermissao = () => permissao?.value || "";
+  wrap.getUsuarioId = () => wrap.dataset.usuarioId || "";
 
   return wrap;
+}
+
+/* ================= RAMAL x USUÁRIO ================= */
+
+function atualizarSelectUsuariosRamal() {
+  const usuarios = [...document.querySelectorAll("#listaUsuariosWeb .campo-descricao")]
+    .map(c => ({
+      id: c.dataset.id,
+      nome: c.getNome()
+    }))
+    .filter(u => u.nome);
+
+  document.querySelectorAll("#listaRings .campo-descricao").forEach(ramal => {
+    const select = ramal.querySelector("select");
+    if (!select) return;
+
+    const atual = ramal.dataset.usuarioId || "";
+    select.innerHTML = `<option value="">Vincular usuário (opcional)</option>`;
+
+    usuarios.forEach(u => {
+      const opt = new Option(u.nome, u.id);
+      if (u.id === atual) opt.selected = true;
+      select.add(opt);
+    });
+  });
 }
 
 /* ================= URA ================= */
@@ -263,6 +304,8 @@ window.criarRangeRamais = function () {
     c.querySelector(".campo-nome").value = i;
     box.appendChild(c);
   }
+
+  atualizarSelectUsuariosRamal();
 };
 
 /* ================= JSON ================= */
@@ -277,7 +320,8 @@ window.explorar = function () {
 
   const ramais = [...listaRings.querySelectorAll(".campo-descricao")].map(c => ({
     ramal: c.getNome(),
-    senha: c.getSenha()
+    senha: c.getSenha(),
+    usuarioId: c.dataset.usuarioId || null
   }));
 
   const dados = { voz: { usuarios, ramais } };
