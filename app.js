@@ -1,4 +1,4 @@
-console.log("APP.JS BASE ESTÁVEL - FILAS COM AGENTES");
+console.log("APP.JS BASE ESTÁVEL - FILAS COM AGENTES (AJUSTADO)");
 
 /* ================= ESTADO GLOBAL ================= */
 
@@ -78,7 +78,9 @@ function criarCampo(tipo) {
     atualizarTodosDestinosURA();
   };
 
-  linha.append(nome, del);
+  if (tipo !== "agente") linha.append(nome, del);
+  else linha.append(del);
+
   wrap.append(linha);
 
   let email = null, senha = null, permissao = null;
@@ -111,7 +113,6 @@ function criarCampo(tipo) {
     };
 
     boxAgente.append(chkAgente, document.createTextNode(" Este usuário é agente"));
-
     wrap.append(email, senha, permissao, boxAgente);
   }
 
@@ -128,7 +129,7 @@ function criarCampo(tipo) {
     wrap.append(senha, selectUsuario);
   }
 
-  /* ===== AGENTE ===== */
+  /* ===== AGENTE (SEM NOME) ===== */
   if (tipo === "agente") {
     const selectUser = document.createElement("select");
     const selectRamal = document.createElement("select");
@@ -136,8 +137,8 @@ function criarCampo(tipo) {
     selectUser.innerHTML = `<option value="">Usuário agente</option>`;
     selectRamal.innerHTML = `<option value="">Ramal (obrigatório)</option>`;
 
-    selectUser.onchange = () => wrap.dataset.usuarioId = selectUser.value;
-    selectRamal.onchange = () => wrap.dataset.ramalId = selectRamal.value;
+    selectUser.onchange = () => wrap.dataset.usuarioId = selectUser.value || "";
+    selectRamal.onchange = () => wrap.dataset.ramalId = selectRamal.value || "";
 
     wrap.append(selectUser, selectRamal);
 
@@ -156,7 +157,6 @@ function criarCampo(tipo) {
     const lista = document.createElement("div");
 
     lista.style.marginTop = "8px";
-
     selectAgente.innerHTML = `<option value="">Selecione um agente</option>`;
     btnAdd.textContent = "Adicionar agente";
 
@@ -178,18 +178,18 @@ function criarCampo(tipo) {
       let agentes = JSON.parse(wrap.dataset.agentes);
 
       agentes.forEach(id => {
-        const nomeAgente = document.querySelector(
-          `#listaAgentes .campo-descricao[data-id="${id}"] .campo-nome`
-        )?.value;
+        const agente = document.querySelector(
+          `#listaAgentes .campo-descricao[data-id="${id}"] select`
+        );
 
-        if (!nomeAgente) return;
+        const nome = agente?.selectedOptions[0]?.text || "Agente";
 
         const item = document.createElement("div");
         item.style.display = "flex";
         item.style.justifyContent = "space-between";
 
         const span = document.createElement("span");
-        span.textContent = nomeAgente;
+        span.textContent = nome;
 
         const btn = document.createElement("button");
         btn.textContent = "🗑";
@@ -223,7 +223,7 @@ function criarCampo(tipo) {
   return wrap;
 }
 
-/* ================= AGENTES GERAIS ================= */
+/* ================= ATUALIZAÇÕES ================= */
 
 function atualizarSelectAgentes() {
   document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
@@ -264,8 +264,9 @@ function carregarAgentesFila(select) {
   select.innerHTML = `<option value="">Selecione um agente</option>`;
 
   document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
-    if (a.dataset.usuarioId && a.dataset.ramalId && a.querySelector(".campo-nome")?.value) {
-      select.add(new Option(a.querySelector(".campo-nome").value, a.dataset.id));
+    if (a.dataset.usuarioId && a.dataset.ramalId) {
+      const user = a.querySelector("select")?.selectedOptions[0]?.text;
+      if (user) select.add(new Option(user, a.dataset.id));
     }
   });
 }
@@ -292,7 +293,6 @@ window.explorar = function () {
 
   const agentes = [...listaAgentes.querySelectorAll(".campo-descricao")].map(c => ({
     id: c.dataset.id,
-    nome: c.getNome(),
     usuarioId: c.dataset.usuarioId || null,
     ramalId: c.dataset.ramalId || null
   }));
