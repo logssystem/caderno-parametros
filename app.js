@@ -1,4 +1,4 @@
-console.log("APP.JS BASE ESTÁVEL - FILAS COM AGENTES (AJUSTADO)");
+console.log("APP.JS BASE ESTÁVEL - FILAS COM AGENTES (FIX FINAL)");
 
 /* ================= ESTADO GLOBAL ================= */
 
@@ -129,7 +129,7 @@ function criarCampo(tipo) {
     wrap.append(senha, selectUsuario);
   }
 
-  /* ===== AGENTE (SEM NOME) ===== */
+  /* ===== AGENTE ===== */
   if (tipo === "agente") {
     const selectUser = document.createElement("select");
     const selectRamal = document.createElement("select");
@@ -150,7 +150,7 @@ function criarCampo(tipo) {
     setTimeout(() => wrap.atualizarAgenteSelects(), 50);
   }
 
-  /* ===== FILA ===== */
+  /* ===== FILA (MULTI AGENTES) ===== */
   if (tipo === "fila") {
     const selectAgente = document.createElement("select");
     const btnAdd = document.createElement("button");
@@ -178,11 +178,11 @@ function criarCampo(tipo) {
       let agentes = JSON.parse(wrap.dataset.agentes);
 
       agentes.forEach(id => {
-        const agente = document.querySelector(
-          `#listaAgentes .campo-descricao[data-id="${id}"] select`
+        const agenteBox = document.querySelector(
+          `#listaAgentes .campo-descricao[data-id="${id}"]`
         );
 
-        const nome = agente?.selectedOptions[0]?.text || "Agente";
+        const nome = agenteBox?.querySelector("select")?.selectedOptions[0]?.text || "Agente";
 
         const item = document.createElement("div");
         item.style.display = "flex";
@@ -225,6 +225,26 @@ function criarCampo(tipo) {
 
 /* ================= ATUALIZAÇÕES ================= */
 
+function atualizarSelectUsuariosRamal() {
+  const usuarios = [...document.querySelectorAll("#listaUsuariosWeb .campo-descricao")]
+    .map(c => ({ id: c.dataset.id, nome: c.getNome() }))
+    .filter(u => u.nome);
+
+  document.querySelectorAll("#listaRings .campo-descricao").forEach(ramal => {
+    const select = ramal.querySelector("select");
+    if (!select) return;
+
+    const atual = ramal.dataset.usuarioId || "";
+    select.innerHTML = `<option value="">Vincular usuário (opcional)</option>`;
+
+    usuarios.forEach(u => {
+      const opt = new Option(u.nome, u.id);
+      if (u.id === atual) opt.selected = true;
+      select.add(opt);
+    });
+  });
+}
+
 function atualizarSelectAgentes() {
   document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
     if (a.atualizarAgenteSelects) a.atualizarAgenteSelects();
@@ -265,11 +285,31 @@ function carregarAgentesFila(select) {
 
   document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
     if (a.dataset.usuarioId && a.dataset.ramalId) {
-      const user = a.querySelector("select")?.selectedOptions[0]?.text;
-      if (user) select.add(new Option(user, a.dataset.id));
+      const nome = a.querySelector("select")?.selectedOptions[0]?.text;
+      if (nome) select.add(new Option(nome, a.dataset.id));
     }
   });
 }
+
+/* ================= RANGE ================= */
+
+window.criarRangeRamais = function () {
+  const ini = +ramalInicio.value;
+  const fim = +ramalFim.value;
+  const box = listaRings;
+
+  if (!ini || !fim || fim < ini) return mostrarToast("Range inválido", true);
+
+  for (let i = ini; i <= fim; i++) {
+    const c = criarCampo("ring");
+    c.querySelector(".campo-nome").value = i;
+    box.appendChild(c);
+  }
+
+  atualizarSelectUsuariosRamal();
+  atualizarSelectAgentes();
+  atualizarSelectAgentesFila();
+};
 
 /* ================= JSON ================= */
 
