@@ -65,6 +65,7 @@ function criarCampo(tipo) {
   let senhaInput = null;
   let permissao = null;
   let regras = null;
+  let chkAgente = null;
 
   /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
@@ -91,9 +92,23 @@ function criarCampo(tipo) {
     opt0.disabled = true;
     opt0.selected = true;
     permissao.appendChild(opt0);
-
     PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
     wrap.append(permissao);
+
+    const boxAgente = document.createElement("label");
+    boxAgente.style.display = "flex";
+    boxAgente.style.alignItems = "center";
+    boxAgente.style.gap = "6px";
+    boxAgente.style.marginTop = "8px";
+
+    chkAgente = document.createElement("input");
+    chkAgente.type = "checkbox";
+
+    const txt = document.createElement("span");
+    txt.textContent = "Este usuário é agente de call center";
+
+    boxAgente.append(chkAgente, txt);
+    wrap.append(boxAgente);
 
     regras = document.createElement("div");
     regras.style.marginTop = "8px";
@@ -120,7 +135,7 @@ function criarCampo(tipo) {
   /* ===== URA ===== */
   if (tipo === "ura") {
     const msg = document.createElement("textarea");
-    msg.placeholder = "Mensagem da URA Ex: Olá Seja Bem Vindo a Empresa ERA selecione as opções a seguir 1 para suporte etc...";
+    msg.placeholder = "Mensagem da URA Ex: Olá seja bem-vindo...";
     msg.style.marginTop = "12px";
     wrap.append(msg);
 
@@ -144,10 +159,6 @@ function criarCampo(tipo) {
     });
   }
 
-  const desc = document.createElement("textarea");
-  desc.placeholder = "Descrição (opcional)";
-  wrap.append(desc);
-
   function validarSenha(input, regrasEl) {
     const v = input.value;
     const ok = v.length >= 11 && /[A-Z]/.test(v) && /\d/.test(v) && /[^A-Za-z0-9]/.test(v);
@@ -160,59 +171,16 @@ function criarCampo(tipo) {
   wrap.getEmail = () => emailInput?.value || "";
   wrap.getSenha = () => senhaInput?.value || "";
   wrap.getPermissao = () => permissao?.value || "";
+  wrap.isAgente = () => chkAgente ? chkAgente.checked : false;
 
   return wrap;
 }
 
-/* ================= DESTINOS URA ================= */
-
-function atualizarDestinosURA(select) {
-  if (!select) return;
-
-  select.innerHTML = "";
-  select.add(new Option("Selecione o destino", ""));
-
-  document.querySelectorAll("#listaFilas .campo-nome").forEach(f =>
-    f.value && select.add(new Option("Fila: " + f.value, "fila:" + f.value))
-  );
-
-  document.querySelectorAll("#listaRings .campo-nome").forEach(r =>
-    r.value && select.add(new Option("Ramal: " + r.value, "ramal:" + r.value))
-  );
-
-  document.querySelectorAll("#listaGrupoRing .campo-nome").forEach(g =>
-    g.value && select.add(new Option("Grupo: " + g.value, "grupo:" + g.value))
-  );
-
-  document.querySelectorAll("#listaURAs .campo-nome").forEach(u =>
-    u.value && select.add(new Option("URA: " + u.value, "ura:" + u.value))
-  );
-
-  document.querySelectorAll("#listaRegrasTempo .campo-descricao input").forEach(r =>
-    r.value && select.add(new Option("Regra de tempo: " + r.value, "tempo:" + r.value))
-  );
-
-  select.add(new Option("Desligar", "desligar"));
-  select.add(new Option("Número externo", "numero"));
-}
-
-function atualizarTodosDestinosURA() {
-  document.querySelectorAll(".opcao-ura select").forEach(select => {
-    const atual = select.value;
-    atualizarDestinosURA(select);
-    select.value = atual;
-  });
-}
-
-/* ================= OPÇÕES URA ================= */
+/* ================= OPÇÃO URA ================= */
 
 function criarOpcaoURA() {
   const wrap = document.createElement("div");
   wrap.className = "opcao-ura";
-  wrap.style.display = "grid";
-  wrap.style.gridTemplateColumns = "70px 1fr 1fr auto";
-  wrap.style.gap = "8px";
-  wrap.style.marginTop = "8px";
 
   const tecla = document.createElement("input");
   tecla.placeholder = "Tecla";
@@ -238,241 +206,59 @@ function criarOpcaoURA() {
   return wrap;
 }
 
-/* ================= IMPORTAÇÃO CSV ================= */
+/* ================= DESTINOS URA ================= */
 
-window.acionarImportacao = function (tipo) {
-  const input = document.getElementById(
-    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
-  );
+function atualizarDestinosURA(select) {
+  if (!select) return;
+  select.innerHTML = "";
+  select.add(new Option("Selecione o destino", ""));
 
-  if (!input) return mostrarToast("Input de importação não encontrado", true);
-
-  input.value = "";
-  input.click();
-
-  input.onchange = () => {
-    const file = input.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = e => processarCSV(tipo, e.target.result);
-    reader.readAsText(file);
-  };
-};
-
-function processarCSV(tipo, texto) {
-  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
-  if (linhas.length < 2) return mostrarToast("CSV vazio ou inválido", true);
-
-  const sep = linhas[0].includes(";") ? ";" : ",";
-  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
-  const container = document.getElementById(listas[tipo]);
-  if (!container) return;
-
-  linhas.forEach(l => {
-    const v = l.split(sep);
-    const d = {};
-    header.forEach((h, i) => d[h] = (v[i] || "").trim());
-
-    const campo = criarCampo(tipo);
-    campo.querySelector(".campo-nome").value = d.usuario || d.nome || "";
-
-    if (tipo === "usuario_web") {
-      campo.querySelector("input[type=email]").value = d.email || "";
-      campo.querySelector(".campo-senha").value = d.senha || "";
-
-      const select = campo.querySelector("select");
-      if (select && d.permissao) {
-        [...select.options].forEach(opt => {
-          if (opt.value.toLowerCase() === d.permissao.toLowerCase()) {
-            opt.selected = true;
-          }
-        });
-      }
-    }
-
-    container.appendChild(campo);
+  ["listaFilas","listaRings","listaGrupoRing","listaURAs"].forEach(id => {
+    document.querySelectorAll(`#${id} .campo-nome`).forEach(i => {
+      if (i.value) select.add(new Option(i.value, `${id}:${i.value}`));
+    });
   });
-
-  atualizarTodosDestinosURA();
-  mostrarToast("CSV importado com sucesso!");
 }
 
-/* ================= TEMPLATE CSV ================= */
-
-window.baixarTemplateUsuarios = function () {
-  const csv = "usuario;email;senha;permissao;descricao\n";
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "template_usuarios_web.csv";
-  link.click();
-};
-
-/* ================= TEMA (MODO ESCURO RESTAURADO) ================= */
-
-const toggleTheme = document.getElementById("toggleTheme");
-
-function aplicarTemaSalvo() {
-  const tema = localStorage.getItem("tema");
-  if (tema === "dark") {
-    document.body.classList.add("dark");
-  } else {
-    document.body.classList.remove("dark");
-  }
-}
-
-if (toggleTheme) {
-  toggleTheme.onclick = () => {
-    document.body.classList.toggle("dark");
-    localStorage.setItem(
-      "tema",
-      document.body.classList.contains("dark") ? "dark" : "light"
-    );
-  };
-}
-
-aplicarTemaSalvo();
-
-/* ================= REGRA DE TEMPO (FIX COMPLETO) ================= */
-
-window.adicionarRegraTempo = function () {
-  const container = document.getElementById("listaRegrasTempo");
-
-  if (!container) {
-    console.error("listaRegrasTempo não encontrada");
-    return mostrarToast("Lista de regras de tempo não encontrada", true);
-  }
-
-  container.appendChild(criarRegraTempo());
-  atualizarTodosDestinosURA();
-};
-
-function criarRegraTempo() {
-  const wrap = document.createElement("div");
-  wrap.className = "campo-descricao";
-
-  const linhaTopo = document.createElement("div");
-  linhaTopo.className = "linha-principal";
-
-  const nome = document.createElement("input");
-  nome.placeholder = "Nome da regra de tempo";
-
-  const btn = document.createElement("button");
-  btn.textContent = "✖";
-  btn.onclick = () => wrap.remove();
-
-  linhaTopo.append(nome, btn);
-  wrap.append(linhaTopo);
-
-  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
-  const diasSelecionados = new Set();
-
-  const diasBox = document.createElement("div");
-  diasBox.style.display = "flex";
-  diasBox.style.flexWrap = "wrap";
-  diasBox.style.gap = "6px";
-  diasBox.style.marginTop = "10px";
-
-  diasSemana.forEach(dia => {
-    const btnDia = document.createElement("button");
-    btnDia.textContent = dia;
-    btnDia.className = "btn-dia";
-    btnDia.onclick = () => {
-      btnDia.classList.toggle("ativo");
-      btnDia.classList.contains("ativo")
-        ? diasSelecionados.add(dia)
-        : diasSelecionados.delete(dia);
-    };
-    diasBox.appendChild(btnDia);
+function atualizarTodosDestinosURA() {
+  document.querySelectorAll(".opcao-ura select").forEach(select => {
+    const atual = select.value;
+    atualizarDestinosURA(select);
+    select.value = atual;
   });
-
-  wrap.appendChild(diasBox);
-
-  const horarios = document.createElement("div");
-  horarios.style.display = "flex";
-  horarios.style.gap = "10px";
-  horarios.style.marginTop = "10px";
-
-  const inicio = document.createElement("input");
-  inicio.type = "time";
-
-  const fim = document.createElement("input");
-  fim.type = "time";
-
-  horarios.append(inicio, fim);
-  wrap.append(horarios);
-
-  wrap.getData = () => ({
-    nome: nome.value,
-    dias: [...diasSelecionados],
-    hora_inicio: inicio.value,
-    hora_fim: fim.value
-  });
-
-  return wrap;
 }
 
-/* ================= RANGE DE RAMAIS (FIX DEFINITIVO) ================= */
+/* ================= RANGE RAMAIS ================= */
 
 window.criarRangeRamais = function () {
   const ini = Number(document.getElementById("ramalInicio")?.value);
   const fim = Number(document.getElementById("ramalFim")?.value);
   const container = document.getElementById("listaRings");
 
-  if (!container) {
-    console.error("listaRings não encontrada");
-    return mostrarToast("Lista de ramais não encontrada", true);
-  }
-
-  if (!ini || !fim || fim < ini) {
-    return mostrarToast("Range inválido", true);
-  }
+  if (!ini || !fim || fim < ini) return mostrarToast("Range inválido", true);
 
   for (let i = ini; i <= fim; i++) {
-    if (container.children.length >= LIMITE) break;
-
     const campo = criarCampo("ring");
     campo.querySelector(".campo-nome").value = i;
     container.appendChild(campo);
   }
 
   atualizarTodosDestinosURA();
-  mostrarToast("Range de ramais criado com sucesso!");
+  mostrarToast("Range criado com sucesso!");
 };
 
-/* ================= REPARO DE FUNÇÕES GLOBAIS ================= */
+/* ================= TOAST ================= */
 
-/* ---- TOAST (garante que nunca fique undefined) ---- */
-if (typeof window.mostrarToast !== "function") {
-  window.mostrarToast = function (msg, error = false) {
-    const t = document.getElementById("toastGlobal");
-    const m = document.getElementById("toastMessage");
-
-    if (!t || !m) {
-      console.warn("Toast não encontrado:", msg);
-      return;
-    }
-
-    m.textContent = msg;
-    t.className = "toast show" + (error ? " error" : "");
-    setTimeout(() => t.classList.remove("show"), 3000);
-  };
+function mostrarToast(msg, error = false) {
+  const t = document.getElementById("toastGlobal");
+  const m = document.getElementById("toastMessage");
+  if (!t || !m) return;
+  m.textContent = msg;
+  t.className = "toast show" + (error ? " error" : "");
+  setTimeout(() => t.classList.remove("show"), 3000);
 }
 
-/* ---- GERAR JSON (garante que o botão funcione) ---- */
-if (typeof window.explorar !== "function") {
-  window.explorar = function () {
-    if (typeof gerarJSON === "function") {
-      gerarJSON();
-    } else {
-      mostrarToast("Função de geração de JSON não encontrada", true);
-      console.error("explorar() não encontrou gerarJSON()");
-    }
-  };
-}
-
-/* ================= GERADOR OFICIAL DE JSON ================= */
+/* ================= JSON ================= */
 
 window.explorar = function () {
   try {
@@ -486,7 +272,8 @@ window.explorar = function () {
       nome: c.getNome(),
       email: c.getEmail(),
       senha: c.getSenha(),
-      permissao: c.getPermissao()
+      permissao: c.getPermissao(),
+      agente: c.isAgente()
     }));
 
     const ramais = coletar("listaRings", c => ({
@@ -494,75 +281,20 @@ window.explorar = function () {
       senha: c.getSenha()
     }));
 
-    const entradas = coletar("listaEntradas", c => ({
-      numero: c.getNome()
-    }));
-
-    const filas = coletar("listaFilas", c => ({
-      nome: c.getNome()
-    }));
-
-    const grupos = coletar("listaGrupoRing", c => ({
-      nome: c.getNome()
-    }));
-
-    const agentes = coletar("listaAgentes", c => ({
-      nome: c.getNome()
-    }));
-
     const uras = [];
     document.querySelectorAll("#listaURAs .campo-descricao").forEach(c => {
       if (c.getURA) uras.push(c.getURA());
     });
 
-    const regras = [];
-    document.querySelectorAll("#listaRegrasTempo .campo-descricao")
-      .forEach(r => regras.push(r.getData()));
+    const dados = { voz: { usuarios, ramais, uras } };
 
-    const temVoz =
-      usuarios.length || ramais.length || entradas.length ||
-      uras.length || filas.length || grupos.length ||
-      agentes.length || regras.length;
+    document.getElementById("resultado").textContent =
+      JSON.stringify(dados, null, 2);
 
-    const temChat = window.chatState &&
-      (chatState.tipo || chatState.api || chatState.conta || chatState.canais.length);
-
-    const dados = {};
-
-    dados.voz = temVoz ? {
-      ativo: true,
-      usuarios_web: usuarios,
-      ramais,
-      entradas,
-      uras,
-      filas,
-      grupos_ring: grupos,
-      agentes,
-      regras_tempo: regras
-    } : {
-      ativo: false,
-      mensagem: "Nenhuma configuração de voz foi informada"
-    };
-
-    dados.chat = temChat ? {
-      ativo: true,
-      tipo: chatState.tipo,
-      api: chatState.api,
-      conta: chatState.conta,
-      canais: chatState.canais
-    } : {
-      ativo: false,
-      mensagem: "Nenhuma configuração de chat foi informada"
-    };
-
-    const box = document.getElementById("resultado");
-    if (box) box.textContent = JSON.stringify(dados, null, 2);
-
-    window.__ultimoJSON = dados;
     mostrarToast("JSON gerado com sucesso!");
 
   } catch (e) {
-    console.error("ERRO AO GERAR JSON:", e);
-    mostrarToast("Erro ao gerar JSON. Veja o console.", true);
+    console.error(e);
+    mostrarToast("Erro ao gerar JSON", true);
   }
 };
