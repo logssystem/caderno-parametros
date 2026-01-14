@@ -556,3 +556,93 @@ function criarRegraTempo() {
 
   return wrap;
 }
+
+/* =========================
+   AGENTES AUTOMÁTICOS VIA USUÁRIO
+========================= */
+
+function gerarAgentesAPartirUsuarios() {
+  const listaAgentes = document.getElementById("listaAgentes");
+  if (!listaAgentes) return;
+
+  listaAgentes.innerHTML = "";
+
+  const usuarios = [...document.querySelectorAll("#listaUsuariosWeb .campo-descricao")];
+
+  usuarios.forEach(u => {
+    if (typeof u.isAgente === "function" && u.isAgente() && u.getNome()) {
+
+      const wrap = document.createElement("div");
+      wrap.className = "campo-descricao";
+      wrap.dataset.id = u.dataset.id || ("agente_" + Math.random().toString(36).slice(2));
+
+      const linha = document.createElement("div");
+      linha.className = "linha-principal";
+
+      const nome = document.createElement("input");
+      nome.value = u.getNome();
+      nome.disabled = true;
+      nome.className = "campo-nome";
+
+      const del = document.createElement("button");
+      del.textContent = "✖";
+      del.onclick = () => {
+        u.querySelector("input[type=checkbox]").checked = false;
+        gerarAgentesAPartirUsuarios();
+      };
+
+      linha.append(nome, del);
+      wrap.append(linha);
+
+      const selectRamal = document.createElement("select");
+      selectRamal.innerHTML = `<option value="">Ramal (obrigatório)</option>`;
+
+      document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+        if (r.getNome()) {
+          selectRamal.add(new Option(r.getNome(), r.getNome()));
+        }
+      });
+
+      wrap.append(selectRamal);
+
+      listaAgentes.append(wrap);
+    }
+  });
+
+  atualizarSelectAgentesFila?.();
+}
+
+/* =========================
+   FILAS ENXERGAM AGENTES
+========================= */
+
+function atualizarSelectAgentesFila() {
+  document.querySelectorAll("#listaFilas .campo-descricao").forEach(fila => {
+    const select = fila.querySelector("select");
+    if (!select) return;
+
+    const atual = select.value;
+    select.innerHTML = `<option value="">Selecione um agente</option>`;
+
+    document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+      const nome = a.querySelector(".campo-nome")?.value;
+      if (nome) select.add(new Option(nome, nome));
+    });
+
+    select.value = atual;
+  });
+}
+
+/* =========================
+   GATILHOS AUTOMÁTICOS
+========================= */
+
+document.addEventListener("change", e => {
+  if (e.target.closest("#listaUsuariosWeb")) {
+    gerarAgentesAPartirUsuarios();
+  }
+
+  if (e.target.closest("#listaRings")) {
+    gerarAgentesAPartirUsuarios();
+  }
+});
