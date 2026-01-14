@@ -491,3 +491,68 @@ window.adicionarRegraTempo = function () {
   container.appendChild(criarRegraTempo());
   atualizarTodosDestinosURA();
 };
+
+function criarRegraTempo() {
+  const wrap = document.createElement("div");
+  wrap.className = "campo-descricao";
+
+  const linhaTopo = document.createElement("div");
+  linhaTopo.className = "linha-principal";
+
+  const nome = document.createElement("input");
+  nome.placeholder = "Nome da regra de tempo";
+
+  const btn = document.createElement("button");
+  btn.textContent = "✖";
+  btn.onclick = () => wrap.remove();
+
+  linhaTopo.append(nome, btn);
+  wrap.append(linhaTopo);
+
+  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+  const diasSelecionados = new Set();
+
+  const diasBox = document.createElement("div");
+  diasBox.style.display = "flex";
+  diasBox.style.flexWrap = "wrap";
+  diasBox.style.gap = "6px";
+  diasBox.style.marginTop = "10px";
+
+  diasSemana.forEach(dia => {
+    const btnDia = document.createElement("button");
+    btnDia.textContent = dia;
+    btnDia.className = "btn-dia";
+    btnDia.onclick = () => {
+      btnDia.classList.toggle("ativo");
+      btnDia.classList.contains("ativo")
+        ? diasSelecionados.add(dia)
+        : diasSelecionados.delete(dia);
+    };
+    diasBox.appendChild(btnDia);
+  });
+
+  wrap.appendChild(diasBox);
+
+  const horarios = document.createElement("div");
+  horarios.style.display = "flex";
+  horarios.style.gap = "10px";
+  horarios.style.marginTop = "10px";
+
+  const inicio = document.createElement("input");
+  inicio.type = "time";
+
+  const fim = document.createElement("input");
+  fim.type = "time";
+
+  horarios.append(inicio, fim);
+  wrap.append(horarios);
+
+  wrap.getData = () => ({
+    nome: nome.value,
+    dias: [...diasSelecionados],
+    hora_inicio: inicio.value,
+    hora_fim: fim.value
+  });
+
+  return wrap;
+}
