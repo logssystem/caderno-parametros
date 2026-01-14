@@ -477,3 +477,17 @@ document.addEventListener("change", e => {
     syncTudo();
   }
 });
+
+/* ================= FIX DEFINITIVO — REGRA DE TEMPO ================= */
+
+window.adicionarRegraTempo = function () {
+  const container = document.getElementById("listaRegrasTempo");
+
+  if (!container) {
+    console.error("listaRegrasTempo não encontrada");
+    return mostrarToast("Lista de regras de tempo não encontrada", true);
+  }
+
+  container.appendChild(criarRegraTempo());
+  atualizarTodosDestinosURA();
+};
