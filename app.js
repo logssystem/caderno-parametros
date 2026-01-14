@@ -105,7 +105,7 @@ function criarCampo(tipo) {
     chkAgente.type = "checkbox";
 
     const txt = document.createElement("span");
-    txt.textContent = "Este usuário é agente de call center";
+    txt.textContent = "Este usuário é agente de call center?. Só marcar essa opção casoutilize o call center.";
 
     boxAgente.append(chkAgente, txt);
     wrap.append(boxAgente);
