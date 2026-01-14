@@ -388,3 +388,92 @@ if (toggleTheme) {
 }
 
 aplicarTemaSalvo();
+
+/* =========================
+   MOTOR CENTRAL DO SISTEMA
+========================= */
+
+window.APP_STATE = {
+  usuarios: [],
+  ramais: [],
+  agentes: [],
+  filas: []
+};
+
+function syncAppState() {
+  /* ---------- USUÁRIOS ---------- */
+  APP_STATE.usuarios = [...document.querySelectorAll("#listaUsuariosWeb .campo-descricao")].map(c => {
+    return {
+      id: c.dataset.id || null,
+      nome: c.getNome(),
+      email: c.getEmail(),
+      senha: c.getSenha(),
+      permissao: c.getPermissao(),
+      isAgente: typeof c.isAgente === "function" ? c.isAgente() : false
+    };
+  }).filter(u => u.nome);
+
+  /* ---------- RAMAIS ---------- */
+  APP_STATE.ramais = [...document.querySelectorAll("#listaRings .campo-descricao")].map(c => {
+    return {
+      id: c.dataset.id || null,
+      ramal: c.getNome(),
+      senha: c.getSenha(),
+      usuarioId: c.dataset.usuarioId || null
+    };
+  }).filter(r => r.ramal);
+
+  /* ---------- AGENTES (DERIVADOS DE USUÁRIOS) ---------- */
+  APP_STATE.agentes = APP_STATE.usuarios
+    .filter(u => u.isAgente)
+    .map(u => {
+      const ramal = APP_STATE.ramais.find(r => r.usuarioId === u.id) || null;
+      return {
+        id: u.id,                 // agente herda ID do usuário
+        nome: u.nome,
+        usuarioId: u.id,
+        ramalId: ramal ? ramal.id : null,
+        ramal: ramal ? ramal.ramal : null
+      };
+    });
+
+  /* ---------- FILAS ---------- */
+  APP_STATE.filas = [...document.querySelectorAll("#listaFilas .campo-descricao")].map(f => {
+    return {
+      id: f.dataset.id || null,
+      nome: f.querySelector(".campo-nome")?.value || "",
+      agentes: JSON.parse(f.dataset.agentes || "[]")
+    };
+  }).filter(f => f.nome);
+
+  console.log("APP_STATE atualizado:", APP_STATE);
+}
+
+/* =========================
+   GANCHO GLOBAL DE SYNC
+========================= */
+
+function syncTudo() {
+  syncAppState();
+
+  if (typeof atualizarSelectUsuariosRamal === "function") atualizarSelectUsuariosRamal();
+  if (typeof atualizarSelectAgentes === "function") atualizarSelectAgentes();
+  if (typeof atualizarSelectAgentesFila === "function") atualizarSelectAgentesFila();
+  if (typeof atualizarTodosDestinosURA === "function") atualizarTodosDestinosURA();
+}
+
+/* =========================
+   AUTO-SYNC (SEGURANÇA)
+========================= */
+
+document.addEventListener("input", e => {
+  if (e.target.closest(".campo-descricao")) {
+    syncTudo();
+  }
+});
+
+document.addEventListener("change", e => {
+  if (e.target.closest(".campo-descricao")) {
+    syncTudo();
+  }
+});
