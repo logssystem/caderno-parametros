@@ -399,3 +399,81 @@ document.addEventListener("change", e => {
     gerarAgentesAPartirUsuarios();
   }
 });
+
+/* =========================
+   GERAR JSON OFICIAL
+========================= */
+
+window.explorar = function () {
+  try {
+
+    const coletar = (id, fn) =>
+      [...document.querySelectorAll(`#${id} .campo-descricao`)]
+        .map(fn)
+        .filter(v => v && Object.values(v).some(x => x));
+
+    const usuarios = coletar("listaUsuariosWeb", c => ({
+      nome: c.getNome(),
+      email: c.getEmail(),
+      senha: c.getSenha(),
+      permissao: c.getPermissao(),
+      agente: c.isAgente()
+    }));
+
+    const ramais = coletar("listaRings", c => ({
+      ramal: c.getNome(),
+      senha: c.getSenha()
+    }));
+
+    const entradas = coletar("listaEntradas", c => ({
+      numero: c.getNome()
+    }));
+
+    const grupos = coletar("listaGrupoRing", c => ({
+      nome: c.getNome()
+    }));
+
+    const agentes = coletar("listaAgentes", c => ({
+      nome: c.getNome()
+    }));
+
+    const filas = [...document.querySelectorAll("#listaFilas .campo-descricao")]
+      .map(f => ({
+        nome: f.querySelector(".campo-nome")?.value || "",
+        agentes: JSON.parse(f.dataset.agentes || "[]")
+      }))
+      .filter(f => f.nome);
+
+    const uras = [];
+    document.querySelectorAll("#listaURAs .campo-descricao").forEach(c => {
+      if (c.getURA) uras.push(c.getURA());
+    });
+
+    const regras = [];
+    document.querySelectorAll("#listaRegrasTempo .campo-descricao")
+      .forEach(r => regras.push(r.getData()));
+
+    const dados = {
+      voz: {
+        usuarios_web: usuarios,
+        ramais,
+        entradas,
+        uras,
+        filas,
+        grupos_ring: grupos,
+        agentes,
+        regras_tempo: regras
+      }
+    };
+
+    document.getElementById("resultado").textContent =
+      JSON.stringify(dados, null, 2);
+
+    window.__ultimoJSON = dados;
+    mostrarToast("JSON gerado com sucesso!");
+
+  } catch (e) {
+    console.error("ERRO AO GERAR JSON:", e);
+    mostrarToast("Erro ao gerar JSON. Veja o console.", true);
+  }
+};
