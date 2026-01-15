@@ -401,11 +401,16 @@ document.addEventListener("change", e => {
 });
 
 /* =========================
-   GERAR JSON OFICIAL
+   GERAR JSON OFICIAL (FIX FINAL)
 ========================= */
 
 window.explorar = function () {
   try {
+
+    const getNomeSeguro = (c) =>
+      typeof c.getNome === "function"
+        ? c.getNome()
+        : c.querySelector(".campo-nome")?.value || "";
 
     const coletar = (id, fn) =>
       [...document.querySelectorAll(`#${id} .campo-descricao`)]
@@ -413,33 +418,33 @@ window.explorar = function () {
         .filter(v => v && Object.values(v).some(x => x));
 
     const usuarios = coletar("listaUsuariosWeb", c => ({
-      nome: c.getNome(),
-      email: c.getEmail(),
-      senha: c.getSenha(),
-      permissao: c.getPermissao(),
-      agente: c.isAgente()
+      nome: getNomeSeguro(c),
+      email: c.getEmail?.() || "",
+      senha: c.getSenha?.() || "",
+      permissao: c.getPermissao?.() || "",
+      agente: c.isAgente?.() || false
     }));
 
     const ramais = coletar("listaRings", c => ({
-      ramal: c.getNome(),
-      senha: c.getSenha()
+      ramal: getNomeSeguro(c),
+      senha: c.getSenha?.() || ""
     }));
 
     const entradas = coletar("listaEntradas", c => ({
-      numero: c.getNome()
+      numero: getNomeSeguro(c)
     }));
 
     const grupos = coletar("listaGrupoRing", c => ({
-      nome: c.getNome()
+      nome: getNomeSeguro(c)
     }));
 
     const agentes = coletar("listaAgentes", c => ({
-      nome: c.getNome()
+      nome: getNomeSeguro(c)
     }));
 
     const filas = [...document.querySelectorAll("#listaFilas .campo-descricao")]
       .map(f => ({
-        nome: f.querySelector(".campo-nome")?.value || "",
+        nome: getNomeSeguro(f),
         agentes: JSON.parse(f.dataset.agentes || "[]")
       }))
       .filter(f => f.nome);
@@ -477,3 +482,4 @@ window.explorar = function () {
     mostrarToast("Erro ao gerar JSON. Veja o console.", true);
   }
 };
+
