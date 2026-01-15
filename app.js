@@ -105,7 +105,7 @@ function criarCampo(tipo) {
     chkAgente.type = "checkbox";
 
     const txt = document.createElement("span");
-    txt.textContent = "Este usuário é agente de call center?. Só marcar essa opção casoutilize o call center.";
+    txt.textContent = "Este usuário é agente de call center";
 
     boxAgente.append(chkAgente, txt);
     wrap.append(boxAgente);
@@ -135,7 +135,7 @@ function criarCampo(tipo) {
   /* ===== URA ===== */
   if (tipo === "ura") {
     const msg = document.createElement("textarea");
-    msg.placeholder = "Mensagem da URA Ex: Olá seja bem-vindo...";
+    msg.placeholder = "Mensagem da URA";
     msg.style.marginTop = "12px";
     wrap.append(msg);
 
@@ -157,6 +157,84 @@ function criarCampo(tipo) {
       mensagem: msg.value,
       opcoes: [...listaOpcoes.querySelectorAll(".opcao-ura")].map(o => o.getData())
     });
+  }
+
+  /* ===== FILA (MÚLTIPLOS AGENTES) ===== */
+  if (tipo === "fila") {
+
+    wrap.dataset.agentes = "[]";
+
+    const selectAgente = document.createElement("select");
+    selectAgente.innerHTML = `<option value="">Selecione um agente</option>`;
+    selectAgente.style.marginTop = "12px";
+
+    const btnAdd = document.createElement("button");
+    btnAdd.textContent = "Adicionar agente";
+    btnAdd.style.marginTop = "8px";
+
+    const lista = document.createElement("div");
+    lista.style.marginTop = "10px";
+    lista.style.display = "flex";
+    lista.style.flexDirection = "column";
+    lista.style.gap = "6px";
+
+    function renderAgentesFila() {
+      lista.innerHTML = "";
+      const agentes = JSON.parse(wrap.dataset.agentes || "[]");
+
+      agentes.forEach(nome => {
+        const item = document.createElement("div");
+        item.style.display = "flex";
+        item.style.justifyContent = "space-between";
+        item.style.alignItems = "center";
+        item.style.border = "1px dashed var(--borda)";
+        item.style.borderRadius = "10px";
+        item.style.padding = "6px 10px";
+
+        const span = document.createElement("span");
+        span.textContent = nome;
+
+        const btn = document.createElement("button");
+        btn.textContent = "🗑";
+        btn.onclick = () => {
+          wrap.dataset.agentes = JSON.stringify(
+            agentes.filter(a => a !== nome)
+          );
+          renderAgentesFila();
+        };
+
+        item.append(span, btn);
+        lista.appendChild(item);
+      });
+    }
+
+    btnAdd.onclick = () => {
+      if (!selectAgente.value) return;
+
+      let agentes = JSON.parse(wrap.dataset.agentes || "[]");
+      if (agentes.includes(selectAgente.value)) return;
+
+      agentes.push(selectAgente.value);
+      wrap.dataset.agentes = JSON.stringify(agentes);
+      renderAgentesFila();
+    };
+
+    wrap.atualizarFilaAgentes = () => {
+      const atual = selectAgente.value;
+      selectAgente.innerHTML = `<option value="">Selecione um agente</option>`;
+
+      document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+        const nome = a.querySelector(".campo-nome")?.value;
+        if (nome) selectAgente.add(new Option(nome, nome));
+      });
+
+      selectAgente.value = atual;
+      renderAgentesFila();
+    };
+
+    wrap.append(selectAgente, btnAdd, lista);
+
+    setTimeout(() => wrap.atualizarFilaAgentes(), 50);
   }
 
   function validarSenha(input, regrasEl) {
@@ -258,304 +336,25 @@ function mostrarToast(msg, error = false) {
   setTimeout(() => t.classList.remove("show"), 3000);
 }
 
-/* ================= JSON ================= */
-
-window.explorar = function () {
-  try {
-
-    const coletar = (id, fn) =>
-      [...document.querySelectorAll(`#${id} .campo-descricao`)]
-        .map(fn)
-        .filter(v => v && Object.values(v).some(x => x));
-
-    const usuarios = coletar("listaUsuariosWeb", c => ({
-      nome: c.getNome(),
-      email: c.getEmail(),
-      senha: c.getSenha(),
-      permissao: c.getPermissao(),
-      agente: c.isAgente()
-    }));
-
-    const ramais = coletar("listaRings", c => ({
-      ramal: c.getNome(),
-      senha: c.getSenha()
-    }));
-
-    const uras = [];
-    document.querySelectorAll("#listaURAs .campo-descricao").forEach(c => {
-      if (c.getURA) uras.push(c.getURA());
-    });
-
-    const dados = { voz: { usuarios, ramais, uras } };
-
-    document.getElementById("resultado").textContent =
-      JSON.stringify(dados, null, 2);
-
-    mostrarToast("JSON gerado com sucesso!");
-
-  } catch (e) {
-    console.error(e);
-    mostrarToast("Erro ao gerar JSON", true);
-  }
-};
-
-window.acionarImportacao = function (tipo) {
-  const input = document.getElementById(
-    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
-  );
-
-  if (!input) return mostrarToast("Input de importação não encontrado", true);
-
-  input.value = "";
-  input.click();
-
-  input.onchange = () => {
-    const file = input.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = e => processarCSV(tipo, e.target.result);
-    reader.readAsText(file);
-  };
-};
-
-function processarCSV(tipo, texto) {
-  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
-  if (linhas.length < 2) return mostrarToast("CSV vazio ou inválido", true);
-
-  const sep = linhas[0].includes(";") ? ";" : ",";
-  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
-  const container = document.getElementById(listas[tipo]);
-  if (!container) return;
-
-  linhas.forEach(l => {
-    const v = l.split(sep);
-    const d = {};
-    header.forEach((h, i) => d[h] = (v[i] || "").trim());
-
-    const campo = criarCampo(tipo);
-    campo.querySelector(".campo-nome").value = d.usuario || d.nome || "";
-
-    if (tipo === "usuario_web") {
-      campo.querySelector("input[type=email]").value = d.email || "";
-      campo.querySelector(".campo-senha").value = d.senha || "";
-
-      const select = campo.querySelector("select");
-      if (select && d.permissao) {
-        [...select.options].forEach(opt => {
-          if (opt.value.toLowerCase() === d.permissao.toLowerCase()) {
-            opt.selected = true;
-          }
-        });
-      }
-    }
-
-    container.appendChild(campo);
-  });
-
-  atualizarTodosDestinosURA();
-  mostrarToast("CSV importado com sucesso!");
-}
-
-window.baixarTemplateUsuarios = function () {
-  const csv = "usuario;email;senha;permissao;descricao\n";
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "template_usuarios_web.csv";
-  link.click();
-};
+/* ================= TEMA ================= */
 
 const toggleTheme = document.getElementById("toggleTheme");
 
 function aplicarTemaSalvo() {
   const tema = localStorage.getItem("tema");
-  if (tema === "dark") {
-    document.body.classList.add("dark");
-  } else {
-    document.body.classList.remove("dark");
-  }
+  document.body.classList.toggle("dark", tema === "dark");
 }
 
 if (toggleTheme) {
   toggleTheme.onclick = () => {
     document.body.classList.toggle("dark");
-    localStorage.setItem(
-      "tema",
+    localStorage.setItem("tema",
       document.body.classList.contains("dark") ? "dark" : "light"
     );
   };
 }
 
 aplicarTemaSalvo();
-
-/* =========================
-   MOTOR CENTRAL DO SISTEMA
-========================= */
-
-window.APP_STATE = {
-  usuarios: [],
-  ramais: [],
-  agentes: [],
-  filas: []
-};
-
-function syncAppState() {
-  /* ---------- USUÁRIOS ---------- */
-  APP_STATE.usuarios = [...document.querySelectorAll("#listaUsuariosWeb .campo-descricao")].map(c => {
-    return {
-      id: c.dataset.id || null,
-      nome: c.getNome(),
-      email: c.getEmail(),
-      senha: c.getSenha(),
-      permissao: c.getPermissao(),
-      isAgente: typeof c.isAgente === "function" ? c.isAgente() : false
-    };
-  }).filter(u => u.nome);
-
-  /* ---------- RAMAIS ---------- */
-  APP_STATE.ramais = [...document.querySelectorAll("#listaRings .campo-descricao")].map(c => {
-    return {
-      id: c.dataset.id || null,
-      ramal: c.getNome(),
-      senha: c.getSenha(),
-      usuarioId: c.dataset.usuarioId || null
-    };
-  }).filter(r => r.ramal);
-
-  /* ---------- AGENTES (DERIVADOS DE USUÁRIOS) ---------- */
-  APP_STATE.agentes = APP_STATE.usuarios
-    .filter(u => u.isAgente)
-    .map(u => {
-      const ramal = APP_STATE.ramais.find(r => r.usuarioId === u.id) || null;
-      return {
-        id: u.id,                 // agente herda ID do usuário
-        nome: u.nome,
-        usuarioId: u.id,
-        ramalId: ramal ? ramal.id : null,
-        ramal: ramal ? ramal.ramal : null
-      };
-    });
-
-  /* ---------- FILAS ---------- */
-  APP_STATE.filas = [...document.querySelectorAll("#listaFilas .campo-descricao")].map(f => {
-    return {
-      id: f.dataset.id || null,
-      nome: f.querySelector(".campo-nome")?.value || "",
-      agentes: JSON.parse(f.dataset.agentes || "[]")
-    };
-  }).filter(f => f.nome);
-
-  console.log("APP_STATE atualizado:", APP_STATE);
-}
-
-/* =========================
-   GANCHO GLOBAL DE SYNC
-========================= */
-
-function syncTudo() {
-  syncAppState();
-
-  if (typeof atualizarSelectUsuariosRamal === "function") atualizarSelectUsuariosRamal();
-  if (typeof atualizarSelectAgentes === "function") atualizarSelectAgentes();
-  if (typeof atualizarSelectAgentesFila === "function") atualizarSelectAgentesFila();
-  if (typeof atualizarTodosDestinosURA === "function") atualizarTodosDestinosURA();
-}
-
-/* =========================
-   AUTO-SYNC (SEGURANÇA)
-========================= */
-
-document.addEventListener("input", e => {
-  if (e.target.closest(".campo-descricao")) {
-    syncTudo();
-  }
-});
-
-document.addEventListener("change", e => {
-  if (e.target.closest(".campo-descricao")) {
-    syncTudo();
-  }
-});
-
-/* ================= FIX DEFINITIVO — REGRA DE TEMPO ================= */
-
-window.adicionarRegraTempo = function () {
-  const container = document.getElementById("listaRegrasTempo");
-
-  if (!container) {
-    console.error("listaRegrasTempo não encontrada");
-    return mostrarToast("Lista de regras de tempo não encontrada", true);
-  }
-
-  container.appendChild(criarRegraTempo());
-  atualizarTodosDestinosURA();
-};
-
-function criarRegraTempo() {
-  const wrap = document.createElement("div");
-  wrap.className = "campo-descricao";
-
-  const linhaTopo = document.createElement("div");
-  linhaTopo.className = "linha-principal";
-
-  const nome = document.createElement("input");
-  nome.placeholder = "Nome da regra de tempo";
-
-  const btn = document.createElement("button");
-  btn.textContent = "✖";
-  btn.onclick = () => wrap.remove();
-
-  linhaTopo.append(nome, btn);
-  wrap.append(linhaTopo);
-
-  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
-  const diasSelecionados = new Set();
-
-  const diasBox = document.createElement("div");
-  diasBox.style.display = "flex";
-  diasBox.style.flexWrap = "wrap";
-  diasBox.style.gap = "6px";
-  diasBox.style.marginTop = "10px";
-
-  diasSemana.forEach(dia => {
-    const btnDia = document.createElement("button");
-    btnDia.textContent = dia;
-    btnDia.className = "btn-dia";
-    btnDia.onclick = () => {
-      btnDia.classList.toggle("ativo");
-      btnDia.classList.contains("ativo")
-        ? diasSelecionados.add(dia)
-        : diasSelecionados.delete(dia);
-    };
-    diasBox.appendChild(btnDia);
-  });
-
-  wrap.appendChild(diasBox);
-
-  const horarios = document.createElement("div");
-  horarios.style.display = "flex";
-  horarios.style.gap = "10px";
-  horarios.style.marginTop = "10px";
-
-  const inicio = document.createElement("input");
-  inicio.type = "time";
-
-  const fim = document.createElement("input");
-  fim.type = "time";
-
-  horarios.append(inicio, fim);
-  wrap.append(horarios);
-
-  wrap.getData = () => ({
-    nome: nome.value,
-    dias: [...diasSelecionados],
-    hora_inicio: inicio.value,
-    hora_fim: fim.value
-  });
-
-  return wrap;
-}
 
 /* =========================
    AGENTES AUTOMÁTICOS VIA USUÁRIO
@@ -567,14 +366,11 @@ function gerarAgentesAPartirUsuarios() {
 
   listaAgentes.innerHTML = "";
 
-  const usuarios = [...document.querySelectorAll("#listaUsuariosWeb .campo-descricao")];
-
-  usuarios.forEach(u => {
-    if (typeof u.isAgente === "function" && u.isAgente() && u.getNome()) {
+  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+    if (u.isAgente && u.isAgente() && u.getNome()) {
 
       const wrap = document.createElement("div");
       wrap.className = "campo-descricao";
-      wrap.dataset.id = u.dataset.id || ("agente_" + Math.random().toString(36).slice(2));
 
       const linha = document.createElement("div");
       linha.className = "linha-principal";
@@ -584,65 +380,22 @@ function gerarAgentesAPartirUsuarios() {
       nome.disabled = true;
       nome.className = "campo-nome";
 
-      const del = document.createElement("button");
-      del.textContent = "✖";
-      del.onclick = () => {
-        u.querySelector("input[type=checkbox]").checked = false;
-        gerarAgentesAPartirUsuarios();
-      };
-
-      linha.append(nome, del);
+      linha.append(nome);
       wrap.append(linha);
-
-      const selectRamal = document.createElement("select");
-      selectRamal.innerHTML = `<option value="">Ramal (obrigatório)</option>`;
-
-      document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
-        if (r.getNome()) {
-          selectRamal.add(new Option(r.getNome(), r.getNome()));
-        }
-      });
-
-      wrap.append(selectRamal);
-
       listaAgentes.append(wrap);
     }
   });
 
-  atualizarSelectAgentesFila?.();
+  document.querySelectorAll("#listaFilas .campo-descricao")
+    .forEach(f => f.atualizarFilaAgentes && f.atualizarFilaAgentes());
 }
 
 /* =========================
-   FILAS ENXERGAM AGENTES
-========================= */
-
-function atualizarSelectAgentesFila() {
-  document.querySelectorAll("#listaFilas .campo-descricao").forEach(fila => {
-    const select = fila.querySelector("select");
-    if (!select) return;
-
-    const atual = select.value;
-    select.innerHTML = `<option value="">Selecione um agente</option>`;
-
-    document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
-      const nome = a.querySelector(".campo-nome")?.value;
-      if (nome) select.add(new Option(nome, nome));
-    });
-
-    select.value = atual;
-  });
-}
-
-/* =========================
-   GATILHOS AUTOMÁTICOS
+   GATILHOS
 ========================= */
 
 document.addEventListener("change", e => {
-  if (e.target.closest("#listaUsuariosWeb")) {
-    gerarAgentesAPartirUsuarios();
-  }
-
-  if (e.target.closest("#listaRings")) {
+  if (e.target.closest("#listaUsuariosWeb") || e.target.closest("#listaRings")) {
     gerarAgentesAPartirUsuarios();
   }
 });
