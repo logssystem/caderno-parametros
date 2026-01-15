@@ -483,10 +483,76 @@ window.explorar = function () {
   }
 };
 
-/* =========================
-   FIX BOTÕES IMPORTAR / TEMPLATE
-========================= */
+/* ================= IMPORTAÇÃO CSV ================= */
 
 window.acionarImportacao = function (tipo) {
   const input = document.getElementById(
-    tipo === "
+    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
+  );
+
+  if (!input) {
+    mostrarToast("Input de importação não encontrado", true);
+    return;
+  }
+
+  input.value = "";
+  input.click();
+
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => processarCSV(tipo, e.target.result);
+    reader.readAsText(file);
+  };
+};
+
+function processarCSV(tipo, texto) {
+  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
+  if (linhas.length < 2) return mostrarToast("CSV vazio ou inválido", true);
+
+  const sep = linhas[0].includes(";") ? ";" : ",";
+  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
+  const container = document.getElementById(listas[tipo]);
+  if (!container) return;
+
+  linhas.forEach(l => {
+    const v = l.split(sep);
+    const d = {};
+    header.forEach((h, i) => d[h] = (v[i] || "").trim());
+
+    const campo = criarCampo(tipo);
+    campo.querySelector(".campo-nome").value = d.usuario || d.nome || "";
+
+    if (tipo === "usuario_web") {
+      campo.querySelector("input[type=email]").value = d.email || "";
+      campo.querySelector(".campo-senha").value = d.senha || "";
+
+      const select = campo.querySelector("select");
+      if (select && d.permissao) {
+        [...select.options].forEach(opt => {
+          if (opt.value.toLowerCase() === d.permissao.toLowerCase()) {
+            opt.selected = true;
+          }
+        });
+      }
+    }
+
+    container.appendChild(campo);
+  });
+
+  atualizarTodosDestinosURA();
+  mostrarToast("CSV importado com sucesso!");
+}
+
+/* ================= TEMPLATE CSV ================= */
+
+window.baixarTemplateUsuarios = function () {
+  const csv = "usuario;email;senha;permissao;descricao\n";
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "template_usuarios_web.csv";
+  link.click();
+};
