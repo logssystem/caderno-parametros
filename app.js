@@ -483,3 +483,10 @@ window.explorar = function () {
   }
 };
 
+/* =========================
+   FIX BOTÕES IMPORTAR / TEMPLATE
+========================= */
+
+window.acionarImportacao = function (tipo) {
+  const input = document.getElementById(
+    tipo === "
