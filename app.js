@@ -1,4 +1,4 @@
-console.log("APP.JS FINAL – ESTÁVEL + VALIDAÇÃO");
+console.log("APP.JS FINAL – BASE RESTAURADA + VALIDAÇÃO");
 
 /* ================= CONFIG ================= */
 
@@ -56,6 +56,7 @@ function criarCampo(tipo) {
   btn.onclick = () => {
     wrap.remove();
     atualizarTodosDestinosURA();
+    syncTudo();
   };
 
   linhaNome.append(nome, btn);
@@ -105,7 +106,7 @@ function criarCampo(tipo) {
     chkAgente.type = "checkbox";
 
     const txt = document.createElement("span");
-    txt.textContent = "Este usuário é agente de call center?";
+    txt.textContent = "Este usuário é agente de call center";
 
     boxAgente.append(chkAgente, txt);
     wrap.append(boxAgente);
@@ -213,7 +214,7 @@ function atualizarDestinosURA(select) {
   select.innerHTML = "";
   select.add(new Option("Selecione o destino", ""));
 
-  ["listaFilas","listaRings","listaGrupoRing","listaURAs"].forEach(id => {
+  ["listaFilas","listaRings","listaGrupoRing","listaURAs","listaRegrasTempo"].forEach(id => {
     document.querySelectorAll(`#${id} .campo-nome`).forEach(i => {
       if (i.value) select.add(new Option(i.value, `${id}:${i.value}`));
     });
@@ -244,6 +245,7 @@ window.criarRangeRamais = function () {
   }
 
   atualizarTodosDestinosURA();
+  syncTudo();
   mostrarToast("Range criado com sucesso!");
 };
 
@@ -258,55 +260,130 @@ function mostrarToast(msg, error = false) {
   setTimeout(() => t.classList.remove("show"), 3000);
 }
 
-/* ================= VALIDAÇÃO OBRIGATÓRIA ================= */
+/* ================= DARK MODE ================= */
+
+const toggleTheme = document.getElementById("toggleTheme");
+
+function aplicarTemaSalvo() {
+  const tema = localStorage.getItem("tema");
+  if (tema === "dark") document.body.classList.add("dark");
+  else document.body.classList.remove("dark");
+}
+
+if (toggleTheme) {
+  toggleTheme.onclick = () => {
+    document.body.classList.toggle("dark");
+    localStorage.setItem(
+      "tema",
+      document.body.classList.contains("dark") ? "dark" : "light"
+    );
+  };
+}
+
+aplicarTemaSalvo();
+
+/* ================= MOTOR CENTRAL ================= */
+
+window.APP_STATE = { usuarios: [], ramais: [], agentes: [], filas: [] };
+
+function syncAppState() {
+  APP_STATE.usuarios = [...document.querySelectorAll("#listaUsuariosWeb .campo-descricao")]
+    .map(c => ({
+      nome: c.getNome(),
+      email: c.getEmail(),
+      senha: c.getSenha(),
+      permissao: c.getPermissao(),
+      isAgente: c.isAgente()
+    })).filter(u => u.nome);
+
+  APP_STATE.ramais = [...document.querySelectorAll("#listaRings .campo-descricao")]
+    .map(c => ({ ramal: c.getNome(), senha: c.getSenha() }))
+    .filter(r => r.ramal);
+}
+
+/* ================= AGENTES AUTOMÁTICOS ================= */
+
+function gerarAgentesAPartirUsuarios() {
+  const listaAgentes = document.getElementById("listaAgentes");
+  if (!listaAgentes) return;
+
+  listaAgentes.innerHTML = "";
+
+  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+    if (u.isAgente() && u.getNome()) {
+
+      const wrap = document.createElement("div");
+      wrap.className = "campo-descricao";
+
+      const linha = document.createElement("div");
+      linha.className = "linha-principal";
+
+      const nome = document.createElement("input");
+      nome.value = u.getNome();
+      nome.disabled = true;
+      nome.className = "campo-nome";
+
+      linha.append(nome);
+      wrap.append(linha);
+
+      const selectRamal = document.createElement("select");
+      selectRamal.innerHTML = `<option value="">Ramal (obrigatório)</option>`;
+
+      document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+        if (r.getNome()) selectRamal.add(new Option(r.getNome(), r.getNome()));
+      });
+
+      wrap.append(selectRamal);
+      listaAgentes.append(wrap);
+    }
+  });
+}
+
+/* ================= SYNC GLOBAL ================= */
+
+function syncTudo() {
+  syncAppState();
+  gerarAgentesAPartirUsuarios();
+  atualizarTodosDestinosURA();
+}
+
+document.addEventListener("input", e => {
+  if (e.target.closest(".campo-descricao")) syncTudo();
+});
+document.addEventListener("change", e => {
+  if (e.target.closest(".campo-descricao")) syncTudo();
+});
+
+/* ================= VALIDAÇÃO ================= */
 
 function validarAntesDeGerarJSON() {
   const erros = [];
-  document.querySelectorAll(".campo-erro").forEach(c => c.classList.remove("campo-erro"));
+  document.querySelectorAll(".campo-erro").forEach(e => e.classList.remove("campo-erro"));
 
-  const marcarErro = (el, msg) => {
+  const marcar = (el, msg) => {
     el.classList.add("campo-erro");
     erros.push(msg);
   };
 
-  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach((c, i) => {
-    if (!c.getNome()) marcarErro(c, `Usuário ${i+1}: nome não preenchido`);
-    if (!c.getEmail()) marcarErro(c, `Usuário ${i+1}: email não preenchido`);
-    if (!c.getSenha()) marcarErro(c, `Usuário ${i+1}: senha não preenchida`);
-    if (!c.getPermissao()) marcarErro(c, `Usuário ${i+1}: permissão não selecionada`);
+  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach((c,i)=>{
+    if(!c.getNome()) marcar(c,`Usuário ${i+1}: nome vazio`);
+    if(!c.getEmail()) marcar(c,`Usuário ${i+1}: email vazio`);
+    if(!c.getSenha()) marcar(c,`Usuário ${i+1}: senha vazia`);
+    if(!c.getPermissao()) marcar(c,`Usuário ${i+1}: permissão vazia`);
   });
 
-  document.querySelectorAll("#listaRings .campo-descricao").forEach((c, i) => {
-    if (!c.getNome()) marcarErro(c, `Ramal ${i+1}: número não informado`);
-    if (!c.getSenha()) marcarErro(c, `Ramal ${i+1}: senha não informada`);
+  document.querySelectorAll("#listaRings .campo-descricao").forEach((c,i)=>{
+    if(!c.getNome()) marcar(c,`Ramal ${i+1}: número vazio`);
+    if(!c.getSenha()) marcar(c,`Ramal ${i+1}: senha vazia`);
   });
 
-  document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a, i) => {
-    if (!a.querySelector("select")?.value) marcarErro(a, `Agente ${i+1}: ramal obrigatório`);
+  document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a,i)=>{
+    if(!a.querySelector("select")?.value) marcar(a,`Agente ${i+1}: ramal obrigatório`);
   });
 
-  document.querySelectorAll("#listaFilas .campo-descricao").forEach((f, i) => {
-    const nome = f.querySelector(".campo-nome")?.value;
-    const agentes = JSON.parse(f.dataset.agentes || "[]");
-    if (!nome) marcarErro(f, `Fila ${i+1}: nome vazio`);
-    if (!agentes.length) marcarErro(f, `Fila ${i+1}: sem agentes`);
-  });
-
-  document.querySelectorAll("#listaURAs .campo-descricao").forEach((u, i) => {
-    const nome = u.querySelector(".campo-nome")?.value;
-    const msg = u.querySelector("textarea")?.value;
-    if (!nome) marcarErro(u, `URA ${i+1}: nome vazio`);
-    if (!msg) marcarErro(u, `URA ${i+1}: mensagem vazia`);
-
-    u.querySelectorAll(".opcao-ura").forEach((o, j) => {
-      if (!o.querySelector("input")?.value) marcarErro(o, `URA ${i+1} opção ${j+1}: tecla vazia`);
-      if (!o.querySelector("select")?.value) marcarErro(o, `URA ${i+1} opção ${j+1}: destino vazio`);
-    });
-  });
-
-  if (erros.length) {
+  if(erros.length){
     mostrarToast("Campos obrigatórios pendentes", true);
-    alert("Corrija os seguintes pontos:\n\n" + erros.join("\n"));
+    alert(erros.join("\n"));
     return false;
   }
 
@@ -320,30 +397,10 @@ window.explorar = function () {
 
     if (!validarAntesDeGerarJSON()) return;
 
-    const coletar = (id, fn) =>
-      [...document.querySelectorAll(`#${id} .campo-descricao`)]
-        .map(fn)
-        .filter(v => v && Object.values(v).some(x => x));
+    const usuarios = APP_STATE.usuarios;
+    const ramais = APP_STATE.ramais;
 
-    const usuarios = coletar("listaUsuariosWeb", c => ({
-      nome: c.getNome(),
-      email: c.getEmail(),
-      senha: c.getSenha(),
-      permissao: c.getPermissao(),
-      agente: c.isAgente()
-    }));
-
-    const ramais = coletar("listaRings", c => ({
-      ramal: c.getNome(),
-      senha: c.getSenha()
-    }));
-
-    const uras = [];
-    document.querySelectorAll("#listaURAs .campo-descricao").forEach(c => {
-      if (c.getURA) uras.push(c.getURA());
-    });
-
-    const dados = { voz: { usuarios, ramais, uras } };
+    const dados = { voz: { usuarios, ramais } };
 
     document.getElementById("resultado").textContent =
       JSON.stringify(dados, null, 2);
