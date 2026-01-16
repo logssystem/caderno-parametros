@@ -1,4 +1,4 @@
-console.log("APP.JS FINAL – ESTÁVEL");
+console.log("APP.JS FINAL – ESTÁVEL + VALIDAÇÃO");
 
 /* ================= CONFIG ================= */
 
@@ -105,7 +105,7 @@ function criarCampo(tipo) {
     chkAgente.type = "checkbox";
 
     const txt = document.createElement("span");
-    txt.textContent = "Este usuário é agente de call center?. Só marcar essa opção casoutilize o call center.";
+    txt.textContent = "Este usuário é agente de call center?";
 
     boxAgente.append(chkAgente, txt);
     wrap.append(boxAgente);
@@ -258,10 +258,67 @@ function mostrarToast(msg, error = false) {
   setTimeout(() => t.classList.remove("show"), 3000);
 }
 
+/* ================= VALIDAÇÃO OBRIGATÓRIA ================= */
+
+function validarAntesDeGerarJSON() {
+  const erros = [];
+  document.querySelectorAll(".campo-erro").forEach(c => c.classList.remove("campo-erro"));
+
+  const marcarErro = (el, msg) => {
+    el.classList.add("campo-erro");
+    erros.push(msg);
+  };
+
+  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach((c, i) => {
+    if (!c.getNome()) marcarErro(c, `Usuário ${i+1}: nome não preenchido`);
+    if (!c.getEmail()) marcarErro(c, `Usuário ${i+1}: email não preenchido`);
+    if (!c.getSenha()) marcarErro(c, `Usuário ${i+1}: senha não preenchida`);
+    if (!c.getPermissao()) marcarErro(c, `Usuário ${i+1}: permissão não selecionada`);
+  });
+
+  document.querySelectorAll("#listaRings .campo-descricao").forEach((c, i) => {
+    if (!c.getNome()) marcarErro(c, `Ramal ${i+1}: número não informado`);
+    if (!c.getSenha()) marcarErro(c, `Ramal ${i+1}: senha não informada`);
+  });
+
+  document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a, i) => {
+    if (!a.querySelector("select")?.value) marcarErro(a, `Agente ${i+1}: ramal obrigatório`);
+  });
+
+  document.querySelectorAll("#listaFilas .campo-descricao").forEach((f, i) => {
+    const nome = f.querySelector(".campo-nome")?.value;
+    const agentes = JSON.parse(f.dataset.agentes || "[]");
+    if (!nome) marcarErro(f, `Fila ${i+1}: nome vazio`);
+    if (!agentes.length) marcarErro(f, `Fila ${i+1}: sem agentes`);
+  });
+
+  document.querySelectorAll("#listaURAs .campo-descricao").forEach((u, i) => {
+    const nome = u.querySelector(".campo-nome")?.value;
+    const msg = u.querySelector("textarea")?.value;
+    if (!nome) marcarErro(u, `URA ${i+1}: nome vazio`);
+    if (!msg) marcarErro(u, `URA ${i+1}: mensagem vazia`);
+
+    u.querySelectorAll(".opcao-ura").forEach((o, j) => {
+      if (!o.querySelector("input")?.value) marcarErro(o, `URA ${i+1} opção ${j+1}: tecla vazia`);
+      if (!o.querySelector("select")?.value) marcarErro(o, `URA ${i+1} opção ${j+1}: destino vazio`);
+    });
+  });
+
+  if (erros.length) {
+    mostrarToast("Campos obrigatórios pendentes", true);
+    alert("Corrija os seguintes pontos:\n\n" + erros.join("\n"));
+    return false;
+  }
+
+  return true;
+}
+
 /* ================= JSON ================= */
 
 window.explorar = function () {
   try {
+
+    if (!validarAntesDeGerarJSON()) return;
 
     const coletar = (id, fn) =>
       [...document.querySelectorAll(`#${id} .campo-descricao`)]
@@ -298,351 +355,3 @@ window.explorar = function () {
     mostrarToast("Erro ao gerar JSON", true);
   }
 };
-
-window.acionarImportacao = function (tipo) {
-  const input = document.getElementById(
-    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
-  );
-
-  if (!input) return mostrarToast("Input de importação não encontrado", true);
-
-  input.value = "";
-  input.click();
-
-  input.onchange = () => {
-    const file = input.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = e => processarCSV(tipo, e.target.result);
-    reader.readAsText(file);
-  };
-};
-
-function processarCSV(tipo, texto) {
-  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
-  if (linhas.length < 2) return mostrarToast("CSV vazio ou inválido", true);
-
-  const sep = linhas[0].includes(";") ? ";" : ",";
-  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
-  const container = document.getElementById(listas[tipo]);
-  if (!container) return;
-
-  linhas.forEach(l => {
-    const v = l.split(sep);
-    const d = {};
-    header.forEach((h, i) => d[h] = (v[i] || "").trim());
-
-    const campo = criarCampo(tipo);
-    campo.querySelector(".campo-nome").value = d.usuario || d.nome || "";
-
-    if (tipo === "usuario_web") {
-      campo.querySelector("input[type=email]").value = d.email || "";
-      campo.querySelector(".campo-senha").value = d.senha || "";
-
-      const select = campo.querySelector("select");
-      if (select && d.permissao) {
-        [...select.options].forEach(opt => {
-          if (opt.value.toLowerCase() === d.permissao.toLowerCase()) {
-            opt.selected = true;
-          }
-        });
-      }
-    }
-
-    container.appendChild(campo);
-  });
-
-  atualizarTodosDestinosURA();
-  mostrarToast("CSV importado com sucesso!");
-}
-
-window.baixarTemplateUsuarios = function () {
-  const csv = "usuario;email;senha;permissao;descricao\n";
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "template_usuarios_web.csv";
-  link.click();
-};
-
-const toggleTheme = document.getElementById("toggleTheme");
-
-function aplicarTemaSalvo() {
-  const tema = localStorage.getItem("tema");
-  if (tema === "dark") {
-    document.body.classList.add("dark");
-  } else {
-    document.body.classList.remove("dark");
-  }
-}
-
-if (toggleTheme) {
-  toggleTheme.onclick = () => {
-    document.body.classList.toggle("dark");
-    localStorage.setItem(
-      "tema",
-      document.body.classList.contains("dark") ? "dark" : "light"
-    );
-  };
-}
-
-aplicarTemaSalvo();
-
-/* =========================
-   MOTOR CENTRAL DO SISTEMA
-========================= */
-
-window.APP_STATE = {
-  usuarios: [],
-  ramais: [],
-  agentes: [],
-  filas: []
-};
-
-function syncAppState() {
-  /* ---------- USUÁRIOS ---------- */
-  APP_STATE.usuarios = [...document.querySelectorAll("#listaUsuariosWeb .campo-descricao")].map(c => {
-    return {
-      id: c.dataset.id || null,
-      nome: c.getNome(),
-      email: c.getEmail(),
-      senha: c.getSenha(),
-      permissao: c.getPermissao(),
-      isAgente: typeof c.isAgente === "function" ? c.isAgente() : false
-    };
-  }).filter(u => u.nome);
-
-  /* ---------- RAMAIS ---------- */
-  APP_STATE.ramais = [...document.querySelectorAll("#listaRings .campo-descricao")].map(c => {
-    return {
-      id: c.dataset.id || null,
-      ramal: c.getNome(),
-      senha: c.getSenha(),
-      usuarioId: c.dataset.usuarioId || null
-    };
-  }).filter(r => r.ramal);
-
-  /* ---------- AGENTES (DERIVADOS DE USUÁRIOS) ---------- */
-  APP_STATE.agentes = APP_STATE.usuarios
-    .filter(u => u.isAgente)
-    .map(u => {
-      const ramal = APP_STATE.ramais.find(r => r.usuarioId === u.id) || null;
-      return {
-        id: u.id,                 // agente herda ID do usuário
-        nome: u.nome,
-        usuarioId: u.id,
-        ramalId: ramal ? ramal.id : null,
-        ramal: ramal ? ramal.ramal : null
-      };
-    });
-
-  /* ---------- FILAS ---------- */
-  APP_STATE.filas = [...document.querySelectorAll("#listaFilas .campo-descricao")].map(f => {
-    return {
-      id: f.dataset.id || null,
-      nome: f.querySelector(".campo-nome")?.value || "",
-      agentes: JSON.parse(f.dataset.agentes || "[]")
-    };
-  }).filter(f => f.nome);
-
-  console.log("APP_STATE atualizado:", APP_STATE);
-}
-
-/* =========================
-   GANCHO GLOBAL DE SYNC
-========================= */
-
-function syncTudo() {
-  syncAppState();
-
-  if (typeof atualizarSelectUsuariosRamal === "function") atualizarSelectUsuariosRamal();
-  if (typeof atualizarSelectAgentes === "function") atualizarSelectAgentes();
-  if (typeof atualizarSelectAgentesFila === "function") atualizarSelectAgentesFila();
-  if (typeof atualizarTodosDestinosURA === "function") atualizarTodosDestinosURA();
-}
-
-/* =========================
-   AUTO-SYNC (SEGURANÇA)
-========================= */
-
-document.addEventListener("input", e => {
-  if (e.target.closest(".campo-descricao")) {
-    syncTudo();
-  }
-});
-
-document.addEventListener("change", e => {
-  if (e.target.closest(".campo-descricao")) {
-    syncTudo();
-  }
-});
-
-/* ================= FIX DEFINITIVO — REGRA DE TEMPO ================= */
-
-window.adicionarRegraTempo = function () {
-  const container = document.getElementById("listaRegrasTempo");
-
-  if (!container) {
-    console.error("listaRegrasTempo não encontrada");
-    return mostrarToast("Lista de regras de tempo não encontrada", true);
-  }
-
-  container.appendChild(criarRegraTempo());
-  atualizarTodosDestinosURA();
-};
-
-function criarRegraTempo() {
-  const wrap = document.createElement("div");
-  wrap.className = "campo-descricao";
-
-  const linhaTopo = document.createElement("div");
-  linhaTopo.className = "linha-principal";
-
-  const nome = document.createElement("input");
-  nome.placeholder = "Nome da regra de tempo";
-
-  const btn = document.createElement("button");
-  btn.textContent = "✖";
-  btn.onclick = () => wrap.remove();
-
-  linhaTopo.append(nome, btn);
-  wrap.append(linhaTopo);
-
-  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
-  const diasSelecionados = new Set();
-
-  const diasBox = document.createElement("div");
-  diasBox.style.display = "flex";
-  diasBox.style.flexWrap = "wrap";
-  diasBox.style.gap = "6px";
-  diasBox.style.marginTop = "10px";
-
-  diasSemana.forEach(dia => {
-    const btnDia = document.createElement("button");
-    btnDia.textContent = dia;
-    btnDia.className = "btn-dia";
-    btnDia.onclick = () => {
-      btnDia.classList.toggle("ativo");
-      btnDia.classList.contains("ativo")
-        ? diasSelecionados.add(dia)
-        : diasSelecionados.delete(dia);
-    };
-    diasBox.appendChild(btnDia);
-  });
-
-  wrap.appendChild(diasBox);
-
-  const horarios = document.createElement("div");
-  horarios.style.display = "flex";
-  horarios.style.gap = "10px";
-  horarios.style.marginTop = "10px";
-
-  const inicio = document.createElement("input");
-  inicio.type = "time";
-
-  const fim = document.createElement("input");
-  fim.type = "time";
-
-  horarios.append(inicio, fim);
-  wrap.append(horarios);
-
-  wrap.getData = () => ({
-    nome: nome.value,
-    dias: [...diasSelecionados],
-    hora_inicio: inicio.value,
-    hora_fim: fim.value
-  });
-
-  return wrap;
-}
-
-/* =========================
-   AGENTES AUTOMÁTICOS VIA USUÁRIO
-========================= */
-
-function gerarAgentesAPartirUsuarios() {
-  const listaAgentes = document.getElementById("listaAgentes");
-  if (!listaAgentes) return;
-
-  listaAgentes.innerHTML = "";
-
-  const usuarios = [...document.querySelectorAll("#listaUsuariosWeb .campo-descricao")];
-
-  usuarios.forEach(u => {
-    if (typeof u.isAgente === "function" && u.isAgente() && u.getNome()) {
-
-      const wrap = document.createElement("div");
-      wrap.className = "campo-descricao";
-      wrap.dataset.id = u.dataset.id || ("agente_" + Math.random().toString(36).slice(2));
-
-      const linha = document.createElement("div");
-      linha.className = "linha-principal";
-
-      const nome = document.createElement("input");
-      nome.value = u.getNome();
-      nome.disabled = true;
-      nome.className = "campo-nome";
-
-      const del = document.createElement("button");
-      del.textContent = "✖";
-      del.onclick = () => {
-        u.querySelector("input[type=checkbox]").checked = false;
-        gerarAgentesAPartirUsuarios();
-      };
-
-      linha.append(nome, del);
-      wrap.append(linha);
-
-      const selectRamal = document.createElement("select");
-      selectRamal.innerHTML = `<option value="">Ramal (obrigatório)</option>`;
-
-      document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
-        if (r.getNome()) {
-          selectRamal.add(new Option(r.getNome(), r.getNome()));
-        }
-      });
-
-      wrap.append(selectRamal);
-
-      listaAgentes.append(wrap);
-    }
-  });
-
-  atualizarSelectAgentesFila?.();
-}
-
-/* =========================
-   FILAS ENXERGAM AGENTES
-========================= */
-
-function atualizarSelectAgentesFila() {
-  document.querySelectorAll("#listaFilas .campo-descricao").forEach(fila => {
-    const select = fila.querySelector("select");
-    if (!select) return;
-
-    const atual = select.value;
-    select.innerHTML = `<option value="">Selecione um agente</option>`;
-
-    document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
-      const nome = a.querySelector(".campo-nome")?.value;
-      if (nome) select.add(new Option(nome, nome));
-    });
-
-    select.value = atual;
-  });
-}
-
-/* =========================
-   GATILHOS AUTOMÁTICOS
-========================= */
-
-document.addEventListener("change", e => {
-  if (e.target.closest("#listaUsuariosWeb")) {
-    gerarAgentesAPartirUsuarios();
-  }
-
-  if (e.target.closest("#listaRings")) {
-    gerarAgentesAPartirUsuarios();
-  }
-});
