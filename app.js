@@ -417,6 +417,13 @@ document.addEventListener("change", e => {
 window.explorar = function () {
   try {
 
+    if (!validarCenarioAntesDoJSON()) return;
+
+    const coletar = (id, fn) =>
+
+window.explorar = function () {
+  try {
+
     const getNomeSeguro = (c) =>
       typeof c.getNome === "function"
         ? c.getNome()
@@ -566,3 +573,75 @@ window.baixarTemplateUsuarios = function () {
   link.download = "template_usuarios_web.csv";
   link.click();
 };
+
+/* =========================
+   VALIDAÇÃO PROFISSIONAL
+========================= */
+
+function validarCenarioAntesDoJSON() {
+  const erros = [];
+
+  /* ---------- USUÁRIOS ---------- */
+  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach((u, i) => {
+    const nome = u.getNome();
+    const email = u.getEmail();
+    const senha = u.getSenha();
+    const perm = u.getPermissao();
+
+    if (!nome) erros.push(`Usuário ${i+1}: nome não informado`);
+    if (!email) erros.push(`Usuário ${i+1}: e-mail não informado`);
+    if (!senha) erros.push(`Usuário ${i+1}: senha não informada`);
+    if (!perm) erros.push(`Usuário ${i+1}: permissão não selecionada`);
+  });
+
+  /* ---------- RAMAIS ---------- */
+  document.querySelectorAll("#listaRings .campo-descricao").forEach((r, i) => {
+    if (!r.getNome()) erros.push(`Ramal ${i+1}: número não informado`);
+    if (!r.getSenha()) erros.push(`Ramal ${i+1}: senha não informada`);
+  });
+
+  /* ---------- AGENTES ---------- */
+  document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a, i) => {
+    const ramal = a.querySelector("select")?.value;
+    if (!ramal) erros.push(`Agente ${i+1}: ramal não vinculado`);
+  });
+
+  /* ---------- FILAS ---------- */
+  document.querySelectorAll("#listaFilas .campo-descricao").forEach((f, i) => {
+    const nome = f.querySelector(".campo-nome")?.value;
+    const agentes = JSON.parse(f.dataset.agentes || "[]");
+
+    if (!nome) erros.push(`Fila ${i+1}: nome não informado`);
+    if (!agentes.length) erros.push(`Fila ${i+1}: sem agentes vinculados`);
+  });
+
+  /* ---------- URAS ---------- */
+  document.querySelectorAll("#listaURAs .campo-descricao").forEach((u, i) => {
+    const nome = u.getNome();
+    const opcoes = u.querySelectorAll(".opcao-ura");
+
+    if (!nome) erros.push(`URA ${i+1}: nome não informado`);
+    if (!opcoes.length) erros.push(`URA ${i+1}: nenhuma opção criada`);
+  });
+
+  /* ---------- REGRAS DE TEMPO ---------- */
+  document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach((r, i) => {
+    const data = r.getData?.();
+    if (!data) return;
+
+    if (!data.nome) erros.push(`Regra de tempo ${i+1}: nome não informado`);
+    if (!data.dias.length) erros.push(`Regra de tempo ${i+1}: nenhum dia selecionado`);
+    if (!data.hora_inicio || !data.hora_fim) erros.push(`Regra de tempo ${i+1}: horário incompleto`);
+  });
+
+  if (erros.length) {
+    console.group("❌ ERROS DE CONFIGURAÇÃO");
+    erros.forEach(e => console.error(e));
+    console.groupEnd();
+
+    mostrarToast("Existem erros no cenário. Veja o console.", true);
+    return false;
+  }
+
+  return true;
+}
