@@ -471,11 +471,13 @@ function validarAntesDeGerarJSON() {
     if(!a.querySelector("select")?.value) marcar(a,`Agente ${i+1}: ramal obrigatório`);
   });
 
-  if(erros.length){
-    mostrarToast("Campos obrigatórios pendentes", true);
-    alert(erros.join("\n"));
-    return false;
-  }
+  if (erros.length) {
+  mostrarToast(
+    "Campos obrigatórios pendentes:\n" + erros.slice(0,5).join(" | "),
+    true
+  );
+  return false;
+}
 
   return true;
 }
