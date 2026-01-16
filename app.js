@@ -1,4 +1,4 @@
-console.log("APP.JS FINAL – BASE RESTAURADA + VALIDAÇÃO");
+console.log("APP.JS FINAL – BASE RESTAURADA + VALIDAÇÃO COMPLETA");
 
 /* ================= CONFIG ================= */
 
@@ -47,16 +47,16 @@ function criarCampo(tipo) {
 
   const nome = document.createElement("input");
   const placeholders = {
-  usuario_web: "Digite o nome do usuário",
-  ura: "Digite o nome da sua URA",
-  entrada: "Digite o número de entrada",
-  fila: "Digite o nome da sua fila",
-  ring: "Digite o número do ramal",
-  grupo_ring: "Digite o nome do grupo de ring",
-  agente: "Digite o nome do agente"
-};
+    usuario_web: "Digite o nome do usuário",
+    ura: "Digite o nome da sua URA",
+    entrada: "Digite o número de entrada",
+    fila: "Digite o nome da sua fila",
+    ring: "Digite o número do ramal",
+    grupo_ring: "Digite o nome do grupo de ring",
+    agente: "Digite o nome do agente"
+  };
 
-nome.placeholder = placeholders[tipo] || "Digite o nome";
+  nome.placeholder = placeholders[tipo] || "Digite o nome";
   nome.classList.add("campo-nome");
   nome.style.width = "100%";
   nome.addEventListener("input", atualizarTodosDestinosURA);
@@ -444,7 +444,7 @@ document.addEventListener("change", e => {
   if (e.target.closest(".campo-descricao")) syncTudo();
 });
 
-/* ================= VALIDAÇÃO ================= */
+/* ================= VALIDAÇÃO COMPLETA ================= */
 
 function validarAntesDeGerarJSON() {
   const erros = [];
@@ -455,6 +455,7 @@ function validarAntesDeGerarJSON() {
     erros.push(msg);
   };
 
+  /* USUÁRIOS */
   document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach((c,i)=>{
     if(!c.getNome()) marcar(c,`Usuário ${i+1}: nome vazio`);
     if(!c.getEmail()) marcar(c,`Usuário ${i+1}: email vazio`);
@@ -462,22 +463,43 @@ function validarAntesDeGerarJSON() {
     if(!c.getPermissao()) marcar(c,`Usuário ${i+1}: permissão vazia`);
   });
 
+  /* RAMAIS */
   document.querySelectorAll("#listaRings .campo-descricao").forEach((c,i)=>{
     if(!c.getNome()) marcar(c,`Ramal ${i+1}: número vazio`);
     if(!c.getSenha()) marcar(c,`Ramal ${i+1}: senha vazia`);
   });
 
+  /* AGENTES */
   document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a,i)=>{
     if(!a.querySelector("select")?.value) marcar(a,`Agente ${i+1}: ramal obrigatório`);
   });
 
+  /* URA */
+  document.querySelectorAll("#listaURAs .campo-descricao").forEach((u, i) => {
+    const nome = u.querySelector(".campo-nome")?.value.trim();
+    const msg = u.querySelector("textarea")?.value.trim();
+    const opcoes = u.querySelectorAll(".opcao-ura");
+
+    if (!nome) marcar(u, `URA ${i+1}: nome não preenchido`);
+    if (!msg) marcar(u, `URA ${i+1}: mensagem não preenchida`);
+    if (opcoes.length === 0) marcar(u, `URA ${i+1}: nenhuma opção criada`);
+
+    opcoes.forEach((o, j) => {
+      const tecla = o.querySelector("input")?.value.trim();
+      const destino = o.querySelector("select")?.value;
+
+      if (!tecla) marcar(o, `URA ${i+1} opção ${j+1}: tecla vazia`);
+      if (!destino) marcar(o, `URA ${i+1} opção ${j+1}: destino não selecionado`);
+    });
+  });
+
   if (erros.length) {
-  mostrarToast(
-    "Campos obrigatórios pendentes:\n" + erros.slice(0,5).join(" | "),
-    true
-  );
-  return false;
-}
+    mostrarToast(
+      "Campos obrigatórios pendentes: " + erros.slice(0,5).join(" | "),
+      true
+    );
+    return false;
+  }
 
   return true;
 }
