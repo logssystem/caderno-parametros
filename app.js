@@ -46,7 +46,17 @@ function criarCampo(tipo) {
   linhaNome.className = "linha-principal";
 
   const nome = document.createElement("input");
-  nome.placeholder = `Digite ${tipo.replace("_", " ")}`;
+  const placeholders = {
+  usuario_web: "Digite o nome do usuário",
+  ura: "Digite o nome da sua URA",
+  entrada: "Digite o número de entrada",
+  fila: "Digite o nome da sua fila",
+  ring: "Digite o número do ramal",
+  grupo_ring: "Digite o nome do grupo de ring",
+  agente: "Digite o nome do agente"
+};
+
+nome.placeholder = placeholders[tipo] || "Digite o nome";
   nome.classList.add("campo-nome");
   nome.style.width = "100%";
   nome.addEventListener("input", atualizarTodosDestinosURA);
