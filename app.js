@@ -1,4 +1,4 @@
-console.log("APP.JS FINAL – BASE RESTAURADA + VALIDAÇÃO COMPLETA");
+console.log("APP.JS FINAL – BASE RESTAURADA + GRUPO DE RING");
 
 /* ================= CONFIG ================= */
 
@@ -34,6 +34,7 @@ window.adicionarCampo = function (tipo) {
   if (!container || container.children.length >= LIMITE) return;
   container.appendChild(criarCampo(tipo));
   atualizarTodosDestinosURA();
+  syncTudo();
 };
 
 /* ================= CRIAR CAMPO ================= */
@@ -162,12 +163,86 @@ function criarCampo(tipo) {
     btnNova.textContent = "+ Nova opção";
     btnNova.onclick = () => listaOpcoes.appendChild(criarOpcaoURA());
     wrap.append(btnNova);
+  }
 
-    wrap.getURA = () => ({
-      nome: nome.value,
-      mensagem: msg.value,
-      opcoes: [...listaOpcoes.querySelectorAll(".opcao-ura")].map(o => o.getData())
-    });
+  /* ===== GRUPO DE RING ===== */
+  if (tipo === "grupo_ring") {
+
+    const titulo = document.createElement("h4");
+    titulo.textContent = "Ramais do grupo";
+    titulo.style.marginTop = "12px";
+    wrap.append(titulo);
+
+    const linha = document.createElement("div");
+    linha.style.display = "flex";
+    linha.style.gap = "8px";
+    linha.style.marginTop = "6px";
+
+    const selectRamal = document.createElement("select");
+    selectRamal.innerHTML = `<option value="">Selecione um ramal</option>`;
+
+    const btnAdd = document.createElement("button");
+    btnAdd.textContent = "Adicionar";
+
+    linha.append(selectRamal, btnAdd);
+    wrap.append(linha);
+
+    const lista = document.createElement("div");
+    lista.style.display = "flex";
+    lista.style.flexDirection = "column";
+    lista.style.gap = "6px";
+    lista.style.marginTop = "8px";
+    wrap.append(lista);
+
+    wrap.dataset.ramais = "[]";
+
+    function atualizarSelect() {
+      selectRamal.innerHTML = `<option value="">Selecione um ramal</option>`;
+      document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+        if (r.getNome()) selectRamal.add(new Option(r.getNome(), r.getNome()));
+      });
+    }
+
+    btnAdd.onclick = () => {
+      const ramal = selectRamal.value;
+      if (!ramal) return;
+
+      const atuais = JSON.parse(wrap.dataset.ramais || "[]");
+      if (atuais.includes(ramal)) return;
+
+      atuais.push(ramal);
+      wrap.dataset.ramais = JSON.stringify(atuais);
+      renderLista();
+    };
+
+    function renderLista() {
+      lista.innerHTML = "";
+      const atuais = JSON.parse(wrap.dataset.ramais || "[]");
+
+      atuais.forEach((ramal, i) => {
+        const item = document.createElement("div");
+        item.style.display = "flex";
+        item.style.justifyContent = "space-between";
+        item.style.alignItems = "center";
+
+        const span = document.createElement("span");
+        span.textContent = ramal;
+
+        const del = document.createElement("button");
+        del.textContent = "✖";
+        del.onclick = () => {
+          atuais.splice(i, 1);
+          wrap.dataset.ramais = JSON.stringify(atuais);
+          renderLista();
+        };
+
+        item.append(span, del);
+        lista.append(item);
+      });
+    }
+
+    atualizarSelect();
+    setTimeout(atualizarSelect, 100);
   }
 
   function validarSenha(input, regrasEl) {
@@ -208,92 +283,6 @@ function criarOpcaoURA() {
 
   wrap.append(tecla, destino, desc, del);
 
-  wrap.getData = () => ({
-    tecla: tecla.value,
-    destino: destino.value,
-    descricao: desc.value
-  });
-
-  return wrap;
-}
-
-/* ================= REGRA DE TEMPO ================= */
-
-window.adicionarRegraTempo = function () {
-  const container = document.getElementById("listaRegrasTempo");
-
-  if (!container) {
-    console.error("listaRegrasTempo não encontrada");
-    return mostrarToast("Lista de regras de tempo não encontrada", true);
-  }
-
-  container.appendChild(criarRegraTempo());
-  atualizarTodosDestinosURA();
-  syncTudo();
-};
-
-function criarRegraTempo() {
-  const wrap = document.createElement("div");
-  wrap.className = "campo-descricao";
-
-  const linhaTopo = document.createElement("div");
-  linhaTopo.className = "linha-principal";
-
-  const nome = document.createElement("input");
-  nome.placeholder = "Nome da regra de tempo";
-
-  const btn = document.createElement("button");
-  btn.textContent = "✖";
-  btn.onclick = () => wrap.remove();
-
-  linhaTopo.append(nome, btn);
-  wrap.append(linhaTopo);
-
-  const diasSemana = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
-  const diasSelecionados = new Set();
-
-  const diasBox = document.createElement("div");
-  diasBox.style.display = "flex";
-  diasBox.style.flexWrap = "wrap";
-  diasBox.style.gap = "6px";
-  diasBox.style.marginTop = "10px";
-
-  diasSemana.forEach(dia => {
-    const btnDia = document.createElement("button");
-    btnDia.textContent = dia;
-    btnDia.className = "btn-dia";
-    btnDia.onclick = () => {
-      btnDia.classList.toggle("ativo");
-      btnDia.classList.contains("ativo")
-        ? diasSelecionados.add(dia)
-        : diasSelecionados.delete(dia);
-    };
-    diasBox.appendChild(btnDia);
-  });
-
-  wrap.appendChild(diasBox);
-
-  const horarios = document.createElement("div");
-  horarios.style.display = "flex";
-  horarios.style.gap = "10px";
-  horarios.style.marginTop = "10px";
-
-  const inicio = document.createElement("input");
-  inicio.type = "time";
-
-  const fim = document.createElement("input");
-  fim.type = "time";
-
-  horarios.append(inicio, fim);
-  wrap.append(horarios);
-
-  wrap.getData = () => ({
-    nome: nome.value,
-    dias: [...diasSelecionados],
-    hora_inicio: inicio.value,
-    hora_fim: fim.value
-  });
-
   return wrap;
 }
 
@@ -319,122 +308,29 @@ function atualizarTodosDestinosURA() {
   });
 }
 
-/* ================= RANGE RAMAIS ================= */
+/* ================= SELECT GRUPO DE RING ================= */
 
-window.criarRangeRamais = function () {
-  const ini = Number(document.getElementById("ramalInicio")?.value);
-  const fim = Number(document.getElementById("ramalFim")?.value);
-  const container = document.getElementById("listaRings");
+function atualizarSelectRamaisGrupo() {
+  document.querySelectorAll("#listaGrupoRing .campo-descricao").forEach(grupo => {
+    const select = grupo.querySelector("select");
+    if (!select) return;
 
-  if (!ini || !fim || fim < ini) return mostrarToast("Range inválido", true);
+    const atual = select.value;
+    select.innerHTML = `<option value="">Selecione um ramal</option>`;
 
-  for (let i = ini; i <= fim; i++) {
-    const campo = criarCampo("ring");
-    campo.querySelector(".campo-nome").value = i;
-    container.appendChild(campo);
-  }
+    document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+      if (r.getNome()) select.add(new Option(r.getNome(), r.getNome()));
+    });
 
-  atualizarTodosDestinosURA();
-  syncTudo();
-  mostrarToast("Range criado com sucesso!");
-};
-
-/* ================= TOAST ================= */
-
-function mostrarToast(msg, error = false) {
-  const t = document.getElementById("toastGlobal");
-  const m = document.getElementById("toastMessage");
-  if (!t || !m) return;
-  m.textContent = msg;
-  t.className = "toast show" + (error ? " error" : "");
-  setTimeout(() => t.classList.remove("show"), 3000);
-}
-
-/* ================= DARK MODE ================= */
-
-const toggleTheme = document.getElementById("toggleTheme");
-
-function aplicarTemaSalvo() {
-  const tema = localStorage.getItem("tema");
-  if (tema === "dark") document.body.classList.add("dark");
-  else document.body.classList.remove("dark");
-}
-
-if (toggleTheme) {
-  toggleTheme.onclick = () => {
-    document.body.classList.toggle("dark");
-    localStorage.setItem(
-      "tema",
-      document.body.classList.contains("dark") ? "dark" : "light"
-    );
-  };
-}
-
-aplicarTemaSalvo();
-
-/* ================= MOTOR CENTRAL ================= */
-
-window.APP_STATE = { usuarios: [], ramais: [], agentes: [], filas: [] };
-
-function syncAppState() {
-  APP_STATE.usuarios = [...document.querySelectorAll("#listaUsuariosWeb .campo-descricao")]
-    .map(c => ({
-      nome: c.getNome(),
-      email: c.getEmail(),
-      senha: c.getSenha(),
-      permissao: c.getPermissao(),
-      isAgente: c.isAgente()
-    })).filter(u => u.nome);
-
-  APP_STATE.ramais = [...document.querySelectorAll("#listaRings .campo-descricao")]
-    .map(c => ({ ramal: c.getNome(), senha: c.getSenha() }))
-    .filter(r => r.ramal);
-}
-
-/* ================= AGENTES AUTOMÁTICOS ================= */
-
-function gerarAgentesAPartirUsuarios() {
-  const listaAgentes = document.getElementById("listaAgentes");
-  if (!listaAgentes) return;
-
-  listaAgentes.innerHTML = "";
-
-  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
-    if (u.isAgente() && u.getNome()) {
-
-      const wrap = document.createElement("div");
-      wrap.className = "campo-descricao";
-
-      const linha = document.createElement("div");
-      linha.className = "linha-principal";
-
-      const nome = document.createElement("input");
-      nome.value = u.getNome();
-      nome.disabled = true;
-      nome.className = "campo-nome";
-
-      linha.append(nome);
-      wrap.append(linha);
-
-      const selectRamal = document.createElement("select");
-      selectRamal.innerHTML = `<option value="">Ramal (obrigatório)</option>`;
-
-      document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
-        if (r.getNome()) selectRamal.add(new Option(r.getNome(), r.getNome()));
-      });
-
-      wrap.append(selectRamal);
-      listaAgentes.append(wrap);
-    }
+    select.value = atual;
   });
 }
 
-/* ================= SYNC GLOBAL ================= */
+/* ================= MOTOR ================= */
 
 function syncTudo() {
-  syncAppState();
-  gerarAgentesAPartirUsuarios();
   atualizarTodosDestinosURA();
+  atualizarSelectRamaisGrupo();
 }
 
 document.addEventListener("input", e => {
@@ -443,86 +339,3 @@ document.addEventListener("input", e => {
 document.addEventListener("change", e => {
   if (e.target.closest(".campo-descricao")) syncTudo();
 });
-
-/* ================= VALIDAÇÃO COMPLETA ================= */
-
-function validarAntesDeGerarJSON() {
-  const erros = [];
-  document.querySelectorAll(".campo-erro").forEach(e => e.classList.remove("campo-erro"));
-
-  const marcar = (el, msg) => {
-    el.classList.add("campo-erro");
-    erros.push(msg);
-  };
-
-  /* USUÁRIOS */
-  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach((c,i)=>{
-    if(!c.getNome()) marcar(c,`Usuário ${i+1}: nome vazio`);
-    if(!c.getEmail()) marcar(c,`Usuário ${i+1}: email vazio`);
-    if(!c.getSenha()) marcar(c,`Usuário ${i+1}: senha vazia`);
-    if(!c.getPermissao()) marcar(c,`Usuário ${i+1}: permissão vazia`);
-  });
-
-  /* RAMAIS */
-  document.querySelectorAll("#listaRings .campo-descricao").forEach((c,i)=>{
-    if(!c.getNome()) marcar(c,`Ramal ${i+1}: número vazio`);
-    if(!c.getSenha()) marcar(c,`Ramal ${i+1}: senha vazia`);
-  });
-
-  /* AGENTES */
-  document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a,i)=>{
-    if(!a.querySelector("select")?.value) marcar(a,`Agente ${i+1}: ramal obrigatório`);
-  });
-
-  /* URA */
-  document.querySelectorAll("#listaURAs .campo-descricao").forEach((u, i) => {
-    const nome = u.querySelector(".campo-nome")?.value.trim();
-    const msg = u.querySelector("textarea")?.value.trim();
-    const opcoes = u.querySelectorAll(".opcao-ura");
-
-    if (!nome) marcar(u, `URA ${i+1}: nome não preenchido`);
-    if (!msg) marcar(u, `URA ${i+1}: mensagem não preenchida`);
-    if (opcoes.length === 0) marcar(u, `URA ${i+1}: nenhuma opção criada`);
-
-    opcoes.forEach((o, j) => {
-      const tecla = o.querySelector("input")?.value.trim();
-      const destino = o.querySelector("select")?.value;
-
-      if (!tecla) marcar(o, `URA ${i+1} opção ${j+1}: tecla vazia`);
-      if (!destino) marcar(o, `URA ${i+1} opção ${j+1}: destino não selecionado`);
-    });
-  });
-
-  if (erros.length) {
-    mostrarToast(
-      "Campos obrigatórios pendentes: " + erros.slice(0,5).join(" | "),
-      true
-    );
-    return false;
-  }
-
-  return true;
-}
-
-/* ================= JSON ================= */
-
-window.explorar = function () {
-  try {
-
-    if (!validarAntesDeGerarJSON()) return;
-
-    const usuarios = APP_STATE.usuarios;
-    const ramais = APP_STATE.ramais;
-
-    const dados = { voz: { usuarios, ramais } };
-
-    document.getElementById("resultado").textContent =
-      JSON.stringify(dados, null, 2);
-
-    mostrarToast("JSON gerado com sucesso!");
-
-  } catch (e) {
-    console.error(e);
-    mostrarToast("Erro ao gerar JSON", true);
-  }
-};
