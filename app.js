@@ -305,4 +305,60 @@ function criarOpcaoURA() {
   del.textContent = "🗑";
   del.onclick = () => wrap.remove();
 
-  wrap.append(tecla,
+  wrap.append(tecla, destino, desc, del);
+  return wrap;
+}
+
+/* ================= DESTINOS URA ================= */
+
+function atualizarDestinosURA(select) {
+  if (!select) return;
+  select.innerHTML = "";
+  select.add(new Option("Selecione o destino", ""));
+
+  ["listaFilas","listaRings","listaGrupoRing","listaURAs","listaRegrasTempo"].forEach(id => {
+    document.querySelectorAll(`#${id} .campo-nome`).forEach(i => {
+      if (i.value) select.add(new Option(i.value, `${id}:${i.value}`));
+    });
+  });
+}
+
+function atualizarTodosDestinosURA() {
+  document.querySelectorAll(".opcao-ura select").forEach(select => {
+    const atual = select.value;
+    atualizarDestinosURA(select);
+    select.value = atual;
+  });
+}
+
+/* ================= SELECT GRUPO DE RING ================= */
+
+function atualizarSelectRamaisGrupo() {
+  document.querySelectorAll("#listaGrupoRing .campo-descricao").forEach(grupo => {
+    const select = grupo.querySelector("select:nth-of-type(2)");
+    if (!select) return;
+
+    const atual = select.value;
+    select.innerHTML = `<option value="">Selecione um ramal</option>`;
+
+    document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+      if (r.getNome()) select.add(new Option(r.getNome(), r.getNome()));
+    });
+
+    select.value = atual;
+  });
+}
+
+/* ================= MOTOR ================= */
+
+function syncTudo() {
+  atualizarTodosDestinosURA();
+  atualizarSelectRamaisGrupo();
+}
+
+document.addEventListener("input", e => {
+  if (e.target.closest(".campo-descricao")) syncTudo();
+});
+document.addEventListener("change", e => {
+  if (e.target.closest(".campo-descricao")) syncTudo();
+});
