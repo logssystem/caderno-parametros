@@ -29,9 +29,20 @@ const PERMISSOES = [
 /* ================= ADICIONAR CAMPO ================= */
 
 window.adicionarCampo = function (tipo) {
+
+  // 👉 AGENTE NÃO É CRIADO NA MÃO — É GERADO DOS USUÁRIOS
+  if (tipo === "agente") {
+    gerarAgentesAPartirUsuarios();
+    atualizarSelectAgentesFila();
+    mostrarToast("Agentes atualizados a partir dos usuários");
+    return;
+  }
+
   if (!listas[tipo]) return mostrarToast(`Tipo inválido: ${tipo}`, true);
+
   const container = document.getElementById(listas[tipo]);
   if (!container || container.children.length >= LIMITE) return;
+
   container.appendChild(criarCampo(tipo));
   atualizarTodosDestinosURA();
   syncTudo();
