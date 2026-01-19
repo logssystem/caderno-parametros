@@ -793,3 +793,30 @@ window.salvarConfiguracao = function () {
 
   window.location.href = "resumo.html";
 };
+
+/* ================= DARK MODE ================= */
+
+const toggleTheme = document.getElementById("toggleTheme");
+
+function aplicarTema(modo) {
+  if (modo === "dark") {
+    document.body.classList.add("dark");
+    if (toggleTheme) toggleTheme.textContent = "☀️";
+  } else {
+    document.body.classList.remove("dark");
+    if (toggleTheme) toggleTheme.textContent = "🌙";
+  }
+  localStorage.setItem("tema_caderno", modo);
+}
+
+// carregar tema salvo
+const temaSalvo = localStorage.getItem("tema_caderno") || "light";
+aplicarTema(temaSalvo);
+
+// clique no botão
+if (toggleTheme) {
+  toggleTheme.addEventListener("click", () => {
+    const escuroAtivo = document.body.classList.contains("dark");
+    aplicarTema(escuroAtivo ? "light" : "dark");
+  });
+}
