@@ -1,4 +1,4 @@
-console.log("APP.JS FINAL – BASE RESTAURADA + GRUPO DE RING");
+console.log("APP.JS FINAL – BASE RESTAURADA + GRUPO DE RING + ESTRATEGIA");
 
 /* ================= CONFIG ================= */
 
@@ -168,6 +168,30 @@ function criarCampo(tipo) {
   /* ===== GRUPO DE RING ===== */
   if (tipo === "grupo_ring") {
 
+    /* --- ESTRATÉGIA --- */
+    const boxEstr = document.createElement("div");
+    boxEstr.style.display = "flex";
+    boxEstr.style.flexDirection = "column";
+    boxEstr.style.gap = "6px";
+    boxEstr.style.marginTop = "10px";
+
+    const labelEstr = document.createElement("strong");
+    labelEstr.textContent = "Estratégia do grupo";
+
+    const selectEstr = document.createElement("select");
+    selectEstr.innerHTML = `
+      <option value="">Selecione a estratégia</option>
+      <option value="simultaneo">Simultânea (todos tocam juntos)</option>
+      <option value="sequencial">Sequencial (um após o outro)</option>
+    `;
+
+    boxEstr.append(labelEstr, selectEstr);
+    wrap.append(boxEstr);
+
+    wrap.dataset.estrategia = "";
+    selectEstr.onchange = () => wrap.dataset.estrategia = selectEstr.value;
+
+    /* --- RAMAIS --- */
     const titulo = document.createElement("h4");
     titulo.textContent = "Ramais do grupo";
     titulo.style.marginTop = "12px";
@@ -281,61 +305,4 @@ function criarOpcaoURA() {
   del.textContent = "🗑";
   del.onclick = () => wrap.remove();
 
-  wrap.append(tecla, destino, desc, del);
-
-  return wrap;
-}
-
-/* ================= DESTINOS URA ================= */
-
-function atualizarDestinosURA(select) {
-  if (!select) return;
-  select.innerHTML = "";
-  select.add(new Option("Selecione o destino", ""));
-
-  ["listaFilas","listaRings","listaGrupoRing","listaURAs","listaRegrasTempo"].forEach(id => {
-    document.querySelectorAll(`#${id} .campo-nome`).forEach(i => {
-      if (i.value) select.add(new Option(i.value, `${id}:${i.value}`));
-    });
-  });
-}
-
-function atualizarTodosDestinosURA() {
-  document.querySelectorAll(".opcao-ura select").forEach(select => {
-    const atual = select.value;
-    atualizarDestinosURA(select);
-    select.value = atual;
-  });
-}
-
-/* ================= SELECT GRUPO DE RING ================= */
-
-function atualizarSelectRamaisGrupo() {
-  document.querySelectorAll("#listaGrupoRing .campo-descricao").forEach(grupo => {
-    const select = grupo.querySelector("select");
-    if (!select) return;
-
-    const atual = select.value;
-    select.innerHTML = `<option value="">Selecione um ramal</option>`;
-
-    document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
-      if (r.getNome()) select.add(new Option(r.getNome(), r.getNome()));
-    });
-
-    select.value = atual;
-  });
-}
-
-/* ================= MOTOR ================= */
-
-function syncTudo() {
-  atualizarTodosDestinosURA();
-  atualizarSelectRamaisGrupo();
-}
-
-document.addEventListener("input", e => {
-  if (e.target.closest(".campo-descricao")) syncTudo();
-});
-document.addEventListener("change", e => {
-  if (e.target.closest(".campo-descricao")) syncTudo();
-});
+  wrap.append(tecla,
