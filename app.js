@@ -307,42 +307,67 @@ function criarOpcaoURA() {
 /* ================= AGENTES AUTOMÁTICOS ================= */
 
 function gerarAgentesAPartirUsuarios() {
-  const lista = document.getElementById("listaAgentes");
-  if(!lista) return;
-  lista.innerHTML = "";
+  const listaAgentes = document.getElementById("listaAgentes");
+  if (!listaAgentes) return;
 
-  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u=>{
-    if(u.isAgente() && u.getNome()){
-      const d=document.createElement("div");
-      d.className="campo-descricao";
-      const i=document.createElement("input");
-      i.value=u.getNome();
-      i.disabled=true;
-      i.className="campo-nome";
-      d.append(i);
-      lista.append(d);
+  listaAgentes.innerHTML = "";
+
+  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+    if (u.isAgente && u.isAgente() && u.getNome()) {
+
+      const wrap = document.createElement("div");
+      wrap.className = "campo-descricao";
+
+      const linha = document.createElement("div");
+      linha.className = "linha-principal";
+
+      const nome = document.createElement("input");
+      nome.value = u.getNome();
+      nome.disabled = true;
+      nome.className = "campo-nome";
+
+      linha.append(nome);
+      wrap.append(linha);
+
+      const selectRamal = document.createElement("select");
+      selectRamal.innerHTML = `<option value="">Ramal (obrigatório)</option>`;
+
+      document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+        if (r.getNome()) {
+          selectRamal.add(new Option(r.getNome(), r.getNome()));
+        }
+      });
+
+      wrap.append(selectRamal);
+
+      // salva o ramal no próprio bloco do agente
+      wrap.getRamal = () => selectRamal.value;
+
+      listaAgentes.append(wrap);
     }
   });
 }
 
 /* ================= DESTINOS URA ================= */
 
-function atualizarDestinosURA(select) {
-  if (!select) return;
-  select.innerHTML = "";
-  select.add(new Option("Selecione o destino", ""));
+function atualizarSelectAgentesFila() {
+  document.querySelectorAll("#listaFilas .campo-descricao").forEach(fila => {
+    const select = fila.querySelector("select");
+    if (!select) return;
 
-  ["listaFilas","listaRings","listaGrupoRing","listaURAs","listaRegrasTempo"].forEach(id=>{
-    document.querySelectorAll(`#${id} .campo-nome`).forEach(i=>{
-      if(i.value) select.add(new Option(i.value, `${id}:${i.value}`));
-    });
-  });
-}
-
-function atualizarTodosDestinosURA() {
-  document.querySelectorAll(".opcao-ura select").forEach(select=>{
     const atual = select.value;
-    atualizarDestinosURA(select);
+    select.innerHTML = `<option value="">Selecione um agente</option>`;
+
+    document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+      const nome = a.querySelector(".campo-nome")?.value;
+      const ramal = a.getRamal ? a.getRamal() : "";
+
+      if (nome) {
+        const label = ramal ? `${nome} (${ramal})` : `${nome} (sem ramal)`;
+        select.add(new Option(label, nome));
+      }
+    });
+
     select.value = atual;
   });
 }
