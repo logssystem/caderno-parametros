@@ -389,12 +389,32 @@ function atualizarSelectRamaisGrupo() {
   });
 }
 
+/* ================= FILAS ENXERGAM AGENTES ================= */
+
+function atualizarSelectAgentesFila() {
+  document.querySelectorAll("#listaFilas .campo-descricao").forEach(fila => {
+    const select = fila.querySelector("select");
+    if (!select) return;
+
+    const atual = select.value;
+    select.innerHTML = `<option value="">Selecione um agente</option>`;
+
+    document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+      const nome = a.querySelector(".campo-nome")?.value;
+      if (nome) select.add(new Option(nome, nome));
+    });
+
+    select.value = atual;
+  });
+}
+
 /* ================= MOTOR ================= */
 
 function syncTudo() {
-  gerarAgentesAPartirUsuarios();
-  atualizarTodosDestinosURA();
-  atualizarSelectRamaisGrupo();
+  gerarAgentesAPartirUsuarios();   // usuários → agentes
+  atualizarSelectAgentesFila();   // agentes → filas
+  atualizarTodosDestinosURA();    // destinos URA
+  atualizarSelectRamaisGrupo();   // ramais → grupos
 }
 
 document.addEventListener("input", e => {
