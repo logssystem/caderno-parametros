@@ -82,3 +82,14 @@ function voltar() {
 }
 
 window.voltar = voltar;
+
+/* ================= DARK MODE (RESUMO) ================= */
+
+(function aplicarTemaResumo() {
+  const tema = localStorage.getItem("tema_caderno") || "light";
+  if (tema === "dark") {
+    document.body.classList.add("dark");
+  } else {
+    document.body.classList.remove("dark");
+  }
+})();
