@@ -1,11 +1,11 @@
-const dados = localStorage.getItem("CONFIG_CADERNO");
+const raw = localStorage.getItem("CONFIG_CADERNO");
 
-if (!dados) {
+if (!raw) {
   document.body.innerHTML = "<h2>Configuração não encontrada.</h2>";
-  throw new Error("Sem dados");
+  throw new Error("Sem dados salvos");
 }
 
-const config = JSON.parse(dados);
+const config = JSON.parse(raw);
 const resumo = document.getElementById("resumo");
 
 /* ========= HELPERS ========= */
@@ -33,8 +33,8 @@ function lista(arr, render) {
 
 const cliente = document.createElement("div");
 cliente.innerHTML = `
-<b>Empresa:</b> ${config.cliente.empresa}<br>
-<b>Domínio:</b> ${config.cliente.dominio}
+<b>Empresa:</b> ${config.cliente?.empresa || "-"}<br>
+<b>Domínio:</b> ${config.cliente?.dominio || "-"}
 `;
 
 resumo.append(card("Dados do Cliente", cliente));
@@ -44,7 +44,7 @@ resumo.append(card("Dados do Cliente", cliente));
 resumo.append(card(
   `Usuários (${config.voz.usuarios.length})`,
   lista(config.voz.usuarios, u =>
-    `${u.nome} - ${u.email} ${u.agente ? "(Agente)" : ""}`
+    `${u.nome} - ${u.email} ${u.agente ? "<b>(Agente)</b>" : ""}`
   )
 ));
 
@@ -70,6 +70,8 @@ resumo.append(card(
 
 const pre = document.createElement("pre");
 pre.textContent = JSON.stringify(config, null, 2);
+pre.style.maxHeight = "400px";
+pre.style.overflow = "auto";
 
 resumo.append(card("JSON Gerado", pre));
 
@@ -78,3 +80,5 @@ resumo.append(card("JSON Gerado", pre));
 function voltar() {
   history.back();
 }
+
+window.voltar = voltar;
