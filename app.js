@@ -26,6 +26,28 @@ const PERMISSOES = [
   "Super Administrador"
 ];
 
+/* ================= DADOS DO CLIENTE ================= */
+
+const dominioInput = document.getElementById("dominioCliente");
+const regraDominio = document.getElementById("regraDominio");
+
+function validarDominioCliente() {
+  if (!dominioInput || !regraDominio) return true;
+
+  const v = dominioInput.value.trim().toLowerCase();
+  const ok = v.endsWith(".sobreip.com.br") && v.length > ".sobreip.com.br".length;
+
+  regraDominio.innerHTML = ok
+    ? `<div class="regra-ok">Domínio válido</div>`
+    : `<div class="regra-erro">Deve terminar com .sobreip.com.br</div>`;
+
+  return ok;
+}
+
+if (dominioInput) {
+  dominioInput.addEventListener("input", validarDominioCliente);
+}
+
 /* ================= ADICIONAR CAMPO ================= */
 
 window.adicionarCampo = function (tipo) {
@@ -642,7 +664,20 @@ function mostrarToast(msg, error = false) {
 
 window.explorar = function () {
   try {
+  
+    const empresa = document.getElementById("empresaCliente")?.value.trim();
+    const dominio = document.getElementById("dominioCliente")?.value.trim();
 
+    if (!empresa) {
+      mostrarToast("Informe o nome da empresa", true);
+      return;
+    }
+
+    if (!validarDominioCliente()) {
+      mostrarToast("Domínio inválido. Ex: suporteera.sobreip.com.br", true);
+      return;
+    }
+    
     // 🔒 trava se existir agente sem ramal
     const agentesSemRamal = [];
     document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a, i) => {
