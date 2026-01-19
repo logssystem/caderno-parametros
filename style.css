@@ -505,3 +505,10 @@ body.dark .chat-card.active {
   border-color: #38bdf8;
   box-shadow: 0 0 0 3px rgba(56,189,248,.35);
 }
+
+#empresaCliente,
+#dominioCliente {
+  width: 100%;
+  max-width: 520px;
+  font-size: 14px;
+}
