@@ -63,3 +63,5 @@ window.toggleCanal = function (el) {
     chatState.canais = chatState.canais.filter(c => c !== canal);
   }
 };
+
+window.chatState = chatState;
