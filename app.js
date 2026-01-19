@@ -845,3 +845,19 @@ window.selecionarApi = function (el, api) {
     window.chatState.api = api;
   }
 };
+
+window.salvarConfiguracao = function () {
+
+  // chama toda validação normal
+  explorar();
+
+  const resultado = document.getElementById("resultado")?.textContent;
+  if (!resultado) {
+    mostrarToast("Gere a configuração antes de salvar", true);
+    return;
+  }
+
+  localStorage.setItem("CONFIG_CADERNO", resultado);
+
+  window.location.href = "resumo.html";
+};
