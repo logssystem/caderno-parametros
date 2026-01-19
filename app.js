@@ -831,3 +831,17 @@ if (toggleTheme) {
     aplicarTema(escuroAtivo ? "light" : "dark");
   });
 }
+window.selecionarApi = function (el, api) {
+  if (typeof selecionarApiInterno === "function") {
+    selecionarApiInterno(el, api);
+  } else {
+    // fallback simples
+    document.querySelectorAll("#api-oficial .chat-card").forEach(c =>
+      c.classList.remove("active")
+    );
+    el.classList.add("active");
+
+    window.chatState = window.chatState || {};
+    window.chatState.api = api;
+  }
+};
