@@ -1,4 +1,4 @@
-console.log("APP.JS FINAL – CONSOLIDADO (URA + REGRA DE TEMPO + FILA + GRUPO DE RING)");
+console.log("APP.JS FINAL – CONSOLIDADO DEFINITIVO (URA + REGRA DE TEMPO + FILA + GRUPO RING + AGENTES)");
 
 /* ================= CONFIG ================= */
 
@@ -29,6 +29,7 @@ const PERMISSOES = [
 /* ================= ADICIONAR CAMPO ================= */
 
 window.adicionarCampo = function (tipo) {
+  if (!listas[tipo]) return mostrarToast(`Tipo inválido: ${tipo}`, true);
   const container = document.getElementById(listas[tipo]);
   if (!container || container.children.length >= LIMITE) return;
   container.appendChild(criarCampo(tipo));
@@ -46,45 +47,101 @@ function criarCampo(tipo) {
   linhaNome.className = "linha-principal";
 
   const nome = document.createElement("input");
+  const placeholders = {
+    usuario_web: "Digite o nome do usuário",
+    ura: "Digite o nome da sua URA",
+    entrada: "Digite o número de entrada",
+    fila: "Digite o nome da sua fila",
+    ring: "Digite o número do ramal",
+    grupo_ring: "Digite o nome do grupo de ring",
+    agente: "Digite o nome do agente"
+  };
+
+  nome.placeholder = placeholders[tipo] || "Digite o nome";
   nome.classList.add("campo-nome");
-  nome.placeholder = "Nome";
   nome.style.width = "100%";
-  nome.oninput = syncTudo;
+  nome.addEventListener("input", atualizarTodosDestinosURA);
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
-  btn.onclick = () => { wrap.remove(); syncTudo(); };
+  btn.onclick = () => {
+    wrap.remove();
+    atualizarTodosDestinosURA();
+    syncTudo();
+  };
 
   linhaNome.append(nome, btn);
   wrap.append(linhaNome);
 
-  let emailInput=null, senhaInput=null, permissao=null, chkAgente=null;
+  let emailInput = null;
+  let senhaInput = null;
+  let permissao = null;
+  let regras = null;
+  let chkAgente = null;
 
-  /* ===== USUÁRIO ===== */
+  /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
+    const linhaCred = document.createElement("div");
+    linhaCred.className = "linha-principal";
+    linhaCred.style.gap = "12px";
+    linhaCred.style.marginTop = "12px";
+
     emailInput = document.createElement("input");
-    emailInput.placeholder = "E-mail";
+    emailInput.type = "email";
+    emailInput.placeholder = "E-mail do usuário";
 
     senhaInput = document.createElement("input");
-    senhaInput.placeholder = "Senha";
+    senhaInput.placeholder = "Senha do usuário";
+    senhaInput.classList.add("campo-senha");
 
-    wrap.append(emailInput, senhaInput);
+    linhaCred.append(emailInput, senhaInput);
+    wrap.append(linhaCred);
 
     permissao = document.createElement("select");
-    permissao.append(new Option("Permissão", ""));
-    PERMISSOES.forEach(p=>permissao.add(new Option(p,p)));
+    permissao.style.marginTop = "12px";
+
+    const opt0 = new Option("Selecione a permissão", "");
+    opt0.disabled = true;
+    opt0.selected = true;
+    permissao.appendChild(opt0);
+    PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
     wrap.append(permissao);
+
+    const boxAgente = document.createElement("label");
+    boxAgente.style.display = "flex";
+    boxAgente.style.alignItems = "center";
+    boxAgente.style.gap = "6px";
+    boxAgente.style.marginTop = "8px";
 
     chkAgente = document.createElement("input");
     chkAgente.type = "checkbox";
-    wrap.append(chkAgente, document.createTextNode(" É agente"));
+
+    const txt = document.createElement("span");
+    txt.textContent = "Este usuário é agente de call center";
+
+    boxAgente.append(chkAgente, txt);
+    wrap.append(boxAgente);
+
+    regras = document.createElement("div");
+    regras.style.marginTop = "8px";
+    wrap.append(regras);
+
+    senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
   /* ===== RAMAL ===== */
   if (tipo === "ring") {
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do ramal";
+    senhaInput.classList.add("campo-senha");
+    senhaInput.style.marginTop = "12px";
     wrap.append(senhaInput);
+
+    regras = document.createElement("div");
+    regras.style.marginTop = "8px";
+    wrap.append(regras);
+
+    senhaInput.oninput = () => validarSenha(senhaInput, regras);
   }
 
   /* ===== URA ===== */
@@ -207,8 +264,19 @@ function criarCampo(tipo) {
     }
   }
 
+  function validarSenha(input, regrasEl) {
+    const v = input.value;
+    const ok = v.length >= 11 && /[A-Z]/.test(v) && /\d/.test(v) && /[^A-Za-z0-9]/.test(v);
+    regrasEl.innerHTML = ok
+      ? `<div class="regra-ok">Senha válida</div>`
+      : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
+  }
+
   wrap.getNome = () => nome.value;
-  wrap.isAgente = () => chkAgente?.checked || false;
+  wrap.getEmail = () => emailInput?.value || "";
+  wrap.getSenha = () => senhaInput?.value || "";
+  wrap.getPermissao = () => permissao?.value || "";
+  wrap.isAgente = () => chkAgente ? chkAgente.checked : false;
 
   return wrap;
 }
