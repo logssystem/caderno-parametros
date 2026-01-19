@@ -59,7 +59,7 @@ window.adicionarCampo = function (tipo) {
   if (tipo === "agente") {
     gerarAgentesAPartirUsuarios();
     atualizarSelectAgentesFila();
-    mostrarToast("Agentes atualizados a partir dos usuários");
+    mostrarToast("Agentes atualizados apartir dos usuários");
     return;
   }
 
