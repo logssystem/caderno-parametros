@@ -622,3 +622,85 @@ function processarCSV(tipo, texto) {
   syncTudo();
   mostrarToast("CSV importado com sucesso!");
 }
+
+function mostrarToast(msg, error = false) {
+  const t = document.getElementById("toastGlobal");
+  const m = document.getElementById("toastMessage");
+
+  if (!t || !m) {
+    console.warn("Toast não encontrado:", msg);
+    return;
+  }
+
+  m.textContent = msg;
+  t.className = "toast show" + (error ? " error" : "");
+
+  setTimeout(() => {
+    t.classList.remove("show");
+  }, 3000);
+}
+
+window.explorar = function () {
+  try {
+
+    // 🔒 trava se existir agente sem ramal
+    const agentesSemRamal = [];
+    document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a, i) => {
+      if (!a.getRamal || !a.getRamal()) {
+        agentesSemRamal.push(`Agente ${i + 1}`);
+        a.classList.add("campo-erro");
+      } else {
+        a.classList.remove("campo-erro");
+      }
+    });
+
+    if (agentesSemRamal.length) {
+      mostrarToast("Existe agente sem ramal vinculado", true);
+      return;
+    }
+
+    const usuarios = [];
+    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+      usuarios.push({
+        nome: u.getNome(),
+        email: u.getEmail(),
+        senha: u.getSenha(),
+        permissao: u.getPermissao(),
+        agente: u.isAgente()
+      });
+    });
+
+    const ramais = [];
+    document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+      ramais.push({
+        ramal: r.getNome(),
+        senha: r.getSenha()
+      });
+    });
+
+    const agentes = [];
+    document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+      agentes.push({
+        nome: a.querySelector(".campo-nome").value,
+        ramal: a.getRamal()
+      });
+    });
+
+    const dados = {
+      voz: {
+        usuarios,
+        ramais,
+        agentes
+      }
+    };
+
+    document.getElementById("resultado").textContent =
+      JSON.stringify(dados, null, 2);
+
+    mostrarToast("JSON gerado com sucesso!");
+
+  } catch (e) {
+    console.error(e);
+    mostrarToast("Erro ao gerar JSON", true);
+  }
+};
