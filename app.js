@@ -37,6 +37,28 @@ window.adicionarCampo = function (tipo) {
   syncTudo();
 };
 
+/* ================= DESTINOS URA (RESTAURADO) ================= */
+
+function atualizarDestinosURA(select) {
+  if (!select) return;
+  select.innerHTML = "";
+  select.add(new Option("Selecione o destino", ""));
+
+  ["listaFilas","listaRings","listaGrupoRing","listaURAs","listaRegrasTempo"].forEach(id => {
+    document.querySelectorAll(`#${id} .campo-nome`).forEach(i => {
+      if (i.value) select.add(new Option(i.value, `${id}:${i.value}`));
+    });
+  });
+}
+
+function atualizarTodosDestinosURA() {
+  document.querySelectorAll(".opcao-ura select").forEach(select => {
+    const atual = select.value;
+    atualizarDestinosURA(select);
+    select.value = atual;
+  });
+}
+
 /* ================= CRIAR CAMPO ================= */
 
 function criarCampo(tipo) {
