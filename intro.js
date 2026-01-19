@@ -51,3 +51,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const modo = localStorage.getItem("modo_atendimento");
   modo ? mostrarApp(modo) : mostrarIntro();
 });
+
+/* ================= DARK MODE (INTRO) ================= */
+
+(function aplicarTemaIntro() {
+  const tema = localStorage.getItem("tema_caderno") || "light";
+  if (tema === "dark") {
+    document.body.classList.add("dark");
+  } else {
+    document.body.classList.remove("dark");
+  }
+})();
