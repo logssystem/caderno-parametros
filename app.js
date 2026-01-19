@@ -781,30 +781,6 @@ window.explorar = function () {
   }
 };
 
-const dados = {
-  cliente: {
-    empresa,
-    dominio
-  },
-  voz: {
-    usuarios,
-    ramais,
-    agentes
-  },
-  chat: window.chatState || null
-};
-
-  // reaproveita TODA sua validação
-  explorar();
-
-  const resultado = document.getElementById("resultado").textContent;
-  if (!resultado) return;
-
-  localStorage.setItem("CONFIG_CADERNO", resultado);
-
-  window.location.href = "resumo.html";
-};
-
 /* ================= DARK MODE ================= */
 
 const toggleTheme = document.getElementById("toggleTheme");
@@ -859,5 +835,104 @@ window.salvarConfiguracao = function () {
 
   localStorage.setItem("CONFIG_CADERNO", resultado);
 
+  window.location.href = "resumo.html";
+};
+
+window.explorar = function () {
+  try {
+
+    const empresa = empresaInput?.value.trim();
+    const dominio = dominioInput?.value.trim();
+
+    empresaInput.classList.remove("campo-obrigatorio-erro");
+    dominioInput.classList.remove("campo-obrigatorio-erro");
+
+    if (!empresa) {
+      mostrarToast("Informe o nome da empresa", true);
+      empresaInput.classList.add("campo-obrigatorio-erro");
+      empresaInput.focus();
+      return;
+    }
+
+    if (!dominio) {
+      mostrarToast("Informe o domínio do cliente", true);
+      dominioInput.classList.add("campo-obrigatorio-erro");
+      dominioInput.focus();
+      return;
+    }
+
+    if (!validarDominioCliente()) {
+      mostrarToast("Domínio inválido. Ex: suporteera.sobreip.com.br", true);
+      dominioInput.classList.add("campo-obrigatorio-erro");
+      dominioInput.focus();
+      return;
+    }
+
+    const agentesSemRamal = [];
+    document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a, i) => {
+      if (!a.getRamal || !a.getRamal()) agentesSemRamal.push(i);
+    });
+
+    if (agentesSemRamal.length) {
+      mostrarToast("Existe agente sem ramal vinculado", true);
+      return;
+    }
+
+    const usuarios = [];
+    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+      usuarios.push({
+        nome: u.getNome(),
+        email: u.getEmail(),
+        senha: u.getSenha(),
+        permissao: u.getPermissao(),
+        agente: u.isAgente()
+      });
+    });
+
+    const ramais = [];
+    document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+      ramais.push({
+        ramal: r.getNome(),
+        senha: r.getSenha()
+      });
+    });
+
+    const agentes = [];
+    document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+      agentes.push({
+        nome: a.querySelector(".campo-nome").value,
+        ramal: a.getRamal()
+      });
+    });
+
+    const dados = {
+      cliente: { empresa, dominio },
+      voz: { usuarios, ramais, agentes },
+      chat: window.chatState || null
+    };
+
+    document.getElementById("resultado").textContent =
+      JSON.stringify(dados, null, 2);
+
+    mostrarToast("JSON gerado com sucesso!");
+
+  } catch (e) {
+    console.error(e);
+    mostrarToast("Erro ao gerar JSON", true);
+  }
+};
+
+
+window.salvarConfiguracao = function () {
+
+  explorar();
+
+  const resultado = document.getElementById("resultado")?.textContent;
+  if (!resultado) {
+    mostrarToast("Gere a configuração antes de salvar", true);
+    return;
+  }
+
+  localStorage.setItem("CONFIG_CADERNO", resultado);
   window.location.href = "resumo.html";
 };
