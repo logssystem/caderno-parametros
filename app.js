@@ -164,7 +164,77 @@ function criarCampo(tipo) {
     btnNova.onclick = () => listaOpcoes.appendChild(criarOpcaoURA());
     wrap.append(btnNova);
   }
+  
+    /* ===== FILA ===== */
+  if (tipo === "fila") {
 
+    const titulo = document.createElement("h4");
+    titulo.textContent = "Agentes da fila";
+    titulo.style.marginTop = "12px";
+    wrap.append(titulo);
+
+    const linha = document.createElement("div");
+    linha.style.display = "flex";
+    linha.style.gap = "8px";
+    linha.style.marginTop = "6px";
+
+    const selectAgente = document.createElement("select");
+    selectAgente.innerHTML = `<option value="">Selecione um agente</option>`;
+
+    const btnAdd = document.createElement("button");
+    btnAdd.textContent = "Adicionar";
+
+    linha.append(selectAgente, btnAdd);
+    wrap.append(linha);
+
+    const lista = document.createElement("div");
+    lista.style.display = "flex";
+    lista.style.flexDirection = "column";
+    lista.style.gap = "6px";
+    lista.style.marginTop = "8px";
+    wrap.append(lista);
+
+    wrap.dataset.agentes = "[]";
+
+    function renderListaFila() {
+      lista.innerHTML = "";
+      const atuais = JSON.parse(wrap.dataset.agentes || "[]");
+
+      atuais.forEach((nome, i) => {
+        const item = document.createElement("div");
+        item.style.display = "flex";
+        item.style.justifyContent = "space-between";
+        item.style.alignItems = "center";
+
+        const span = document.createElement("span");
+        span.textContent = nome;
+
+        const del = document.createElement("button");
+        del.textContent = "✖";
+        del.onclick = () => {
+          atuais.splice(i, 1);
+          wrap.dataset.agentes = JSON.stringify(atuais);
+          renderListaFila();
+        };
+
+        item.append(span, del);
+        lista.append(item);
+      });
+    }
+
+    btnAdd.onclick = () => {
+      const nome = selectAgente.value;
+      if (!nome) return;
+
+      const atuais = JSON.parse(wrap.dataset.agentes || "[]");
+      if (atuais.includes(nome)) return;
+
+      atuais.push(nome);
+      wrap.dataset.agentes = JSON.stringify(atuais);
+      renderListaFila();
+    };
+  }
+  
   /* ===== GRUPO DE RING ===== */
   if (tipo === "grupo_ring") {
 
