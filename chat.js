@@ -35,9 +35,12 @@ window.selecionarTipoChat = function (el, tipo) {
 };
 
 /* ========== API ========== */
-window.selecionarApi = function (el, api) {
-  chatState.api = api;
-  limparAtivos("#api-oficial .chat-card");
+window.selecionarContaApi = function (el, conta) {
+  chatState.conta = conta;
+
+  document.querySelectorAll("#bloco-conta-api .chat-card")
+    .forEach(c => c.classList.remove("active"));
+
   el.classList.add("active");
 };
 
@@ -67,5 +70,3 @@ window.toggleCanal = function (el) {
     chatState.canais = chatState.canais.filter(c => c !== canal);
   }
 };
-
-window.chatState = chatState;
