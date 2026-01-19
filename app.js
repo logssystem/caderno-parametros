@@ -739,12 +739,16 @@ window.explorar = function () {
     });
 
     const dados = {
-      voz: {
-        usuarios,
-        ramais,
-        agentes
-      }
-    };
+  cliente: {
+    empresa,
+    dominio
+  },
+  voz: {
+    usuarios,
+    ramais,
+    agentes
+  }
+};
 
     document.getElementById("resultado").textContent =
       JSON.stringify(dados, null, 2);
