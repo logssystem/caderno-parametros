@@ -84,3 +84,26 @@ document.addEventListener("DOMContentLoaded", () => {
     <p><b>Canais:</b> ${canais}</p>
   `;
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const raw = localStorage.getItem("CONFIG_CADERNO");
+  if (!raw) return;
+
+  const dados = JSON.parse(raw);
+  const chat = dados.chat || {};
+
+  const tipo =
+    chat.tipo === "api" ? "API Oficial" :
+    chat.tipo === "qr" ? "QR Code" :
+    "Não definido";
+
+  document.getElementById("resumoChat").innerHTML = `
+    <h3>💬 Resumo do Atendimento por Chat</h3>
+    <p><b>Empresa:</b> ${dados.cliente?.empresa || "-"}</p>
+    <p><b>Domínio:</b> ${dados.cliente?.dominio || "-"}</p>
+    <p><b>Tipo de integração:</b> ${tipo}</p>
+    <p><b>API oficial:</b> ${chat.api || "-"}</p>
+    <p><b>Conta:</b> ${chat.conta || "-"}</p>
+    <p><b>Canais:</b> ${chat.canais?.join(", ") || "-"}</p>
+  `;
+});
