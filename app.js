@@ -78,20 +78,32 @@ window.adicionarCampo = function (tipo) {
 function atualizarDestinosURA(select) {
   if (!select) return;
   select.innerHTML = "";
+
   select.add(new Option("Selecione o destino", ""));
 
-  ["listaFilas","listaRings","listaGrupoRing","listaURAs","listaRegrasTempo"].forEach(id => {
-    document.querySelectorAll(`#${id} .campo-nome`).forEach(i => {
-      if (i.value) select.add(new Option(i.value, `${id}:${i.value}`));
-    });
-  });
-}
+  const grupos = [
+    { id: "listaRings", label: "📞 Ramais" },
+    { id: "listaFilas", label: "👥 Filas" },
+    { id: "listaGrupoRing", label: "🔔 Grupos de Ring" },
+    { id: "listaURAs", label: "☎ URAs" },
+    { id: "listaRegrasTempo", label: "⏰ Regras de Tempo" }
+  ];
 
-function atualizarTodosDestinosURA() {
-  document.querySelectorAll(".opcao-ura select").forEach(select => {
-    const atual = select.value;
-    atualizarDestinosURA(select);
-    select.value = atual;
+  grupos.forEach(g => {
+    const optgroup = document.createElement("optgroup");
+    optgroup.label = g.label;
+
+    document.querySelectorAll(`#${g.id} .campo-nome`).forEach(i => {
+      if (i.value) {
+        optgroup.appendChild(
+          new Option(i.value, `${g.id}:${i.value}`)
+        );
+      }
+    });
+
+    if (optgroup.children.length) {
+      select.appendChild(optgroup);
+    }
   });
 }
 
