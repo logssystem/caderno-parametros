@@ -42,6 +42,8 @@ function validarDominioCliente() {
     ? `<div class="regra-ok">Domínio válido</div>`
     : `<div class="regra-erro">Deve terminar com .sobreip.com.br</div>`;
 
+  dominioInput.classList.toggle("campo-obrigatorio-erro", !ok);
+
   return ok;
 }
 
@@ -666,16 +668,30 @@ function mostrarToast(msg, error = false) {
 window.explorar = function () {
   try {
   
-    const empresa = document.getElementById("empresaCliente")?.value.trim();
-    const dominio = document.getElementById("dominioCliente")?.value.trim();
+    const empresa = empresaInput?.value.trim();
+    const dominio = dominioInput?.value.trim();
+
+    empresaInput.classList.remove("campo-obrigatorio-erro");
+    dominioInput.classList.remove("campo-obrigatorio-erro");
 
     if (!empresa) {
       mostrarToast("Informe o nome da empresa", true);
+      empresaInput.classList.add("campo-obrigatorio-erro");
+      empresaInput.focus();
+      return;
+    }
+
+    if (!dominio) {
+      mostrarToast("Informe o domínio do cliente", true);
+      dominioInput.classList.add("campo-obrigatorio-erro");
+      dominioInput.focus();
       return;
     }
 
     if (!validarDominioCliente()) {
       mostrarToast("Domínio inválido. Ex: suporteera.sobreip.com.br", true);
+      dominioInput.classList.add("campo-obrigatorio-erro");
+      dominioInput.focus();
       return;
     }
     
