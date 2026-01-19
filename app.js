@@ -60,7 +60,6 @@ window.adicionarCampo = function (tipo) {
     gerarAgentesAPartirUsuarios();
     atualizarSelectAgentesFila();
     mostrarToast("Agentes atualizados apartir dos usuários");
-    return;
   }
 
   if (!listas[tipo]) return mostrarToast(`Tipo inválido: ${tipo}`, true);
