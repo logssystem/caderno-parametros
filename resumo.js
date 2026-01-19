@@ -42,3 +42,45 @@ if (dados.chat) {
 function voltar() {
   window.location.href = "index.html"; // ou o nome do arquivo principal do caderno
 }
+
+// ================= RESUMO CHAT DEFINITIVO =================
+
+document.addEventListener("DOMContentLoaded", () => {
+  const raw = localStorage.getItem("CONFIG_CADERNO");
+  if (!raw) return;
+
+  let dados;
+  try {
+    dados = JSON.parse(raw);
+  } catch (e) {
+    console.error("Erro ao ler CONFIG_CADERNO", e);
+    return;
+  }
+
+  const chat = dados.chat || {};
+
+  const empresa = dados.cliente?.empresa || "-";
+  const dominio = dados.cliente?.dominio || "-";
+
+  const tipo =
+    chat.tipo === "api" ? "API Oficial" :
+    chat.tipo === "qr" ? "QR Code" :
+    "Não definido";
+
+  const api = chat.api || "Não definido";
+  const conta = chat.conta || "Não definido";
+  const canais = chat.canais?.length ? chat.canais.join(", ") : "Nenhum";
+
+  const box = document.getElementById("resumoChat");
+  if (!box) return;
+
+  box.innerHTML = `
+    <h3>💬 Resumo do Atendimento por Chat</h3>
+    <p><b>Empresa:</b> ${empresa}</p>
+    <p><b>Domínio:</b> ${dominio}</p>
+    <p><b>Tipo de integração:</b> ${tipo}</p>
+    <p><b>API oficial:</b> ${api}</p>
+    <p><b>Conta:</b> ${conta}</p>
+    <p><b>Canais:</b> ${canais}</p>
+  `;
+});
