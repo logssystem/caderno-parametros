@@ -77,8 +77,8 @@ window.adicionarCampo = function (tipo) {
 
 function atualizarDestinosURA(select) {
   if (!select) return;
-  select.innerHTML = "";
 
+  select.innerHTML = "";
   select.add(new Option("Selecione o destino", ""));
 
   const grupos = [
