@@ -906,10 +906,10 @@ window.explorar = function () {
     });
 
     const dados = {
-      cliente: { empresa, dominio },
-      voz: { usuarios, ramais, agentes },
-      chat: window.chatState || null
-    };
+  cliente: { empresa, dominio },
+  voz: { usuarios, ramais, agentes },
+  chat: window.chatState   // 🔥 AQUI É O PONTO-CHAVE
+};
 
     document.getElementById("resultado").textContent =
       JSON.stringify(dados, null, 2);
@@ -937,15 +937,16 @@ window.salvarConfiguracao = function () {
   window.location.href = "resumo.html";
 };
 
-// ================= CHAT STATE FIX =================
+// ================= CHAT STATE OFICIAL (ÚNICO) =================
 
-window.chatState = window.chatState || {
+window.chatState = {
   tipo: null,
   api: null,
   conta: null,
   canais: []
 };
 
+// 👉 tipo de integração (api / qr)
 window.selecionarTipoChat = function (el, tipo) {
   window.chatState.tipo = tipo;
 
@@ -953,29 +954,38 @@ window.selecionarTipoChat = function (el, tipo) {
     .forEach(c => c.classList.remove("active"));
   el.classList.add("active");
 
-  document.getElementById("api-oficial").style.display =
-    tipo === "api" ? "block" : "none";
+  const apiBox = document.getElementById("api-oficial");
+  const qrBox = document.getElementById("chat-qr");
 
-  document.getElementById("chat-qr").style.display =
-    tipo === "qr" ? "block" : "none";
+  if (apiBox) apiBox.style.display = tipo === "api" ? "block" : "none";
+  if (qrBox) qrBox.style.display = tipo === "qr" ? "block" : "none";
+
+  console.log("CHAT STATE:", window.chatState);
 };
 
+// 👉 fornecedor oficial
 window.selecionarApi = function (el, api) {
   window.chatState.api = api;
 
   document.querySelectorAll("#api-oficial .chat-card")
     .forEach(c => c.classList.remove("active"));
   el.classList.add("active");
+
+  console.log("CHAT STATE:", window.chatState);
 };
 
+// 👉 conta (cliente / ERA)
 window.selecionarConta = function (el, conta) {
   window.chatState.conta = conta;
 
   document.querySelectorAll(".bloco-conta .chat-card")
     .forEach(c => c.classList.remove("active"));
   el.classList.add("active");
+
+  console.log("CHAT STATE:", window.chatState);
 };
 
+// 👉 canais (whatsapp, insta, etc)
 window.toggleCanal = function (el, canal) {
   el.classList.toggle("active");
 
@@ -987,32 +997,6 @@ window.toggleCanal = function (el, canal) {
     window.chatState.canais =
       window.chatState.canais.filter(c => c !== canal);
   }
-};
 
-// ================= FIX DEFINITIVO TIPO DE INTEGRAÇÃO =================
-
-window.chatState = window.chatState || {
-  tipo: null,
-  api: null,
-  conta: null,
-  canais: []
-};
-
-window.selecionarTipoChat = function (el, tipo) {
-  console.log("Tipo selecionado:", tipo);
-
-  window.chatState.tipo = tipo;
-
-  // visual
-  document.querySelectorAll(".chat-card.tipo")
-    .forEach(c => c.classList.remove("active"));
-
-  el.classList.add("active");
-
-  // exibição de blocos
-  const apiBox = document.getElementById("api-oficial");
-  const qrBox = document.getElementById("chat-qr");
-
-  if (apiBox) apiBox.style.display = tipo === "api" ? "block" : "none";
-  if (qrBox) qrBox.style.display = tipo === "qr" ? "block" : "none";
+  console.log("CHAT STATE:", window.chatState);
 };
