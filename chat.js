@@ -44,16 +44,20 @@ window.selecionarApi = function (el, api) {
 /* ========== CONTA ========== */
 window.selecionarContaApi = function (el, conta) {
   chatState.conta = conta;
-  limparAtivos("#bloco-conta-api .chat-card");
+
+  document.querySelectorAll("#bloco-conta-api .chat-card")
+    .forEach(c => c.classList.remove("active"));
+
   el.classList.add("active");
 };
 
 /* ========== CANAIS ========== */
 window.toggleCanal = function (el) {
   el.classList.toggle("active");
+
   const canal = el.dataset.canal;
 
-  if (!canal) return;
+  if (!chatState.canais) chatState.canais = [];
 
   if (el.classList.contains("active")) {
     if (!chatState.canais.includes(canal)) {
