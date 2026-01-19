@@ -936,3 +936,55 @@ window.salvarConfiguracao = function () {
   localStorage.setItem("CONFIG_CADERNO", resultado);
   window.location.href = "resumo.html";
 };
+
+// ================= CHAT STATE FIX =================
+
+window.chatState = window.chatState || {
+  tipo: null,
+  api: null,
+  conta: null,
+  canais: []
+};
+
+window.selecionarTipoChat = function (el, tipo) {
+  window.chatState.tipo = tipo;
+
+  document.querySelectorAll(".tipo-chat .chat-card")
+    .forEach(c => c.classList.remove("active"));
+  el.classList.add("active");
+
+  document.getElementById("api-oficial").style.display =
+    tipo === "api" ? "block" : "none";
+
+  document.getElementById("chat-qr").style.display =
+    tipo === "qr" ? "block" : "none";
+};
+
+window.selecionarApi = function (el, api) {
+  window.chatState.api = api;
+
+  document.querySelectorAll("#api-oficial .chat-card")
+    .forEach(c => c.classList.remove("active"));
+  el.classList.add("active");
+};
+
+window.selecionarConta = function (el, conta) {
+  window.chatState.conta = conta;
+
+  document.querySelectorAll(".bloco-conta .chat-card")
+    .forEach(c => c.classList.remove("active"));
+  el.classList.add("active");
+};
+
+window.toggleCanal = function (el, canal) {
+  el.classList.toggle("active");
+
+  if (el.classList.contains("active")) {
+    if (!window.chatState.canais.includes(canal)) {
+      window.chatState.canais.push(canal);
+    }
+  } else {
+    window.chatState.canais =
+      window.chatState.canais.filter(c => c !== canal);
+  }
+};
