@@ -38,3 +38,7 @@ if (dados.chat) {
 
   resumo.innerHTML += htmlChat;
 }
+
+function voltar() {
+  window.location.href = "index.html"; // ou o nome do arquivo principal do caderno
+}
