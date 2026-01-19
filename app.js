@@ -988,3 +988,31 @@ window.toggleCanal = function (el, canal) {
       window.chatState.canais.filter(c => c !== canal);
   }
 };
+
+// ================= FIX DEFINITIVO TIPO DE INTEGRAÇÃO =================
+
+window.chatState = window.chatState || {
+  tipo: null,
+  api: null,
+  conta: null,
+  canais: []
+};
+
+window.selecionarTipoChat = function (el, tipo) {
+  console.log("Tipo selecionado:", tipo);
+
+  window.chatState.tipo = tipo;
+
+  // visual
+  document.querySelectorAll(".chat-card.tipo")
+    .forEach(c => c.classList.remove("active"));
+
+  el.classList.add("active");
+
+  // exibição de blocos
+  const apiBox = document.getElementById("api-oficial");
+  const qrBox = document.getElementById("chat-qr");
+
+  if (apiBox) apiBox.style.display = tipo === "api" ? "block" : "none";
+  if (qrBox) qrBox.style.display = tipo === "qr" ? "block" : "none";
+};
