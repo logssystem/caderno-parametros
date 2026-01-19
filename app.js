@@ -28,6 +28,7 @@ const PERMISSOES = [
 
 /* ================= DADOS DO CLIENTE ================= */
 
+const empresaInput = document.getElementById("empresaCliente");
 const dominioInput = document.getElementById("dominioCliente");
 const regraDominio = document.getElementById("regraDominio");
 
