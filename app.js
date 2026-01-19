@@ -309,6 +309,46 @@ function criarOpcaoURA() {
   return wrap;
 }
 
+/* ================= AGENTES AUTOMÁTICOS ================= */
+
+function gerarAgentesAPartirUsuarios() {
+  const listaAgentes = document.getElementById("listaAgentes");
+  if (!listaAgentes) return;
+
+  listaAgentes.innerHTML = "";
+
+  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+    if (u.isAgente && u.isAgente() && u.getNome()) {
+
+      const wrap = document.createElement("div");
+      wrap.className = "campo-descricao";
+
+      const linha = document.createElement("div");
+      linha.className = "linha-principal";
+
+      const nome = document.createElement("input");
+      nome.value = u.getNome();
+      nome.disabled = true;
+      nome.className = "campo-nome";
+
+      linha.append(nome);
+      wrap.append(linha);
+
+      const selectRamal = document.createElement("select");
+      selectRamal.innerHTML = `<option value="">Ramal (obrigatório)</option>`;
+
+      document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+        if (r.getNome()) {
+          selectRamal.add(new Option(r.getNome(), r.getNome()));
+        }
+      });
+
+      wrap.append(selectRamal);
+      listaAgentes.append(wrap);
+    }
+  });
+}
+
 /* ================= DESTINOS URA ================= */
 
 function atualizarDestinosURA(select) {
@@ -352,6 +392,7 @@ function atualizarSelectRamaisGrupo() {
 /* ================= MOTOR ================= */
 
 function syncTudo() {
+  gerarAgentesAPartirUsuarios();
   atualizarTodosDestinosURA();
   atualizarSelectRamaisGrupo();
 }
