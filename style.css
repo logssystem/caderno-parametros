@@ -512,3 +512,26 @@ body.dark .chat-card.active {
   max-width: 520px;
   font-size: 14px;
 }
+
+    .campo-cliente {
+  gap: 18px;
+}
+
+.bloco-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bloco-campo label {
+  font-weight: 800;
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+#empresaCliente,
+#dominioCliente {
+  width: 100%;
+  max-width: 520px;
+  font-size: 14px;
+}
