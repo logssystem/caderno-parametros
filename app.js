@@ -767,7 +767,8 @@ window.explorar = function () {
     usuarios,
     ramais,
     agentes
-  }
+  },
+  chat: window.chatState || null
 };
 
     document.getElementById("resultado").textContent =
