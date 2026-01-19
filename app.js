@@ -782,7 +782,18 @@ window.explorar = function () {
   }
 };
 
-window.salvarConfiguracao = function () {
+const dados = {
+  cliente: {
+    empresa,
+    dominio
+  },
+  voz: {
+    usuarios,
+    ramais,
+    agentes
+  },
+  chat: window.chatState || null
+};
 
   // reaproveita TODA sua validação
   explorar();
