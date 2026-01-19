@@ -1,4 +1,4 @@
-console.log("APP.JS FINAL – BASE ESTÁVEL CONSOLIDADA");
+console.log("APP.JS FINAL – CONSOLIDADO (URA + REGRA DE TEMPO + FILA + GRUPO DE RING)");
 
 /* ================= CONFIG ================= */
 
@@ -32,6 +32,7 @@ window.adicionarCampo = function (tipo) {
   const container = document.getElementById(listas[tipo]);
   if (!container || container.children.length >= LIMITE) return;
   container.appendChild(criarCampo(tipo));
+  atualizarTodosDestinosURA();
   syncTudo();
 };
 
@@ -41,20 +42,21 @@ function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  const linha = document.createElement("div");
-  linha.className = "linha-principal";
+  const linhaNome = document.createElement("div");
+  linhaNome.className = "linha-principal";
 
   const nome = document.createElement("input");
-  nome.className = "campo-nome";
+  nome.classList.add("campo-nome");
   nome.placeholder = "Nome";
+  nome.style.width = "100%";
   nome.oninput = syncTudo;
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
   btn.onclick = () => { wrap.remove(); syncTudo(); };
 
-  linha.append(nome, btn);
-  wrap.append(linha);
+  linhaNome.append(nome, btn);
+  wrap.append(linhaNome);
 
   let emailInput=null, senhaInput=null, permissao=null, chkAgente=null;
 
@@ -85,12 +87,37 @@ function criarCampo(tipo) {
     wrap.append(senhaInput);
   }
 
+  /* ===== URA ===== */
+  if (tipo === "ura") {
+    const msg = document.createElement("textarea");
+    msg.placeholder = "Mensagem da URA Ex: Olá seja bem-vindo...";
+    msg.style.marginTop = "12px";
+    wrap.append(msg);
+
+    const titulo = document.createElement("h4");
+    titulo.textContent = "Opções da URA";
+    titulo.style.marginTop = "12px";
+    wrap.append(titulo);
+
+    const listaOpcoes = document.createElement("div");
+    wrap.append(listaOpcoes);
+
+    const btnNova = document.createElement("button");
+    btnNova.textContent = "+ Nova opção";
+    btnNova.onclick = () => listaOpcoes.appendChild(criarOpcaoURA());
+    wrap.append(btnNova);
+  }
+
   /* ===== FILA ===== */
   if (tipo === "fila") {
+    const titulo = document.createElement("h4");
+    titulo.textContent = "Agentes da fila";
+    titulo.style.marginTop = "12px";
+    wrap.append(titulo);
+
     const select = document.createElement("select");
     select.innerHTML = `<option value="">Selecione um agente</option>`;
     wrap.append(select);
-    wrap.dataset.agentes = "[]";
 
     const btnAdd = document.createElement("button");
     btnAdd.textContent = "Adicionar agente";
@@ -98,6 +125,8 @@ function criarCampo(tipo) {
 
     const lista = document.createElement("div");
     wrap.append(lista);
+
+    wrap.dataset.agentes = "[]";
 
     btnAdd.onclick = () => {
       if (!select.value) return;
@@ -136,7 +165,6 @@ function criarCampo(tipo) {
     `;
     wrap.append(estr);
     wrap.dataset.estrategia="";
-
     estr.onchange = ()=> wrap.dataset.estrategia=estr.value;
 
     const select = document.createElement("select");
@@ -185,10 +213,34 @@ function criarCampo(tipo) {
   return wrap;
 }
 
+/* ================= OPÇÃO URA ================= */
+
+function criarOpcaoURA() {
+  const wrap = document.createElement("div");
+  wrap.className = "opcao-ura";
+
+  const tecla = document.createElement("input");
+  tecla.placeholder = "Tecla";
+
+  const destino = document.createElement("select");
+  atualizarDestinosURA(destino);
+
+  const desc = document.createElement("input");
+  desc.placeholder = "Descrição";
+
+  const del = document.createElement("button");
+  del.textContent = "🗑";
+  del.onclick = () => wrap.remove();
+
+  wrap.append(tecla, destino, desc, del);
+  return wrap;
+}
+
 /* ================= AGENTES AUTOMÁTICOS ================= */
 
 function gerarAgentesAPartirUsuarios() {
   const lista = document.getElementById("listaAgentes");
+  if(!lista) return;
   lista.innerHTML = "";
 
   document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u=>{
@@ -205,7 +257,29 @@ function gerarAgentesAPartirUsuarios() {
   });
 }
 
-/* ================= FILAS ENXERGAM AGENTES ================= */
+/* ================= DESTINOS URA ================= */
+
+function atualizarDestinosURA(select) {
+  if (!select) return;
+  select.innerHTML = "";
+  select.add(new Option("Selecione o destino", ""));
+
+  ["listaFilas","listaRings","listaGrupoRing","listaURAs","listaRegrasTempo"].forEach(id=>{
+    document.querySelectorAll(`#${id} .campo-nome`).forEach(i=>{
+      if(i.value) select.add(new Option(i.value, `${id}:${i.value}`));
+    });
+  });
+}
+
+function atualizarTodosDestinosURA() {
+  document.querySelectorAll(".opcao-ura select").forEach(select=>{
+    const atual = select.value;
+    atualizarDestinosURA(select);
+    select.value = atual;
+  });
+}
+
+/* ================= SELECTS DINÂMICOS ================= */
 
 function atualizarSelectAgentesFila() {
   document.querySelectorAll("#listaFilas .campo-descricao").forEach(f=>{
@@ -220,8 +294,6 @@ function atualizarSelectAgentesFila() {
   });
 }
 
-/* ================= GRUPOS ENXERGAM RAMAIS ================= */
-
 function atualizarSelectRamaisGrupo(){
   document.querySelectorAll("#listaGrupoRing .campo-descricao").forEach(g=>{
     const s=g.querySelectorAll("select")[1];
@@ -235,7 +307,7 @@ function atualizarSelectRamaisGrupo(){
   });
 }
 
-/* ================= REGRA DE TEMPO (RESTAURADA) ================= */
+/* ================= REGRA DE TEMPO ================= */
 
 window.adicionarRegraTempo = function(){
   const c=document.getElementById("listaRegrasTempo");
@@ -246,7 +318,7 @@ window.adicionarRegraTempo = function(){
   c.append(d);
 };
 
-/* ================= RANGE RAMAIS (RESTAURADO) ================= */
+/* ================= RANGE RAMAIS ================= */
 
 window.criarRangeRamais = function(){
   const ini=+ramalInicio.value;
@@ -267,8 +339,12 @@ function syncTudo(){
   gerarAgentesAPartirUsuarios();
   atualizarSelectAgentesFila();
   atualizarSelectRamaisGrupo();
+  atualizarTodosDestinosURA();
 }
 
 document.addEventListener("input",e=>{
-  if(e.target.closest(".campo-descricao"))syncTudo();
+  if(e.target.closest(".campo-descricao")) syncTudo();
+});
+document.addEventListener("change",e=>{
+  if(e.target.closest(".campo-descricao")) syncTudo();
 });
