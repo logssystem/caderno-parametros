@@ -35,19 +35,20 @@
 <section class="card">
   <h2>Dados do Cliente</h2>
 
-  <div class="campo-descricao">
+  <div class="campo-descricao campo-cliente">
 
-    <div class="linha-principal">
-      <input id="empresaCliente" placeholder="Nome da empresa / cliente">
-    </div>
-
-    <div class="linha-principal" style="margin-top:10px;">
-      <input id="dominioCliente" placeholder="ex: suporteera.sobreip.com.br">
-    </div>
-
-    <div id="regraDominio" style="margin-top:6px;font-size:13px;"></div>
-
+  <div class="bloco-campo">
+    <label>Nome da empresa / cliente</label>
+    <input id="empresaCliente" placeholder="Ex: ERA Telecom">
   </div>
+
+  <div class="bloco-campo">
+    <label>Domínio do cliente</label>
+    <input id="dominioCliente" placeholder="ex: suporteera.sobreip.com.br">
+    <div id="regraDominio"></div>
+  </div>
+
+</div>
 </section>
 
   <!-- ================= VOZ ================= -->
@@ -233,4 +234,5 @@
 
 </body>
 </html>
+
 
