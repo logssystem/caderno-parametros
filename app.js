@@ -343,6 +343,14 @@ function gerarAgentesAPartirUsuarios() {
   const listaAgentes = document.getElementById("listaAgentes");
   if (!listaAgentes) return;
 
+  // 🔒 salva ramais já escolhidos
+  const ramaisSalvos = {};
+  listaAgentes.querySelectorAll(".campo-descricao").forEach(a => {
+    const nome = a.querySelector(".campo-nome")?.value;
+    const ramal = a.getRamal ? a.getRamal() : "";
+    if (nome && ramal) ramaisSalvos[nome] = ramal;
+  });
+
   listaAgentes.innerHTML = "";
 
   document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
@@ -371,9 +379,13 @@ function gerarAgentesAPartirUsuarios() {
         }
       });
 
+      // ♻ restaura ramal se já existia
+      if (ramaisSalvos[u.getNome()]) {
+        selectRamal.value = ramaisSalvos[u.getNome()];
+      }
+
       wrap.append(selectRamal);
 
-      // salva o ramal no próprio bloco do agente
       wrap.getRamal = () => selectRamal.value;
 
       listaAgentes.append(wrap);
