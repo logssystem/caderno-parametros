@@ -351,18 +351,6 @@ select.campo-permissao {
   gap: 6px;
 }
 
-const chatState = {
-  tipo: null,
-  api: null,
-  canais: []
-};
-
-function limparAtivos(selector) {
-  document.querySelectorAll(selector).forEach(el =>
-    el.classList.remove("active")
-  );
-}
-
 window.selecionarTipoChat = function (el, tipo) {
   chatState.tipo = tipo;
 
