@@ -484,3 +484,71 @@ document.addEventListener("input",e=>{
 document.addEventListener("change",e=>{
   if(e.target.closest(".campo-descricao")) syncTudo();
 });
+
+/* ================= IMPORTAÇÃO CSV ================= */
+
+window.acionarImportacao = function (tipo) {
+  const input = document.getElementById(
+    tipo === "usuario_web" ? "importUsuarios" : "importRamais"
+  );
+
+  if (!input) return mostrarToast("Input de importação não encontrado", true);
+
+  input.value = "";
+  input.click();
+
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => processarCSV(tipo, e.target.result);
+    reader.readAsText(file);
+  };
+};
+
+function processarCSV(tipo, texto) {
+  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
+  if (linhas.length < 2) return mostrarToast("CSV vazio ou inválido", true);
+
+  const sep = linhas[0].includes(";") ? ";" : ",";
+  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
+  const container = document.getElementById(listas[tipo]);
+  if (!container) return;
+
+  linhas.forEach(l => {
+    const v = l.split(sep);
+    const d = {};
+    header.forEach((h, i) => d[h] = (v[i] || "").trim());
+
+    const campo = criarCampo(tipo);
+    campo.querySelector(".campo-nome").value = d.usuario || d.nome || d.ramal || "";
+
+    if (tipo === "usuario_web") {
+      campo.querySelector("input[type=email]").value = d.email || "";
+      campo.querySelector(".campo-senha").value = d.senha || "";
+
+      const select = campo.querySelector("select");
+      if (select && d.permissao) {
+        [...select.options].forEach(opt => {
+          if (opt.value.toLowerCase() === d.permissao.toLowerCase()) {
+            opt.selected = true;
+          }
+        });
+      }
+
+      if (d.agente === "1" || d.agente?.toLowerCase() === "sim") {
+        campo.querySelector("input[type=checkbox]").checked = true;
+      }
+    }
+
+    if (tipo === "ring") {
+      campo.querySelector(".campo-senha").value = d.senha || "";
+    }
+
+    container.appendChild(campo);
+  });
+
+  syncTudo();
+  mostrarToast("CSV importado com sucesso!");
+}
