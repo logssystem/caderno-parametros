@@ -756,3 +756,16 @@ window.explorar = function () {
     mostrarToast("Erro ao gerar JSON", true);
   }
 };
+
+window.salvarConfiguracao = function () {
+
+  // reaproveita TODA sua validação
+  explorar();
+
+  const resultado = document.getElementById("resultado").textContent;
+  if (!resultado) return;
+
+  localStorage.setItem("CONFIG_CADERNO", resultado);
+
+  window.location.href = "resumo.html";
+};
