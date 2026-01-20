@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>
             <b>Nome:</b> ${u.nome || "-"} <br>
             <b>Email:</b> ${u.email || "-"} <br>
+            <b>Senha:</b> <code>${u.senha || "-"}</code><br>
             <b>Permissão:</b> ${u.permissao || "-"} <br>
             <b>Agente:</b> ${u.agente ? "Sim" : "Não"}
           </p>
@@ -57,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ${voz.ramais.map(r => `
           <p>
             <b>Ramal:</b> ${r.ramal || "-"} <br>
-            <b>Senha definida:</b> ${r.senha ? "Sim" : "Não"}
+            <b>Senha:</b> <code>${r.senha || "-"}</code>
           </p>
           <hr>
         `).join("")}
@@ -95,7 +96,6 @@ document.addEventListener("DOMContentLoaded", () => {
     resumo.innerHTML += `
       <div class="card">
         <h2>💬 Atendimento por Chat</h2>
-
         <p><b>Tipo de integração:</b> ${tipo}</p>
         <p><b>API oficial:</b> ${chat.api || "-"}</p>
         <p><b>Conta:</b> ${chat.conta || "-"}</p>
