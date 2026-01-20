@@ -52,21 +52,33 @@ window.adicionarCampo = function (tipo) {
 
 function atualizarDestinosURA(select) {
   if (!select) return;
+
   select.innerHTML = "";
   select.add(new Option("Selecione o destino", ""));
 
-  ["listaFilas","listaRings","listaGrupoRing","listaURAs","listaRegrasTempo"].forEach(id => {
-    document.querySelectorAll(`#${id} .campo-nome`).forEach(i => {
-      if (i.value) select.add(new Option(i.value, `${id}:${i.value}`));
-    });
-  });
-}
+  const grupos = [
+    { id: "listaRings", label: "📞 Ramal", tipo: "ramal" },
+    { id: "listaFilas", label: "👥 Fila", tipo: "fila" },
+    { id: "listaGrupoRing", label: "🔔 Grupo de Ring", tipo: "grupo_ring" },
+    { id: "listaURAs", label: "☎ URA", tipo: "ura" },
+    { id: "listaRegrasTempo", label: "⏰ Regra de Tempo", tipo: "regra_tempo" }
+  ];
 
-function atualizarTodosDestinosURA() {
-  document.querySelectorAll(".opcao-ura select").forEach(select => {
-    const atual = select.value;
-    atualizarDestinosURA(select);
-    select.value = atual;
+  grupos.forEach(g => {
+    const optgroup = document.createElement("optgroup");
+    optgroup.label = g.label;
+
+    document.querySelectorAll(`#${g.id} .campo-nome`).forEach(i => {
+      if (i.value) {
+        const opt = new Option(i.value, i.value);
+        opt.dataset.tipo = g.tipo;
+        optgroup.appendChild(opt);
+      }
+    });
+
+    if (optgroup.children.length) {
+      select.appendChild(optgroup);
+    }
   });
 }
 
@@ -323,8 +335,18 @@ function criarOpcaoURA() {
   const tecla = document.createElement("input");
   tecla.placeholder = "Tecla";
 
+  const tipo = document.createElement("input");
+  tipo.placeholder = "Tipo";
+  tipo.readOnly = true;
+  tipo.className = "tipo-destino";
+
   const destino = document.createElement("select");
   atualizarDestinosURA(destino);
+
+  destino.onchange = () => {
+    const opt = destino.selectedOptions[0];
+    tipo.value = opt?.dataset.tipo || "";
+  };
 
   const desc = document.createElement("input");
   desc.placeholder = "Descrição";
@@ -333,7 +355,7 @@ function criarOpcaoURA() {
   del.textContent = "🗑";
   del.onclick = () => wrap.remove();
 
-  wrap.append(tecla, destino, desc, del);
+  wrap.append(tecla, tipo, destino, desc, del);
   return wrap;
 }
 
@@ -724,6 +746,25 @@ window.salvarConfiguracao = function () {
 
   window.location.href = "resumo.html";
 };
+
+const uras = [];
+
+document.querySelectorAll("#listaURAs .campo-descricao").forEach(ura => {
+  const nome = ura.querySelector(".campo-nome")?.value || "";
+  const mensagem = ura.querySelector("textarea")?.value || "";
+
+  const opcoes = [];
+  ura.querySelectorAll(".opcao-ura").forEach(o => {
+    opcoes.push({
+      tecla: o.querySelector("input")?.value || "",
+      tipo: o.querySelector(".tipo-destino")?.value || "",
+      destino: o.querySelector("select")?.value || "",
+      descricao: o.querySelectorAll("input")[1]?.value || ""
+    });
+  });
+
+  uras.push({ nome, mensagem, opcoes });
+});
 
 // ================= CHAT STATE OFICIAL =================
 
