@@ -724,3 +724,67 @@ window.salvarConfiguracao = function () {
 
   window.location.href = "resumo.html";
 };
+
+// ================= CHAT STATE OFICIAL =================
+
+window.chatState = window.chatState || {
+  tipo: "",
+  api: "",
+  conta: "",
+  canais: []
+};
+
+// 👉 seleciona TIPO (api / qr)
+window.selecionarTipoChat = function (el, tipo) {
+  window.chatState.tipo = tipo;
+
+  document.querySelectorAll(".tipo-chat .chat-card")
+    .forEach(c => c.classList.remove("active"));
+  el.classList.add("active");
+
+  const apiBox = document.getElementById("api-oficial");
+  const qrBox = document.getElementById("chat-qr");
+
+  if (apiBox) apiBox.style.display = tipo === "api" ? "block" : "none";
+  if (qrBox) qrBox.style.display = tipo === "qr" ? "block" : "none";
+
+  console.log("CHAT STATE:", window.chatState);
+};
+
+// 👉 fornecedor oficial (Meta, 360, Gupshup…)
+window.selecionarApi = function (el, api) {
+  window.chatState.api = api;
+
+  document.querySelectorAll("#api-oficial .chat-card")
+    .forEach(c => c.classList.remove("active"));
+  el.classList.add("active");
+
+  console.log("CHAT STATE:", window.chatState);
+};
+
+// 👉 conta (cliente / ERA)
+window.selecionarConta = function (el, conta) {
+  window.chatState.conta = conta;
+
+  document.querySelectorAll(".bloco-conta .chat-card")
+    .forEach(c => c.classList.remove("active"));
+  el.classList.add("active");
+
+  console.log("CHAT STATE:", window.chatState);
+};
+
+// 👉 canais (whatsapp, insta, etc)
+window.toggleCanal = function (el, canal) {
+  el.classList.toggle("active");
+
+  if (el.classList.contains("active")) {
+    if (!window.chatState.canais.includes(canal)) {
+      window.chatState.canais.push(canal);
+    }
+  } else {
+    window.chatState.canais =
+      window.chatState.canais.filter(c => c !== canal);
+  }
+
+  console.log("CHAT STATE:", window.chatState);
+};
