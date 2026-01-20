@@ -70,3 +70,82 @@ window.toggleCanal = function (el) {
     chatState.canais = chatState.canais.filter(c => c !== canal);
   }
 };
+
+window.adicionarUsuarioChat = function () {
+  const lista = document.getElementById("listaUsuariosChat");
+  if (!lista) return;
+
+  lista.appendChild(criarUsuarioChat());
+};
+
+function criarUsuarioChat() {
+  const wrap = document.createElement("div");
+  wrap.className = "campo-descricao";
+
+  const nome = document.createElement("input");
+  nome.placeholder = "Nome do usuário";
+
+  const email = document.createElement("input");
+  email.placeholder = "E-mail";
+
+  const senha = document.createElement("input");
+  senha.placeholder = "Senha";
+
+  const permissoes = document.createElement("select");
+  permissoes.multiple = true;
+
+  [
+    "Agente Omnichannel",
+    "Supervisor Omnichannel",
+    "Administrador Omnichannel"
+  ].forEach(p => permissoes.add(new Option(p, p)));
+
+  const del = document.createElement("button");
+  del.textContent = "✖";
+  del.onclick = () => wrap.remove();
+
+  wrap.getData = () => ({
+    nome: nome.value,
+    email: email.value,
+    senha: senha.value,
+    permissoes: [...permissoes.selectedOptions].map(o => o.value)
+  });
+
+  wrap.append(nome, email, senha, permissoes, del);
+  return wrap;
+}
+
+window.adicionarAgenteChat = function () {
+  const lista = document.getElementById("listaAgentesChat");
+  if (!lista) return;
+
+  lista.appendChild(criarAgenteChat());
+};
+
+function criarAgenteChat() {
+  const wrap = document.createElement("div");
+  wrap.className = "campo-descricao";
+
+  const nome = document.createElement("input");
+  nome.placeholder = "Nome do agente";
+
+  const usuarioVoz = document.createElement("select");
+  usuarioVoz.innerHTML = `<option value="">Vincular a usuário da voz (opcional)</option>`;
+
+  document.querySelectorAll("#listaUsuariosWeb .campo-descricao .campo-nome")
+    .forEach(u => {
+      usuarioVoz.add(new Option(u.value, u.value));
+    });
+
+  wrap.getData = () => ({
+    nome: nome.value,
+    usuario_voz: usuarioVoz.value
+  });
+
+  const del = document.createElement("button");
+  del.textContent = "✖";
+  del.onclick = () => wrap.remove();
+
+  wrap.append(nome, usuarioVoz, del);
+  return wrap;
+}
