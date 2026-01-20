@@ -704,3 +704,23 @@ window.explorar = function () {
     mostrarToast("Erro ao gerar JSON", true);
   }
 };
+
+// ================= SALVAR CONFIGURAÇÃO =================
+
+window.salvarConfiguracao = function () {
+
+  // gera o JSON antes
+  explorar();
+
+  const resultado = document.getElementById("resultado")?.textContent;
+  if (!resultado) {
+    mostrarToast("Gere a configuração antes de salvar", true);
+    return;
+  }
+
+  localStorage.setItem("CONFIG_CADERNO", resultado);
+
+  console.log("CONFIG_CADERNO salvo:", resultado);
+
+  window.location.href = "resumo.html";
+};
