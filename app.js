@@ -758,6 +758,18 @@ window.explorar = function () {
         ramal: a.getRamal()
       });
     });
+
+    // ================= CHAT - USUÁRIOS =================
+    const usuariosChat = [];
+    document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
+      if (u.getData) usuariosChat.push(u.getData());
+    });
+    
+    // ================= CHAT - AGENTES =================
+    const agentesChat = [];
+    document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
+      if (a.getData) agentesChat.push(a.getData());
+    });
     
     // ================= FILAS =================
 
