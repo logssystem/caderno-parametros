@@ -674,6 +674,20 @@ function mostrarToast(msg, error = false) {
 window.explorar = function () {
   try {
 
+    const empresa = document.getElementById("empresaCliente")?.value.trim();
+    const dominio = document.getElementById("dominioCliente")?.value.trim();
+    
+    if (!empresa || !dominio) {
+      mostrarToast("Preencha o nome da empresa e o domínio do cliente", true);
+      return;
+    }
+
+    if (!dominio.endsWith(".sobreip.com.br")) {
+  mostrarToast("O domínio deve obrigatoriamente terminar com .sobreip.com.br", true);
+  return;
+}
+
+
     // 🔒 trava se existir agente sem ramal
     const agentesSemRamal = [];
     document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a, i) => {
@@ -740,14 +754,19 @@ document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
   });
     
     const dados = {
-      voz: {
-        usuarios,
-        ramais,
-        agentes,
-        filas,
-        regras_tempo
-      }
-    };
+    cliente: {
+      empresa,
+      dominio
+    },
+    voz: {
+      usuarios,
+      ramais,
+      agentes,
+      filas,
+      regras_tempo
+    },
+    chat: window.chatState || {}
+  };
 
     document.getElementById("resultado").textContent =
       JSON.stringify(dados, null, 2);
