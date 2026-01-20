@@ -865,8 +865,6 @@ window.selecionarTipoChat = function (el, tipo) {
   console.log("CHAT STATE:", window.chatState);
 };
 
-atualizarModulosVisiveis();
-
 // 👉 fornecedor oficial (Meta, 360, Gupshup…)
 window.selecionarApi = function (el, api) {
   window.chatState.api = api;
