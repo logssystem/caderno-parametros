@@ -149,3 +149,14 @@ function criarAgenteChat() {
   wrap.append(nome, usuarioVoz, del);
   return wrap;
 }
+
+function atualizarModulosVisiveis() {
+  const chatBox = document.getElementById("modulochat");
+  if (!chatBox) return;
+
+  const temChat =
+    window.chatState?.tipo === "api"E" ||
+    window.chatState?.tipo === "qr";
+
+  chatBox.style.display = temChat ? "block" : "none";
+}
