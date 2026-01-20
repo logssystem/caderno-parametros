@@ -10,12 +10,41 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  /* ================= RESUMO CHAT ================= */
-
-  const chat = dados.chat || {};
+  /* ================= RESUMO CLIENTE ================= */
 
   const empresa = dados.cliente?.empresa || "-";
   const dominio = dados.cliente?.dominio || "-";
+
+  const boxCliente = document.getElementById("resumoCliente");
+  if (boxCliente) {
+    boxCliente.innerHTML = `
+      <div class="card">
+        <h3>🏢 Dados do Cliente</h3>
+        <p><b>Empresa:</b> ${empresa}</p>
+        <p><b>Domínio:</b> ${dominio}</p>
+      </div>
+    `;
+  }
+
+  /* ================= RESUMO VOZ ================= */
+
+  const voz = dados.voz || {};
+
+  const boxVoz = document.getElementById("resumoVoz");
+  if (boxVoz) {
+    boxVoz.innerHTML = `
+      <div class="card">
+        <h3>📞 Resumo da Voz</h3>
+        <p><b>Usuários:</b> ${voz.usuarios?.length || 0}</p>
+        <p><b>Ramais:</b> ${voz.ramais?.length || 0}</p>
+        <p><b>Agentes:</b> ${voz.agentes?.length || 0}</p>
+      </div>
+    `;
+  }
+
+  /* ================= RESUMO CHAT ================= */
+
+  const chat = dados.chat || {};
 
   const tipo =
     chat.tipo === "api" ? "API Oficial" :
@@ -26,20 +55,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const conta = chat.conta || "Não definido";
   const canais = chat.canais?.length ? chat.canais.join(", ") : "Nenhum";
 
-  const box = document.getElementById("resumoChat");
-  if (!box) return;
-
-  box.innerHTML = `
-    <div class="card">
-      <h3>💬 Resumo do Atendimento por Chat</h3>
-      <p><b>Empresa:</b> ${empresa}</p>
-      <p><b>Domínio:</b> ${dominio}</p>
-      <p><b>Tipo de integração:</b> ${tipo}</p>
-      <p><b>API oficial:</b> ${api}</p>
-      <p><b>Conta:</b> ${conta}</p>
-      <p><b>Canais:</b> ${canais}</p>
-    </div>
-  `;
+  const boxChat = document.getElementById("resumoChat");
+  if (boxChat) {
+    boxChat.innerHTML = `
+      <div class="card">
+        <h3>💬 Resumo do Atendimento por Chat</h3>
+        <p><b>Empresa:</b> ${empresa}</p>
+        <p><b>Domínio:</b> ${dominio}</p>
+        <p><b>Tipo de integração:</b> ${tipo}</p>
+        <p><b>API oficial:</b> ${api}</p>
+        <p><b>Conta:</b> ${conta}</p>
+        <p><b>Canais:</b> ${canais}</p>
+      </div>
+    `;
+  }
 });
 
 /* ================= BOTÃO VOLTAR ================= */
