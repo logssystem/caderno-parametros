@@ -28,6 +28,8 @@ const PERMISSOES = [
 
 /* ================= DADOS DO CLIENTE ================= */
 
+/* ================= DADOS DO CLIENTE ================= */
+
 const dominioInput = document.getElementById("dominioCliente");
 const regraDominio = document.getElementById("regraDominio");
 
@@ -37,20 +39,21 @@ window.validarDominioCliente = function () {
   const v = dominioInput.value.trim().toLowerCase();
   const ok = v.endsWith(".sobreip.com.br") && v.length > ".sobreip.com.br".length;
 
+  // borda vermelha / normal
   dominioInput.classList.toggle("campo-obrigatorio-erro", !ok);
+
+  // mensagem bonita embaixo
+  if (regraDominio) {
+    regraDominio.innerHTML = ok
+      ? `<div class="regra-ok">Domínio válido</div>`
+      : `<div class="regra-erro">Deve terminar com .sobreip.com.br</div>`;
+  }
 
   return ok;
 };
 
-  regraDominio.innerHTML = ok
-    ? `<div class="regra-ok">Domínio válido</div>`
-    : `<div class="regra-erro">Deve terminar com .sobreip.com.br</div>`;
-
-  return ok;
-}
-
 if (dominioInput) {
-  dominioInput.addEventListener("input", validarDominio);
+  dominioInput.addEventListener("input", window.validarDominioCliente);
 }
 
 /* ================= ADICIONAR CAMPO ================= */
