@@ -716,7 +716,29 @@ window.explorar = function () {
         ramal: a.getRamal()
       });
     });
+    
+    // ================= FILAS =================
 
+const filas = [];
+document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
+  const nome = f.querySelector(".campo-nome")?.value || "";
+  const agentesFila = JSON.parse(f.dataset.agentes || "[]");
+
+  filas.push({
+    nome,
+    agentes: agentesFila
+  });
+});
+
+  // ================= REGRAS DE TEMPO =================
+  
+  const regras_tempo = [];
+  document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
+    if (r.getData) {
+      regras_tempo.push(r.getData());
+    }
+  });
+    
     const dados = {
       voz: {
         usuarios,
