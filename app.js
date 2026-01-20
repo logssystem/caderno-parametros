@@ -906,3 +906,12 @@ window.toggleCanal = function (el, canal) {
 document.addEventListener("DOMContentLoaded", () => {
   atualizarModulosVisiveis();
 });
+
+function atualizarModulosVisiveis() {
+  const moduloChat = document.getElementById("modulochat");
+  if (!moduloChat) return;
+
+  const temChat = window.chatState?.tipo === "api" || window.chatState?.tipo === "qr";
+
+  moduloChat.style.display = temChat ? "block" : "none";
+}
