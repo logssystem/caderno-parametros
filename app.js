@@ -747,25 +747,6 @@ window.salvarConfiguracao = function () {
   window.location.href = "resumo.html";
 };
 
-const uras = [];
-
-document.querySelectorAll("#listaURAs .campo-descricao").forEach(ura => {
-  const nome = ura.querySelector(".campo-nome")?.value || "";
-  const mensagem = ura.querySelector("textarea")?.value || "";
-
-  const opcoes = [];
-  ura.querySelectorAll(".opcao-ura").forEach(o => {
-    opcoes.push({
-      tecla: o.querySelector("input")?.value || "",
-      tipo: o.querySelector(".tipo-destino")?.value || "",
-      destino: o.querySelector("select")?.value || "",
-      descricao: o.querySelectorAll("input")[1]?.value || ""
-    });
-  });
-
-  uras.push({ nome, mensagem, opcoes });
-});
-
 // ================= CHAT STATE OFICIAL =================
 
 window.chatState = window.chatState || {
