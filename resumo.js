@@ -10,68 +10,102 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  /* ================= RESUMO CLIENTE ================= */
+  const resumo = document.getElementById("resumo");
+  if (!resumo) return;
 
-  const empresa = dados.cliente?.empresa || "-";
-  const dominio = dados.cliente?.dominio || "-";
+  resumo.innerHTML = "";
 
-  const boxCliente = document.getElementById("resumoCliente");
-  if (boxCliente) {
-    boxCliente.innerHTML = `
+  /* ================= DADOS DO CLIENTE ================= */
+
+  if (dados.cliente) {
+    resumo.innerHTML += `
       <div class="card">
-        <h3>🏢 Dados do Cliente</h3>
-        <p><b>Empresa:</b> ${empresa}</p>
-        <p><b>Domínio:</b> ${dominio}</p>
+        <h2>🏢 Dados do Cliente</h2>
+        <p><b>Empresa:</b> ${dados.cliente.empresa || "-"}</p>
+        <p><b>Domínio:</b> ${dados.cliente.dominio || "-"}</p>
       </div>
     `;
   }
 
-  /* ================= RESUMO VOZ ================= */
+  /* ================= VOZ ================= */
 
   const voz = dados.voz || {};
 
-  const boxVoz = document.getElementById("resumoVoz");
-  if (boxVoz) {
-    boxVoz.innerHTML = `
+  // 👉 Usuários Web
+  if (voz.usuarios?.length) {
+    resumo.innerHTML += `
       <div class="card">
-        <h3>📞 Resumo da Voz</h3>
-        <p><b>Usuários:</b> ${voz.usuarios?.length || 0}</p>
-        <p><b>Ramais:</b> ${voz.ramais?.length || 0}</p>
-        <p><b>Agentes:</b> ${voz.agentes?.length || 0}</p>
+        <h2>👤 Usuários Web</h2>
+        ${voz.usuarios.map(u => `
+          <p>
+            <b>Nome:</b> ${u.nome || "-"} <br>
+            <b>Email:</b> ${u.email || "-"} <br>
+            <b>Permissão:</b> ${u.permissao || "-"} <br>
+            <b>Agente:</b> ${u.agente ? "Sim" : "Não"}
+          </p>
+          <hr>
+        `).join("")}
       </div>
     `;
   }
 
-  /* ================= RESUMO CHAT ================= */
-
-  const chat = dados.chat || {};
-
-  const tipo =
-    chat.tipo === "api" ? "API Oficial" :
-    chat.tipo === "qr" ? "QR Code" :
-    "Não definido";
-
-  const api = chat.api || "Não definido";
-  const conta = chat.conta || "Não definido";
-  const canais = chat.canais?.length ? chat.canais.join(", ") : "Nenhum";
-
-  const boxChat = document.getElementById("resumoChat");
-  if (boxChat) {
-    boxChat.innerHTML = `
+  // 👉 Ramais
+  if (voz.ramais?.length) {
+    resumo.innerHTML += `
       <div class="card">
-        <h3>💬 Resumo do Atendimento por Chat</h3>
-        <p><b>Empresa:</b> ${empresa}</p>
-        <p><b>Domínio:</b> ${dominio}</p>
+        <h2>📞 Ramais</h2>
+        ${voz.ramais.map(r => `
+          <p>
+            <b>Ramal:</b> ${r.ramal || "-"} <br>
+            <b>Senha definida:</b> ${r.senha ? "Sim" : "Não"}
+          </p>
+          <hr>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  // 👉 Agentes
+  if (voz.agentes?.length) {
+    resumo.innerHTML += `
+      <div class="card">
+        <h2>🎧 Agentes</h2>
+        ${voz.agentes.map(a => `
+          <p>
+            <b>Nome:</b> ${a.nome || "-"} <br>
+            <b>Ramal:</b> ${a.ramal || "-"}
+          </p>
+          <hr>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  /* ================= CHAT ================= */
+
+  if (dados.chat) {
+    const chat = dados.chat;
+    const canais = chat.canais?.length ? chat.canais.join(", ") : "Nenhum";
+
+    const tipo =
+      chat.tipo === "api" ? "API Oficial" :
+      chat.tipo === "qr" ? "QR Code" :
+      "Não definido";
+
+    resumo.innerHTML += `
+      <div class="card">
+        <h2>💬 Atendimento por Chat</h2>
+
         <p><b>Tipo de integração:</b> ${tipo}</p>
-        <p><b>API oficial:</b> ${api}</p>
-        <p><b>Conta:</b> ${conta}</p>
+        <p><b>API oficial:</b> ${chat.api || "-"}</p>
+        <p><b>Conta:</b> ${chat.conta || "-"}</p>
         <p><b>Canais:</b> ${canais}</p>
       </div>
     `;
   }
 });
 
-/* ================= BOTÃO VOLTAR ================= */
+/* ================= VOLTAR ================= */
 
 function voltar() {
   window.location.href = "index.html";
