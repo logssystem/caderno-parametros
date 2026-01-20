@@ -31,7 +31,7 @@ const PERMISSOES = [
 const dominioInput = document.getElementById("dominioCliente");
 const regraDominio = document.getElementById("regraDominio");
 
-function validarDominio() {
+window.validarDominioCliente = function () {
   if (!dominioInput || !regraDominio) return true;
 
   const v = dominioInput.value.trim().toLowerCase();
