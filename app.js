@@ -26,31 +26,6 @@ const PERMISSOES = [
   "Super Administrador"
 ];
 
-/* ================= DADOS DO CLIENTE ================= */
-
-const empresaInput = document.getElementById("empresaCliente");
-const dominioInput = document.getElementById("dominioCliente");
-const regraDominio = document.getElementById("regraDominio");
-
-function validarDominioCliente() {
-  if (!dominioInput || !regraDominio) return true;
-
-  const v = dominioInput.value.trim().toLowerCase();
-  const ok = v.endsWith(".sobreip.com.br") && v.length > ".sobreip.com.br".length;
-
-  regraDominio.innerHTML = ok
-    ? <div class="regra-ok">Domínio válido</div>
-    : <div class="regra-erro">Deve terminar com .sobreip.com.br</div>;
-
-  dominioInput.classList.toggle("campo-obrigatorio-erro", !ok);
-
-  return ok;
-}
-
-if (dominioInput) {
-  dominioInput.addEventListener("input", validarDominioCliente);
-}
-
 /* ================= ADICIONAR CAMPO ================= */
 
 window.adicionarCampo = function (tipo) {
@@ -59,10 +34,11 @@ window.adicionarCampo = function (tipo) {
   if (tipo === "agente") {
     gerarAgentesAPartirUsuarios();
     atualizarSelectAgentesFila();
-    mostrarToast("Agentes atualizados apartir dos usuários");
+    mostrarToast("Agentes atualizados a partir dos usuários");
+    return;
   }
 
-  if (!listas[tipo]) return mostrarToast(Tipo inválido: ${tipo}, true);
+  if (!listas[tipo]) return mostrarToast(`Tipo inválido: ${tipo}`, true);
 
   const container = document.getElementById(listas[tipo]);
   if (!container || container.children.length >= LIMITE) return;
@@ -81,22 +57,22 @@ function atualizarDestinosURA(select) {
   select.add(new Option("Selecione o destino", ""));
 
   const grupos = [
-    { id: "listaRings", label: "📞 Ramais" },
-    { id: "listaFilas", label: "👥 Filas" },
-    { id: "listaGrupoRing", label: "🔔 Grupos de Ring" },
-    { id: "listaURAs", label: "☎ URAs" },
-    { id: "listaRegrasTempo", label: "⏰ Regras de Tempo" }
+    { id: "listaRings", label: "📞 Ramal", tipo: "ramal" },
+    { id: "listaFilas", label: "👥 Fila", tipo: "fila" },
+    { id: "listaGrupoRing", label: "🔔 Grupo de Ring", tipo: "grupo_ring" },
+    { id: "listaURAs", label: "☎ URA", tipo: "ura" },
+    { id: "listaRegrasTempo", label: "⏰ Regra de Tempo", tipo: "regra_tempo" }
   ];
 
   grupos.forEach(g => {
     const optgroup = document.createElement("optgroup");
     optgroup.label = g.label;
 
-    document.querySelectorAll(#${g.id} .campo-nome).forEach(i => {
+    document.querySelectorAll(`#${g.id} .campo-nome`).forEach(i => {
       if (i.value) {
-        optgroup.appendChild(
-          new Option(i.value, ${g.id}:${i.value})
-        );
+        const opt = new Option(i.value, i.value);
+        opt.dataset.tipo = g.tipo;
+        optgroup.appendChild(opt);
       }
     });
 
@@ -106,6 +82,7 @@ function atualizarDestinosURA(select) {
   });
 }
 
+// 🔧 GARANTIA: função global para não quebrar o app
 function atualizarTodosDestinosURA() {
   document.querySelectorAll(".opcao-ura select").forEach(select => {
     const atual = select.value;
@@ -250,7 +227,7 @@ function criarCampo(tipo) {
     wrap.append(titulo);
 
     const select = document.createElement("select");
-    select.innerHTML = <option value="">Selecione um agente</option>;
+    select.innerHTML = `<option value="">Selecione um agente</option>`;
     wrap.append(select);
 
     const btnAdd = document.createElement("button");
@@ -292,17 +269,17 @@ function criarCampo(tipo) {
   /* ===== GRUPO DE RING ===== */
   if (tipo === "grupo_ring") {
     const estr = document.createElement("select");
-    estr.innerHTML = 
+    estr.innerHTML = `
       <option value="">Estratégia</option>
       <option value="simultaneo">Simultânea</option>
       <option value="sequencial">Sequencial</option>
-    ;
+    `;
     wrap.append(estr);
     wrap.dataset.estrategia="";
     estr.onchange = ()=> wrap.dataset.estrategia=estr.value;
 
     const select = document.createElement("select");
-    select.innerHTML = <option value="">Selecione um ramal</option>;
+    select.innerHTML = `<option value="">Selecione um ramal</option>`;
     wrap.append(select);
 
     const btnAdd = document.createElement("button");
@@ -345,8 +322,8 @@ function criarCampo(tipo) {
     const v = input.value;
     const ok = v.length >= 11 && /[A-Z]/.test(v) && /\d/.test(v) && /[^A-Za-z0-9]/.test(v);
     regrasEl.innerHTML = ok
-      ? <div class="regra-ok">Senha válida</div>
-      : <div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>;
+      ? `<div class="regra-ok">Senha válida</div>`
+      : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
   }
 
   wrap.getNome = () => nome.value;
@@ -367,8 +344,18 @@ function criarOpcaoURA() {
   const tecla = document.createElement("input");
   tecla.placeholder = "Tecla";
 
+  const tipo = document.createElement("input");
+  tipo.placeholder = "Tipo";
+  tipo.readOnly = true;
+  tipo.className = "tipo-destino";
+
   const destino = document.createElement("select");
   atualizarDestinosURA(destino);
+
+  destino.onchange = () => {
+    const opt = destino.selectedOptions[0];
+    tipo.value = opt?.dataset.tipo || "";
+  };
 
   const desc = document.createElement("input");
   desc.placeholder = "Descrição";
@@ -377,7 +364,7 @@ function criarOpcaoURA() {
   del.textContent = "🗑";
   del.onclick = () => wrap.remove();
 
-  wrap.append(tecla, destino, desc, del);
+  wrap.append(tecla, tipo, destino, desc, del);
   return wrap;
 }
 
@@ -415,7 +402,7 @@ function gerarAgentesAPartirUsuarios() {
       wrap.append(linha);
 
       const selectRamal = document.createElement("select");
-      selectRamal.innerHTML = <option value="">Ramal (obrigatório)</option>;
+      selectRamal.innerHTML = `<option value="">Ramal (obrigatório)</option>`;
 
       document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
         if (r.getNome()) {
@@ -445,14 +432,14 @@ function atualizarSelectAgentesFila() {
     if (!select) return;
 
     const atual = select.value;
-    select.innerHTML = <option value="">Selecione um agente</option>;
+    select.innerHTML = `<option value="">Selecione um agente</option>`;
 
     document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
       const nome = a.querySelector(".campo-nome")?.value;
       const ramal = a.getRamal ? a.getRamal() : "";
 
       if (nome) {
-        const label = ramal ? ${nome} (${ramal}) : ${nome} (sem ramal);
+        const label = ramal ? `${nome} (${ramal})` : `${nome} (sem ramal)`;
         select.add(new Option(label, nome));
       }
     });
@@ -468,7 +455,7 @@ function atualizarSelectAgentesFila() {
     const s=f.querySelector("select");
     if(!s)return;
     const atual=s.value;
-    s.innerHTML=<option value="">Selecione um agente</option>;
+    s.innerHTML=`<option value="">Selecione um agente</option>`;
     document.querySelectorAll("#listaAgentes .campo-nome").forEach(a=>{
       s.add(new Option(a.value,a.value));
     });
@@ -481,7 +468,7 @@ function atualizarSelectRamaisGrupo(){
     const s=g.querySelectorAll("select")[1];
     if(!s)return;
     const atual=s.value;
-    s.innerHTML=<option value="">Selecione um ramal</option>;
+    s.innerHTML=`<option value="">Selecione um ramal</option>`;
     document.querySelectorAll("#listaRings .campo-nome").forEach(r=>{
       s.add(new Option(r.value,r.value));
     });
@@ -686,39 +673,26 @@ function mostrarToast(msg, error = false) {
 
 window.explorar = function () {
   try {
-  
-    const empresa = empresaInput?.value.trim();
-    const dominio = dominioInput?.value.trim();
 
-    empresaInput.classList.remove("campo-obrigatorio-erro");
-    dominioInput.classList.remove("campo-obrigatorio-erro");
-
-    if (!empresa) {
-      mostrarToast("Informe o nome da empresa", true);
-      empresaInput.classList.add("campo-obrigatorio-erro");
-      empresaInput.focus();
-      return;
-    }
-
-    if (!dominio) {
-      mostrarToast("Informe o domínio do cliente", true);
-      dominioInput.classList.add("campo-obrigatorio-erro");
-      dominioInput.focus();
-      return;
-    }
-
-    if (!validarDominioCliente()) {
-      mostrarToast("Domínio inválido. Ex: suporteera.sobreip.com.br", true);
-      dominioInput.classList.add("campo-obrigatorio-erro");
-      dominioInput.focus();
-      return;
-    }
+    const empresa = document.getElementById("empresaCliente")?.value.trim();
+    const dominio = document.getElementById("dominioCliente")?.value.trim();
     
+    if (!empresa || !dominio) {
+      mostrarToast("Preencha o nome da empresa e o domínio do cliente", true);
+      return;
+    }
+
+    if (!dominio.endsWith(".sobreip.com.br")) {
+  mostrarToast("O domínio deve obrigatoriamente terminar com .sobreip.com.br", true);
+  return;
+}
+
+
     // 🔒 trava se existir agente sem ramal
     const agentesSemRamal = [];
     document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a, i) => {
       if (!a.getRamal || !a.getRamal()) {
-        agentesSemRamal.push(Agente ${i + 1});
+        agentesSemRamal.push(`Agente ${i + 1}`);
         a.classList.add("campo-erro");
       } else {
         a.classList.remove("campo-erro");
@@ -756,160 +730,43 @@ window.explorar = function () {
         ramal: a.getRamal()
       });
     });
+    
+    // ================= FILAS =================
 
-    const dados = {
-  cliente: {
-    empresa,
-    dominio
-  },
-  voz: {
-    usuarios,
-    ramais,
-    agentes
-  },
-  chat: window.chatState || null
-};
+const filas = [];
+document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
+  const nome = f.querySelector(".campo-nome")?.value || "";
+  const agentesFila = JSON.parse(f.dataset.agentes || "[]");
 
-    document.getElementById("resultado").textContent =
-      JSON.stringify(dados, null, 2);
-
-    mostrarToast("JSON gerado com sucesso!");
-
-  } catch (e) {
-    console.error(e);
-    mostrarToast("Erro ao gerar JSON", true);
-  }
-};
-
-/* ================= DARK MODE ================= */
-
-const toggleTheme = document.getElementById("toggleTheme");
-
-function aplicarTema(modo) {
-  if (modo === "dark") {
-    document.body.classList.add("dark");
-    if (toggleTheme) toggleTheme.textContent = "☀️";
-  } else {
-    document.body.classList.remove("dark");
-    if (toggleTheme) toggleTheme.textContent = "🌙";
-  }
-  localStorage.setItem("tema_caderno", modo);
-}
-
-// carregar tema salvo
-const temaSalvo = localStorage.getItem("tema_caderno") || "light";
-aplicarTema(temaSalvo);
-
-// clique no botão
-if (toggleTheme) {
-  toggleTheme.addEventListener("click", () => {
-    const escuroAtivo = document.body.classList.contains("dark");
-    aplicarTema(escuroAtivo ? "light" : "dark");
+  filas.push({
+    nome,
+    agentes: agentesFila
   });
-}
-window.selecionarApi = function (el, api) {
-  if (typeof selecionarApiInterno === "function") {
-    selecionarApiInterno(el, api);
-  } else {
-    // fallback simples
-    document.querySelectorAll("#api-oficial .chat-card").forEach(c =>
-      c.classList.remove("active")
-    );
-    el.classList.add("active");
+});
 
-    window.chatState = window.chatState || {};
-    window.chatState.api = api;
-  }
-};
-
-window.salvarConfiguracao = function () {
-
-  // chama toda validação normal
-  explorar();
-
-  const resultado = document.getElementById("resultado")?.textContent;
-  if (!resultado) {
-    mostrarToast("Gere a configuração antes de salvar", true);
-    return;
-  }
-
-  localStorage.setItem("CONFIG_CADERNO", resultado);
-
-  window.location.href = "resumo.html";
-};
-
-window.explorar = function () {
-  try {
-
-    const empresa = empresaInput?.value.trim();
-    const dominio = dominioInput?.value.trim();
-
-    empresaInput.classList.remove("campo-obrigatorio-erro");
-    dominioInput.classList.remove("campo-obrigatorio-erro");
-
-    if (!empresa) {
-      mostrarToast("Informe o nome da empresa", true);
-      empresaInput.classList.add("campo-obrigatorio-erro");
-      empresaInput.focus();
-      return;
+  // ================= REGRAS DE TEMPO =================
+  
+  const regras_tempo = [];
+  document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
+    if (r.getData) {
+      regras_tempo.push(r.getData());
     }
-
-    if (!dominio) {
-      mostrarToast("Informe o domínio do cliente", true);
-      dominioInput.classList.add("campo-obrigatorio-erro");
-      dominioInput.focus();
-      return;
-    }
-
-    if (!validarDominioCliente()) {
-      mostrarToast("Domínio inválido. Ex: suporteera.sobreip.com.br", true);
-      dominioInput.classList.add("campo-obrigatorio-erro");
-      dominioInput.focus();
-      return;
-    }
-
-    const agentesSemRamal = [];
-    document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a, i) => {
-      if (!a.getRamal || !a.getRamal()) agentesSemRamal.push(i);
-    });
-
-    if (agentesSemRamal.length) {
-      mostrarToast("Existe agente sem ramal vinculado", true);
-      return;
-    }
-
-    const usuarios = [];
-    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
-      usuarios.push({
-        nome: u.getNome(),
-        email: u.getEmail(),
-        senha: u.getSenha(),
-        permissao: u.getPermissao(),
-        agente: u.isAgente()
-      });
-    });
-
-    const ramais = [];
-    document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
-      ramais.push({
-        ramal: r.getNome(),
-        senha: r.getSenha()
-      });
-    });
-
-    const agentes = [];
-    document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
-      agentes.push({
-        nome: a.querySelector(".campo-nome").value,
-        ramal: a.getRamal()
-      });
-    });
-
+  });
+    
     const dados = {
-  cliente: { empresa, dominio },
-  voz: { usuarios, ramais, agentes },
-  chat: window.chatState   // 🔥 AQUI É O PONTO-CHAVE
-};
+    cliente: {
+      empresa,
+      dominio
+    },
+    voz: {
+      usuarios,
+      ramais,
+      agentes,
+      filas,
+      regras_tempo
+    },
+    chat: window.chatState || {}
+  };
 
     document.getElementById("resultado").textContent =
       JSON.stringify(dados, null, 2);
@@ -922,9 +779,11 @@ window.explorar = function () {
   }
 };
 
+// ================= SALVAR CONFIGURAÇÃO =================
 
 window.salvarConfiguracao = function () {
 
+  // gera o JSON antes
   explorar();
 
   const resultado = document.getElementById("resultado")?.textContent;
@@ -934,19 +793,22 @@ window.salvarConfiguracao = function () {
   }
 
   localStorage.setItem("CONFIG_CADERNO", resultado);
+
+  console.log("CONFIG_CADERNO salvo:", resultado);
+
   window.location.href = "resumo.html";
 };
 
-// ================= CHAT STATE OFICIAL (ÚNICO) =================
+// ================= CHAT STATE OFICIAL =================
 
-window.chatState = {
+window.chatState = window.chatState || {
   tipo: "",
   api: "",
   conta: "",
   canais: []
 };
 
-// 👉 tipo de integração (api / qr)
+// 👉 seleciona TIPO (api / qr)
 window.selecionarTipoChat = function (el, tipo) {
   window.chatState.tipo = tipo;
 
@@ -963,7 +825,7 @@ window.selecionarTipoChat = function (el, tipo) {
   console.log("CHAT STATE:", window.chatState);
 };
 
-// 👉 fornecedor oficial
+// 👉 fornecedor oficial (Meta, 360, Gupshup…)
 window.selecionarApi = function (el, api) {
   window.chatState.api = api;
 
