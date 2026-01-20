@@ -721,7 +721,9 @@ window.explorar = function () {
       voz: {
         usuarios,
         ramais,
-        agentes
+        agentes,
+        filas,
+        regras_tempo
       }
     };
 
