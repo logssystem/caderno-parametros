@@ -82,6 +82,15 @@ function atualizarDestinosURA(select) {
   });
 }
 
+// 🔧 GARANTIA: função global para não quebrar o app
+function atualizarTodosDestinosURA() {
+  document.querySelectorAll(".opcao-ura select").forEach(select => {
+    const atual = select.value;
+    atualizarDestinosURA(select);
+    select.value = atual;
+  });
+}
+
 /* ================= CRIAR CAMPO ================= */
 
 function criarCampo(tipo) {
