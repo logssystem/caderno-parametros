@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const voz = dados.voz || {};
 
-  // 👉 Usuários Web
+  // 👉 Usuários
   if (voz.usuarios?.length) {
     resumo.innerHTML += `
       <div class="card">
@@ -75,6 +75,39 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>
             <b>Nome:</b> ${a.nome || "-"} <br>
             <b>Ramal:</b> ${a.ramal || "-"}
+          </p>
+          <hr>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  // 👉 Filas
+  if (voz.filas?.length) {
+    resumo.innerHTML += `
+      <div class="card">
+        <h2>👥 Filas</h2>
+        ${voz.filas.map(f => `
+          <p>
+            <b>Fila:</b> ${f.nome || "-"} <br>
+            <b>Agentes:</b> ${f.agentes?.length ? f.agentes.join(", ") : "Nenhum"}
+          </p>
+          <hr>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  // 👉 Regras de tempo
+  if (voz.regras_tempo?.length) {
+    resumo.innerHTML += `
+      <div class="card">
+        <h2>⏰ Regras de Tempo</h2>
+        ${voz.regras_tempo.map(r => `
+          <p>
+            <b>Nome:</b> ${r.nome || "-"} <br>
+            <b>Dias:</b> ${r.dias?.join(", ") || "-"} <br>
+            <b>Horário:</b> ${r.hora_inicio || "--:--"} até ${r.hora_fim || "--:--"}
           </p>
           <hr>
         `).join("")}
