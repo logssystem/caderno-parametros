@@ -710,7 +710,6 @@ window.explorar = function () {
   return;
 }
 
-
     // 🔒 trava se existir agente sem ramal
     const agentesSemRamal = [];
     document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a, i) => {
