@@ -20,6 +20,23 @@ window.selecionarContaApi = function (el, conta) {
   el.classList.add("active");
 };
 
+/* ========== CANAIS ========== */
+window.toggleCanal = function (el) {
+  el.classList.toggle("active");
+
+  const canal = el.dataset.canal;
+
+  if (!chatState.canais) chatState.canais = [];
+
+  if (el.classList.contains("active")) {
+    if (!chatState.canais.includes(canal)) {
+      chatState.canais.push(canal);
+    }
+  } else {
+    chatState.canais = chatState.canais.filter(c => c !== canal);
+  }
+};
+
 /* ========== CONTA ========== */
 window.selecionarContaApi = function (el, conta) {
   chatState.conta = conta;
