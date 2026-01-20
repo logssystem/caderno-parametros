@@ -32,10 +32,15 @@ const dominioInput = document.getElementById("dominioCliente");
 const regraDominio = document.getElementById("regraDominio");
 
 window.validarDominioCliente = function () {
-  if (!dominioInput || !regraDominio) return true;
+  if (!dominioInput) return true;
 
   const v = dominioInput.value.trim().toLowerCase();
   const ok = v.endsWith(".sobreip.com.br") && v.length > ".sobreip.com.br".length;
+
+  dominioInput.classList.toggle("campo-obrigatorio-erro", !ok);
+
+  return ok;
+};
 
   regraDominio.innerHTML = ok
     ? `<div class="regra-ok">Domínio válido</div>`
