@@ -28,22 +28,24 @@ const PERMISSOES = [
 
 /* ================= DADOS DO CLIENTE ================= */
 
-const empresaInput = document.getElementById("empresaCliente");
 const dominioInput = document.getElementById("dominioCliente");
+const regraDominio = document.getElementById("regraDominio");
 
-function validarDominioCliente() {
-  if (!dominioInput) return true;
+function validarDominio() {
+  if (!dominioInput || !regraDominio) return true;
 
   const v = dominioInput.value.trim().toLowerCase();
   const ok = v.endsWith(".sobreip.com.br") && v.length > ".sobreip.com.br".length;
 
-  dominioInput.classList.toggle("campo-obrigatorio-erro", !ok);
+  regraDominio.innerHTML = ok
+    ? `<div class="regra-ok">Domínio válido</div>`
+    : `<div class="regra-erro">Deve terminar com .sobreip.com.br</div>`;
 
   return ok;
 }
 
 if (dominioInput) {
-  dominioInput.addEventListener("input", validarDominioCliente);
+  dominioInput.addEventListener("input", validarDominio);
 }
 
 /* ================= ADICIONAR CAMPO ================= */
