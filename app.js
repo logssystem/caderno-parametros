@@ -26,6 +26,26 @@ const PERMISSOES = [
   "Super Administrador"
 ];
 
+/* ================= DADOS DO CLIENTE ================= */
+
+const empresaInput = document.getElementById("empresaCliente");
+const dominioInput = document.getElementById("dominioCliente");
+
+function validarDominioCliente() {
+  if (!dominioInput) return true;
+
+  const v = dominioInput.value.trim().toLowerCase();
+  const ok = v.endsWith(".sobreip.com.br") && v.length > ".sobreip.com.br".length;
+
+  dominioInput.classList.toggle("campo-obrigatorio-erro", !ok);
+
+  return ok;
+}
+
+if (dominioInput) {
+  dominioInput.addEventListener("input", validarDominioCliente);
+}
+
 /* ================= ADICIONAR CAMPO ================= */
 
 window.adicionarCampo = function (tipo) {
@@ -682,8 +702,9 @@ window.explorar = function () {
       return;
     }
 
-    if (!dominio.endsWith(".sobreip.com.br")) {
+    if (!validarDominioCliente()) {
   mostrarToast("O domínio deve obrigatoriamente terminar com .sobreip.com.br", true);
+  dominioInput?.focus();
   return;
 }
 
