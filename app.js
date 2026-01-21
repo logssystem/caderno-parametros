@@ -915,3 +915,25 @@ function atualizarModulosVisiveis() {
 
   moduloChat.style.display = temChat ? "block" : "none";
 }
+
+/* ========== CANAIS CHAT ========== */
+window.toggleCanal = function (el) {
+  const canal = el.dataset.canal;
+
+  if (!window.chatState.canais) {
+    window.chatState.canais = [];
+  }
+
+  el.classList.toggle("active");
+
+  if (el.classList.contains("active")) {
+    if (!chatState.canais.includes(canal)) {
+      chatState.canais.push(canal);
+    }
+  } else {
+    chatState.canais = chatState.canais.filter(c => c !== canal);
+  }
+
+  console.log("CHAT STATE:", chatState);
+  atualizarResumoJSON?.();
+};
