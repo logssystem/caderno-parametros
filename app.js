@@ -478,19 +478,6 @@ function atualizarSelectAgentesFila() {
 
 /* ================= SELECTS DINÂMICOS ================= */
 
-function atualizarSelectAgentesFila() {
-  document.querySelectorAll("#listaFilas .campo-descricao").forEach(f=>{
-    const s=f.querySelector("select");
-    if(!s)return;
-    const atual=s.value;
-    s.innerHTML=`<option value="">Selecione um agente</option>`;
-    document.querySelectorAll("#listaAgentes .campo-nome").forEach(a=>{
-      s.add(new Option(a.value,a.value));
-    });
-    s.value=atual;
-  });
-}
-
 function atualizarSelectRamaisGrupo(){
   document.querySelectorAll("#listaGrupoRing .campo-descricao").forEach(g=>{
     const s=g.querySelectorAll("select")[1];
@@ -848,6 +835,43 @@ window.chatState = window.chatState || {
   canais: []
 };
 
+/* ========== CANAIS CHAT (OFICIAL) ========== */
+
+window.toggleCanal = function (el) {
+  const canal = el.dataset.canal;
+
+  if (!window.chatState.canais) {
+    window.chatState.canais = [];
+  }
+
+  el.classList.toggle("active");
+
+  if (el.classList.contains("active")) {
+    if (!window.chatState.canais.includes(canal)) {
+      window.chatState.canais.push(canal);
+    }
+  } else {
+    window.chatState.canais =
+      window.chatState.canais.filter(c => c !== canal);
+  }
+
+  console.log("CHAT STATE:", window.chatState);
+};
+
+/* ========== RENDERIZA CANAIS (quando recarregar) ========== */
+
+window.renderCanais = function () {
+  document.querySelectorAll("[data-canal]").forEach(el => {
+    const canal = el.dataset.canal;
+
+    if (window.chatState.canais.includes(canal)) {
+      el.classList.add("active");
+    } else {
+      el.classList.remove("active");
+    }
+  });
+};
+
 // 👉 seleciona TIPO (api / qr)
 window.selecionarTipoChat = function (el, tipo) {
   window.chatState.tipo = tipo;
@@ -862,7 +886,10 @@ window.selecionarTipoChat = function (el, tipo) {
   if (apiBox) apiBox.style.display = tipo === "api" ? "block" : "none";
   if (qrBox) qrBox.style.display = tipo === "qr" ? "block" : "none";
 
+  renderCanais();
+  
   console.log("CHAT STATE:", window.chatState);
+  
 };
 
 // 👉 fornecedor oficial (Meta, 360, Gupshup…)
@@ -887,24 +914,9 @@ window.selecionarConta = function (el, conta) {
   console.log("CHAT STATE:", window.chatState);
 };
 
-// 👉 canais (whatsapp, insta, etc)
-window.toggleCanal = function (el, canal) {
-  el.classList.toggle("active");
-
-  if (el.classList.contains("active")) {
-    if (!window.chatState.canais.includes(canal)) {
-      window.chatState.canais.push(canal);
-    }
-  } else {
-    window.chatState.canais =
-      window.chatState.canais.filter(c => c !== canal);
-  }
-
-  console.log("CHAT STATE:", window.chatState);
-};
-
 document.addEventListener("DOMContentLoaded", () => {
   atualizarModulosVisiveis();
+  renderCanais();
 });
 
 function atualizarModulosVisiveis() {
@@ -915,25 +927,3 @@ function atualizarModulosVisiveis() {
 
   moduloChat.style.display = temChat ? "block" : "none";
 }
-
-/* ========== CANAIS CHAT ========== */
-window.toggleCanal = function (el) {
-  const canal = el.dataset.canal;
-
-  if (!window.chatState.canais) {
-    window.chatState.canais = [];
-  }
-
-  el.classList.toggle("active");
-
-  if (el.classList.contains("active")) {
-    if (!chatState.canais.includes(canal)) {
-      chatState.canais.push(canal);
-    }
-  } else {
-    chatState.canais = chatState.canais.filter(c => c !== canal);
-  }
-
-  console.log("CHAT STATE:", chatState);
-  atualizarResumoJSON?.();
-};
