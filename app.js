@@ -901,7 +901,8 @@ window.selecionarApi = function (el, api) {
   el.classList.add("active");
 
   // 👇 MOSTRA BLOCO DE CONTA
-  document.getElementById("bloco-conta-api")?.style.display = "block";
+  const blocoConta = document.getElementById("bloco-conta-api");
+if (blocoConta) blocoConta.style.display = "block";
 
   console.log("CHAT STATE:", window.chatState);
 };
@@ -915,7 +916,9 @@ window.selecionarConta = function (el, conta) {
   el.classList.add("active");
 
   // 👇 MOSTRA CANAIS
-  document.getElementById("chat-canais")?.style.display = "block";
+   const canais = document.getElementById("chat-canais");
+  if (canais) canais.style.display = "block";
+
 
   console.log("CHAT STATE:", window.chatState);
 };
