@@ -900,6 +900,9 @@ window.selecionarApi = function (el, api) {
     .forEach(c => c.classList.remove("active"));
   el.classList.add("active");
 
+  // 👇 MOSTRA BLOCO DE CONTA
+  document.getElementById("bloco-conta-api")?.style.display = "block";
+
   console.log("CHAT STATE:", window.chatState);
 };
 
@@ -907,9 +910,12 @@ window.selecionarApi = function (el, api) {
 window.selecionarConta = function (el, conta) {
   window.chatState.conta = conta;
 
-  document.querySelectorAll(".bloco-conta .chat-card")
+  document.querySelectorAll(".bloco-conta .chat-card, #bloco-conta-api .chat-card")
     .forEach(c => c.classList.remove("active"));
   el.classList.add("active");
+
+  // 👇 MOSTRA CANAIS
+  document.getElementById("chat-canais")?.style.display = "block";
 
   console.log("CHAT STATE:", window.chatState);
 };
