@@ -832,7 +832,8 @@ window.chatState = window.chatState || {
   tipo: "",
   api: "",
   conta: "",
-  canais: []
+  canais: [],
+  departamentos: []
 };
 
 /* ========== CANAIS CHAT (OFICIAL) ========== */
