@@ -46,44 +46,61 @@ function criarUsuarioChat() {
   nome.placeholder = "Nome do usuário";
 
   const email = document.createElement("input");
+  email.type = "email";
   email.placeholder = "E-mail";
 
   const senha = document.createElement("input");
   senha.placeholder = "Senha";
+  senha.classList.add("campo-senha");
+
+  const regras = document.createElement("div");
+
+  senha.oninput = () => validarSenha(senha, regras);
 
   const permissoes = document.createElement("select");
   permissoes.multiple = true;
 
-  const departamento = document.createElement("select");
-departamento.innerHTML = `<option value="">Departamento (opcional)</option>`;
+  ["Agente Omnichannel","Supervisor Omnichannel","Administrador Omnichannel"]
+    .forEach(p => permissoes.add(new Option(p, p)));
 
-document
-  .querySelectorAll("#listaDepartamentosChat .campo-descricao input")
-  .forEach(d => {
-    if (d.value) {
-      departamento.add(new Option(d.value, d.value));
-    }
-  });
-  
-  [
-    "Agente Omnichannel",
-    "Supervisor Omnichannel",
-    "Administrador Omnichannel"
-  ].forEach(p => permissoes.add(new Option(p, p)));
+  const chkAgente = document.createElement("input");
+  chkAgente.type = "checkbox";
+
+  const lbl = document.createElement("label");
+  lbl.append(chkAgente, document.createTextNode(" Este usuário é agente omnichannel"));
+
+  const departamento = document.createElement("select");
+  atualizarSelectDepartamentosChat(departamento);
 
   const del = document.createElement("button");
   del.textContent = "✖";
-  del.onclick = () => wrap.remove();
+  del.onclick = () => {
+    wrap.remove();
+    gerarAgentesChatAPartirUsuarios();
+  };
 
-  // ✅ AQUI
+  chkAgente.onchange = gerarAgentesChatAPartirUsuarios;
+
   wrap.getData = () => ({
     nome: nome.value,
     email: email.value,
     senha: senha.value,
-    permissoes: [...permissoes.selectedOptions].map(o => o.value)
+    permissoes: [...permissoes.selectedOptions].map(o => o.value),
+    agente: chkAgente.checked,
+    departamento: departamento.value
   });
 
-  wrap.append(nome, email, senha, permissoes, departamento, del);
+  wrap.append(
+    nome,
+    email,
+    senha,
+    regras,
+    permissoes,
+    lbl,
+    departamento,
+    del
+  );
+
   return wrap;
 }
 
