@@ -754,12 +754,11 @@ window.explorar = function () {
     });
 
     /* ================= CHAT (SEM VALIDAÇÃO) ================= */
-    const departamentosChat = [];
-    document
-      .querySelectorAll("#listaDepartamentosChat .campo-descricao")
-      .forEach(d => {
-        if (d.getData) departamentosChat.push(d.getData());
-      });
+      const departamentosChat = [];
+  document.querySelectorAll("#listaDepartamentosChat .campo-descricao")
+    .forEach(d => {
+      if (d.getData) departamentosChat.push(d.getData());
+    });
 
     const usuariosChat = [];
     document
