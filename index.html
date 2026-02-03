@@ -61,14 +61,7 @@
     <!-- 🔹 ENTIDADES DO CHAT (PADRÃO PABX) -->
     <section id="modulochat" style="display:none;">
 
-      <section class="card">
-        <h2>Departamentos (Chat)</h2>
-        <div id="listaDepartamentosChat"></div>
-        <button onclick="adicionarDepartamentoChat()" class="btn-add">
-          + Adicionar departamento
-        </button>
-      </section>
-
+      <!-- 1️⃣ USUÁRIOS -->
       <section class="card">
         <h2>Usuários Omnichannel</h2>
         <div id="listaUsuariosChat"></div>
@@ -76,7 +69,8 @@
           + Adicionar usuário chat
         </button>
       </section>
-
+    
+      <!-- 2️⃣ AGENTES -->
       <section class="card">
         <h2>Agentes Omnichannel</h2>
         <div id="listaAgentesChat"></div>
@@ -84,8 +78,18 @@
           + Adicionar agente chat
         </button>
       </section>
-
+    
+      <!-- 3️⃣ DEPARTAMENTOS -->
+      <section class="card">
+        <h2>Departamentos (Chat)</h2>
+        <div id="listaDepartamentosChat"></div>
+        <button onclick="adicionarDepartamentoChat()" class="btn-add">
+          + Adicionar departamento
+        </button>
+      </section>
+    
     </section>
+
 
     <!-- 🔹 CONFIGURAÇÃO TÉCNICA DO CHAT -->
     <section class="card">
@@ -193,3 +197,4 @@
 
 </body>
 </html>
+
