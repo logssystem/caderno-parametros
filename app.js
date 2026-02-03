@@ -703,8 +703,12 @@ window.explorar = function () {
   return;
 }
 
-    // 🔒 trava se existir agente sem ramal
+      // 🔒 valida agentes da voz APENAS se não for chat puro
+  const modo = window.modoSelecionado || "voz";
+  
+  if (modo !== "chat") {
     const agentesSemRamal = [];
+  
     document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a, i) => {
       if (!a.getRamal || !a.getRamal()) {
         agentesSemRamal.push(`Agente ${i + 1}`);
@@ -713,11 +717,12 @@ window.explorar = function () {
         a.classList.remove("campo-erro");
       }
     });
-
+  
     if (agentesSemRamal.length) {
       mostrarToast("Existe agente sem ramal vinculado", true);
       return;
     }
+}
 
     const usuarios = [];
     document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
