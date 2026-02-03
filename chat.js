@@ -50,18 +50,7 @@ function criarUsuarioChat() {
 
   const senha = document.createElement("input");
   senha.placeholder = "Senha";
-  
-  const departamento = document.createElement("select");
-atualizarSelectDepartamentos(departamento);
 
-  document.querySelectorAll("#listaDepartamentosChat .campo-descricao input")
-  .forEach(d => {
-    if (d.value) {
-      departamento.add(new Option(d.value, d.value));
-    }
-  });
-
-  
   const permissoes = document.createElement("select");
   permissoes.multiple = true;
 
@@ -75,15 +64,15 @@ atualizarSelectDepartamentos(departamento);
   del.textContent = "✖";
   del.onclick = () => wrap.remove();
 
+  // ✅ AQUI
   wrap.getData = () => ({
-  nome: nome.value,
-  email: email.value,
-  senha: senha.value,
-  permissoes: [...permissoes.selectedOptions].map(o => o.value),
-  departamento: departamento.value
-});
+    nome: nome.value,
+    email: email.value,
+    senha: senha.value,
+    permissoes: [...permissoes.selectedOptions].map(o => o.value)
+  });
 
-  wrap.append(nome, email, senha, permissoes, departamento, del);
+  wrap.append(nome, email, senha, permissoes, del);
   return wrap;
 }
 
