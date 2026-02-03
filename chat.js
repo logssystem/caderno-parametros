@@ -196,3 +196,36 @@ function criarDepartamentoChat() {
 
   return wrap;
 }
+
+// ================= DEPARTAMENTOS CHAT =================
+
+window.adicionarDepartamentoChat = function () {
+  const container = document.getElementById("listaDepartamentosChat");
+  if (!container) return;
+
+  container.appendChild(criarDepartamentoChat());
+};
+
+function criarDepartamentoChat() {
+  const wrap = document.createElement("div");
+  wrap.className = "campo-descricao";
+
+  const linha = document.createElement("div");
+  linha.className = "linha-principal";
+
+  const nome = document.createElement("input");
+  nome.placeholder = "Nome do departamento";
+
+  const btn = document.createElement("button");
+  btn.textContent = "✖";
+  btn.onclick = () => wrap.remove();
+
+  linha.append(nome, btn);
+  wrap.append(linha);
+
+  wrap.getData = () => ({
+    nome: nome.value
+  });
+
+  return wrap;
+}
