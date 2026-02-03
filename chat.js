@@ -33,7 +33,18 @@ function criarUsuarioChat() {
 
   const senha = document.createElement("input");
   senha.placeholder = "Senha";
+  
+  const departamento = document.createElement("select");
+  departamento.innerHTML = `<option value="">Departamento</option>`;
 
+  document.querySelectorAll("#listaDepartamentosChat .campo-descricao input")
+  .forEach(d => {
+    if (d.value) {
+      departamento.add(new Option(d.value, d.value));
+    }
+  });
+
+  
   const permissoes = document.createElement("select");
   permissoes.multiple = true;
 
@@ -48,13 +59,14 @@ function criarUsuarioChat() {
   del.onclick = () => wrap.remove();
 
   wrap.getData = () => ({
-    nome: nome.value,
-    email: email.value,
-    senha: senha.value,
-    permissoes: [...permissoes.selectedOptions].map(o => o.value)
-  });
+  nome: nome.value,
+  email: email.value,
+  senha: senha.value,
+  permissoes: [...permissoes.selectedOptions].map(o => o.value),
+  departamento: departamento.value
+});
 
-  wrap.append(nome, email, senha, permissoes, del);
+  wrap.append(nome, email, senha, permissoes, departamento, del);
   return wrap;
 }
 
@@ -79,7 +91,17 @@ function criarAgenteChat() {
     .forEach(u => {
       usuarioVoz.add(new Option(u.value, u.value));
     });
+  
+  const departamento = document.createElement("select");
+departamento.innerHTML = `<option value="">Departamento</option>`;
 
+document.querySelectorAll("#listaDepartamentosChat .campo-descricao input")
+  .forEach(d => {
+    if (d.value) {
+      departamento.add(new Option(d.value, d.value));
+    }
+  });
+  
   wrap.getData = () => ({
     nome: nome.value,
     usuario_voz: usuarioVoz.value
@@ -89,7 +111,7 @@ function criarAgenteChat() {
   del.textContent = "✖";
   del.onclick = () => wrap.remove();
 
-  wrap.append(nome, usuarioVoz, del);
+  wrap.append(nome, usuarioVoz, departamento, del);
   return wrap;
 }
 
