@@ -842,3 +842,23 @@ window.selecionarApi = function (el, api) {
 
   console.log("API selecionada:", api);
 };
+
+// ================= CHAT – SELECIONAR CONTA =================
+window.selecionarConta = function (el, conta) {
+  window.chatState = window.chatState || {};
+  window.chatState.conta = conta;
+
+  // remove seleção anterior
+  document
+    .querySelectorAll("#bloco-conta-api .chat-card")
+    .forEach(c => c.classList.remove("active"));
+
+  // marca o selecionado
+  el.classList.add("active");
+
+  // mostra canais
+  const canais = document.getElementById("chat-canais");
+  if (canais) canais.style.display = "block";
+
+  console.log("Conta selecionada:", conta);
+};
