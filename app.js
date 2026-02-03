@@ -805,3 +805,20 @@ window.explorar = function () {
     mostrarToast("Erro ao gerar JSON", true);
   }
 };
+
+window.selecionarTipoChat = function (el, tipo) {
+  window.chatState = window.chatState || {};
+  window.chatState.tipo = tipo;
+
+  document
+    .querySelectorAll(".tipo-chat .chat-card, .chat-section .chat-card")
+    .forEach(c => c.classList.remove("active"));
+
+  el.classList.add("active");
+
+  const apiBox = document.getElementById("api-oficial");
+  const qrBox = document.getElementById("chat-qr");
+
+  if (apiBox) apiBox.style.display = tipo === "api" ? "block" : "none";
+  if (qrBox) qrBox.style.display = tipo === "qr" ? "block" : "none";
+};
