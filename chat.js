@@ -1,10 +1,3 @@
-window.chatState = window.chatState || {
-  tipo: "",
-  api: "",
-  conta: "",
-  canais: []
-};
-
 function limparAtivos(selector) {
   document.querySelectorAll(selector).forEach(el =>
     el.classList.remove("active")
