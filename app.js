@@ -821,7 +821,9 @@ window.selecionarTipoChat = function (el, tipo) {
 
   if (apiBox) apiBox.style.display = tipo === "api" ? "block" : "none";
   if (qrBox) qrBox.style.display = tipo === "qr" ? "block" : "none";
-};
+  
+  atualizarModuloChat();  
+  };
 
 // ================= CHAT – SELECIONAR API =================
 window.selecionarApi = function (el, api) {
@@ -905,3 +907,15 @@ window.salvarConfiguracao = function () {
 
   window.location.href = "resumo.html";
 };
+
+// ================= VISIBILIDADE DO MÓDULO CHAT =================
+function atualizarModuloChat() {
+  const moduloChat = document.getElementById("modulochat");
+  if (!moduloChat) return;
+
+  const temChat =
+    window.chatState?.tipo === "api" ||
+    window.chatState?.tipo === "qr";
+
+  moduloChat.style.display = temChat ? "block" : "none";
+}
