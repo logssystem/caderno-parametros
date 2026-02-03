@@ -1,3 +1,20 @@
+function atualizarSelectDepartamentos(select) {
+  if (!select) return;
+
+  const atual = select.value;
+  select.innerHTML = `<option value="">Departamento</option>`;
+
+  document
+    .querySelectorAll("#listaDepartamentosChat .campo-descricao input")
+    .forEach(d => {
+      if (d.value) {
+        select.add(new Option(d.value, d.value));
+      }
+    });
+
+  select.value = atual;
+}
+
 function limparAtivos(selector) {
   document.querySelectorAll(selector).forEach(el =>
     el.classList.remove("active")
@@ -35,7 +52,7 @@ function criarUsuarioChat() {
   senha.placeholder = "Senha";
   
   const departamento = document.createElement("select");
-  departamento.innerHTML = `<option value="">Departamento</option>`;
+atualizarSelectDepartamentos(departamento);
 
   document.querySelectorAll("#listaDepartamentosChat .campo-descricao input")
   .forEach(d => {
@@ -93,7 +110,7 @@ function criarAgenteChat() {
     });
   
   const departamento = document.createElement("select");
-departamento.innerHTML = `<option value="">Departamento</option>`;
+atualizarSelectDepartamentos(departamento);
 
 document.querySelectorAll("#listaDepartamentosChat .campo-descricao input")
   .forEach(d => {
@@ -122,6 +139,10 @@ window.adicionarDepartamentoChat = function () {
   if (!lista) return;
 
   lista.appendChild(criarDepartamentoChat());
+  
+  document.querySelectorAll("#listaUsuariosChat select, #listaAgentesChat select")
+  .forEach(s => atualizarSelectDepartamentos(s));
+
 };
 
 function criarDepartamentoChat() {
