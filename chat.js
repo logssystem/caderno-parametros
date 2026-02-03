@@ -3,32 +3,6 @@ function limparAtivos(selector) {
     el.classList.remove("active")
   );
 }
-/* ========== API ========== */
-window.selecionarContaApi = function (el, conta) {
-  chatState.conta = conta;
-
-  document.querySelectorAll("#bloco-conta-api .chat-card")
-    .forEach(c => c.classList.remove("active"));
-
-  el.classList.add("active");
-};
-
-/* ========== CANAIS ========== */
-window.toggleCanal = function (el) {
-  el.classList.toggle("active");
-
-  const canal = el.dataset.canal;
-
-  if (!chatState.canais) chatState.canais = [];
-
-  if (el.classList.contains("active")) {
-    if (!chatState.canais.includes(canal)) {
-      chatState.canais.push(canal);
-    }
-  } else {
-    chatState.canais = chatState.canais.filter(c => c !== canal);
-  }
-};
 
 /* ========== CONTA ========== */
 window.selecionarContaApi = function (el, conta) {
