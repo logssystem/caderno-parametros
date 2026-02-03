@@ -156,3 +156,36 @@ function gerarAgentesChatAPartirUsuarios() {
     }
   });
 }
+
+function validarSenha(input, regrasEl) {
+  const v = input.value;
+
+  const temTamanho = v.length >= 11;
+  const temMaiuscula = /[A-Z]/.test(v);
+  const temMinuscula = /[a-z]/.test(v);
+  const temNumero = /\d/.test(v);
+  const temEspecial = /[^A-Za-z0-9]/.test(v);
+
+  const ok =
+    temTamanho &&
+    temMaiuscula &&
+    temMinuscula &&
+    temNumero &&
+    temEspecial;
+
+  if (regrasEl) {
+    regrasEl.innerHTML = ok
+      ? `<div class="regra-ok">Senha válida</div>`
+      : `<div class="regra-erro">
+          Mín. 11 caracteres<br>
+          1 letra maiúscula<br>
+          1 letra minúscula<br>
+          1 número<br>
+          1 caractere especial
+        </div>`;
+  }
+
+  input.classList.toggle("campo-obrigatorio-erro", !ok);
+
+  return ok;
+}
