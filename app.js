@@ -862,3 +862,26 @@ window.selecionarConta = function (el, conta) {
 
   console.log("Conta selecionada:", conta);
 };
+
+// ================= CHAT – TOGGLE CANAL =================
+window.toggleCanal = function (el) {
+  const canal = el.dataset.canal;
+
+  window.chatState = window.chatState || {};
+  if (!window.chatState.canais) {
+    window.chatState.canais = [];
+  }
+
+  el.classList.toggle("active");
+
+  if (el.classList.contains("active")) {
+    if (!window.chatState.canais.includes(canal)) {
+      window.chatState.canais.push(canal);
+    }
+  } else {
+    window.chatState.canais =
+      window.chatState.canais.filter(c => c !== canal);
+  }
+
+  console.log("Canais ativos:", window.chatState.canais);
+};
