@@ -229,3 +229,20 @@ function criarDepartamentoChat() {
 
   return wrap;
 }
+
+document
+  .querySelectorAll("#listaUsuariosChat select")
+  .forEach(select => {
+    const atual = select.value;
+    select.innerHTML = `<option value="">Departamento (opcional)</option>`;
+
+    document
+      .querySelectorAll("#listaDepartamentosChat .campo-descricao input")
+      .forEach(d => {
+        if (d.value) {
+          select.add(new Option(d.value, d.value));
+        }
+      });
+
+    select.value = atual;
+  });
