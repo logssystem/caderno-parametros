@@ -92,3 +92,33 @@ function criarAgenteChat() {
   wrap.append(nome, usuarioVoz, del);
   return wrap;
 }
+
+/* ================= DEPARTAMENTOS CHAT ================= */
+
+window.adicionarDepartamentoChat = function () {
+  const lista = document.getElementById("listaDepartamentosChat");
+  if (!lista) return;
+
+  lista.appendChild(criarDepartamentoChat());
+};
+
+function criarDepartamentoChat() {
+  const wrap = document.createElement("div");
+  wrap.className = "campo-descricao";
+
+  const nome = document.createElement("input");
+  nome.placeholder = "Nome do departamento (ex: Suporte, Vendas)";
+
+  const del = document.createElement("button");
+  del.textContent = "✖";
+  del.onclick = () => wrap.remove();
+
+  wrap.getData = () => ({
+    nome: nome.value,
+    usuarios: [],
+    agentes: []
+  });
+
+  wrap.append(nome, del);
+  return wrap;
+}
