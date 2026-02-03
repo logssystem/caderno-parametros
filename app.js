@@ -792,7 +792,11 @@ document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
       filas,
       regras_tempo
     },
-    chat: window.chatState || {}
+    chat: {
+  ...window.chatState,
+  departamentos: departamentosChat
+}
+
   };
 
     document.getElementById("resultado").textContent =
@@ -818,7 +822,13 @@ window.salvarConfiguracao = function () {
     mostrarToast("Gere a configuração antes de salvar", true);
     return;
   }
-
+  
+  const departamentosChat = [];
+document.querySelectorAll("#listaDepartamentosChat .campo-descricao")
+  .forEach(d => {
+    if (d.getData) departamentosChat.push(d.getData());
+  });
+  
   localStorage.setItem("CONFIG_CADERNO", resultado);
 
   console.log("CONFIG_CADERNO salvo:", resultado);
