@@ -165,3 +165,34 @@ function criarDepartamentoChat() {
   wrap.append(nome, del);
   return wrap;
 }
+
+window.adicionarDepartamentoChat = function () {
+  const lista = document.getElementById("listaDepartamentosChat");
+  if (!lista) return;
+
+  lista.appendChild(criarDepartamentoChat());
+};
+
+function criarDepartamentoChat() {
+  const wrap = document.createElement("div");
+  wrap.className = "campo-descricao";
+
+  const linha = document.createElement("div");
+  linha.className = "linha-principal";
+
+  const nome = document.createElement("input");
+  nome.placeholder = "Nome do departamento";
+
+  const del = document.createElement("button");
+  del.textContent = "✖";
+  del.onclick = () => wrap.remove();
+
+  linha.append(nome, del);
+  wrap.append(linha);
+
+  wrap.getData = () => ({
+    nome: nome.value
+  });
+
+  return wrap;
+}
