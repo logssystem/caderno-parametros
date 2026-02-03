@@ -822,3 +822,23 @@ window.selecionarTipoChat = function (el, tipo) {
   if (apiBox) apiBox.style.display = tipo === "api" ? "block" : "none";
   if (qrBox) qrBox.style.display = tipo === "qr" ? "block" : "none";
 };
+
+// ================= CHAT – SELECIONAR API =================
+window.selecionarApi = function (el, api) {
+  window.chatState = window.chatState || {};
+  window.chatState.api = api;
+
+  // remove seleção anterior
+  document
+    .querySelectorAll("#api-oficial .chat-card")
+    .forEach(c => c.classList.remove("active"));
+
+  // marca o atual
+  el.classList.add("active");
+
+  // mostra bloco de conta
+  const blocoConta = document.getElementById("bloco-conta-api");
+  if (blocoConta) blocoConta.style.display = "block";
+
+  console.log("API selecionada:", api);
+};
