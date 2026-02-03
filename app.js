@@ -885,3 +885,23 @@ window.toggleCanal = function (el) {
 
   console.log("Canais ativos:", window.chatState.canais);
 };
+
+// ================= SALVAR CONFIGURAÇÃO =================
+window.salvarConfiguracao = function () {
+  // gera o JSON
+  if (typeof explorar === "function") {
+    explorar();
+  }
+
+  const resultado = document.getElementById("resultado")?.textContent;
+
+  if (!resultado || !resultado.trim()) {
+    mostrarToast("Gere a configuração antes de salvar", true);
+    return;
+  }
+
+  localStorage.setItem("CONFIG_CADERNO", resultado);
+  console.log("CONFIG_CADERNO salvo:", resultado);
+
+  window.location.href = "resumo.html";
+};
