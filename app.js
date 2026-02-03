@@ -946,9 +946,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function atualizarModulosVisiveis() {
   const moduloChat = document.getElementById("modulochat");
-  if (!moduloChat) return;
+  const chatArea = document.getElementById("chat-area");
+  const vozArea = document.getElementById("voz-area");
 
-  const temChat = window.chatState?.tipo === "api" || window.chatState?.tipo === "qr";
+  if (!moduloChat || !chatArea || !vozArea) return;
 
-  moduloChat.style.display = temChat ? "block" : "none";
+  const modo = window.modoSelecionado || "voz";
+
+  // CHAT PURO
+  if (modo === "chat") {
+    chatArea.style.display = "block";
+    moduloChat.style.display = "block";
+    vozArea.style.display = "none";
+    return;
+  }
+
+  // VOZ + CHAT
+  if (modo === "ambos") {
+    chatArea.style.display = "block";
+    moduloChat.style.display = "block";
+    vozArea.style.display = "block";
+    return;
+  }
+
+  // SOMENTE VOZ
+  chatArea.style.display = "none";
+  moduloChat.style.display = "none";
+  vozArea.style.display = "block";
 }
