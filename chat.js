@@ -54,6 +54,17 @@ function criarUsuarioChat() {
   const permissoes = document.createElement("select");
   permissoes.multiple = true;
 
+  const departamento = document.createElement("select");
+departamento.innerHTML = `<option value="">Departamento (opcional)</option>`;
+
+document
+  .querySelectorAll("#listaDepartamentosChat .campo-descricao input")
+  .forEach(d => {
+    if (d.value) {
+      departamento.add(new Option(d.value, d.value));
+    }
+  });
+  
   [
     "Agente Omnichannel",
     "Supervisor Omnichannel",
@@ -72,7 +83,7 @@ function criarUsuarioChat() {
     permissoes: [...permissoes.selectedOptions].map(o => o.value)
   });
 
-  wrap.append(nome, email, senha, permissoes, del);
+  wrap.append(nome, email, senha, permissoes, departamento, del);
   return wrap;
 }
 
