@@ -752,34 +752,48 @@ window.explorar = function () {
     document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
       if (r.getData) regras_tempo.push(r.getData());
     });
+    
+    /* ================= CHAT ================= */
 
-    /* ================= VALIDAÇÃO AGENTES CHAT ================= */
+const usuariosChat = [];
+document
+  .querySelectorAll("#listaUsuariosChat .campo-descricao")
+  .forEach(u => {
+    if (u.getData) usuariosChat.push(u.getData());
+  });
 
-const agentesDefinidos = new Set();
+const departamentosChat = [];
+const agentesVinculados = new Set();
 
 document
   .querySelectorAll("#listaDepartamentosChat .campo-descricao")
   .forEach(d => {
     const data = d.getData?.();
-    data?.agentes?.forEach(a => agentesDefinidos.add(a));
+    if (!data || !data.nome) return;
+
+    data.agentes.forEach(a => agentesVinculados.add(a));
+
+    departamentosChat.push({
+      nome: data.nome,
+      agentes: data.agentes
+    });
   });
 
-document
-  .querySelectorAll("#listaUsuariosChat .campo-descricao")
-  .forEach(u => {
-    const data = u.getData?.();
-    const isAgente =
-      data?.agente === true ||
-      data?.permissoes?.includes("Agente Omnichannel");
+/* ================= VALIDAÇÃO ================= */
 
-    if (isAgente && !agentesDefinidos.has(data.nome)) {
-      mostrarToast(
-        `Agente "${data.nome}" não está vinculado a nenhum departamento`,
-        true
-      );
-      throw new Error("Agente omnichannel sem departamento");
-    }
-  });
+usuariosChat.forEach(u => {
+  const isAgente =
+    u.agente === true ||
+    u.permissoes?.includes("Agente Omnichannel");
+
+  if (isAgente && !agentesVinculados.has(u.nome)) {
+    mostrarToast(
+      `Agente "${u.nome}" não está vinculado a nenhum departamento`,
+      true
+    );
+    throw new Error("Agente omnichannel sem departamento");
+  }
+});
     
     /* ================= CHAT (SEM VALIDAÇÃO) ================= */
       const departamentosChat = [];
