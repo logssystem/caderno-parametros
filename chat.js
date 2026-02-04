@@ -20,6 +20,8 @@ window.adicionarDepartamentoChat = function () {
   if (!lista) return;
 
   lista.appendChild(criarDepartamentoChat());
+  atualizarSelectAgentesDepartamentoChat();
+};
 
   document
     .querySelectorAll("#listaUsuariosChat select, #listaAgentesChat select")
@@ -30,8 +32,8 @@ function criarDepartamentoChat() {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  const linha = document.createElement("div");
-  linha.className = "linha-principal";
+  const linhaTopo = document.createElement("div");
+  linhaTopo.className = "linha-principal";
 
   const nome = document.createElement("input");
   nome.placeholder = "Nome do departamento";
@@ -40,15 +42,92 @@ function criarDepartamentoChat() {
   del.textContent = "✖";
   del.onclick = () => wrap.remove();
 
-  linha.append(nome, del);
-  wrap.append(linha);
+  linhaTopo.append(nome, del);
+  wrap.append(linhaTopo);
+
+  /* ===== AGENTES DO DEPARTAMENTO ===== */
+
+  const titulo = document.createElement("h4");
+  titulo.textContent = "Agentes do departamento";
+  titulo.style.marginTop = "12px";
+  wrap.append(titulo);
+
+  const select = document.createElement("select");
+  select.innerHTML = `<option value="">Selecione um agente</option>`;
+  wrap.append(select);
+
+  const btnAdd = document.createElement("button");
+  btnAdd.textContent = "Adicionar agente";
+  wrap.append(btnAdd);
+
+  const lista = document.createElement("div");
+  wrap.append(lista);
+
+  wrap.dataset.agentes = "[]";
+
+  btnAdd.onclick = () => {
+    if (!select.value) return;
+
+    const agentes = JSON.parse(wrap.dataset.agentes);
+    if (!agentes.includes(select.value)) {
+      agentes.push(select.value);
+      wrap.dataset.agentes = JSON.stringify(agentes);
+      render();
+    }
+  };
+
+  function render() {
+    lista.innerHTML = "";
+    JSON.parse(wrap.dataset.agentes).forEach((a, i) => {
+      const d = document.createElement("div");
+      d.textContent = a;
+
+      const x = document.createElement("button");
+      x.textContent = "✖";
+      x.onclick = () => {
+        const agentes = JSON.parse(wrap.dataset.agentes);
+        agentes.splice(i, 1);
+        wrap.dataset.agentes = JSON.stringify(agentes);
+        render();
+      };
+
+      d.append(x);
+      lista.append(d);
+    });
+  }
 
   wrap.getData = () => ({
-    nome: nome.value
+    nome: nome.value,
+    agentes: JSON.parse(wrap.dataset.agentes)
   });
 
   return wrap;
 }
+
+function atualizarSelectAgentesDepartamentoChat() {
+  document
+    .querySelectorAll("#listaDepartamentosChat .campo-descricao select")
+    .forEach(select => {
+      const atual = select.value;
+      select.innerHTML = `<option value="">Selecione um agente</option>`;
+
+      document
+        .querySelectorAll("#listaUsuariosChat .campo-descricao")
+        .forEach(u => {
+          const data = u.getData?.();
+          const isAgente =
+            data?.agente === true ||
+            data?.permissoes?.includes("Agente Omnichannel");
+
+          if (isAgente && data.nome) {
+            select.add(new Option(data.nome, data.nome));
+          }
+        });
+
+      select.value = atual;
+    });
+}
+
 
 /* ================= USUÁRIOS CHAT ================= */
 
@@ -92,7 +171,10 @@ function criarUsuarioChat() {
   const departamento = document.createElement("select");
   atualizarSelectDepartamentosChat(departamento);
 
-  chkAgente.onchange = gerarAgentesChatAPartirUsuarios;
+  chkAgente.onchange = () => {
+  gerarAgentesChatAPartirUsuarios?.();
+  atualizarSelectAgentesDepartamentoChat();
+};
 
   const del = document.createElement("button");
   del.textContent = "✖";
