@@ -753,6 +753,34 @@ window.explorar = function () {
       if (r.getData) regras_tempo.push(r.getData());
     });
 
+    /* ================= VALIDAÇÃO AGENTES CHAT ================= */
+
+const agentesDefinidos = new Set();
+
+document
+  .querySelectorAll("#listaDepartamentosChat .campo-descricao")
+  .forEach(d => {
+    const data = d.getData?.();
+    data?.agentes?.forEach(a => agentesDefinidos.add(a));
+  });
+
+document
+  .querySelectorAll("#listaUsuariosChat .campo-descricao")
+  .forEach(u => {
+    const data = u.getData?.();
+    const isAgente =
+      data?.agente === true ||
+      data?.permissoes?.includes("Agente Omnichannel");
+
+    if (isAgente && !agentesDefinidos.has(data.nome)) {
+      mostrarToast(
+        `Agente "${data.nome}" não está vinculado a nenhum departamento`,
+        true
+      );
+      throw new Error("Agente omnichannel sem departamento");
+    }
+  });
+    
     /* ================= CHAT (SEM VALIDAÇÃO) ================= */
       const departamentosChat = [];
   document.querySelectorAll("#listaDepartamentosChat .campo-descricao")
