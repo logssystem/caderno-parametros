@@ -5,37 +5,64 @@ const introMensagem =
   "Selecione o tipo de serviço para continuar.";
 
 let pos = 0;
+let digitando = false;
+
+/* ================= INTRO ================= */
 
 function iniciarIntro() {
   const el = document.getElementById("intro-text");
-  if (!el) return;
+  if (!el || digitando) return;
+
   el.innerHTML = "";
   pos = 0;
+  digitando = true;
 
   (function digitar() {
-    if (pos >= introMensagem.length) return;
-    el.innerHTML += introMensagem[pos] === "\n" ? "<br>" : introMensagem[pos];
+    if (pos >= introMensagem.length) {
+      digitando = false;
+      return;
+    }
+
+    el.innerHTML += introMensagem[pos] === "\n"
+      ? "<br>"
+      : introMensagem[pos];
+
     pos++;
     setTimeout(digitar, 30);
   })();
 }
 
 function mostrarIntro() {
-  document.getElementById("intro-screen").style.display = "flex";
-  document.getElementById("app-content").style.display = "none";
+  const intro = document.getElementById("intro-screen");
+  const app = document.getElementById("app-content");
+
+  if (intro) intro.style.display = "flex";
+  if (app) app.style.display = "none";
+
   iniciarIntro();
 }
 
 function mostrarApp(modo) {
-  document.getElementById("intro-screen").style.display = "none";
-  document.getElementById("app-content").style.display = "block";
+  const intro = document.getElementById("intro-screen");
+  const app = document.getElementById("app-content");
+  const voz = document.getElementById("voz-area");
+  const chat = document.getElementById("chat-area");
 
-  document.getElementById("voz-area").style.display =
-    modo === "voz" || modo === "ambos" ? "block" : "none";
+  if (intro) intro.style.display = "none";
+  if (app) app.style.display = "block";
 
-  document.getElementById("chat-area").style.display =
-    modo === "chat" || modo === "ambos" ? "block" : "none";
+  if (voz) {
+    voz.style.display =
+      modo === "voz" || modo === "ambos" ? "block" : "none";
+  }
+
+  if (chat) {
+    chat.style.display =
+      modo === "chat" || modo === "ambos" ? "block" : "none";
+  }
 }
+
+/* ================= AÇÕES ================= */
 
 window.selecionarModo = modo => {
   localStorage.setItem("modo_atendimento", modo);
@@ -47,15 +74,23 @@ window.resetarIntro = () => {
   mostrarIntro();
 };
 
+/* ================= INIT ================= */
+
 document.addEventListener("DOMContentLoaded", () => {
   const modo = localStorage.getItem("modo_atendimento");
-  modo ? mostrarApp(modo) : mostrarIntro();
+
+  if (modo === "voz" || modo === "chat" || modo === "ambos") {
+    mostrarApp(modo);
+  } else {
+    mostrarIntro();
+  }
 });
 
 /* ================= DARK MODE (INTRO) ================= */
 
 (function aplicarTemaIntro() {
   const tema = localStorage.getItem("tema_caderno") || "light";
+
   if (tema === "dark") {
     document.body.classList.add("dark");
   } else {
