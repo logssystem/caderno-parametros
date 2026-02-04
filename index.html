@@ -49,49 +49,85 @@
     </div>
   </section>
 
-  <!-- ================= VOZ ================= -->
   <section id="voz-area" style="display:none">
 
-      <section id="voz-area" style="display:none">
-  
-    <section class="card">
-      <h2>Usuários Web</h2>
-      <div id="listaUsuariosWeb"></div>
+  <!-- ================= USUÁRIOS WEB ================= -->
+  <section class="card">
+    <h2>Usuários Web</h2>
+    <div class="acoes-card">
       <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
-    </section>
-  
-    <section class="card">
-      <h2>Ramais</h2>
-      <div id="listaRings"></div>
-      <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
-    </section>
-  
-    <section class="card">
-      <h2>URAs</h2>
-      <div id="listaURAs"></div>
-      <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
-    </section>
-  
-    <section class="card">
-      <h2>Filas</h2>
-      <div id="listaFilas"></div>
-      <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
-    </section>
-  
-    <section class="card">
-      <h2>Grupo de Ring</h2>
-      <div id="listaGrupoRing"></div>
-      <button class="btn-add" onclick="adicionarCampo('grupo_ring')">+</button>
-    </section>
-  
-    <section class="card">
-      <h2>Agentes</h2>
-      <div id="listaAgentes"></div>
-      <button class="btn-add" onclick="adicionarCampo('agente')">+</button>
-    </section>
-  
+      <button class="btn-import" onclick="acionarImportacao('usuario_web')">📥 Importar</button>
+      <button class="btn-import" onclick="baixarTemplateUsuarios()">📥 Baixar template CSV</button>
+      <input type="file" id="importUsuarios" accept=".csv" hidden>
+    </div>
+    <div id="listaUsuariosWeb"></div>
   </section>
 
+  <!-- ================= REGRAS DE TEMPO ================= -->
+  <section class="card">
+    <h2>Regras de Tempo (Horário de Funcionamento)</h2>
+    <div class="acoes-card">
+      <button class="btn-add" onclick="adicionarRegraTempo()">+ Nova regra</button>
+    </div>
+    <div id="listaRegrasTempo"></div>
+  </section>
+
+  <!-- ================= RAMAIS ================= -->
+  <section class="card">
+    <h2>Ramais (Range)</h2>
+    <div class="acoes-card">
+      <input id="ramalInicio" type="number" placeholder="Ramal inicial">
+      <input id="ramalFim" type="number" placeholder="Ramal final">
+      <button class="btn-add" onclick="criarRangeRamais()">Criar range</button>
+    </div>
+
+    <div class="acoes-card">
+      <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
+      <button class="btn-import" onclick="acionarImportacao('ring')">📥 Importar</button>
+      <input type="file" id="importRamais" accept=".csv" hidden>
+    </div>
+
+    <div id="listaRings"></div>
+  </section>
+
+  <!-- ================= ENTRADAS ================= -->
+  <section class="card">
+    <h2>Números de Entrada</h2>
+    <div id="listaEntradas"></div>
+    <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
+  </section>
+
+  <!-- ================= URAs ================= -->
+  <section class="card">
+    <h2>URAs</h2>
+    <div id="listaURAs"></div>
+    <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
+  </section>
+
+  <!-- ================= FILAS ================= -->
+  <section class="card">
+    <h2>Filas</h2>
+    <div id="listaFilas"></div>
+    <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
+  </section>
+
+  <!-- ================= GRUPO DE RING ================= -->
+  <section class="card">
+    <h2>Grupo de Ring</h2>
+    <div id="listaGrupoRing"></div>
+    <button class="btn-add" onclick="adicionarCampo('grupo_ring')">+</button>
+  </section>
+
+  <!-- ================= AGENTES ================= -->
+  <section class="card">
+    <h2>Agentes</h2>
+    <div id="listaAgentes"></div>
+    <button class="btn-add" onclick="adicionarCampo('agente')">
+      🔄 Atualizar agentes a partir dos usuários
+    </button>
+  </section>
+
+</section>
 
   <!-- ================= CHAT ================= -->
   <section id="chat-area" style="display:none">
@@ -235,5 +271,6 @@
 
 </body>
 </html>
+
 
 
