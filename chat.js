@@ -15,17 +15,36 @@ function atualizarSelectDepartamentosChat(select) {
   select.value = atual;
 }
 
+function atualizarSelectAgentesDepartamentoChat() {
+  document
+    .querySelectorAll("#listaDepartamentosChat .campo-descricao select")
+    .forEach(select => {
+      const atual = select.value;
+      select.innerHTML = `<option value="">Selecione um agente</option>`;
+
+      document
+        .querySelectorAll("#listaUsuariosChat .campo-descricao")
+        .forEach(u => {
+          const data = u.getData?.();
+          const isAgente =
+            data?.agente === true ||
+            data?.permissoes?.includes("Agente Omnichannel");
+
+          if (isAgente && data.nome) {
+            select.add(new Option(data.nome, data.nome));
+          }
+        });
+
+      select.value = atual;
+    });
+}
+
 window.adicionarDepartamentoChat = function () {
   const lista = document.getElementById("listaDepartamentosChat");
   if (!lista) return;
 
   lista.appendChild(criarDepartamentoChat());
   atualizarSelectAgentesDepartamentoChat();
-};
-
-  document
-    .querySelectorAll("#listaUsuariosChat select, #listaAgentesChat select")
-    .forEach(s => atualizarSelectDepartamentosChat(s));
 };
 
 function criarDepartamentoChat() {
@@ -44,8 +63,6 @@ function criarDepartamentoChat() {
 
   linhaTopo.append(nome, del);
   wrap.append(linhaTopo);
-
-  /* ===== AGENTES DO DEPARTAMENTO ===== */
 
   const titulo = document.createElement("h4");
   titulo.textContent = "Agentes do departamento";
@@ -104,31 +121,6 @@ function criarDepartamentoChat() {
   return wrap;
 }
 
-function atualizarSelectAgentesDepartamentoChat() {
-  document
-    .querySelectorAll("#listaDepartamentosChat .campo-descricao select")
-    .forEach(select => {
-      const atual = select.value;
-      select.innerHTML = `<option value="">Selecione um agente</option>`;
-
-      document
-        .querySelectorAll("#listaUsuariosChat .campo-descricao")
-        .forEach(u => {
-          const data = u.getData?.();
-          const isAgente =
-            data?.agente === true ||
-            data?.permissoes?.includes("Agente Omnichannel");
-
-          if (isAgente && data.nome) {
-            select.add(new Option(data.nome, data.nome));
-          }
-        });
-
-      select.value = atual;
-    });
-}
-
-
 /* ================= USUÁRIOS CHAT ================= */
 
 window.adicionarUsuarioChat = function () {
@@ -158,7 +150,6 @@ function criarUsuarioChat() {
 
   const permissoes = document.createElement("select");
   permissoes.multiple = true;
-
   ["Agente Omnichannel","Supervisor Omnichannel","Administrador Omnichannel"]
     .forEach(p => permissoes.add(new Option(p, p)));
 
@@ -172,9 +163,9 @@ function criarUsuarioChat() {
   atualizarSelectDepartamentosChat(departamento);
 
   chkAgente.onchange = () => {
-  gerarAgentesChatAPartirUsuarios?.();
-  atualizarSelectAgentesDepartamentoChat();
-};
+    gerarAgentesChatAPartirUsuarios();
+    atualizarSelectAgentesDepartamentoChat();
+  };
 
   const del = document.createElement("button");
   del.textContent = "✖";
@@ -239,35 +230,22 @@ function gerarAgentesChatAPartirUsuarios() {
   });
 }
 
+/* ================= SENHA ================= */
+
 function validarSenha(input, regrasEl) {
   const v = input.value;
 
-  const temTamanho = v.length >= 11;
-  const temMaiuscula = /[A-Z]/.test(v);
-  const temMinuscula = /[a-z]/.test(v);
-  const temNumero = /\d/.test(v);
-  const temEspecial = /[^A-Za-z0-9]/.test(v);
-
   const ok =
-    temTamanho &&
-    temMaiuscula &&
-    temMinuscula &&
-    temNumero &&
-    temEspecial;
+    v.length >= 11 &&
+    /[A-Z]/.test(v) &&
+    /[a-z]/.test(v) &&
+    /\d/.test(v) &&
+    /[^A-Za-z0-9]/.test(v);
 
-  if (regrasEl) {
-    regrasEl.innerHTML = ok
-      ? `<div class="regra-ok">Senha válida</div>`
-      : `<div class="regra-erro">
-          Mín. 11 caracteres<br>
-          1 letra maiúscula<br>
-          1 letra minúscula<br>
-          1 número<br>
-          1 caractere especial
-        </div>`;
-  }
+  regrasEl.innerHTML = ok
+    ? `<div class="regra-ok">Senha válida</div>`
+    : `<div class="regra-erro">Senha inválida</div>`;
 
   input.classList.toggle("campo-obrigatorio-erro", !ok);
-
   return ok;
 }
