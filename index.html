@@ -51,9 +51,47 @@
 
   <!-- ================= VOZ ================= -->
   <section id="voz-area" style="display:none">
-    <!-- (VOZ permanece exatamente como você já tem) -->
-    <!-- Usuários Web, Ramais, URA, Filas, Grupo Ring, Agentes -->
+
+      <section id="voz-area" style="display:none">
+  
+    <section class="card">
+      <h2>Usuários Web</h2>
+      <div id="listaUsuariosWeb"></div>
+      <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
+    </section>
+  
+    <section class="card">
+      <h2>Ramais</h2>
+      <div id="listaRings"></div>
+      <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
+    </section>
+  
+    <section class="card">
+      <h2>URAs</h2>
+      <div id="listaURAs"></div>
+      <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
+    </section>
+  
+    <section class="card">
+      <h2>Filas</h2>
+      <div id="listaFilas"></div>
+      <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
+    </section>
+  
+    <section class="card">
+      <h2>Grupo de Ring</h2>
+      <div id="listaGrupoRing"></div>
+      <button class="btn-add" onclick="adicionarCampo('grupo_ring')">+</button>
+    </section>
+  
+    <section class="card">
+      <h2>Agentes</h2>
+      <div id="listaAgentes"></div>
+      <button class="btn-add" onclick="adicionarCampo('agente')">+</button>
+    </section>
+  
   </section>
+
 
   <!-- ================= CHAT ================= -->
   <section id="chat-area" style="display:none">
@@ -197,4 +235,5 @@
 
 </body>
 </html>
+
 
