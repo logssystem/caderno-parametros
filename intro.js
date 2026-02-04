@@ -97,3 +97,17 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.remove("dark");
   }
 })();
+
+document.addEventListener("DOMContentLoaded", () => {
+  const modo = localStorage.getItem("modo_atendimento");
+
+  // 🔒 MODO INVÁLIDO → volta pro intro
+  if (!["voz", "chat", "ambos"].includes(modo)) {
+    localStorage.removeItem("modo_atendimento");
+    mostrarIntro();
+    return;
+  }
+
+  // ✅ modo válido
+  mostrarApp(modo);
+});
