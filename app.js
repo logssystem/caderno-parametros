@@ -753,7 +753,7 @@ window.explorar = function () {
       if (r.getData) regras_tempo.push(r.getData());
     });
     
-    /* ================= CHAT ================= */
+/* ================= CHAT ================= */
 
 const usuariosChat = [];
 document
@@ -771,11 +771,11 @@ document
     const data = d.getData?.();
     if (!data || !data.nome) return;
 
-    data.agentes.forEach(a => agentesVinculados.add(a));
+    (data.agentes || []).forEach(a => agentesVinculados.add(a));
 
     departamentosChat.push({
       nome: data.nome,
-      agentes: data.agentes
+      agentes: data.agentes || []
     });
   });
 
@@ -788,7 +788,7 @@ usuariosChat.forEach(u => {
 
   if (isAgente && !agentesVinculados.has(u.nome)) {
     mostrarToast(
-      `Agente "${u.nome}" não está vinculado a nenhum departamento`,
+      `O agente "${u.nome}" não está vinculado a nenhum departamento`,
       true
     );
     throw new Error("Agente omnichannel sem departamento");
