@@ -965,3 +965,22 @@ window.selecionarApi = window.selecionarApi;
 window.selecionarConta = window.selecionarConta;
 window.toggleCanal = window.toggleCanal;
 window.informarAgenteChat = window.informarAgenteChat;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const blocoAgentesChat = document.querySelector("#listaAgentesChat")?.parentElement;
+  if (!blocoAgentesChat) return;
+
+  // evita duplicar
+  if (blocoAgentesChat.querySelector(".info-agente-chat")) return;
+
+  const info = document.createElement("div");
+  info.className = "info-agente-chat";
+  info.style.marginTop = "8px";
+  info.style.fontSize = "13px";
+  info.style.color = "#666";
+
+  info.textContent =
+    "ℹ️ Os agentes omnichannel são gerados automaticamente a partir dos usuários marcados como agente.";
+
+  blocoAgentesChat.insertBefore(info, blocoAgentesChat.children[1]);
+});
