@@ -909,6 +909,14 @@ window.toggleCanal = function (el) {
   console.log("Canais ativos:", window.chatState.canais);
 };
 
+// ================= CHAT – INFO AGENTE =================
+window.informarAgenteChat = function () {
+  mostrarToast(
+    "Os agentes omnichannel são gerados automaticamente a partir dos usuários marcados como agente.",
+    true
+  );
+};
+
 // ================= SALVAR CONFIGURAÇÃO =================
 window.salvarConfiguracao = function () {
   // gera o JSON
