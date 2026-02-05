@@ -28,8 +28,11 @@ const PERMISSOES = [
 
 /* ================= DOMÍNIO ================= */
 
-const dominioInput = document.getElementById("dominioCliente");
-const regraDominio = document.getElementById("regraDominio");
+const blocoConta = document.getElementById("bloco-conta-api");
+if (blocoConta) blocoConta.style.display = "none";
+
+const canais = document.getElementById("chat-canais");
+if (canais) canais.style.display = "none";
 
 window.validarDominioCliente = function () {
   if (!dominioInput) return true;
