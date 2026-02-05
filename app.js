@@ -346,9 +346,18 @@ function criarCampo(tipo) {
         }
     }
 
-    function validarSenha(input, regrasEl) {
-        const v = input.value;
-        const ok = v.length >= 11 && /[A-Z]/.test(v) && /\d/.test(v) && /[^A-Za-z0-9]/.test(v);
+        function validarSenha(input, regrasEl) {
+        if (!regrasEl) return;
+    
+        const v = input.value || "";
+    
+        const temMin = v.length >= 11;
+        const temMaiuscula = /[A-Z]/.test(v);
+        const temNumero = /\d/.test(v);
+        const temEspecial = /[^A-Za-z0-9]/.test(v);
+    
+        const ok = temMin && temMaiuscula && temNumero && temEspecial;
+    
         regrasEl.innerHTML = ok
             ? `<div class="regra-ok">Senha válida</div>`
             : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
