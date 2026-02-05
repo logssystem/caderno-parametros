@@ -60,4 +60,161 @@ function mostrarToast(msg, error = false) {
   if (!t || !m) return;
 
   m.textContent = msg;
-  t.className =
+  t.className = "toast show" + (error ? " error" : "");
+  setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+/* ================= CHAT – INFO AGENTE ================= */
+
+window.informarAgenteChat = function () {
+  mostrarToast(
+    "Os agentes omnichannel são gerados automaticamente a partir dos usuários marcados como agente.",
+    true
+  );
+};
+
+// ponte para HTML antigo
+window.adicionarAgenteChat = function () {
+  informarAgenteChat();
+};
+
+/* ================= SALVAR ================= */
+
+window.salvarConfiguracao = function () {
+  explorar();
+
+  const resultadoEl = document.getElementById("resultado");
+  const resultado = resultadoEl ? resultadoEl.textContent : "";
+
+  if (!resultado.trim()) {
+    mostrarToast("Gere a configuração antes de salvar", true);
+    return;
+  }
+
+  localStorage.setItem("CONFIG_CADERNO", resultado);
+  window.location.href = "resumo.html";
+};
+
+/* ================= EXPLORAR ================= */
+
+window.explorar = function () {
+  try {
+    const empresaEl = document.getElementById("empresaCliente");
+    const dominioEl = document.getElementById("dominioCliente");
+
+    const empresa = empresaEl ? empresaEl.value.trim() : "";
+    const dominio = dominioEl ? dominioEl.value.trim() : "";
+
+    if (!empresa || !dominio) {
+      mostrarToast("Preencha o nome da empresa e o domínio", true);
+      return;
+    }
+
+    if (!validarDominioCliente()) return;
+
+    /* ===== VOZ ===== */
+
+    const usuarios = [];
+    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+      usuarios.push({
+        nome: u.getNome(),
+        email: u.getEmail(),
+        senha: u.getSenha(),
+        permissao: u.getPermissao(),
+        agente: u.isAgente()
+      });
+    });
+
+    const ramais = [];
+    document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+      ramais.push({
+        ramal: r.getNome(),
+        senha: r.getSenha()
+      });
+    });
+
+    const agentes = [];
+    document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+      const nomeEl = a.querySelector(".campo-nome");
+      agentes.push({
+        nome: nomeEl ? nomeEl.value : "",
+        ramal: a.getRamal()
+      });
+    });
+
+    if (agentes.some(a => !a.ramal)) {
+      mostrarToast("Existe agente sem ramal vinculado", true);
+      return;
+    }
+
+    const filas = [];
+    document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
+      const nomeEl = f.querySelector(".campo-nome");
+      filas.push({
+        nome: nomeEl ? nomeEl.value : "",
+        agentes: JSON.parse(f.dataset.agentes || "[]")
+      });
+    });
+
+    const regras_tempo = [];
+    document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
+      if (r.getData) regras_tempo.push(r.getData());
+    });
+
+    /* ===== CHAT ===== */
+
+    const usuariosChat = [];
+    document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
+      if (u.getData) usuariosChat.push(u.getData());
+    });
+
+    const departamentosChat = [];
+    const agentesVinculados = new Set();
+
+    document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
+      const data = d.getData ? d.getData() : null;
+      if (!data || !data.nome) return;
+
+      (data.agentes || []).forEach(a => agentesVinculados.add(a));
+
+      departamentosChat.push({
+        nome: data.nome,
+        agentes: data.agentes || []
+      });
+    });
+
+    usuariosChat.forEach(u => {
+      const isAgente =
+        u.agente === true ||
+        (Array.isArray(u.permissoes) && u.permissoes.includes("Agente Omnichannel"));
+
+      if (isAgente && !agentesVinculados.has(u.nome)) {
+        mostrarToast(`O agente "${u.nome}" não está em nenhum departamento`, true);
+        throw new Error("Agente chat sem departamento");
+      }
+    });
+
+    /* ===== JSON FINAL ===== */
+
+    const dados = {
+      cliente: { empresa, dominio },
+      voz: { usuarios, ramais, agentes, filas, regras_tempo },
+      chat: {
+        ...(window.chatState ? window.chatState : {}),
+        usuarios: usuariosChat,
+        departamentos: departamentosChat
+      }
+    };
+
+    const resultadoBox = document.getElementById("resultado");
+    if (resultadoBox) {
+      resultadoBox.textContent = JSON.stringify(dados, null, 2);
+    }
+
+    mostrarToast("JSON gerado com sucesso!");
+
+  } catch (e) {
+    console.error(e);
+    mostrarToast("Erro ao gerar JSON", true);
+  }
+};
