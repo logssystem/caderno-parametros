@@ -218,3 +218,68 @@ window.explorar = function () {
     mostrarToast("Erro ao gerar JSON", true);
   }
 };
+
+/* ================= CHAT – SELEÇÃO ================= */
+
+// garante estado global
+window.chatState = window.chatState || {};
+
+window.selecionarTipoChat = function (el, tipo) {
+  window.chatState.tipo = tipo;
+
+  document
+    .querySelectorAll(".tipo-chat .chat-card")
+    .forEach(c => c.classList.remove("active"));
+
+  if (el) el.classList.add("active");
+
+  const apiBox = document.getElementById("api-oficial");
+  const qrBox = document.getElementById("chat-qr");
+
+  if (apiBox) apiBox.style.display = tipo === "api" ? "block" : "none";
+  if (qrBox) qrBox.style.display = tipo === "qr" ? "block" : "none";
+};
+
+window.selecionarApi = function (el, api) {
+  window.chatState.api = api;
+
+  document
+    .querySelectorAll("#api-oficial .chat-card")
+    .forEach(c => c.classList.remove("active"));
+
+  if (el) el.classList.add("active");
+
+  const conta = document.getElementById("bloco-conta-api");
+  if (conta) conta.style.display = "block";
+};
+
+window.selecionarConta = function (el, conta) {
+  window.chatState.conta = conta;
+
+  document
+    .querySelectorAll("#bloco-conta-api .chat-card")
+    .forEach(c => c.classList.remove("active"));
+
+  if (el) el.classList.add("active");
+
+  const canais = document.getElementById("chat-canais");
+  if (canais) canais.style.display = "block";
+};
+
+window.toggleCanal = function (el) {
+  const canal = el.dataset.canal;
+  if (!canal) return;
+
+  window.chatState.canais = window.chatState.canais || [];
+
+  el.classList.toggle("active");
+
+  if (el.classList.contains("active")) {
+    if (!window.chatState.canais.includes(canal)) {
+      window.chatState.canais.push(canal);
+    }
+  } else {
+    window.chatState.canais =
+      window.chatState.canais.filter(c => c !== canal);
+  }
+};
