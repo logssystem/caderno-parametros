@@ -141,12 +141,17 @@ function criarUsuarioChat() {
   email.type = "email";
   email.placeholder = "E-mail";
 
-  const senha = document.createElement("input");
-  senha.placeholder = "Senha";
-  senha.classList.add("campo-senha");
+ const senha = document.createElement("input");
+senha.placeholder = "Senha";
+senha.classList.add("campo-senha");
 
-  const regras = document.createElement("div");
-  senha.oninput = () => validarSenha(senha, regras);
+const regras = document.createElement("div");
+
+// 👉 mostra o aviso já na criação (igual PABX)
+validarSenha(senha, regras);
+
+// 👉 continua validando enquanto digita
+senha.oninput = () => validarSenha(senha, regras);
 
   const permissoes = document.createElement("select");
   permissoes.multiple = true;
