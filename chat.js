@@ -238,7 +238,15 @@ function gerarAgentesChatAPartirUsuarios() {
 /* ================= SENHA ================= */
 
 function validarSenha(input, regrasEl) {
-  const v = input.value;
+  const v = input.value || "";
+
+  // 👉 campo vazio = neutro (NÃO mostra erro)
+  if (!v.length) {
+    regrasEl.innerHTML =
+      `<div class="regra-neutra">Mín. 11 | Maiúscula | Número | Especial</div>`;
+    input.classList.remove("campo-obrigatorio-erro");
+    return false;
+  }
 
   const ok =
     v.length >= 11 &&
@@ -249,7 +257,7 @@ function validarSenha(input, regrasEl) {
 
   regrasEl.innerHTML = ok
     ? `<div class="regra-ok">Senha válida</div>`
-    : `<div class="regra-erro">Senha inválida</div>`;
+    : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
 
   input.classList.toggle("campo-obrigatorio-erro", !ok);
   return ok;
