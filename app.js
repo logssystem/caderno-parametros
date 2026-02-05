@@ -950,3 +950,18 @@ function atualizarModuloChat() {
 
     moduloChat.style.display = temChat ? "block" : "none";
 }
+
+/* ================= EXPOSIÇÃO GLOBAL (HTML) ================= */
+
+window.adicionarCampo = window.adicionarCampo;
+window.adicionarRegraTempo = window.adicionarRegraTempo;
+window.criarRangeRamais = window.criarRangeRamais;
+window.explorar = window.explorar;
+window.salvarConfiguracao = window.salvarConfiguracao;
+
+/* CHAT */
+window.selecionarTipoChat = window.selecionarTipoChat;
+window.selecionarApi = window.selecionarApi;
+window.selecionarConta = window.selecionarConta;
+window.toggleCanal = window.toggleCanal;
+window.informarAgenteChat = window.informarAgenteChat;
