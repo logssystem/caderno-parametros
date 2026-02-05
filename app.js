@@ -704,7 +704,8 @@ window.explorar = function () {
             return;
         }
 
-        /* ================= USUÁRIOS VOZ ================= */
+        /* ================= VOZ ================= */
+
         const usuarios = [];
         document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
             usuarios.push({
@@ -716,7 +717,6 @@ window.explorar = function () {
             });
         });
 
-        /* ================= RAMAIS ================= */
         const ramais = [];
         document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
             ramais.push({
@@ -725,7 +725,6 @@ window.explorar = function () {
             });
         });
 
-        /* ================= AGENTES (VOZ) ================= */
         const agentes = [];
         document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
             agentes.push({
@@ -734,89 +733,92 @@ window.explorar = function () {
             });
         });
 
-        /* ================= VALIDAÇÃO VOZ (RAMAL OBRIGATÓRIO) ================= */
         const agentesSemRamal = agentes.filter(a => !a.ramal);
         if (agentesSemRamal.length) {
             mostrarToast("Existe agente sem ramal vinculado", true);
             return;
         }
 
-        /* ================= FILAS ================= */
         const filas = [];
         document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
-            const nome = f.querySelector(".campo-nome")?.value || "";
-            const agentesFila = JSON.parse(f.dataset.agentes || "[]");
-            filas.push({ nome, agentes: agentesFila });
+            filas.push({
+                nome: f.querySelector(".campo-nome")?.value || "",
+                agentes: JSON.parse(f.dataset.agentes || "[]")
+            });
         });
 
-        /* ================= REGRAS DE TEMPO ================= */
         const regras_tempo = [];
         document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
             if (r.getData) regras_tempo.push(r.getData());
         });
 
-        /* ================= CHAT ================= */
+        /* ================= CHAT (ISOLADO E SEGURO) ================= */
 
-        const usuariosChat = [];
-        document
-            .querySelectorAll("#listaUsuariosChat .campo-descricao")
-            .forEach(u => {
-                if (u.getData) usuariosChat.push(u.getData());
-            });
+        let usuariosChat = [];
+        let departamentosChat = [];
 
-        const departamentosChat = [];
-        const agentesVinculados = new Set();
-
-        document
-            .querySelectorAll("#listaDepartamentosChat .campo-descricao")
-            .forEach(d => {
-                const data = d.getData?.();
-                if (!data || !data.nome) return;
-
-                (data.agentes || []).forEach(a => agentesVinculados.add(a));
-
-                departamentosChat.push({
-                    nome: data.nome,
-                    agentes: data.agentes || []
+        if (document.getElementById("listaUsuariosChat")) {
+            document
+                .querySelectorAll("#listaUsuariosChat .campo-descricao")
+                .forEach(u => {
+                    if (u.getData) usuariosChat.push(u.getData());
                 });
+        }
+
+        if (document.getElementById("listaDepartamentosChat")) {
+            const agentesVinculados = new Set();
+
+            document
+                .querySelectorAll("#listaDepartamentosChat .campo-descricao")
+                .forEach(d => {
+                    const data = d.getData?.();
+                    if (!data || !data.nome) return;
+
+                    (data.agentes || []).forEach(a => agentesVinculados.add(a));
+
+                    departamentosChat.push({
+                        nome: data.nome,
+                        agentes: data.agentes || []
+                    });
+                });
+
+            // valida SOMENTE se chat existir
+            usuariosChat.forEach(u => {
+                const isAgente =
+                    u.agente === true ||
+                    u.permissoes?.includes("Agente Omnichannel");
+
+                if (isAgente && !agentesVinculados.has(u.nome)) {
+                    mostrarToast(
+                        `O agente "${u.nome}" não está vinculado a nenhum departamento`,
+                        true
+                    );
+                    return;
+                }
             });
-
-        /* ================= VALIDAÇÃO ================= */
-
-        usuariosChat.forEach(u => {
-            const isAgente =
-                u.agente === true ||
-                u.permissoes?.includes("Agente Omnichannel");
-
-            if (isAgente && !agentesVinculados.has(u.nome)) {
-                mostrarToast(
-                    `O agente "${u.nome}" não está vinculado a nenhum departamento`,
-                    true
-                );
-                throw new Error("Agente omnichannel sem departamento");
-            }
-        });
+        }
 
         /* ================= JSON FINAL ================= */
+
         const dados = {
-            cliente: {
-                empresa,
-                dominio
-            },
+            cliente: { empresa, dominio },
             voz: {
                 usuarios,
                 ramais,
                 agentes,
                 filas,
                 regras_tempo
-            },
-            chat: {
-                ...(window.chatState || {}),
-                departamentos: departamentosChat,
-                usuarios: usuariosChat,
-                agentes: agentesChat
             }
         };
+
+        // só inclui chat se existir
+        if (usuariosChat.length || departamentosChat.length || window.chatState) {
+            dados.chat = {
+                ...(window.chatState || {}),
+                usuarios: usuariosChat,
+                departamentos: departamentosChat
+            };
+        }
 
         document.getElementById("resultado").textContent =
             JSON.stringify(dados, null, 2);
