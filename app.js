@@ -28,11 +28,8 @@ const PERMISSOES = [
 
 /* ================= DOMÍNIO ================= */
 
-const blocoConta = document.getElementById("bloco-conta-api");
-if (blocoConta) blocoConta.style.display = "none";
-
-const canais = document.getElementById("chat-canais");
-if (canais) canais.style.display = "none";
+const dominioInput = document.getElementById("dominioCliente");
+const regraDominio = document.getElementById("regraDominio");
 
 window.validarDominioCliente = function () {
   if (!dominioInput) return true;
@@ -74,6 +71,7 @@ window.informarAgenteChat = function () {
   );
 };
 
+// ponte para não quebrar HTML antigo
 window.adicionarAgenteChat = function () {
   informarAgenteChat();
 };
@@ -180,4 +178,29 @@ window.explorar = function () {
 
       if (isAgente && !agentesVinculados.has(u.nome)) {
         mostrarToast(`O agente "${u.nome}" não está em nenhum departamento`, true);
-        throw new Error("Agente chat sem depar
+        throw new Error("Agente chat sem departamento");
+      }
+    });
+
+    /* ===== JSON FINAL ===== */
+
+    const dados = {
+      cliente: { empresa, dominio },
+      voz: { usuarios, ramais, agentes, filas, regras_tempo },
+      chat: {
+        ...(window.chatState || {}),
+        usuarios: usuariosChat,
+        departamentos: departamentosChat
+      }
+    };
+
+    document.getElementById("resultado").textContent =
+      JSON.stringify(dados, null, 2);
+
+    mostrarToast("JSON gerado com sucesso!");
+
+  } catch (e) {
+    console.error(e);
+    mostrarToast("Erro ao gerar JSON", true);
+  }
+};
