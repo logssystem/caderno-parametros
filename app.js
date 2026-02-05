@@ -71,7 +71,6 @@ window.informarAgenteChat = function () {
   );
 };
 
-// ponte para não quebrar HTML antigo
 window.adicionarAgenteChat = function () {
   informarAgenteChat();
 };
@@ -178,29 +177,4 @@ window.explorar = function () {
 
       if (isAgente && !agentesVinculados.has(u.nome)) {
         mostrarToast(`O agente "${u.nome}" não está em nenhum departamento`, true);
-        throw new Error("Agente chat sem departamento");
-      }
-    });
-
-    /* ===== JSON FINAL ===== */
-
-    const dados = {
-      cliente: { empresa, dominio },
-      voz: { usuarios, ramais, agentes, filas, regras_tempo },
-      chat: {
-        ...(window.chatState || {}),
-        usuarios: usuariosChat,
-        departamentos: departamentosChat
-      }
-    };
-
-    document.getElementById("resultado").textContent =
-      JSON.stringify(dados, null, 2);
-
-    mostrarToast("JSON gerado com sucesso!");
-
-  } catch (e) {
-    console.error(e);
-    mostrarToast("Erro ao gerar JSON", true);
-  }
-};
+        throw new Error("Agente chat sem depar
