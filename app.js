@@ -794,27 +794,6 @@ usuariosChat.forEach(u => {
     throw new Error("Agente omnichannel sem departamento");
   }
 });
-    
-    /* ================= CHAT (SEM VALIDAÇÃO) ================= */
-      const departamentosChat = [];
-  document.querySelectorAll("#listaDepartamentosChat .campo-descricao")
-    .forEach(d => {
-      if (d.getData) departamentosChat.push(d.getData());
-    });
-
-    const usuariosChat = [];
-    document
-      .querySelectorAll("#listaUsuariosChat .campo-descricao")
-      .forEach(u => {
-        if (u.getData) usuariosChat.push(u.getData());
-      });
-
-    const agentesChat = [];
-    document
-      .querySelectorAll("#listaAgentesChat .campo-descricao")
-      .forEach(a => {
-        if (a.getData) agentesChat.push(a.getData());
-      });
 
     /* ================= JSON FINAL ================= */
     const dados = {
