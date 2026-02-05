@@ -1,8 +1,6 @@
-console.log("APP.JS FINAL – PABX ESTÁVEL + CHAT ACOPLADO");
+console.log("APP.JS FINAL – CONSOLIDADO DEFINITIVO (URA + REGRA DE TEMPO + FILA + GRUPO RING + AGENTES)");
 
-/* =====================================================
-   CONFIG GERAL
-===================================================== */
+/* ================= CONFIG ================= */
 
 const LIMITE = 600;
 
@@ -28,71 +26,149 @@ const PERMISSOES = [
   "Super Administrador"
 ];
 
-/* =====================================================
-   TOAST
-===================================================== */
+/* ================= DADOS DO CLIENTE ================= */
 
-function mostrarToast(msg, error) {
-  const t = document.getElementById("toastGlobal");
-  const m = document.getElementById("toastMessage");
-  if (!t || !m) return;
+const dominioInput = document.getElementById("dominioCliente");
+const regraDominio = document.getElementById("regraDominio");
 
-  m.textContent = msg;
-  t.className = "toast show" + (error ? " error" : "");
-  setTimeout(function () {
-    t.classList.remove("show");
-  }, 3000);
-}
+window.validarDominioCliente = function () {
+  if (!dominioInput) return true;
 
-/* =====================================================
-   ===================== PABX ==========================
-   (TUDO AQUI É SEU CÓDIGO ORIGINAL)
-===================================================== */
+  const v = dominioInput.value.trim().toLowerCase();
+  const ok = v.endsWith(".sobreip.com.br") && v.length > ".sobreip.com.br".length;
 
-/* ---------- ADICIONAR CAMPO ---------- */
+  dominioInput.classList.toggle("campo-obrigatorio-erro", !ok);
 
-window.adicionarCampo = function (tipo) {
-  if (!listas[tipo]) return mostrarToast("Tipo inválido", true);
-  const container = document.getElementById(listas[tipo]);
-  if (!container || container.children.length >= LIMITE) return;
-  container.appendChild(criarCampo(tipo));
-  atualizarTodosDestinosURA();
+  if (regraDominio) {
+    regraDominio.innerHTML = ok
+      ? '<div class="regra-ok">Domínio válido</div>'
+      : '<div class="regra-erro">Deve terminar com .sobreip.com.br</div>';
+  }
+
+  return ok;
 };
 
-/* ---------- CRIAR CAMPO ---------- */
+if (dominioInput) {
+  dominioInput.addEventListener("input", window.validarDominioCliente);
+}
+
+/* ================= ADICIONAR CAMPO ================= */
+
+window.adicionarCampo = function (tipo) {
+  if (tipo === "agente") {
+    gerarAgentesAPartirUsuarios();
+    atualizarSelectAgentesFila();
+    mostrarToast("Agentes atualizados a partir dos usuários");
+    return;
+  }
+
+  if (!listas[tipo]) {
+    mostrarToast(`Tipo inválido: ${tipo}`, true);
+    return;
+  }
+
+  const container = document.getElementById(listas[tipo]);
+  if (!container || container.children.length >= LIMITE) return;
+
+  container.appendChild(criarCampo(tipo));
+  atualizarTodosDestinosURA();
+  syncTudo();
+};
+
+/* ================= DESTINOS URA ================= */
+
+function atualizarDestinosURA(select) {
+  if (!select) return;
+
+  select.innerHTML = "";
+  select.add(new Option("Selecione o destino", ""));
+
+  const grupos = [
+    { id: "listaRings", label: "📞 Ramal", tipo: "ramal" },
+    { id: "listaFilas", label: "👥 Fila", tipo: "fila" },
+    { id: "listaGrupoRing", label: "🔔 Grupo de Ring", tipo: "grupo_ring" },
+    { id: "listaURAs", label: "☎ URA", tipo: "ura" },
+    { id: "listaRegrasTempo", label: "⏰ Regra de Tempo", tipo: "regra_tempo" }
+  ];
+
+  grupos.forEach(g => {
+    const optgroup = document.createElement("optgroup");
+    optgroup.label = g.label;
+
+    document.querySelectorAll(`#${g.id} .campo-nome`).forEach(i => {
+      if (i.value) {
+        const opt = new Option(i.value, i.value);
+        opt.dataset.tipo = g.tipo;
+        optgroup.appendChild(opt);
+      }
+    });
+
+    if (optgroup.children.length) {
+      select.appendChild(optgroup);
+    }
+  });
+}
+
+function atualizarTodosDestinosURA() {
+  document.querySelectorAll(".opcao-ura select").forEach(select => {
+    const atual = select.value;
+    atualizarDestinosURA(select);
+    select.value = atual;
+  });
+}
+
+/* ================= CRIAR CAMPO ================= */
 
 function criarCampo(tipo) {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  const linha = document.createElement("div");
-  linha.className = "linha-principal";
+  const linhaNome = document.createElement("div");
+  linhaNome.className = "linha-principal";
 
   const nome = document.createElement("input");
   nome.className = "campo-nome";
-  nome.placeholder = "Digite " + tipo.replace("_", " ");
-  nome.oninput = atualizarTodosDestinosURA;
+  nome.style.width = "100%";
 
-  const del = document.createElement("button");
-  del.textContent = "✖";
-  del.onclick = function () {
-    wrap.remove();
-    atualizarTodosDestinosURA();
+  const placeholders = {
+    usuario_web: "Digite o nome do usuário",
+    ura: "Digite o nome da sua URA",
+    entrada: "Digite o número de entrada",
+    fila: "Digite o nome da sua fila",
+    ring: "Digite o número do ramal",
+    grupo_ring: "Digite o nome do grupo de ring",
+    agente: "Digite o nome do agente"
   };
 
-  linha.append(nome, del);
-  wrap.append(linha);
+  nome.placeholder = placeholders[tipo] || "Digite o nome";
+  nome.addEventListener("input", atualizarTodosDestinosURA);
 
-  let email, senha, permissao, chkAgente, regras;
+  const btn = document.createElement("button");
+  btn.textContent = "✖";
+  btn.onclick = function () {
+    wrap.remove();
+    atualizarTodosDestinosURA();
+    syncTudo();
+  };
 
+  linhaNome.append(nome, btn);
+  wrap.append(linhaNome);
+
+  let emailInput = null;
+  let senhaInput = null;
+  let permissao = null;
+  let regras = null;
+  let chkAgente = null;
+
+  /* ===== USUÁRIO WEB ===== */
   if (tipo === "usuario_web") {
-    email = document.createElement("input");
-    email.type = "email";
-    email.placeholder = "E-mail";
+    emailInput = document.createElement("input");
+    emailInput.type = "email";
+    emailInput.placeholder = "E-mail do usuário";
 
-    senha = document.createElement("input");
-    senha.placeholder = "Senha";
-    senha.className = "campo-senha";
+    senhaInput = document.createElement("input");
+    senhaInput.placeholder = "Senha do usuário";
+    senhaInput.className = "campo-senha";
 
     permissao = document.createElement("select");
     permissao.append(new Option("Selecione a permissão", ""));
@@ -103,203 +179,44 @@ function criarCampo(tipo) {
 
     regras = document.createElement("div");
 
-    wrap.append(email, senha, permissao, chkAgente, regras);
+    wrap.append(emailInput, senhaInput, permissao, chkAgente, regras);
   }
 
+  /* ===== RAMAL ===== */
   if (tipo === "ring") {
-    senha = document.createElement("input");
-    senha.placeholder = "Senha do ramal";
-    senha.className = "campo-senha";
+    senhaInput = document.createElement("input");
+    senhaInput.placeholder = "Senha do ramal";
+    senhaInput.className = "campo-senha";
     regras = document.createElement("div");
-    wrap.append(senha, regras);
+    wrap.append(senhaInput, regras);
   }
 
   wrap.getNome = () => nome.value;
-  wrap.getEmail = () => email ? email.value : "";
-  wrap.getSenha = () => senha ? senha.value : "";
+  wrap.getEmail = () => emailInput ? emailInput.value : "";
+  wrap.getSenha = () => senhaInput ? senhaInput.value : "";
   wrap.getPermissao = () => permissao ? permissao.value : "";
   wrap.isAgente = () => chkAgente ? chkAgente.checked : false;
 
   return wrap;
 }
 
-/* ---------- URA ---------- */
-
-function criarOpcaoURA() {
-  const wrap = document.createElement("div");
-  wrap.className = "opcao-ura";
-
-  const tecla = document.createElement("input");
-  tecla.placeholder = "Tecla";
-
-  const destino = document.createElement("select");
-  atualizarDestinosURA(destino);
-
-  const desc = document.createElement("input");
-  desc.placeholder = "Descrição";
-
-  const del = document.createElement("button");
-  del.textContent = "🗑";
-  del.onclick = () => wrap.remove();
-
-  wrap.append(tecla, destino, desc, del);
-
-  wrap.getData = () => ({
-    tecla: tecla.value,
-    destino: destino.value,
-    descricao: desc.value
-  });
-
-  return wrap;
-}
-
-function atualizarDestinosURA(select) {
-  if (!select) return;
-  select.innerHTML = "";
-  select.add(new Option("Selecione o destino", ""));
-  ["listaFilas", "listaRings", "listaGrupoRing", "listaURAs"].forEach(id => {
-    document.querySelectorAll("#" + id + " .campo-nome").forEach(i => {
-      if (i.value) select.add(new Option(i.value, id + ":" + i.value));
-    });
-  });
-}
-
-function atualizarTodosDestinosURA() {
-  document.querySelectorAll(".opcao-ura select").forEach(s => {
-    const v = s.value;
-    atualizarDestinosURA(s);
-    s.value = v;
-  });
-}
-
-/* ---------- JSON PABX ---------- */
-
-function gerarJSONVoz() {
-  const usuarios = [];
-  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(c => {
-    usuarios.push({
-      nome: c.getNome(),
-      email: c.getEmail(),
-      senha: c.getSenha(),
-      permissao: c.getPermissao(),
-      agente: c.isAgente()
-    });
-  });
-
-  const ramais = [];
-  document.querySelectorAll("#listaRings .campo-descricao").forEach(c => {
-    ramais.push({
-      ramal: c.getNome(),
-      senha: c.getSenha()
-    });
-  });
-
-  return { usuarios, ramais };
-}
-
-/* =====================================================
-   ===================== CHAT ==========================
-===================================================== */
-
-window.chatState = {
-  ativo: false,
-  modo: null, // 'chat' | 'voz_chat'
-  api: null,
-  conta: null,
-  canais: []
-};
-
-window.selecionarVoz = function () {
-  chatState.ativo = false;
-  atualizarVisibilidade();
-};
-
-window.selecionarChat = function () {
-  chatState.ativo = true;
-  chatState.modo = "chat";
-  atualizarVisibilidade();
-};
-
-window.selecionarVozChat = function () {
-  chatState.ativo = true;
-  chatState.modo = "voz_chat";
-  atualizarVisibilidade();
-};
-
-function atualizarVisibilidade() {
-  const voz = document.getElementById("moduloVoz");
-  const chat = document.getElementById("modulochat");
-
-  if (voz) voz.style.display = chatState.ativo && chatState.modo === "chat" ? "none" : "block";
-  if (chat) chat.style.display = chatState.ativo ? "block" : "none";
-}
-
-/* ---------- INFO AGENTE CHAT ---------- */
+/* ================= CHAT – INFO AGENTE ================= */
 
 window.informarAgenteChat = function () {
   mostrarToast(
-    "Os agentes omnichannel são gerados automaticamente a partir dos usuários.",
+    "Os agentes omnichannel são gerados automaticamente a partir dos usuários marcados como agente.",
     true
   );
 };
 
-/* ---------- JSON CHAT ---------- */
+/* ================= TOAST ================= */
 
-function gerarJSONChat() {
-  const usuariosChat = [];
-  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
-    if (u.getData) usuariosChat.push(u.getData());
-  });
+function mostrarToast(msg, error) {
+  const t = document.getElementById("toastGlobal");
+  const m = document.getElementById("toastMessage");
+  if (!t || !m) return;
 
-  const departamentos = [];
-  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
-    if (d.getData) departamentos.push(d.getData());
-  });
-
-  return {
-    ...chatState,
-    usuarios: usuariosChat,
-    departamentos
-  };
+  m.textContent = msg;
+  t.className = "toast show" + (error ? " error" : "");
+  setTimeout(() => t.classList.remove("show"), 3000);
 }
-
-/* =====================================================
-   ===================== EXPLORAR ======================
-===================================================== */
-
-window.explorar = function () {
-  try {
-    const dados = {};
-
-    // VOZ sempre entra se não for chat puro
-    if (!chatState.ativo || chatState.modo === "voz_chat") {
-      dados.voz = gerarJSONVoz();
-    }
-
-    // CHAT entra somente se ativo
-    if (chatState.ativo) {
-      dados.chat = gerarJSONChat();
-    }
-
-    document.getElementById("resultado").textContent =
-      JSON.stringify(dados, null, 2);
-
-    mostrarToast("JSON gerado com sucesso!");
-
-  } catch (e) {
-    console.error(e);
-    mostrarToast("Erro ao gerar JSON", true);
-  }
-};
-
-/* =====================================================
-   SALVAR
-===================================================== */
-
-window.salvarConfiguracao = function () {
-  explorar();
-  const r = document.getElementById("resultado").textContent;
-  if (!r) return mostrarToast("Nada para salvar", true);
-  localStorage.setItem("CONFIG_CADERNO", r);
-  window.location.href = "resumo.html";
-};
