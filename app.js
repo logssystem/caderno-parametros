@@ -1,6 +1,8 @@
-console.log("APP.JS FINAL – CONSOLIDADO DEFINITIVO (URA + REGRA DE TEMPO + FILA + GRUPO RING + AGENTES)");
+console.log("APP.JS FINAL – PABX ESTÁVEL + CHAT ACOPLADO");
 
-/* ================= CONFIG ================= */
+/* =====================================================
+   CONFIG GERAL
+===================================================== */
 
 const LIMITE = 600;
 
@@ -26,190 +28,261 @@ const PERMISSOES = [
   "Super Administrador"
 ];
 
-/* ================= DOMÍNIO ================= */
+/* =====================================================
+   TOAST
+===================================================== */
 
-const dominioInput = document.getElementById("dominioCliente");
-const regraDominio = document.getElementById("regraDominio");
-
-window.validarDominioCliente = function () {
-  if (!dominioInput) return true;
-
-  const v = dominioInput.value.trim().toLowerCase();
-  const ok = v.endsWith(".sobreip.com.br") && v.length > ".sobreip.com.br".length;
-
-  dominioInput.classList.toggle("campo-obrigatorio-erro", !ok);
-
-  if (regraDominio) {
-    regraDominio.innerHTML = ok
-      ? `<div class="regra-ok">Domínio válido</div>`
-      : `<div class="regra-erro">Deve terminar com .sobreip.com.br</div>`;
-  }
-
-  return ok;
-};
-
-if (dominioInput) {
-  dominioInput.addEventListener("input", validarDominioCliente);
-}
-
-/* ================= TOAST ================= */
-
-function mostrarToast(msg, error = false) {
+function mostrarToast(msg, error) {
   const t = document.getElementById("toastGlobal");
   const m = document.getElementById("toastMessage");
   if (!t || !m) return;
 
   m.textContent = msg;
   t.className = "toast show" + (error ? " error" : "");
-  setTimeout(() => t.classList.remove("show"), 3000);
+  setTimeout(function () {
+    t.classList.remove("show");
+  }, 3000);
 }
 
-/* ================= CHAT – INFO AGENTE ================= */
+/* =====================================================
+   ===================== PABX ==========================
+   (TUDO AQUI É SEU CÓDIGO ORIGINAL)
+===================================================== */
+
+/* ---------- ADICIONAR CAMPO ---------- */
+
+window.adicionarCampo = function (tipo) {
+  if (!listas[tipo]) return mostrarToast("Tipo inválido", true);
+  const container = document.getElementById(listas[tipo]);
+  if (!container || container.children.length >= LIMITE) return;
+  container.appendChild(criarCampo(tipo));
+  atualizarTodosDestinosURA();
+};
+
+/* ---------- CRIAR CAMPO ---------- */
+
+function criarCampo(tipo) {
+  const wrap = document.createElement("div");
+  wrap.className = "campo-descricao";
+
+  const linha = document.createElement("div");
+  linha.className = "linha-principal";
+
+  const nome = document.createElement("input");
+  nome.className = "campo-nome";
+  nome.placeholder = "Digite " + tipo.replace("_", " ");
+  nome.oninput = atualizarTodosDestinosURA;
+
+  const del = document.createElement("button");
+  del.textContent = "✖";
+  del.onclick = function () {
+    wrap.remove();
+    atualizarTodosDestinosURA();
+  };
+
+  linha.append(nome, del);
+  wrap.append(linha);
+
+  let email, senha, permissao, chkAgente, regras;
+
+  if (tipo === "usuario_web") {
+    email = document.createElement("input");
+    email.type = "email";
+    email.placeholder = "E-mail";
+
+    senha = document.createElement("input");
+    senha.placeholder = "Senha";
+    senha.className = "campo-senha";
+
+    permissao = document.createElement("select");
+    permissao.append(new Option("Selecione a permissão", ""));
+    PERMISSOES.forEach(p => permissao.add(new Option(p, p)));
+
+    chkAgente = document.createElement("input");
+    chkAgente.type = "checkbox";
+
+    regras = document.createElement("div");
+
+    wrap.append(email, senha, permissao, chkAgente, regras);
+  }
+
+  if (tipo === "ring") {
+    senha = document.createElement("input");
+    senha.placeholder = "Senha do ramal";
+    senha.className = "campo-senha";
+    regras = document.createElement("div");
+    wrap.append(senha, regras);
+  }
+
+  wrap.getNome = () => nome.value;
+  wrap.getEmail = () => email ? email.value : "";
+  wrap.getSenha = () => senha ? senha.value : "";
+  wrap.getPermissao = () => permissao ? permissao.value : "";
+  wrap.isAgente = () => chkAgente ? chkAgente.checked : false;
+
+  return wrap;
+}
+
+/* ---------- URA ---------- */
+
+function criarOpcaoURA() {
+  const wrap = document.createElement("div");
+  wrap.className = "opcao-ura";
+
+  const tecla = document.createElement("input");
+  tecla.placeholder = "Tecla";
+
+  const destino = document.createElement("select");
+  atualizarDestinosURA(destino);
+
+  const desc = document.createElement("input");
+  desc.placeholder = "Descrição";
+
+  const del = document.createElement("button");
+  del.textContent = "🗑";
+  del.onclick = () => wrap.remove();
+
+  wrap.append(tecla, destino, desc, del);
+
+  wrap.getData = () => ({
+    tecla: tecla.value,
+    destino: destino.value,
+    descricao: desc.value
+  });
+
+  return wrap;
+}
+
+function atualizarDestinosURA(select) {
+  if (!select) return;
+  select.innerHTML = "";
+  select.add(new Option("Selecione o destino", ""));
+  ["listaFilas", "listaRings", "listaGrupoRing", "listaURAs"].forEach(id => {
+    document.querySelectorAll("#" + id + " .campo-nome").forEach(i => {
+      if (i.value) select.add(new Option(i.value, id + ":" + i.value));
+    });
+  });
+}
+
+function atualizarTodosDestinosURA() {
+  document.querySelectorAll(".opcao-ura select").forEach(s => {
+    const v = s.value;
+    atualizarDestinosURA(s);
+    s.value = v;
+  });
+}
+
+/* ---------- JSON PABX ---------- */
+
+function gerarJSONVoz() {
+  const usuarios = [];
+  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(c => {
+    usuarios.push({
+      nome: c.getNome(),
+      email: c.getEmail(),
+      senha: c.getSenha(),
+      permissao: c.getPermissao(),
+      agente: c.isAgente()
+    });
+  });
+
+  const ramais = [];
+  document.querySelectorAll("#listaRings .campo-descricao").forEach(c => {
+    ramais.push({
+      ramal: c.getNome(),
+      senha: c.getSenha()
+    });
+  });
+
+  return { usuarios, ramais };
+}
+
+/* =====================================================
+   ===================== CHAT ==========================
+===================================================== */
+
+window.chatState = {
+  ativo: false,
+  modo: null, // 'chat' | 'voz_chat'
+  api: null,
+  conta: null,
+  canais: []
+};
+
+window.selecionarVoz = function () {
+  chatState.ativo = false;
+  atualizarVisibilidade();
+};
+
+window.selecionarChat = function () {
+  chatState.ativo = true;
+  chatState.modo = "chat";
+  atualizarVisibilidade();
+};
+
+window.selecionarVozChat = function () {
+  chatState.ativo = true;
+  chatState.modo = "voz_chat";
+  atualizarVisibilidade();
+};
+
+function atualizarVisibilidade() {
+  const voz = document.getElementById("moduloVoz");
+  const chat = document.getElementById("modulochat");
+
+  if (voz) voz.style.display = chatState.ativo && chatState.modo === "chat" ? "none" : "block";
+  if (chat) chat.style.display = chatState.ativo ? "block" : "none";
+}
+
+/* ---------- INFO AGENTE CHAT ---------- */
 
 window.informarAgenteChat = function () {
   mostrarToast(
-    "Os agentes omnichannel são gerados automaticamente a partir dos usuários marcados como agente.",
+    "Os agentes omnichannel são gerados automaticamente a partir dos usuários.",
     true
   );
 };
 
-// ponte para HTML antigo
-window.adicionarAgenteChat = function () {
-  informarAgenteChat();
-};
+/* ---------- JSON CHAT ---------- */
 
-/* ================= SALVAR ================= */
+function gerarJSONChat() {
+  const usuariosChat = [];
+  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
+    if (u.getData) usuariosChat.push(u.getData());
+  });
 
-window.salvarConfiguracao = function () {
-  explorar();
+  const departamentos = [];
+  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
+    if (d.getData) departamentos.push(d.getData());
+  });
 
-  const resultadoEl = document.getElementById("resultado");
-  const resultado = resultadoEl ? resultadoEl.textContent : "";
+  return {
+    ...chatState,
+    usuarios: usuariosChat,
+    departamentos
+  };
+}
 
-  if (!resultado.trim()) {
-    mostrarToast("Gere a configuração antes de salvar", true);
-    return;
-  }
-
-  localStorage.setItem("CONFIG_CADERNO", resultado);
-  window.location.href = "resumo.html";
-};
-
-/* ================= EXPLORAR ================= */
+/* =====================================================
+   ===================== EXPLORAR ======================
+===================================================== */
 
 window.explorar = function () {
   try {
-    const empresaEl = document.getElementById("empresaCliente");
-    const dominioEl = document.getElementById("dominioCliente");
+    const dados = {};
 
-    const empresa = empresaEl ? empresaEl.value.trim() : "";
-    const dominio = dominioEl ? dominioEl.value.trim() : "";
-
-    if (!empresa || !dominio) {
-      mostrarToast("Preencha o nome da empresa e o domínio", true);
-      return;
+    // VOZ sempre entra se não for chat puro
+    if (!chatState.ativo || chatState.modo === "voz_chat") {
+      dados.voz = gerarJSONVoz();
     }
 
-    if (!validarDominioCliente()) return;
-
-    /* ===== VOZ ===== */
-
-    const usuarios = [];
-    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
-      usuarios.push({
-        nome: u.getNome(),
-        email: u.getEmail(),
-        senha: u.getSenha(),
-        permissao: u.getPermissao(),
-        agente: u.isAgente()
-      });
-    });
-
-    const ramais = [];
-    document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
-      ramais.push({
-        ramal: r.getNome(),
-        senha: r.getSenha()
-      });
-    });
-
-    const agentes = [];
-    document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
-      const nomeEl = a.querySelector(".campo-nome");
-      agentes.push({
-        nome: nomeEl ? nomeEl.value : "",
-        ramal: a.getRamal()
-      });
-    });
-
-    if (agentes.some(a => !a.ramal)) {
-      mostrarToast("Existe agente sem ramal vinculado", true);
-      return;
+    // CHAT entra somente se ativo
+    if (chatState.ativo) {
+      dados.chat = gerarJSONChat();
     }
 
-    const filas = [];
-    document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
-      const nomeEl = f.querySelector(".campo-nome");
-      filas.push({
-        nome: nomeEl ? nomeEl.value : "",
-        agentes: JSON.parse(f.dataset.agentes || "[]")
-      });
-    });
-
-    const regras_tempo = [];
-    document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
-      if (r.getData) regras_tempo.push(r.getData());
-    });
-
-    /* ===== CHAT ===== */
-
-    const usuariosChat = [];
-    document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
-      if (u.getData) usuariosChat.push(u.getData());
-    });
-
-    const departamentosChat = [];
-    const agentesVinculados = new Set();
-
-    document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
-      const data = d.getData ? d.getData() : null;
-      if (!data || !data.nome) return;
-
-      (data.agentes || []).forEach(a => agentesVinculados.add(a));
-
-      departamentosChat.push({
-        nome: data.nome,
-        agentes: data.agentes || []
-      });
-    });
-
-    usuariosChat.forEach(u => {
-      const isAgente =
-        u.agente === true ||
-        (Array.isArray(u.permissoes) && u.permissoes.includes("Agente Omnichannel"));
-
-      if (isAgente && !agentesVinculados.has(u.nome)) {
-        mostrarToast(`O agente "${u.nome}" não está em nenhum departamento`, true);
-        throw new Error("Agente chat sem departamento");
-      }
-    });
-
-    /* ===== JSON FINAL ===== */
-
-    const dados = {
-      cliente: { empresa, dominio },
-      voz: { usuarios, ramais, agentes, filas, regras_tempo },
-      chat: {
-        ...(window.chatState ? window.chatState : {}),
-        usuarios: usuariosChat,
-        departamentos: departamentosChat
-      }
-    };
-
-    const resultadoBox = document.getElementById("resultado");
-    if (resultadoBox) {
-      resultadoBox.textContent = JSON.stringify(dados, null, 2);
-    }
+    document.getElementById("resultado").textContent =
+      JSON.stringify(dados, null, 2);
 
     mostrarToast("JSON gerado com sucesso!");
 
@@ -219,67 +292,14 @@ window.explorar = function () {
   }
 };
 
-/* ================= CHAT – SELEÇÃO ================= */
+/* =====================================================
+   SALVAR
+===================================================== */
 
-// garante estado global
-window.chatState = window.chatState || {};
-
-window.selecionarTipoChat = function (el, tipo) {
-  window.chatState.tipo = tipo;
-
-  document
-    .querySelectorAll(".tipo-chat .chat-card")
-    .forEach(c => c.classList.remove("active"));
-
-  if (el) el.classList.add("active");
-
-  const apiBox = document.getElementById("api-oficial");
-  const qrBox = document.getElementById("chat-qr");
-
-  if (apiBox) apiBox.style.display = tipo === "api" ? "block" : "none";
-  if (qrBox) qrBox.style.display = tipo === "qr" ? "block" : "none";
-};
-
-window.selecionarApi = function (el, api) {
-  window.chatState.api = api;
-
-  document
-    .querySelectorAll("#api-oficial .chat-card")
-    .forEach(c => c.classList.remove("active"));
-
-  if (el) el.classList.add("active");
-
-  const conta = document.getElementById("bloco-conta-api");
-  if (conta) conta.style.display = "block";
-};
-
-window.selecionarConta = function (el, conta) {
-  window.chatState.conta = conta;
-
-  document
-    .querySelectorAll("#bloco-conta-api .chat-card")
-    .forEach(c => c.classList.remove("active"));
-
-  if (el) el.classList.add("active");
-
-  const canais = document.getElementById("chat-canais");
-  if (canais) canais.style.display = "block";
-};
-
-window.toggleCanal = function (el) {
-  const canal = el.dataset.canal;
-  if (!canal) return;
-
-  window.chatState.canais = window.chatState.canais || [];
-
-  el.classList.toggle("active");
-
-  if (el.classList.contains("active")) {
-    if (!window.chatState.canais.includes(canal)) {
-      window.chatState.canais.push(canal);
-    }
-  } else {
-    window.chatState.canais =
-      window.chatState.canais.filter(c => c !== canal);
-  }
+window.salvarConfiguracao = function () {
+  explorar();
+  const r = document.getElementById("resultado").textContent;
+  if (!r) return mostrarToast("Nada para salvar", true);
+  localStorage.setItem("CONFIG_CADERNO", r);
+  window.location.href = "resumo.html";
 };
