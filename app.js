@@ -1,5 +1,3 @@
-olha aqui o erro que esta aparecendo e codigo para ajustar e me avisarrr
-
 console.log("APP.JS FINAL – CONSOLIDADO DEFINITIVO (URA + REGRA DE TEMPO + FILA + GRUPO RING + AGENTES)");
 
 /* ================= CONFIG ================= */
