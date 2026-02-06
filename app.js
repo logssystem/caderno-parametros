@@ -759,52 +759,40 @@ window.explorar = function () {
             if (r.getData) regras_tempo.push(r.getData());
         });
 
-        /* ================= CHAT (ISOLADO E SEGURO) ================= */
+        /* ================= CHAT (STATE-BASED, SEGURO) ================= */
 
-        let usuariosChat = [];
-        let departamentosChat = [];
-
-        if (document.getElementById("listaUsuariosChat")) {
-            document
-                .querySelectorAll("#listaUsuariosChat .campo-descricao")
-                .forEach(u => {
-                    if (u.getData) usuariosChat.push(u.getData());
-                });
-        }
-
-        if (document.getElementById("listaDepartamentosChat")) {
-            const agentesVinculados = new Set();
-
-            document
-                .querySelectorAll("#listaDepartamentosChat .campo-descricao")
-                .forEach(d => {
-                    const data = d.getData?.();
-                    if (!data || !data.nome) return;
-
-                    (data.agentes || []).forEach(a => agentesVinculados.add(a));
-
-                    departamentosChat.push({
-                        nome: data.nome,
-                        agentes: data.agentes || []
-                    });
-                });
-
-            // valida SOMENTE se chat existir
-            usuariosChat.forEach(u => {
-                const isAgente =
-                    u.agente === true ||
-                    u.permissoes?.includes("Agente Omnichannel");
-
-                if (isAgente && !agentesVinculados.has(u.nome)) {
-                    mostrarToast(
-                        `O agente "${u.nome}" não está vinculado a nenhum departamento`,
-                        true
-                    );
-                    return;
+            let chat = null;
+            
+            if (window.chatState && window.chatState.tipo) {
+            
+              // validações padrão PABX
+              if (window.chatState.tipo !== "voz") {
+            
+                if (!window.chatState.departamentos?.length) {
+                  mostrarToast("Chat ativo sem departamentos", true);
+                  return;
                 }
-            });
-        }
-
+            
+                if (!window.chatState.agentes?.length) {
+                  mostrarToast("Chat ativo sem agentes", true);
+                  return;
+                }
+            
+                window.chatState.agentes.forEach(a => {
+                  if (!a.departamentos?.length) {
+                    mostrarToast(`Agente ${a.nome} sem departamento`, true);
+                    throw new Error("Agente sem departamento");
+                  }
+                  if (!a.usuarioId) {
+                    mostrarToast(`Agente ${a.nome} sem usuário`, true);
+                    throw new Error("Agente sem usuário");
+                  }
+                });
+              }
+            
+              chat = window.chatState;
+            }
+        
         /* ================= JSON FINAL ================= */
 
         const dados = {
