@@ -808,15 +808,6 @@ window.explorar = function () {
             }
         };
 
-        // só inclui chat se existir
-        if (usuariosChat.length || departamentosChat.length || window.chatState) {
-            dados.chat = {
-                ...(window.chatState || {}),
-                usuarios: usuariosChat,
-                departamentos: departamentosChat
-            };
-        }
-
         document.getElementById("resultado").textContent =
             JSON.stringify(dados, null, 2);
 
