@@ -763,35 +763,37 @@ window.explorar = function () {
 
             let chat = null;
             
-            if (window.chatState && window.chatState.tipo) {
+            // chat só é considerado ativo se for API ou QR
+            const chatAtivo =
+              window.chatState &&
+              (window.chatState.tipo === "api" || window.chatState.tipo === "qr");
             
-              // validações padrão PABX
-              if (window.chatState.tipo !== "voz") {
+            if (chatAtivo) {
             
-                if (!window.chatState.departamentos?.length) {
-                  mostrarToast("Chat ativo sem departamentos", true);
-                  return;
-                }
-            
-                if (!window.chatState.agentes?.length) {
-                  mostrarToast("Chat ativo sem agentes", true);
-                  return;
-                }
-            
-                window.chatState.agentes.forEach(a => {
-                  if (!a.departamentos?.length) {
-                    mostrarToast(`Agente ${a.nome} sem departamento`, true);
-                    throw new Error("Agente sem departamento");
-                  }
-                  if (!a.usuarioId) {
-                    mostrarToast(`Agente ${a.nome} sem usuário`, true);
-                    throw new Error("Agente sem usuário");
-                  }
-                });
+              if (!window.chatState.departamentos?.length) {
+                mostrarToast("Chat ativo sem departamentos", true);
+                return;
               }
+            
+              if (!window.chatState.agentes?.length) {
+                mostrarToast("Chat ativo sem agentes", true);
+                return;
+              }
+            
+              window.chatState.agentes.forEach(a => {
+                if (!a.departamentos?.length) {
+                  mostrarToast(`Agente ${a.nome} sem departamento`, true);
+                  throw new Error("Agente sem departamento");
+                }
+                if (!a.usuarioId) {
+                  mostrarToast(`Agente ${a.nome} sem usuário`, true);
+                  throw new Error("Agente sem usuário");
+                }
+              });
             
               chat = window.chatState;
             }
+
         
         /* ================= JSON FINAL ================= */
 
