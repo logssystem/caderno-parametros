@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
 
-    // ===== Agentes =====
+        // ===== Agentes =====
     if (chat.agentes?.length) {
       resumo.innerHTML += `
         <div class="card">
@@ -169,7 +169,16 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
     }
-  });
+  } // fecha if (dados.chat)
+
+}); // fecha DOMContentLoaded
+
+/* ================= VOLTAR ================= */
+
+window.voltar = function () {
+  window.location.href = "index.html";
+};
+
 
 /* ================= VOLTAR ================= */
 
