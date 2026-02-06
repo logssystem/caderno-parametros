@@ -808,6 +808,11 @@ window.explorar = function () {
             }
         };
 
+        // 👉 SALVAR CHAT NO JSON
+        if (chat) {
+          dados.chat = chat;
+        }
+                
         document.getElementById("resultado").textContent =
             JSON.stringify(dados, null, 2);
 
