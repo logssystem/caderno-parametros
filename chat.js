@@ -262,3 +262,76 @@ function validarSenha(input, regrasEl) {
   input.classList.toggle("campo-obrigatorio-erro", !ok);
   return ok;
 }
+
+/* ================= CHAT – DEPARTAMENTOS ================= */
+
+window.adicionarDepartamentoChat = function () {
+  const lista = document.getElementById("listaDepartamentosChat");
+  if (!lista) return;
+
+  const wrap = document.createElement("div");
+  wrap.className = "campo-descricao";
+
+  const input = document.createElement("input");
+  input.placeholder = "Nome do departamento";
+
+  const btn = document.createElement("button");
+  btn.textContent = "✖";
+  btn.onclick = () => wrap.remove();
+
+  wrap.append(input, btn);
+
+  // 🔑 getData obrigatório
+  wrap.getData = () => ({
+    nome: input.value.trim()
+  });
+
+  lista.appendChild(wrap);
+};
+
+
+/* ================= CHAT – AGENTES ================= */
+
+window.adicionarAgenteChat = function () {
+  const lista = document.getElementById("listaAgentesChat");
+  if (!lista) return;
+
+  const wrap = document.createElement("div");
+  wrap.className = "campo-descricao";
+
+  const nome = document.createElement("input");
+  nome.placeholder = "Nome do agente";
+
+  const usuario = document.createElement("input");
+  usuario.placeholder = "Usuário vinculado (login)";
+
+  const selectDept = document.createElement("select");
+  selectDept.multiple = true;
+
+  // popula departamentos existentes
+  document
+    .querySelectorAll("#listaDepartamentosChat .campo-descricao")
+    .forEach(d => {
+      if (d.getData) {
+        const dep = d.getData();
+        if (dep.nome) {
+          selectDept.add(new Option(dep.nome, dep.nome));
+        }
+      }
+    });
+
+  const btn = document.createElement("button");
+  btn.textContent = "✖";
+  btn.onclick = () => wrap.remove();
+
+  wrap.append(nome, usuario, selectDept, btn);
+
+  // 🔑 getData obrigatório
+  wrap.getData = () => ({
+    nome: nome.value.trim(),
+    usuarioId: usuario.value.trim(),
+    departamentos: [...selectDept.selectedOptions].map(o => o.value)
+  });
+
+  lista.appendChild(wrap);
+};
