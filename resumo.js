@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
     }
-  }
+  });
 
 /* ================= VOLTAR ================= */
 
