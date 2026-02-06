@@ -761,79 +761,78 @@ window.explorar = function () {
 
        /* ================= CHAT (COLETA REAL DO DOM) ================= */
 
-        let chat = null;
-        
-        // garante objeto base
-        window.chatState = window.chatState || {};
-        
-        // ---------- DEPARTAMENTOS ----------
-        const departamentosChat = [];
-        document
-          .querySelectorAll("#listaDepartamentosChat .campo-descricao")
-          .forEach(d => {
-            if (d.getData) {
-              departamentosChat.push(d.getData());
+            let chat = null;
+            
+            // garante state
+            window.chatState = window.chatState || {};
+            
+            // -------- DEPARTAMENTOS --------
+            const departamentosChat = [];
+            document
+              .querySelectorAll("#listaDepartamentosChat .campo-descricao")
+              .forEach(d => {
+                if (d.getData) {
+                  departamentosChat.push(d.getData());
+                }
+              });
+            
+            // -------- AGENTES --------
+            const agentesChat = [];
+            document
+              .querySelectorAll("#listaAgentesChat .campo-descricao")
+              .forEach(a => {
+                if (a.getData) {
+                  agentesChat.push(a.getData());
+                }
+              });
+            
+            // injeta no state
+            window.chatState.departamentos = departamentosChat;
+            window.chatState.agentes = agentesChat;
+            
+            // considera chat ativo se QUALQUER coisa existir
+            const chatAtivo =
+              window.chatState.tipo ||
+              window.chatState.api ||
+              window.chatState.conta ||
+              window.chatState.canais?.length ||
+              departamentosChat.length ||
+              agentesChat.length;
+            
+            if (chatAtivo) {
+            
+              if (!departamentosChat.length) {
+                mostrarToast("Chat ativo sem departamentos", true);
+                return;
+              }
+            
+              if (!agentesChat.length) {
+                mostrarToast("Chat ativo sem agentes", true);
+                return;
+              }
+            
+              agentesChat.forEach(a => {
+                if (!a.departamentos?.length) {
+                  mostrarToast(`Agente ${a.nome} sem departamento`, true);
+                  throw new Error("Agente sem departamento");
+                }
+            
+                if (!a.usuarioId) {
+                  mostrarToast(`Agente ${a.nome} sem usuário`, true);
+                  throw new Error("Agente sem usuário");
+                }
+              });
+            
+              chat = {
+                tipo: window.chatState.tipo || "",
+                api: window.chatState.api || "",
+                conta: window.chatState.conta || "",
+                canais: window.chatState.canais || [],
+                departamentos: departamentosChat,
+                agentes: agentesChat
+              };
             }
-          });
-        
-        // ---------- AGENTES ----------
-        const agentesChat = [];
-        document
-          .querySelectorAll("#listaAgentesChat .campo-descricao")
-          .forEach(a => {
-            if (a.getData) {
-              agentesChat.push(a.getData());
-            }
-          });
-        
-        // injeta no state
-        window.chatState.departamentos = departamentosChat;
-        window.chatState.agentes = agentesChat;
-        
-        // existe chat se tiver QUALQUER coisa configurada
-        const chatAtivo =
-          window.chatState.tipo ||
-          window.chatState.api ||
-          window.chatState.conta ||
-          window.chatState.canais?.length ||
-          departamentosChat.length ||
-          agentesChat.length;
-        
-        if (chatAtivo) {
-        
-          if (!departamentosChat.length) {
-            mostrarToast("Chat ativo sem departamentos", true);
-            return;
-          }
-        
-          if (!agentesChat.length) {
-            mostrarToast("Chat ativo sem agentes", true);
-            return;
-          }
-        
-          agentesChat.forEach(a => {
-            if (!a.departamentos?.length) {
-              mostrarToast(`Agente ${a.nome} sem departamento`, true);
-              throw new Error("Agente sem departamento");
-            }
-        
-            if (!a.usuarioId) {
-              mostrarToast(`Agente ${a.nome} sem usuário`, true);
-              throw new Error("Agente sem usuário");
-            }
-          });
-        
-          chat = {
-            tipo: window.chatState.tipo || "",
-            api: window.chatState.api || "",
-            conta: window.chatState.conta || "",
-            canais: window.chatState.canais || [],
-            departamentos: departamentosChat,
-            agentes: agentesChat
-          };
-        }
-
-        
+            
         /* ================= JSON FINAL ================= */
 
         const dados = {
