@@ -117,26 +117,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= CHAT ================= */
 
-  if (dados.chat) {
-    const chat = dados.chat;
-    const canais = chat.canais?.length ? chat.canais.join(", ") : "Nenhum";
+if (dados.chat) {
+  const chat = dados.chat;
 
-    const tipo =
-      chat.tipo === "api" ? "API Oficial" :
-      chat.tipo === "qr" ? "QR Code" :
-      "Não definido";
+  const canais = chat.canais?.length ? chat.canais.join(", ") : "Nenhum";
 
+  const tipo =
+    chat.tipo === "api" ? "API Oficial" :
+    chat.tipo === "qr" ? "QR Code" :
+    "Não definido";
+
+  resumo.innerHTML += `
+    <div class="card">
+      <h2>💬 Atendimento por Chat</h2>
+      <p><b>Tipo de integração:</b> ${tipo}</p>
+      <p><b>API oficial:</b> ${chat.api || "-"}</p>
+      <p><b>Conta:</b> ${chat.conta || "-"}</p>
+      <p><b>Canais:</b> ${canais}</p>
+    </div>
+  `;
+
+  /* ===== Departamentos ===== */
+  if (chat.departamentos?.length) {
     resumo.innerHTML += `
       <div class="card">
-        <h2>💬 Atendimento por Chat</h2>
-        <p><b>Tipo de integração:</b> ${tipo}</p>
-        <p><b>API oficial:</b> ${chat.api || "-"}</p>
-        <p><b>Conta:</b> ${chat.conta || "-"}</p>
-        <p><b>Canais:</b> ${canais}</p>
+        <h3>🏷️ Departamentos do Chat</h3>
+        ${chat.departamentos.map(d => `
+          <p>
+            <b>Nome:</b> ${d.nome || "-"}
+          </p>
+          <hr>
+        `).join("")}
       </div>
     `;
   }
-});
+
+  /* ===== Agentes ===== */
+  if (chat.agentes?.length) {
+    resumo.innerHTML += `
+      <div class="card">
+        <h3>🎧 Agentes Omnichannel</h3>
+        ${chat.agentes.map(a => `
+          <p>
+            <b>Nome:</b> ${a.nome || "-"} <br>
+            <b>Usuário vinculado:</b> ${a.usuarioId || "-"} <br>
+            <b>Departamentos:</b>
+            ${a.departamentos?.length ? a.departamentos.join(", ") : "Nenhum"}
+          </p>
+          <hr>
+        `).join("")}
+      </div>
+    `;
+  }
+}
 
 /* ================= VOLTAR ================= */
 
