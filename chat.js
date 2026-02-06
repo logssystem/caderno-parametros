@@ -335,3 +335,40 @@ window.adicionarAgenteChat = function () {
 
   lista.appendChild(wrap);
 };
+
+/* =========================================================
+   PATCH – ENSINAR O SISTEMA A LER DEPARTAMENTOS (SEM UI)
+   ========================================================= */
+
+function aplicarGetDataDepartamentosChat() {
+  document
+    .querySelectorAll("#listaDepartamentosChat .campo-descricao")
+    .forEach(dep => {
+
+      // evita sobrescrever se já existir
+      if (dep.getData) return;
+
+      const inputNome = dep.querySelector("input");
+
+      dep.getData = () => {
+        // tenta achar agentes vinculados dentro do departamento
+        const agentes = [];
+
+        dep.querySelectorAll("[data-agente]").forEach(a => {
+          agentes.push(a.dataset.agente);
+        });
+
+        return {
+          nome: inputNome?.value.trim() || "",
+          agentes
+        };
+      };
+    });
+}
+
+// reaplica sempre que algo mudar no chat
+document.addEventListener("click", e => {
+  if (e.target.closest("#listaDepartamentosChat")) {
+    aplicarGetDataDepartamentosChat();
+  }
+});
