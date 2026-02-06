@@ -766,50 +766,50 @@ window.explorar = function () {
         // garante state único
         window.chatState = window.chatState || {};
         
-        // --------- DEPARTAMENTOS ---------
-        const departamentos = [];
+        // ---------- DEPARTAMENTOS CHAT ----------
+        const departamentosChat = [];
         document
           .querySelectorAll("#listaDepartamentosChat .campo-descricao")
           .forEach(d => {
             if (d.getData) {
               const data = d.getData();
-              if (data?.nome) departamentos.push(data);
+              if (data?.nome) departamentosChat.push(data);
             }
           });
         
-        // --------- AGENTES ---------
-        const agentes = [];
+        // ---------- AGENTES CHAT ----------
+        const agentesChat = [];
         document
           .querySelectorAll("#listaAgentesChat .campo-descricao")
           .forEach(a => {
             if (a.getData) {
               const data = a.getData();
-              if (data?.nome) agentes.push(data);
+              if (data?.nome) agentesChat.push(data);
             }
           });
         
-        // existe chat se houver QUALQUER coisa configurada
+        // existe chat se houver qualquer coisa configurada
         const chatAtivo =
           window.chatState.tipo ||
           window.chatState.api ||
           window.chatState.conta ||
           window.chatState.canais?.length ||
-          departamentos.length ||
-          agentes.length;
+          departamentosChat.length ||
+          agentesChat.length;
         
         if (chatAtivo) {
         
-          if (!departamentos.length) {
+          if (!departamentosChat.length) {
             mostrarToast("Chat ativo sem departamentos", true);
             return;
           }
         
-          if (!agentes.length) {
+          if (!agentesChat.length) {
             mostrarToast("Chat ativo sem agentes", true);
             return;
           }
         
-          agentes.forEach(a => {
+          agentesChat.forEach(a => {
             if (!a.departamentos?.length) {
               mostrarToast(`Agente ${a.nome} sem departamento`, true);
               throw new Error("Agente sem departamento");
@@ -825,8 +825,8 @@ window.explorar = function () {
             api: window.chatState.api || "",
             conta: window.chatState.conta || "",
             canais: window.chatState.canais || [],
-            departamentos,
-            agentes
+            departamentos: departamentosChat,
+            agentes: agentesChat
           };
         }
             
