@@ -372,3 +372,71 @@ document.addEventListener("click", e => {
     aplicarGetDataDepartamentosChat();
   }
 });
+
+function adicionarDepartamentoChat() {
+  const lista = document.getElementById("listaDepartamentosChat");
+  if (!lista) return;
+
+  const wrap = document.createElement("div");
+  wrap.className = "campo-descricao";
+
+  // ===== Nome do departamento =====
+  const inputNome = document.createElement("input");
+  inputNome.placeholder = "Nome do departamento";
+
+  // ===== Lista de agentes =====
+  const listaAgentes = document.createElement("div");
+  listaAgentes.className = "lista-agentes-departamento";
+  listaAgentes.style.marginTop = "8px";
+
+  // ===== Botão adicionar agente =====
+  const btnAddAgente = document.createElement("button");
+  btnAddAgente.textContent = "+ Adicionar agente";
+  btnAddAgente.className = "btn-add";
+  btnAddAgente.style.marginTop = "6px";
+
+  btnAddAgente.onclick = () => {
+    const select = document.createElement("select");
+    select.innerHTML = `<option value="">Selecione um agente</option>`;
+
+    document
+      .querySelectorAll("#listaAgentesChat .campo-descricao")
+      .forEach(a => {
+        if (a.getData) {
+          const d = a.getData();
+          if (d?.nome) {
+            select.add(new Option(d.nome, d.nome));
+          }
+        }
+      });
+
+    const linha = document.createElement("div");
+    linha.style.display = "flex";
+    linha.style.gap = "6px";
+    linha.style.marginTop = "4px";
+
+    const btnRemover = document.createElement("button");
+    btnRemover.textContent = "✖";
+    btnRemover.onclick = () => linha.remove();
+
+    linha.append(select, btnRemover);
+    listaAgentes.appendChild(linha);
+  };
+
+  // ===== getData (LEITURA PARA O JSON) =====
+  wrap.getData = () => {
+    const agentes = [];
+
+    listaAgentes.querySelectorAll("select").forEach(s => {
+      if (s.value) agentes.push(s.value);
+    });
+
+    return {
+      nome: inputNome.value.trim(),
+      agentes
+    };
+  };
+
+  wrap.append(inputNome, listaAgentes, btnAddAgente);
+  lista.appendChild(wrap);
+}
