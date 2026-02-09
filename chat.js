@@ -208,16 +208,18 @@ window.coletarChatDoDOM = function () {
     if (dep) departamentos.push(dep);
   });
 
-  // vincula agentes aos departamentos (modelo PABX)
-  agentes.forEach(a => {
-    a.departamentos = departamentos
-      .filter(d => d.agentes.includes(a.nome))
-      .map(d => d.nome);
+  // 🔥 AQUI ESTÁ O BUG QUE FOI CORRIGIDO
+  agentes.forEach(agente => {
+    agente.departamentos = departamentos
+      .filter(dep => dep.agentes.includes(agente.nome))
+      .map(dep => dep.nome);
   });
 
   window.chatState.usuarios = usuarios;
   window.chatState.agentes = agentes;
   window.chatState.departamentos = departamentos;
+
+  console.log("CHAT STATE FINAL:", window.chatState);
 
   return window.chatState;
 };
