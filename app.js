@@ -763,30 +763,52 @@ window.explorar = function () {
 
         let chat = null;
         
-        // garante state único
-        window.chatState = window.chatState || {};
+        // só tenta salvar chat se a função existir
+        if (typeof window.coletarChatDoDOM === "function") {
         
-        // ---------- DEPARTAMENTOS CHAT ----------
-        const departamentosChat = [];
-        document
-          .querySelectorAll("#listaDepartamentosChat .campo-descricao")
-          .forEach(d => {
-            if (d.getData) {
-              const data = d.getData();
-              if (data?.nome) departamentosChat.push(data);
-            }
-          });
+          const chatData = window.coletarChatDoDOM();
         
-        // ---------- AGENTES CHAT ----------
-        const agentesChat = [];
-        document
-          .querySelectorAll("#listaAgentesChat .campo-descricao")
-          .forEach(a => {
-            if (a.getData) {
-              const data = a.getData();
-              if (data?.nome) agentesChat.push(data);
+          const chatAtivo =
+            chatData?.tipo ||
+            chatData?.api ||
+            chatData?.conta ||
+            chatData?.canais?.length ||
+            chatData?.departamentos?.length ||
+            chatData?.agentes?.length;
+        
+          if (chatAtivo) {
+        
+            if (!chatData.departamentos?.length) {
+              mostrarToast("Chat ativo sem departamentos", true);
+              return;
             }
-          });
+        
+            if (!chatData.agentes?.length) {
+              mostrarToast("Chat ativo sem agentes", true);
+              return;
+            }
+        
+            chatData.agentes.forEach(a => {
+              if (!a.departamentos?.length) {
+                mostrarToast(`Agente ${a.nome} sem departamento`, true);
+                throw new Error("Agente sem departamento");
+              }
+              if (!a.usuario) {
+                mostrarToast(`Agente ${a.nome} sem usuário`, true);
+                throw new Error("Agente sem usuário");
+              }
+            });
+        
+            chat = {
+              tipo: chatData.tipo || "",
+              api: chatData.api || "",
+              conta: chatData.conta || "",
+              canais: chatData.canais || [],
+              departamentos: chatData.departamentos,
+              agentes: chatData.agentes
+            };
+          }
+        }
         
         // existe chat se houver qualquer coisa configurada
         const chatAtivo =
