@@ -809,49 +809,7 @@ window.explorar = function () {
             };
           }
         }
-        
-        // existe chat se houver qualquer coisa configurada
-        const chatAtivo =
-          window.chatState.tipo ||
-          window.chatState.api ||
-          window.chatState.conta ||
-          window.chatState.canais?.length ||
-          departamentosChat.length ||
-          agentesChat.length;
-        
-        if (chatAtivo) {
-        
-          if (!departamentosChat.length) {
-            mostrarToast("Chat ativo sem departamentos", true);
-            return;
-          }
-        
-          if (!agentesChat.length) {
-            mostrarToast("Chat ativo sem agentes", true);
-            return;
-          }
-        
-          agentesChat.forEach(a => {
-            if (!a.departamentos?.length) {
-              mostrarToast(`Agente ${a.nome} sem departamento`, true);
-              throw new Error("Agente sem departamento");
-            }
-            if (!a.usuarioId) {
-              mostrarToast(`Agente ${a.nome} sem usuário`, true);
-              throw new Error("Agente sem usuário");
-            }
-          });
-        
-          chat = {
-            tipo: window.chatState.tipo || "",
-            api: window.chatState.api || "",
-            conta: window.chatState.conta || "",
-            canais: window.chatState.canais || [],
-            departamentos: departamentosChat,
-            agentes: agentesChat
-          };
-        }
-            
+    
         /* ================= JSON FINAL ================= */
 
         const dados = {
