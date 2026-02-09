@@ -85,7 +85,9 @@ function gerarAgentesChatAPartirUsuarios() {
 
       wrap.getData = () => ({
         nome: data.nome,
-        usuarioId: data.nome // padrão simples (login = nome)
+        usuario: data.email,
+        senha: data.senha,
+        departamentos: [] // preenchido no salvar
       });
 
       wrap.append(nome);
@@ -95,7 +97,7 @@ function gerarAgentesChatAPartirUsuarios() {
 }
 
 /* =====================================================
-   DEPARTAMENTOS CHAT (MODELO PABX – FINAL)
+   DEPARTAMENTOS CHAT (MODELO PABX)
    ===================================================== */
 window.adicionarDepartamentoChat = function () {
   const lista = document.getElementById("listaDepartamentosChat");
@@ -127,12 +129,8 @@ window.adicionarDepartamentoChat = function () {
     document
       .querySelectorAll("#listaAgentesChat .campo-descricao")
       .forEach(a => {
-        if (a.getData) {
-          const d = a.getData();
-          if (d?.nome) {
-            select.add(new Option(d.nome, d.nome));
-          }
-        }
+        const d = a.getData?.();
+        if (d?.nome) select.add(new Option(d.nome, d.nome));
       });
 
     const remover = document.createElement("button");
@@ -160,7 +158,7 @@ window.adicionarDepartamentoChat = function () {
 };
 
 /* =====================================================
-   SENHA – MESMO PADRÃO DO PABX
+   SENHA – PADRÃO PABX
    ===================================================== */
 function validarSenha(input, regrasEl) {
   const v = input.value || "";
@@ -188,7 +186,7 @@ function validarSenha(input, regrasEl) {
 }
 
 /* =====================================================
-   COLETA FINAL PARA O JSON (USADO PELO app.js)
+   COLETA FINAL PARA O JSON (SALVAR)
    ===================================================== */
 window.coletarChatDoDOM = function () {
   const usuarios = [];
@@ -196,15 +194,25 @@ window.coletarChatDoDOM = function () {
   const departamentos = [];
 
   document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
-    if (u.getData) usuarios.push(u.getData());
+    const d = u.getData?.();
+    if (d) usuarios.push(d);
   });
 
   document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
-    if (a.getData) agentes.push(a.getData());
+    const d = a.getData?.();
+    if (d) agentes.push(d);
   });
 
   document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
-    if (d.getData) departamentos.push(d.getData());
+    const dep = d.getData?.();
+    if (dep) departamentos.push(dep);
+  });
+
+  // vincula agentes aos departamentos (modelo PABX)
+  agentes.forEach(a => {
+    a.departamentos = departamentos
+      .filter(d => d.agentes.includes(a.nome))
+      .map(d => d.nome);
   });
 
   window.chatState.usuarios = usuarios;
