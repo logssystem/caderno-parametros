@@ -145,13 +145,26 @@
     <section id="modulochat" style="display:none;">
 
       <!-- 1️⃣ USUÁRIOS -->
-      <section class="card">
-        <h2>Usuários Omnichannel</h2>
-        <div id="listaUsuariosChat"></div>
-        <button onclick="adicionarUsuarioChat()" class="btn-add">
-          + Adicionar usuário chat
-        </button>
-      </section>
+     <section class="card">
+  <h2>Usuários Omnichannel</h2>
+
+  <div class="acoes-card">
+    <button class="btn-add" onclick="adicionarUsuarioChat()">+</button>
+
+    <button class="btn-import" onclick="acionarImportacaoUsuariosChat()">
+      📥 Importar
+    </button>
+
+    <button class="btn-import" onclick="baixarTemplateUsuariosChat()">
+      📥 Baixar template CSV
+    </button>
+
+    <input type="file" id="importUsuariosChat" accept=".csv" hidden>
+  </div>
+
+  <div id="listaUsuariosChat"></div>
+</section>
+
     
       <!-- 2️⃣ AGENTES -->
       <section class="card">
@@ -280,6 +293,7 @@
 
 </body>
 </html>
+
 
 
 
