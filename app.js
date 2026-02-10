@@ -645,29 +645,29 @@ document.addEventListener("change", e => {
 
 window.baixarTemplateUsuarios = function () {
   const csv = [
-    // cabeçalho principal
+    // Cabeçalho (coluna I = permissões)
     "usuario;email;senha;permissao;agente;;;;permissoes_validas",
 
-    // exemplo de preenchimento
+    // Exemplo de preenchimento
     "joao;joao@empresa.com;Senha@12345;Agente de Call Center;sim",
 
-    // linha em branco para separar
+    // Linha em branco
     "",
 
-    // lista de permissões (coluna I)
-    ";;;;;;;Administrador do Módulo de PABX",
-    ";;;;;;;Agente de Call Center",
-    ";;;;;;;Supervisor(a) de Call Center",
-    ";;;;;;;CRM",
-    ";;;;;;;CRM Owner",
-    ";;;;;;;Administrador do Módulo de Omnichannel",
-    ";;;;;;;Agente Omnichannel",
-    ";;;;;;;Supervisor(a) Omnichannel",
-    ";;;;;;;Super Administrador"
+    // Lista de permissões (coluna I)
+    ";;;;;;;;Administrador do Módulo de PABX",
+    ";;;;;;;;Agente de Call Center",
+    ";;;;;;;;Supervisor(a) de Call Center",
+    ";;;;;;;;CRM",
+    ";;;;;;;;CRM Owner",
+    ";;;;;;;;Administrador do Módulo de Omnichannel",
+    ";;;;;;;;Agente Omnichannel",
+    ";;;;;;;;Supervisor(a) Omnichannel",
+    ";;;;;;;;Super Administrador"
   ].join("\n");
 
   const blob = new Blob([csv], {
-    type: "text/csv;charset=windows-1252;"
+    type: "text/csv;charset=utf-8;"
   });
 
   const url = URL.createObjectURL(blob);
