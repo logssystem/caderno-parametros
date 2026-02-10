@@ -212,19 +212,59 @@ function criarCampo(tipo) {
     }
 
     /* ===== RAMAL ===== */
-    if (tipo === "ring") {
-        senhaInput = document.createElement("input");
-        senhaInput.placeholder = "Senha do ramal";
-        senhaInput.classList.add("campo-senha");
-        senhaInput.style.marginTop = "12px";
-        wrap.append(senhaInput);
+if (tipo === "ring") {
 
-        regras = document.createElement("div");
-        regras.style.marginTop = "8px";
-        wrap.append(regras);
+    // 🔒 restringe para números apenas
+    nome.type = "text";
+    nome.inputMode = "numeric";
+    nome.pattern = "[0-9]*";
 
-        senhaInput.oninput = () => validarSenha(senhaInput, regras);
-    }
+    // 🔹 mensagem informativa
+    const infoRamal = document.createElement("div");
+    infoRamal.className = "regra-neutra";
+    infoRamal.style.marginTop = "6px";
+    infoRamal.textContent =
+        "O ramal não pode iniciar com 0 e deve ter entre 3 e 6 dígitos.";
+
+    // 🔍 validação visual
+    nome.addEventListener("input", () => {
+        // remove tudo que não for número
+        nome.value = nome.value.replace(/\D/g, "");
+
+        const v = nome.value;
+
+        const valido =
+            v.length >= 3 &&
+            v.length <= 6 &&
+            !v.startsWith("0");
+
+        nome.classList.toggle("campo-obrigatorio-erro", !valido && v.length > 0);
+
+        infoRamal.className = valido
+            ? "regra-ok"
+            : "regra-neutra";
+
+        infoRamal.textContent = valido
+            ? "Ramal válido"
+            : "O ramal não pode iniciar com 0 e deve ter entre 3 e 6 dígitos.";
+    });
+
+    // senha do ramal (já existente)
+    senhaInput = document.createElement("input");
+    senhaInput.placeholder = "Senha do ramal";
+    senhaInput.classList.add("campo-senha");
+    senhaInput.style.marginTop = "12px";
+    wrap.append(senhaInput);
+
+    regras = document.createElement("div");
+    regras.style.marginTop = "8px";
+    wrap.append(regras);
+
+    senhaInput.oninput = () => validarSenha(senhaInput, regras);
+
+    // adiciona info visual
+    wrap.append(infoRamal);
+}
 
     /* ===== URA ===== */
     if (tipo === "ura") {
