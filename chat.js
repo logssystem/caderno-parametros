@@ -25,6 +25,7 @@ window.adicionarUsuarioChat = function () {
 
   const nome = document.createElement("input");
   nome.placeholder = "Nome do usuário";
+  nome.classList.add("campo-nome");
 
   const email = document.createElement("input");
   email.type = "email";
@@ -38,10 +39,28 @@ window.adicionarUsuarioChat = function () {
   validarSenha(senha, regras);
   senha.oninput = () => validarSenha(senha, regras);
 
+  // ===== PERMISSÃO (MANUAL – PADRÃO PABX) =====
+  const permissao = document.createElement("select");
+  permissao.style.marginTop = "8px";
+
+  const opt0 = new Option("Selecione a permissão (opcional)", "");
+  opt0.disabled = true;
+  opt0.selected = true;
+  permissao.appendChild(opt0);
+
+  [
+    "Administrador do Módulo de Omnichannel",
+    "Supervisor(a) Omnichannel",
+    "Agente Omnichannel"
+  ].forEach(p => permissao.add(new Option(p, p)));
+
   const chkAgente = document.createElement("input");
   chkAgente.type = "checkbox";
 
   const lbl = document.createElement("label");
+  lbl.style.display = "flex";
+  lbl.style.alignItems = "center";
+  lbl.style.gap = "6px";
   lbl.append(chkAgente, document.createTextNode(" Este usuário é agente omnichannel"));
 
   const del = document.createElement("button");
@@ -51,17 +70,30 @@ window.adicionarUsuarioChat = function () {
     gerarAgentesChatAPartirUsuarios();
   };
 
+  // 🔹 DADOS PARA SALVAR
   wrap.getData = () => ({
     nome: nome.value.trim(),
     email: email.value.trim(),
     senha: senha.value,
+    permissao: permissao.value || "",
     agente: chkAgente.checked
   });
 
   chkAgente.onchange = gerarAgentesChatAPartirUsuarios;
 
-  wrap.append(nome, email, senha, regras, lbl, del);
+  wrap.append(
+    nome,
+    email,
+    senha,
+    regras,
+    permissao,
+    lbl,
+    del
+  );
+
   lista.appendChild(wrap);
+
+  return wrap; // 🔴 ESSENCIAL para importação CSV
 };
 
 /* ================= TEMPLATE CSV USUÁRIOS CHAT ================= */
