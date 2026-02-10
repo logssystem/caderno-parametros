@@ -33,24 +33,32 @@
 
   <!-- ================= DADOS DO CLIENTE ================= -->
   <section class="card">
-    <h2>Dados do Cliente</h2>
+  <h2>Dados do Cliente</h2>
 
-    <div class="campo-descricao campo-cliente">
-      <div class="bloco-campo">
-        <label>Nome da empresa / cliente</label>
-        <input id="empresaCliente" placeholder="Ex: ERA Telecom">
-      </div>
+  <div class="campo-descricao campo-cliente">
 
-      <div class="bloco-campo">
-        <label>Domínio do cliente</label>
-        <input id="dominioCliente" placeholder="ex: suporteera.sobreip.com.br">
-        <div id="regraDominio"></div>
-      </div>
+    <div class="bloco-campo">
+      <label>Nome da empresa / cliente</label>
+      <input id="empresaCliente" placeholder="Ex: ERA Telecom">
     </div>
-  </section>
 
-  <section id="voz-area" style="display:none">
+    <div class="bloco-campo">
+      <label>Domínio do cliente</label>
+      <input id="dominioCliente" placeholder="ex: suporteera.sobreip.com.br">
+      <div id="regraDominio"></div>
+    </div>
 
+    <div class="bloco-campo">
+      <label>CNPJ</label>
+      <input id="cnpjCliente" placeholder="00.000.000/0000-00">
+      <div id="regraCNPJ"></div>
+    </div>
+
+  </div> 
+
+</section>
+
+<section id="voz-area" style="display:none">
   <!-- ================= USUÁRIOS WEB ================= -->
   <section class="card">
     <h2>Usuários Web</h2>
@@ -293,6 +301,7 @@
 
 </body>
 </html>
+
 
 
 
