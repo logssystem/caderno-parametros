@@ -714,37 +714,52 @@ function processarCSV(tipo, texto) {
     if (!container) return;
 
     linhas.forEach(l => {
-        const v = l.split(sep);
-        const d = {};
-        header.forEach((h, i) => d[h] = (v[i] || "").trim());
+    const v = l.split(sep);
+    const d = {};
 
-        const campo = criarCampo(tipo);
-        campo.querySelector(".campo-nome").value = d.usuario || d.nome || d.ramal || "";
-
-        if (tipo === "usuario_web") {
-            campo.querySelector("input[type=email]").value = d.email || "";
-            campo.querySelector(".campo-senha").value = d.senha || "";
-
-            const select = campo.querySelector("select");
-            if (select && d.permissao) {
-                [...select.options].forEach(opt => {
-                    if (opt.value.toLowerCase() === d.permissao.toLowerCase()) {
-                        opt.selected = true;
-                    }
-                });
-            }
-
-            if (d.agente === "1" || d.agente?.toLowerCase() === "sim") {
-                campo.querySelector("input[type=checkbox]").checked = true;
-            }
-        }
-
-        if (tipo === "ring") {
-            campo.querySelector(".campo-senha").value = d.senha || "";
-        }
-
-        container.appendChild(campo);
+    header.forEach((h, i) => {
+        d[h] = (v[i] || "").trim();
     });
+
+    // 🔒 AQUI É O AJUSTE (LINHA NOVA)
+    // se não tiver dado real, ignora a linha
+    if (
+        !d.usuario &&
+        !d.nome &&
+        !d.email &&
+        !d.ramal
+    ) {
+        return;
+    }
+
+    const campo = criarCampo(tipo);
+    campo.querySelector(".campo-nome").value =
+        d.usuario || d.nome || d.ramal || "";
+
+    if (tipo === "usuario_web") {
+        campo.querySelector("input[type=email]").value = d.email || "";
+        campo.querySelector(".campo-senha").value = d.senha || "";
+
+        const select = campo.querySelector("select");
+        if (select && d.permissao) {
+            [...select.options].forEach(opt => {
+                if (opt.value.toLowerCase() === d.permissao.toLowerCase()) {
+                    opt.selected = true;
+                }
+            });
+        }
+
+        if (d.agente === "1" || d.agente?.toLowerCase() === "sim") {
+            campo.querySelector("input[type=checkbox]").checked = true;
+        }
+    }
+
+    if (tipo === "ring") {
+        campo.querySelector(".campo-senha").value = d.senha || "";
+    }
+
+    container.appendChild(campo);
+});
 
     syncTudo();
     mostrarToast("CSV importado com sucesso!");
