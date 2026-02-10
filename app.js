@@ -54,6 +54,30 @@ if (dominioInput) {
     dominioInput.addEventListener("input", window.validarDominioCliente);
 }
 
+const cnpjInput = document.getElementById("cnpjCliente");
+const regraCNPJ = document.getElementById("regraCNPJ");
+
+if (cnpjInput) {
+  cnpjInput.addEventListener("input", () => {
+    let v = cnpjInput.value.replace(/\D/g, "").slice(0, 14);
+
+    v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+    v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+    v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+    v = v.replace(/(\d{4})(\d)/, "$1-$2");
+
+    cnpjInput.value = v;
+
+    if (v.length === 18) {
+      regraCNPJ.textContent = "CNPJ preenchido";
+      regraCNPJ.style.color = "green";
+    } else {
+      regraCNPJ.textContent = "CNPJ incompleto";
+      regraCNPJ.style.color = "red";
+    }
+  });
+}
+
 /* ================= ADICIONAR CAMPO ================= */
 
 window.adicionarCampo = function (tipo) {
