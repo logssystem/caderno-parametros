@@ -641,21 +641,29 @@ document.addEventListener("change", e => {
     if (e.target.closest(".campo-descricao")) syncTudo();
 });
 
-//* ================= TEMPLATE CSV USUÁRIOS WEB ================= */
+/* ================= TEMPLATE CSV USUÁRIOS WEB ================= */
 
 window.baixarTemplateUsuarios = function () {
   const csv = [
-    "usuario;email;senha;permissao;agente;permissoes_validas",
-    "joao;joao@empresa.com;Senha@12345;Agente de Call Center;sim;" +
-    "Administrador do Módulo de PABX | " +
-    "Agente de Call Center | " +
-    "Supervisor(a) de Call Center | " +
-    "CRM | " +
-    "CRM Owner | " +
-    "Administrador do Módulo de Omnichannel | " +
-    "Agente Omnichannel | " +
-    "Supervisor(a) Omnichannel | " +
-    "Super Administrador"
+    // cabeçalho principal
+    "usuario;email;senha;permissao;agente;;;;permissoes_validas",
+
+    // exemplo de preenchimento
+    "joao;joao@empresa.com;Senha@12345;Agente de Call Center;sim",
+
+    // linha em branco para separar
+    "",
+
+    // lista de permissões (coluna I)
+    ";;;;;;;Administrador do Módulo de PABX",
+    ";;;;;;;Agente de Call Center",
+    ";;;;;;;Supervisor(a) de Call Center",
+    ";;;;;;;CRM",
+    ";;;;;;;CRM Owner",
+    ";;;;;;;Administrador do Módulo de Omnichannel",
+    ";;;;;;;Agente Omnichannel",
+    ";;;;;;;Supervisor(a) Omnichannel",
+    ";;;;;;;Super Administrador"
   ].join("\n");
 
   const blob = new Blob([csv], {
