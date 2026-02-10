@@ -436,10 +436,10 @@ function criarOpcaoURA() {
     const tecla = document.createElement("input");
     tecla.placeholder = "Tecla";
 
-    const tipo = document.createElement("input");
+    /*const tipo = document.createElement("input");
     tipo.placeholder = "Tipo";
     tipo.readOnly = true;
-    tipo.className = "tipo-destino";
+    tipo.className = "tipo-destino";*/
 
     const destino = document.createElement("select");
     atualizarDestinosURA(destino);
