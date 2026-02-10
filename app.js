@@ -641,6 +641,30 @@ document.addEventListener("change", e => {
     if (e.target.closest(".campo-descricao")) syncTudo();
 });
 
+/* ================= TEMPLATE CSV USUÁRIOS WEB ================= */
+
+window.baixarTemplateUsuarios = function () {
+  const csv =
+`usuario,email,senha,permissao,agente
+joao,joao@empresa.com,Senha@12345,Agente de Call Center,sim
+`;
+
+  const blob = new Blob([csv], {
+    type: "text/csv;charset=utf-8;"
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "template_usuarios_web.csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  URL.revokeObjectURL(url);
+};
+
 /* ================= IMPORTAÇÃO CSV ================= */
 
 window.acionarImportacao = function (tipo) {
