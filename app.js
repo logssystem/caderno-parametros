@@ -582,16 +582,47 @@ function criarRegraTempo() {
 /* ================= RANGE RAMAIS ================= */
 
 window.criarRangeRamais = function () {
-    const ini = +ramalInicio.value;
-    const fim = +ramalFim.value;
-    if (!ini || !fim || fim < ini) return;
-    const c = document.getElementById("listaRings");
-    for (let i = ini; i <= fim; i++) {
-        const campo = criarCampo("ring");
-        campo.querySelector(".campo-nome").value = i;
-        c.append(campo);
+    const ini = parseInt(ramalInicio.value.replace(/\D/g, ""), 10);
+    const fim = parseInt(ramalFim.value.replace(/\D/g, ""), 10);
+
+    if (!ini || !fim) {
+        mostrarToast("Informe o ramal inicial e final", true);
+        return;
     }
+
+    if (fim < ini) {
+        mostrarToast("O ramal final não pode ser menor que o inicial", true);
+        return;
+    }
+
+    const container = document.getElementById("listaRings");
+    if (!container) return;
+
+    // evita duplicar ramais já existentes
+    const ramaisExistentes = new Set();
+    container.querySelectorAll(".campo-nome").forEach(r => {
+        if (r.value) ramaisExistentes.add(r.value);
+    });
+
+    for (let i = ini; i <= fim; i++) {
+        const ramal = String(i);
+
+        if (ramaisExistentes.has(ramal)) continue;
+
+        const campo = criarCampo("ring");
+        const inputRamal = campo.querySelector(".campo-nome");
+
+        // garante só número
+        inputRamal.value = ramal;
+        inputRamal.addEventListener("input", () => {
+            inputRamal.value = inputRamal.value.replace(/\D/g, "");
+        });
+
+        container.appendChild(campo);
+    }
+
     syncTudo();
+    mostrarToast("Ramais criados com sucesso");
 };
 
 /* ================= MOTOR ================= */
