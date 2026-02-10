@@ -64,6 +64,30 @@ window.adicionarUsuarioChat = function () {
   lista.appendChild(wrap);
 };
 
+/* ================= TEMPLATE CSV USUÁRIOS CHAT ================= */
+
+window.baixarTemplateUsuariosChat = function () {
+  const csv = [
+    "usuario;email;senha;permissao;agente",
+    "joao;joao@empresa.com;Senha@12345;Agente Omnichannel;sim"
+  ].join("\n");
+
+  const blob = new Blob([csv], {
+    type: "text/csv;charset=utf-8;"
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "template_usuarios_chat.csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  URL.revokeObjectURL(url);
+};
+
 /* =====================================================
    AGENTES CHAT (GERADOS DOS USUÁRIOS)
    ===================================================== */
