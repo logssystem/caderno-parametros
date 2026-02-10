@@ -649,18 +649,18 @@ window.baixarTemplateUsuarios = function () {
     "usuario;email;senha;permissao;agente;;;;permissoes_validas",
 
     // Exemplo de preenchimento
-    "joao;joao@empresa.com;Senha@12345;Agente de Call Center;sim",
+    "teste;teste@empresa.com;Senha@12345;Agente de Call Center;sim",
 
     // Linha em branco
     "",
 
     // Lista de permissões (coluna I)
-    ";;;;;;;;Administrador do Módulo de PABX",
+    ";;;;;;;;Administrador do Modulo de PABX",
     ";;;;;;;;Agente de Call Center",
     ";;;;;;;;Supervisor(a) de Call Center",
     ";;;;;;;;CRM",
     ";;;;;;;;CRM Owner",
-    ";;;;;;;;Administrador do Módulo de Omnichannel",
+    ";;;;;;;;Administrador do Modulo de Omnichannel",
     ";;;;;;;;Agente Omnichannel",
     ";;;;;;;;Supervisor(a) Omnichannel",
     ";;;;;;;;Super Administrador"
