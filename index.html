@@ -74,21 +74,30 @@
 
   <!-- ================= RAMAIS ================= -->
   <section class="card">
-    <h2>Ramais (Range)</h2>
-    <div class="acoes-card">
-      <input id="ramalInicio" type="number" placeholder="Ramal inicial">
-      <input id="ramalFim" type="number" placeholder="Ramal final">
-      <button class="btn-add" onclick="criarRangeRamais()">Criar range</button>
-    </div>
+  <h2>Ramais (Range)</h2>
 
-    <div class="acoes-card">
-      <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
-      <button class="btn-import" onclick="acionarImportacao('ring')">📥 Importar</button>
-      <input type="file" id="importRamais" accept=".csv" hidden>
-    </div>
+  <div class="acoes-card">
+    <input id="ramalInicio" type="number" placeholder="Ramal inicial">
+    <input id="ramalFim" type="number" placeholder="Ramal final">
+    <button class="btn-add" onclick="criarRangeRamais()">Criar range</button>
+  </div>
 
-    <div id="listaRings"></div>
-  </section>
+  <div class="acoes-card">
+    <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
+
+    <button class="btn-import" onclick="acionarImportacao('ring')">
+      📥 Importar
+    </button>
+
+    <button class="btn-import" onclick="baixarTemplateRamais()">
+      📥 Baixar template CSV
+    </button>
+
+    <input type="file" id="importRamais" accept=".csv" hidden>
+  </div>
+
+  <div id="listaRings"></div>
+</section>
 
   <!-- ================= ENTRADAS ================= -->
   <section class="card">
@@ -271,6 +280,7 @@
 
 </body>
 </html>
+
 
 
 
