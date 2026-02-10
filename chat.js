@@ -88,6 +88,71 @@ window.baixarTemplateUsuariosChat = function () {
   URL.revokeObjectURL(url);
 };
 
+/* ================= IMPORTAÇÃO CSV USUÁRIOS CHAT ================= */
+
+window.acionarImportacaoUsuariosChat = function () {
+  const input = document.getElementById("importUsuariosChat");
+  if (!input) return;
+
+  input.value = "";
+  input.click();
+
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => processarCSVUsuariosChat(e.target.result);
+    reader.readAsText(file);
+  };
+};
+
+function processarCSVUsuariosChat(texto) {
+  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
+  if (linhas.length < 2) return;
+
+  const sep = linhas[0].includes(";") ? ";" : ",";
+  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
+
+  linhas.forEach(linha => {
+    const valores = linha.split(sep);
+    const d = {};
+    header.forEach((h, i) => d[h] = (valores[i] || "").trim());
+
+    // ❌ ignora usuário vazio
+    if (!d.usuario) return;
+
+    // ❌ evita duplicar
+    const existe = [...document.querySelectorAll("#listaUsuariosChat .campo-nome")]
+      .some(i => i.value === d.usuario);
+
+    if (existe) return;
+
+    const wrap = adicionarUsuarioChat(true);
+
+    wrap.querySelector(".campo-nome").value = d.usuario;
+    wrap.querySelector("input[type=email]").value = d.email || "";
+    wrap.querySelector(".campo-senha").value = d.senha || "";
+
+    // permissão
+    const select = wrap.querySelector("select");
+    if (select && d.permissao) {
+      [...select.options].forEach(opt => {
+        if (opt.value.toLowerCase() === d.permissao.toLowerCase()) {
+          opt.selected = true;
+        }
+      });
+    }
+
+    // agente
+    if (d.agente?.toLowerCase() === "sim") {
+      wrap.querySelector("input[type=checkbox]")?.click();
+    }
+  });
+
+  mostrarToast("Usuários do chat importados com sucesso!");
+}
+
 /* =====================================================
    AGENTES CHAT (GERADOS DOS USUÁRIOS)
    ===================================================== */
