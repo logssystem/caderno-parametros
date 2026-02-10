@@ -646,7 +646,7 @@ document.addEventListener("change", e => {
 window.baixarTemplateUsuarios = function () {
   const csv = [
     "usuario;email;senha;permissao;agente",
-    ""
+    "teste;teste@empresa.com;Senha@12345;Agente de Call Center;sim"
   ].join("\n");
 
   const blob = new Blob([csv], {
