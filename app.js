@@ -436,18 +436,8 @@ function criarOpcaoURA() {
     const tecla = document.createElement("input");
     tecla.placeholder = "Tecla";
 
-    /*const tipo = document.createElement("input");
-    tipo.placeholder = "Tipo";
-    tipo.readOnly = true;
-    tipo.className = "tipo-destino";*/
-
     const destino = document.createElement("select");
     atualizarDestinosURA(destino);
-
-    destino.onchange = () => {
-        const opt = destino.selectedOptions[0];
-        tipo.value = opt?.dataset.tipo || "";
-    };
 
     const desc = document.createElement("input");
     desc.placeholder = "Descrição";
@@ -456,7 +446,7 @@ function criarOpcaoURA() {
     del.textContent = "🗑";
     del.onclick = () => wrap.remove();
 
-    wrap.append(tecla, tipo, destino, desc, del);
+    wrap.append(tecla, destino, desc, del);
     return wrap;
 }
 
