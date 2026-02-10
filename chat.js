@@ -102,9 +102,9 @@ window.baixarTemplateUsuariosChat = function () {
   const csv = [
     "usuario;email;senha;permissao;agente;;;;permissoes_disponiveis",
     "joao;joao@empresa.com;Senha@12345;Agente Omnichannel;sim;;;;",
-    ";;;;;;;;Administrador do Módulo de Omnichannel",
-    ";;;;;;;;Supervisor(a) Omnichannel",
-    ";;;;;;;;Agente Omnichannel"
+    ";;;;;;;;;Administrador do Módulo de Omnichannel",
+    ";;;;;;;;;Supervisor(a) Omnichannel",
+    ";;;;;;;;;Agente Omnichannel"
   ].join("\n");
 
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
