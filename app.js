@@ -214,12 +214,14 @@ function criarCampo(tipo) {
 /* ===== RAMAL ===== */
 if (tipo === "ring") {
 
-    // mantém layout original
+    // 🔧 largura igual ao campo de senha
+    nome.style.width = "260px";
+    nome.style.maxWidth = "100%";
+
     nome.type = "text";
     nome.inputMode = "numeric";
     nome.placeholder = "Digite o número do ramal";
 
-    // informativo visual
     const infoRamal = document.createElement("div");
     infoRamal.className = "regra-neutra";
     infoRamal.style.marginTop = "6px";
@@ -227,11 +229,9 @@ if (tipo === "ring") {
         "O ramal não pode iniciar com 0 e deve ter entre 3 e 6 dígitos.";
 
     nome.addEventListener("input", () => {
-        // remove letras, mantém números
         nome.value = nome.value.replace(/\D/g, "");
         const v = nome.value;
 
-        // estado neutro (vazio)
         if (!v.length) {
             nome.classList.remove("campo-obrigatorio-erro");
             infoRamal.className = "regra-neutra";
@@ -240,7 +240,6 @@ if (tipo === "ring") {
             return;
         }
 
-        // validações
         if (v.startsWith("0")) {
             nome.classList.add("campo-obrigatorio-erro");
             infoRamal.className = "regra-erro";
@@ -262,13 +261,11 @@ if (tipo === "ring") {
             return;
         }
 
-        // válido
         nome.classList.remove("campo-obrigatorio-erro");
         infoRamal.className = "regra-ok";
         infoRamal.textContent = "Ramal válido.";
     });
 
-    // senha do ramal (inalterado)
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do ramal";
     senhaInput.classList.add("campo-senha");
@@ -281,7 +278,6 @@ if (tipo === "ring") {
 
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
 
-    // informativo por último (fica embaixo, alinhado)
     wrap.append(infoRamal);
 }
 
