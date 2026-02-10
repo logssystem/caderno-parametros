@@ -211,45 +211,64 @@ function criarCampo(tipo) {
         senhaInput.oninput = () => validarSenha(senhaInput, regras);
     }
 
-    /* ===== RAMAL ===== */
+/* ===== RAMAL ===== */
 if (tipo === "ring") {
 
-    // 🔒 restringe para números apenas
+    // mantém layout original
     nome.type = "text";
     nome.inputMode = "numeric";
-    nome.pattern = "[0-9]*";
+    nome.placeholder = "Digite o número do ramal";
 
-    // 🔹 mensagem informativa
+    // informativo visual
     const infoRamal = document.createElement("div");
     infoRamal.className = "regra-neutra";
     infoRamal.style.marginTop = "6px";
     infoRamal.textContent =
         "O ramal não pode iniciar com 0 e deve ter entre 3 e 6 dígitos.";
 
-    // 🔍 validação visual
     nome.addEventListener("input", () => {
-        // remove tudo que não for número
+        // remove letras, mantém números
         nome.value = nome.value.replace(/\D/g, "");
-
         const v = nome.value;
 
-        const valido =
-            v.length >= 3 &&
-            v.length <= 6 &&
-            !v.startsWith("0");
+        // estado neutro (vazio)
+        if (!v.length) {
+            nome.classList.remove("campo-obrigatorio-erro");
+            infoRamal.className = "regra-neutra";
+            infoRamal.textContent =
+                "O ramal não pode iniciar com 0 e deve ter entre 3 e 6 dígitos.";
+            return;
+        }
 
-        nome.classList.toggle("campo-obrigatorio-erro", !valido && v.length > 0);
+        // validações
+        if (v.startsWith("0")) {
+            nome.classList.add("campo-obrigatorio-erro");
+            infoRamal.className = "regra-erro";
+            infoRamal.textContent = "O ramal não pode iniciar com 0.";
+            return;
+        }
 
-        infoRamal.className = valido
-            ? "regra-ok"
-            : "regra-neutra";
+        if (v.length < 3) {
+            nome.classList.add("campo-obrigatorio-erro");
+            infoRamal.className = "regra-erro";
+            infoRamal.textContent = "O ramal deve ter no mínimo 3 dígitos.";
+            return;
+        }
 
-        infoRamal.textContent = valido
-            ? "Ramal válido"
-            : "O ramal não pode iniciar com 0 e deve ter entre 3 e 6 dígitos.";
+        if (v.length > 6) {
+            nome.classList.add("campo-obrigatorio-erro");
+            infoRamal.className = "regra-erro";
+            infoRamal.textContent = "O ramal pode ter no máximo 6 dígitos.";
+            return;
+        }
+
+        // válido
+        nome.classList.remove("campo-obrigatorio-erro");
+        infoRamal.className = "regra-ok";
+        infoRamal.textContent = "Ramal válido.";
     });
 
-    // senha do ramal (já existente)
+    // senha do ramal (inalterado)
     senhaInput = document.createElement("input");
     senhaInput.placeholder = "Senha do ramal";
     senhaInput.classList.add("campo-senha");
@@ -262,7 +281,7 @@ if (tipo === "ring") {
 
     senhaInput.oninput = () => validarSenha(senhaInput, regras);
 
-    // adiciona info visual
+    // informativo por último (fica embaixo, alinhado)
     wrap.append(infoRamal);
 }
 
