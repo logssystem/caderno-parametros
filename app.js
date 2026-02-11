@@ -33,11 +33,11 @@ const DUVIDAS = {
     blocos: [
       {
         tipo: "info",
-        texto: "Esses dados identificam a empresa dentro do sistema e são usados em integrações de voz e chat."
+        texto: "Esses dados identificam a empresa dentro do sistema e são utilizados em autenticação, integrações e organização interna."
       },
       {
         tipo: "campo",
-        texto: "Nome da empresa: usado apenas para identificação interna."
+        texto: "Nome da empresa: utilizado apenas para identificação do projeto."
       },
       {
         tipo: "campo",
@@ -45,11 +45,11 @@ const DUVIDAS = {
       },
       {
         tipo: "alerta",
-        texto: "Domínios inválidos impedem autenticação e integrações do sistema."
+        texto: "Domínios inválidos impedem o funcionamento correto das integrações de voz e chat."
       },
       {
         tipo: "campo",
-        texto: "CNPJ: utilizado apenas para controle e registro interno."
+        texto: "CNPJ: utilizado apenas para registro e controle interno."
       }
     ]
   },
@@ -63,7 +63,7 @@ const DUVIDAS = {
       },
       {
         tipo: "campo",
-        texto: "Nome e e-mail: usados para identificação e login no sistema."
+        texto: "Nome e e-mail: utilizados para identificação e login no sistema."
       },
       {
         tipo: "campo",
@@ -73,8 +73,8 @@ const DUVIDAS = {
         tipo: "lista",
         texto: "Permissões disponíveis:",
         itens: [
-          "Administrador: acesso total ao sistema e às configurações.",
-          "Supervisor: acompanha filas e agentes, sem alterar regras críticas.",
+          "Administrador: acesso total às configurações do sistema.",
+          "Supervisor: acompanha agentes e filas, sem alterar regras críticas.",
           "Operador: acesso básico, apenas operacional.",
           "Relatórios: apenas visualização de dados e métricas."
         ]
@@ -95,7 +95,7 @@ const DUVIDAS = {
     blocos: [
       {
         tipo: "info",
-        texto: "Ramais são os pontos de atendimento telefônico do sistema."
+        texto: "Ramais são os pontos de atendimento telefônico utilizados para realizar e receber chamadas."
       },
       {
         tipo: "campo",
@@ -103,7 +103,7 @@ const DUVIDAS = {
       },
       {
         tipo: "campo",
-        texto: "Senha do ramal: utilizada para o registro SIP e segue as mesmas regras de segurança."
+        texto: "Senha do ramal: utilizada para o registro SIP e deve seguir as regras de segurança."
       },
       {
         tipo: "campo",
@@ -111,7 +111,7 @@ const DUVIDAS = {
       },
       {
         tipo: "exemplo",
-        texto: "Exemplo: ramais no mesmo grupo permitem uso do *8 para captura de chamadas em ring."
+        texto: "Exemplo: ramais no mesmo grupo permitem o uso do *8 para captura de chamadas em ring."
       }
     ]
   },
@@ -121,19 +121,19 @@ const DUVIDAS = {
     blocos: [
       {
         tipo: "info",
-        texto: "Agentes são os usuários responsáveis por atender chamadas telefônicas e/ou chats."
+        texto: "Agentes são os usuários responsáveis por atender chamadas telefônicas e atendimentos digitais."
       },
       {
         tipo: "campo",
-        texto: "Criação do agente: todo agente é originado a partir de um Usuário Web marcado como agente."
+        texto: "Origem do agente: todo agente é criado a partir de um Usuário Web marcado como agente."
       },
       {
         tipo: "campo",
-        texto: "Vínculo com ramal: todo agente deve obrigatoriamente estar associado a um ramal válido."
+        texto: "Vínculo com ramal: todo agente deve obrigatoriamente estar associado a um ramal."
       },
       {
         tipo: "campo",
-        texto: "Um agente pode participar de múltiplas filas ao mesmo tempo."
+        texto: "Um agente pode participar de múltiplas filas simultaneamente."
       },
       {
         tipo: "alerta",
@@ -141,7 +141,7 @@ const DUVIDAS = {
       },
       {
         tipo: "exemplo",
-        texto: "Exemplo: um agente pode atender simultaneamente a fila Comercial e a fila Suporte."
+        texto: "Exemplo: um agente pode atender as filas Comercial e Suporte ao mesmo tempo."
       }
     ]
   },
@@ -155,23 +155,53 @@ const DUVIDAS = {
       },
       {
         tipo: "campo",
-        texto: "Nome da fila: utilizado apenas para identificação da fila."
+        texto: "Nome da fila: utilizado apenas para identificação."
       },
       {
         tipo: "campo",
-        texto: "Agentes da fila: selecione quais agentes irão atender as chamadas dessa fila."
+        texto: "Agentes da fila: selecione os agentes que atenderão as chamadas."
       },
       {
         tipo: "campo",
-        texto: "Distribuição de chamadas: as chamadas são entregues aos agentes disponíveis conforme a estratégia configurada."
+        texto: "Distribuição de chamadas: ocorre conforme a estratégia definida no sistema."
       },
       {
         tipo: "alerta",
-        texto: "Filas sem agentes configurados não atendem chamadas."
+        texto: "Filas sem agentes configurados não realizam atendimento."
       },
       {
         tipo: "exemplo",
-        texto: "Exemplo: uma fila de Suporte pode tocar para três agentes ao mesmo tempo."
+        texto: "Exemplo: uma fila de Suporte pode tocar para vários agentes ao mesmo tempo."
+      }
+    ]
+  },
+
+  regrasTempo: {
+    titulo: "Regras de Tempo",
+    blocos: [
+      {
+        tipo: "info",
+        texto: "Regras de Tempo definem os dias e horários em que o atendimento estará ativo."
+      },
+      {
+        tipo: "campo",
+        texto: "Nome da regra: utilizado para identificar o horário configurado."
+      },
+      {
+        tipo: "campo",
+        texto: "Dias da semana: selecione os dias em que a regra será válida."
+      },
+      {
+        tipo: "campo",
+        texto: "Horário inicial e final: define o período de funcionamento."
+      },
+      {
+        tipo: "alerta",
+        texto: "Chamadas fora do horário definido devem ser direcionadas para outro destino."
+      },
+      {
+        tipo: "exemplo",
+        texto: "Exemplo: horário comercial de segunda a sexta, das 08:00 às 18:00."
       }
     ]
   },
@@ -181,7 +211,7 @@ const DUVIDAS = {
     blocos: [
       {
         tipo: "info",
-        texto: "A URA é o atendimento automático responsável por direcionar as chamadas."
+        texto: "A URA é o atendimento automático responsável por direcionar as chamadas dos clientes."
       },
       {
         tipo: "campo",
@@ -218,7 +248,7 @@ const DUVIDAS = {
       },
       {
         tipo: "campo",
-        texto: "Tipo de integração: define se o sistema utilizará apenas Chat ou Voz + Chat."
+        texto: "Tipo de integração: define se o atendimento será apenas Chat ou Voz + Chat."
       },
       {
         tipo: "campo",
