@@ -501,23 +501,30 @@ body.dark .chat-card.active {
 /* ================= PESQUISA DE SATISFAÇÃO ================= */
 
 .opcao-pesquisa {
-  display: grid;
-  grid-template-columns: 90px 1fr 40px;
-  gap: 12px;
+  display: flex;
   align-items: center;
-  margin-bottom: 12px;
-}
-
-.opcao-pesquisa input {
-  height: 40px;
+  gap: 14px;              /* AFASTAMENTO ENTRE OS CAMPOS */
+  margin-bottom: 14px;   /* ESPAÇO ENTRE AS LINHAS */
 }
 
 .opcao-pesquisa input[type="number"] {
+  width: 70px;           /* Nota pequena */
   text-align: center;
 }
 
+.opcao-pesquisa input[type="text"],
+.opcao-pesquisa input:not([type]) {
+  flex: 1;               /* Descrição ocupa o resto */
+}
+
 .opcao-pesquisa button {
+  width: 40px;
   height: 40px;
   border-radius: 8px;
+}
+
+/* AFASTAR O BOTÃO + ADICIONAR NOTA */
+#listaRespostasPesquisa + .btn-add {
+  margin-top: 16px;
 }
 
