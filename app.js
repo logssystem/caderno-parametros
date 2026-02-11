@@ -608,30 +608,30 @@ function gerarAgentesAPartirUsuarios() {
 
             wrap.append(selectRamal);
 
+            // ===== BOTÃO MULTISKILL =====
+            const btnMultiskill = document.createElement("button");
+            btnMultiskill.textContent = "Multiskill";
+            btnMultiskill.className = "btn-multiskill";
+            btnMultiskill.dataset.ativo = "false";
+            
+            btnMultiskill.onclick = () => {
+            const ativo = btnMultiskill.dataset.ativo === "true";
+            btnMultiskill.dataset.ativo = (!ativo).toString();
+            btnMultiskill.classList.toggle("ativo", !ativo);
+            };
+            
+            wrap.append(btnMultiskill);
+            
+            // getter para o JSON
+            wrap.isMultiskill = () => btnMultiskill.dataset.ativo === "true";
+
+            
             wrap.getRamal = () => selectRamal.value;
 
             listaAgentes.append(wrap);
         }
     });
 }
-
-// ===== MULTISKILL =====
-    const btnMultiskill = document.createElement("button");
-    btnMultiskill.textContent = "Multiskill";
-    btnMultiskill.className = "btn-multiskill";
-    btnMultiskill.dataset.ativo = "false";
-    
-    btnMultiskill.onclick = () => {
-      const ativo = btnMultiskill.dataset.ativo === "true";
-      btnMultiskill.dataset.ativo = (!ativo).toString();
-      btnMultiskill.classList.toggle("ativo", !ativo);
-    };
-    
-    wrap.append(btnMultiskill);
-    
-    // getter do multiskill
-    wrap.isMultiskill = () => btnMultiskill.dataset.ativo === "true";
-
 
 /* ================= DESTINOS URA ================= */
 
