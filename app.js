@@ -63,7 +63,7 @@ const DUVIDAS = {
       },
       {
         tipo: "campo",
-        texto: "Nome e e-mail: utilizados para identificação e login no sistema."
+        texto: "Nome e e-mail: utilizados para identificação."
       },
       {
         tipo: "campo",
