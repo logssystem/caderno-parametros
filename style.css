@@ -594,3 +594,10 @@ body.dark .chat-card.active {
   color: #fff;
   opacity: 1;
 }
+
+/* ===== Multiskill – ajuste fino visual ===== */
+.btn-multiskill {
+  font-size: 14px;        /* antes devia estar 12/13 */
+  color: #111827;        /* preto mais escuro (padrão Tailwind text-gray-900) */
+  font-weight: 500;      /* um pouco mais de presença */
+}
