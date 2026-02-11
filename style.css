@@ -638,12 +638,14 @@ body.dark .chat-card.active {
   font-size: 13px;
 }
 
-/* ================= BOTÃO DÚVIDAS ================= */
+/* ================= BOTÃO DÚVIDAS (FIXO) ================= */
 .btn-duvidas {
-  position: relative;
-  margin: 32px 0 24px 0;   /* empurra ele para baixo */
-  padding: 14px 22px;
+  position: fixed;
+  top: 96px;              /* distância segura do header */
+  right: 24px;
+  z-index: 1100;
 
+  padding: 14px 22px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -654,18 +656,18 @@ body.dark .chat-card.active {
   background-color: var(--btn-primary-bg);
   color: #fff;
 
-  opacity: 1;             /* FORÇA cor viva */
-  filter: none;           /* remove efeito lavado */
+  opacity: 1;
+  filter: none;
   pointer-events: auto;
 
   border: none;
   border-radius: 10px;
   cursor: pointer;
 
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
 }
 
 .btn-duvidas:hover {
-  background-color: var(--btn-primary-bg);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.25);
 }
+
