@@ -605,47 +605,48 @@ body.dark .chat-card.active {
 /* ===== Botão Dúvidas ===== */
 .btn-duvidas {
   position: fixed;
-  top: 140px;           /* ajuste fino conforme header */
-  right: 32px;
-  padding: 8px 12px;
+  top: 92px;
+  right: 24px;
+  padding: 6px 14px;
   font-size: 13px;
-  background: #ffffff;
-  border: 1px solid #d1d5db;
+  font-weight: 500;
   border-radius: 20px;
+  border: 1px solid #cfd8e3;
+  background: #ffffff;
+  color: #1f2937;
   cursor: pointer;
-  color: #111827;
-  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+  transition: all .2s ease;
 }
 
 .btn-duvidas:hover {
-  background: #f9fafb;
+  background: #f8fafc;
+  border-color: #94a3b8;
 }
 
 /* ===== Painel de Dúvidas ===== */
 .painel-duvidas {
   position: fixed;
-  top: 180px;
-  right: 32px;
-  width: 340px;
+  top: 130px;
+  right: 24px;
+  width: 320px;
   max-height: 70vh;
-  overflow: auto;
+  overflow-y: auto;
   background: #ffffff;
-  border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 10px 25px rgba(0,0,0,.15);
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
   font-size: 13px;
-  color: #374151;
-  z-index: 999;
+  line-height: 1.5;
+  color: #334155;
 }
 
 .painel-duvidas h4 {
   margin: 12px 0 6px;
   font-size: 14px;
-  color: #111827;
+  color: #0f172a;
 }
 
 .painel-duvidas p {
-  margin: 0 0 8px;
-  line-height: 1.4;
+  margin: 4px 0;
 }
