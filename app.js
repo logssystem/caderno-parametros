@@ -100,6 +100,35 @@ window.adicionarCampo = function (tipo) {
     syncTudo();
 };
 
+/* ================= PESQUISA DE SATISFAÇÃO ================= */
+
+function adicionarRespostaPesquisa() {
+  const lista = document.getElementById("listaRespostasPesquisa");
+  if (!lista) return;
+
+  lista.appendChild(criarRespostaPesquisa());
+}
+
+function criarRespostaPesquisa() {
+  const wrap = document.createElement("div");
+  wrap.className = "opcao-ura"; // reaproveita layout existente
+
+  const nota = document.createElement("input");
+  nota.type = "number";
+  nota.placeholder = "Nota";
+  nota.style.maxWidth = "80px";
+
+  const descricao = document.createElement("input");
+  descricao.placeholder = "Descrição da resposta (ex: Excelente, Bom, Ruim...)";
+
+  const del = document.createElement("button");
+  del.textContent = "🗑";
+  del.onclick = () => wrap.remove();
+
+  wrap.append(nota, descricao, del);
+  return wrap;
+}
+
 /* ================= DESTINOS URA (RESTAURADO) ================= */
 
 function atualizarDestinosURA(select) {
