@@ -74,9 +74,10 @@ const DUVIDAS = {
         texto: "Permissões disponíveis:",
         itens: [
           "Administrador: acesso total às configurações do sistema.",
+            
           "Supervisor: acompanha agentes e filas, sem alterar regras críticas.",
+
           "Operador: acesso básico, apenas operacional.",
-          "Relatórios: apenas visualização de dados e métricas."
         ]
       },
       {
