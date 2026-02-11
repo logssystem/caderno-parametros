@@ -228,7 +228,7 @@ const DUVIDAS = {
       },
       {
         tipo: "campo",
-        texto: "Opções: cada tecla deve possuir um destino configurado."
+        texto: "Opções: cada tecla deve obrigatoriamente possuir um destino configurado, Lembrando que as teclas aceitam apenas números, não sendo permitido o uso de letras ou caracteres especiais."
       },
       {
         tipo: "lista",
