@@ -1033,6 +1033,65 @@ window.criarRangeRamais = function () {
     mostrarToast("Ramais criados com sucesso");
 };
 
+/* ================= COLETAS NOVAS ================= */
+
+function coletarPausas() {
+  const container = document.getElementById("pausasConteudo");
+  if (!container || container.style.display === "none") return null;
+
+  const nomeGrupo = document.getElementById("nomeGrupoPausas")?.value.trim();
+  if (!nomeGrupo) {
+    throw new Error("Informe o nome do Grupo de Pausas.");
+  }
+
+  const pausas = [];
+  document.querySelectorAll("#listaPausas .campo-descricao").forEach(p => {
+    const nome = p.querySelector("input")?.value.trim();
+    if (nome) pausas.push({ nome });
+  });
+
+  if (!pausas.length) {
+    throw new Error("Adicione ao menos uma pausa.");
+  }
+
+  return { grupo: nomeGrupo, itens: pausas };
+}
+
+function coletarPesquisaSatisfacao() {
+  const container = document.getElementById("pesquisaSatisfacaoConteudo");
+  if (!container || container.style.display === "none") return null;
+
+  const nome = document.getElementById("pesquisaNome")?.value.trim();
+  const intro = document.getElementById("pesquisaAudioIntro")?.value.trim();
+  const pergunta = document.getElementById("pesquisaPergunta")?.value.trim();
+  const fim = document.getElementById("pesquisaAudioFim")?.value.trim();
+
+  if (!nome || !pergunta) {
+    throw new Error("Preencha a Pesquisa de Satisfação.");
+  }
+
+  const respostas = [];
+  document.querySelectorAll("#listaRespostasPesquisa .campo-descricao").forEach(r => {
+    const nota = r.querySelector("input[type=number]")?.value;
+    const desc = r.querySelector("input[type=text]")?.value?.trim();
+    if (nota !== "" && desc) {
+      respostas.push({ nota: Number(nota), descricao: desc });
+    }
+  });
+
+  if (!respostas.length) {
+    throw new Error("Adicione respostas na Pesquisa de Satisfação.");
+  }
+
+  return {
+    nome,
+    introducao: intro,
+    pergunta,
+    respostas,
+    encerramento: fim
+  };
+}
+
 /* ================= MOTOR ================= */
 
 function syncTudo() {
@@ -1363,6 +1422,8 @@ window.explorar = function () {
                 agentes,
                 filas,
                 regras_tempo
+                pausas: coletarPausas(),
+                pesquisaSatisfacao: coletarPesquisaSatisfacao()
             }
         };
 
