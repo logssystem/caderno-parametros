@@ -26,6 +26,43 @@ const PERMISSOES = [
     "Super Administrador"
 ];
 
+function toggleDuvidas() {
+  const painel = document.getElementById("painelDuvidas");
+  if (!painel) return;
+
+  if (!painel.hidden) {
+    painel.hidden = true;
+    return;
+  }
+
+  painel.innerHTML = `
+    <h4>Dados do Cliente</h4>
+    <p><strong>Nome da empresa:</strong> informe o nome oficial do cliente.</p>
+    <p><strong>Domínio:</strong> deve terminar com <code>.sobreip.com.br</code>.</p>
+    <p><strong>CNPJ:</strong> utilizado para identificação do cliente.</p>
+
+    <h4>Usuários Web</h4>
+    <p>Crie usuários que acessarão o sistema.</p>
+    <p>Marque como agente apenas usuários que irão atender chamadas ou chats.</p>
+
+    <h4>Ramais</h4>
+    <p>O ramal deve conter apenas números e possuir senha segura.</p>
+
+    <h4>Agentes</h4>
+    <p>Os agentes são gerados automaticamente a partir dos usuários.</p>
+    <p><strong>Multiskill:</strong> permite que o agente atenda mais de uma fila.</p>
+
+    <h4>URAs</h4>
+    <p>Configure a mensagem inicial e as opções de atendimento.</p>
+
+    <h4>Chat / Omnichannel</h4>
+    <p>Selecione o tipo de integração, API, conta e canais.</p>
+    <p>Agentes de chat devem estar vinculados a departamentos.</p>
+  `;
+
+  painel.hidden = false;
+}
+
 /* ================= DADOS DO CLIENTE ================= */
 
 const dominioInput = document.getElementById("dominioCliente");
