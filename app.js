@@ -411,6 +411,34 @@ if (tipo === "ring") {
         }
     }
 
+    <!-- ================= PAUSAS DO CALL CENTER ================= -->
+    <section class="card">
+      <h2>Pausas do Call Center</h2>
+      <p style="opacity:.7;margin-top:-6px;">
+        Crie os motivos de pausa que poderão ser utilizados nas filas de Call Center.
+      </p>
+    
+      <div class="acoes-card">
+        <button class="btn-add" onclick="togglePausas()">+</button>
+      </div>
+    
+      <div id="pausasConteudo" style="display:none;">
+    
+        <div class="campo-descricao">
+          <div class="bloco-campo">
+            <label>Nome do Grupo de Pausas</label>
+            <input id="nomeGrupoPausas" placeholder="Ex: Pausas Operacionais">
+          </div>
+        </div>
+    
+        <h3 style="margin-top:20px;">Pausas</h3>
+        <div id="listaPausas"></div>
+    
+        <button class="btn-add" onclick="adicionarPausa()">+ Adicionar pausa</button>
+    
+      </div>
+    </section>
+
     /* ===== GRUPO DE RING ===== */
     if (tipo === "grupo_ring") {
         const estr = document.createElement("select");
