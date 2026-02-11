@@ -703,3 +703,29 @@ body.dark #intro-screen .intro-actions button:hover {
   opacity: 1;
   color: #e11d48;
 }
+
+/* ===== BOTÃO REMOVER DEPARTAMENTO ===== */
+.btn-remover {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.btn-remover:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+  transform: scale(1.05);
+}
+
+/* ===== ANIMAÇÃO DE REMOÇÃO ===== */
+.campo-descricao.removendo {
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.18s ease;
+}
