@@ -641,7 +641,7 @@ body.dark .chat-card.active {
 /* ================= BOTÃO DÚVIDAS (FIXO) ================= */
 .btn-duvidas {
   position: fixed;
-  top: 96px;              /* distância segura do header */
+  top: 80px;              /* distância segura do header */
   right: 24px;
   z-index: 1100;
 
