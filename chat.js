@@ -220,16 +220,38 @@ function gerarAgentesChatAPartirUsuarios() {
 /* =====================================================
    DEPARTAMENTOS CHAT (MODELO PABX)
    ===================================================== */
-window.adicionarDepartamentoChat = function () {
+  window.adicionarDepartamentoChat = function () {
   const lista = document.getElementById("listaDepartamentosChat");
   if (!lista) return;
 
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
+  /* ===== LINHA TOPO (NOME + REMOVER) ===== */
+  const linhaTopo = document.createElement("div");
+  linhaTopo.style.display = "flex";
+  linhaTopo.style.gap = "8px";
+  linhaTopo.style.alignItems = "center";
+
   const inputNome = document.createElement("input");
   inputNome.placeholder = "Nome do departamento";
+  inputNome.style.flex = "1";
 
+  const btnRemoverDepto = document.createElement("button");
+  btnRemoverDepto.textContent = "🗑";
+  btnRemoverDepto.title = "Remover departamento";
+  btnRemoverDepto.className = "btn-remover";
+
+  btnRemoverDepto.onclick = () => {
+    if (confirm("Deseja remover este departamento?")) {
+      wrap.remove();
+    }
+  };
+
+  linhaTopo.append(inputNome, btnRemoverDepto);
+  wrap.appendChild(linhaTopo);
+
+  /* ===== LISTA DE AGENTES ===== */
   const listaAgentes = document.createElement("div");
   listaAgentes.style.marginTop = "8px";
 
@@ -262,6 +284,7 @@ window.adicionarDepartamentoChat = function () {
     listaAgentes.appendChild(linha);
   };
 
+  /* ===== DATA PARA SALVAR ===== */
   wrap.getData = () => {
     const agentes = [];
     listaAgentes.querySelectorAll("select").forEach(s => {
@@ -274,7 +297,7 @@ window.adicionarDepartamentoChat = function () {
     };
   };
 
-  wrap.append(inputNome, listaAgentes, btnAddAgente);
+  wrap.append(listaAgentes, btnAddAgente);
   lista.appendChild(wrap);
 };
 
