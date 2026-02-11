@@ -138,6 +138,47 @@ function criarRespostaPesquisa() {
   return wrap;
 }
 
+/* ================= PAUSAS DO CALL CENTER ================= */
+
+function togglePausas() {
+  const bloco = document.getElementById("pausasConteudo");
+  if (!bloco) return;
+
+  bloco.style.display =
+    bloco.style.display === "none" ? "block" : "none";
+}
+
+function adicionarPausa() {
+  const lista = document.getElementById("listaPausas");
+  if (!lista) return;
+
+  lista.appendChild(criarPausa());
+}
+
+function criarPausa() {
+  const wrap = document.createElement("div");
+  wrap.className = "opcao-pausa";
+
+  const nome = document.createElement("input");
+  nome.type = "text";
+  nome.placeholder = "Nome da pausa (ex: Almoço, Banheiro, Treinamento)";
+
+  const timeout = document.createElement("select");
+  for (let i = 0; i <= 240; i += 5) {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = i === 0 ? "Sem limite" : `${i} min`;
+    timeout.appendChild(opt);
+  }
+
+  const del = document.createElement("button");
+  del.textContent = "🗑";
+  del.onclick = () => wrap.remove();
+
+  wrap.append(nome, timeout, del);
+  return wrap;
+}
+
 /* ================= DESTINOS URA (RESTAURADO) ================= */
 
 function atualizarDestinosURA(select) {
