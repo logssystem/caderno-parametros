@@ -1047,11 +1047,11 @@ function coletarPausas() {
     const nome = p.querySelector("input")?.value.trim();
     if (nome) pausas.push({ nome });
   });
-
-  if (!pausas.length) {
-    throw new Error("Adicione ao menos uma pausa.");
-  }
-
+    
+    if (!pausas.length) {
+  return null;
+}
+    
   return { grupo: nomeGrupo, itens: pausas };
 }
 
