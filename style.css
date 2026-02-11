@@ -650,3 +650,12 @@ body.dark .chat-card.active {
 .painel-duvidas p {
   margin: 4px 0;
 }
+
+#selectDuvida {
+  width: 100%;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 13px;
+}
