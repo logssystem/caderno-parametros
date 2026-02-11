@@ -31,17 +31,19 @@ body {
 
 /* HEADER */
 .app-header {
-  height: 120px;
   display: grid;
   grid-template-columns: auto 1fr auto auto;
   align-items: center;
-  padding: 0 48px;
-  background: var(--header-bg);
-  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  gap: 16px;
 }
 
 .app-logo { height: 72px; }
-.app-title { font-size: 26px; font-weight: 800; }
+.app-title {
+  justify-self: center;
+  text-align: center;
+  margin: 0;
+}
 
 .theme-toggle {
   background: none;
