@@ -674,3 +674,19 @@ body.dark .chat-card.active {
   box-shadow: 0 8px 22px rgba(0,0,0,0.25);
 }
 
+/* ================= INTRO – AJUSTE TEXTO NO MODO ESCURO ================= */
+
+body.dark #intro-screen .intro-actions button {
+  color: #e5e7eb; /* texto claro (cinza/branco suave) */
+}
+
+/* ícones dentro do botão (emoji ou svg) */
+body.dark #intro-screen .intro-actions button span,
+body.dark #intro-screen .intro-actions button i {
+  color: #e5e7eb;
+}
+
+/* hover no modo escuro */
+body.dark #intro-screen .intro-actions button:hover {
+  color: #ffffff;
+}
