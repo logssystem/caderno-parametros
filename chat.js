@@ -243,10 +243,12 @@ function gerarAgentesChatAPartirUsuarios() {
   btnRemoverDepto.className = "btn-remover";
 
   btnRemoverDepto.onclick = () => {
-    if (confirm("Deseja remover este departamento?")) {
-      wrap.remove();
-    }
-  };
+  wrap.classList.add("removendo");
+
+  setTimeout(() => {
+    wrap.remove();
+  }, 180); // tempo da animação
+};
 
   linhaTopo.append(inputNome, btnRemoverDepto);
   wrap.appendChild(linhaTopo);
