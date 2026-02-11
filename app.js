@@ -119,15 +119,16 @@ function adicionarRespostaPesquisa() {
 
 function criarRespostaPesquisa() {
   const wrap = document.createElement("div");
-  wrap.className = "opcao-ura"; // reaproveita layout existente
+  wrap.className = "opcao-pesquisa"; // ⚠️ NÃO usar opcao-ura
 
   const nota = document.createElement("input");
   nota.type = "number";
   nota.placeholder = "Nota";
-  nota.style.maxWidth = "80px";
+  nota.style.width = "70px";
 
   const descricao = document.createElement("input");
-  descricao.placeholder = "Descrição da resposta (ex: Excelente, Bom, Ruim...)";
+  descricao.type = "text"; // explícito (seguro)
+  descricao.placeholder = "Descrição da resposta";
 
   const del = document.createElement("button");
   del.textContent = "🗑";
