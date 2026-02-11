@@ -271,6 +271,46 @@ const DUVIDAS = {
 
 };
 
+const DUVIDAS = {
+  // todo o objeto gigante que você já colou
+};
+
+// ⬇️ COLE ISSO AQUI, LOGO ABAIXO ⬇️
+function renderizarDuvidas(chave) {
+  const container = document.getElementById("conteudoDuvida");
+  container.innerHTML = "";
+
+  const dados = DUVIDAS[chave];
+  if (!dados) return;
+
+  dados.blocos.forEach(bloco => {
+    const el = document.createElement("div");
+    el.className = `duvida-bloco duvida-${bloco.tipo}`;
+
+    if (bloco.tipo === "lista") {
+      el.innerHTML = `
+        <strong>${bloco.texto}</strong>
+        <ul>
+          ${bloco.itens.map(item => `<li>${item}</li>`).join("")}
+        </ul>
+      `;
+    } else {
+      el.innerHTML = bloco.texto;
+    }
+
+    container.appendChild(el);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("selectDuvida");
+  if (!select) return;
+
+  select.addEventListener("change", function () {
+    renderizarDuvidas(this.value);
+  });
+});
+
 function toggleDuvidas() {
   const painel = document.getElementById("painelDuvidas");
   if (!painel) return;
