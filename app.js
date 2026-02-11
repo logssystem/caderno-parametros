@@ -88,7 +88,7 @@ const DUVIDAS = {
 
         ]
       },
-      {
+    
         tipo: "alerta",
         texto: "Evite conceder permissão de Administrador para usuários que não são responsáveis técnicos."
       },
