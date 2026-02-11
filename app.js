@@ -128,7 +128,7 @@ function criarRespostaPesquisa() {
 
   const descricao = document.createElement("input");
   descricao.type = "text"; // explícito (seguro)
-  descricao.placeholder = "Descrição da resposta";
+  descricao.placeholder = "Descrição da resposta (ex: Ruim, Regular, Bom, Excelente";
 
   const del = document.createElement("button");
   del.textContent = "🗑";
