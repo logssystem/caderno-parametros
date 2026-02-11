@@ -643,6 +643,7 @@ body.dark .chat-card.active {
   position: fixed;
   top: 180px;              /* distância segura do header */
   right: 24px;
+  
   z-index: 1100;
 
   padding: 14px 22px;
@@ -653,7 +654,7 @@ body.dark .chat-card.active {
   font-size: 15px;
   font-weight: 600;
 
-  background-color: var(--btn-primary-bg);
+  background-color: var(--accent);
   color: #000;
 
   opacity: 1;
