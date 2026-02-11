@@ -419,36 +419,34 @@ function criarPausa() {
 /* ================= DESTINOS URA (RESTAURADO) ================= */
 
 function atualizarDestinosURA(select) {
-    if (!select) return;
+  if (!select) return;
 
-    select.innerHTML = "";
-    select.add(new Option("Selecione o destino", ""));
+  select.innerHTML = "";
+  select.add(new Option("Selecione o destino", ""));
 
-    const grupos = [
-        { id: "listaRings", label: "📞 Ramal", tipo: "ramal" },
-        { id: "listaFilas", label: "👥 Fila", tipo: "fila" },
-        { id: "listaGrupoRing", label: "🔔 Grupo de Ring", tipo: "grupo_ring" },
-        { id: "listaURAs", label: "☎ URA", tipo: "ura" },
-        { id: "listaRegrasTempo", label: "⏰ Regra de Tempo", tipo: "regra_tempo" }
-    ];
+  const grupos = [
+    { id: "listaRings", label: "📞 Ramal" },
+    { id: "listaFilas", label: "👥 Fila" },
+    { id: "listaGrupoRing", label: "🔔 Grupo de Ring" },
+    { id: "listaURAs", label: "☎ URA" },
+    { id: "listaRegrasTempo", label: "⏰ Regra de Tempo" }
+  ];
 
-    grupos.forEach(g => {
-        const optgroup = document.createElement("optgroup");
-        optgroup.label = g.label;
+  grupos.forEach(g => {
+    const optgroup = document.createElement("optgroup");
+    optgroup.label = g.label;
 
-        document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
-            agentes.push({
-            nome: a.querySelector(".campo-nome")?.value || "",
-            ramal: a.getRamal ? a.getRamal() : "",
-            multiskill: a.isMultiskill ? a.isMultiskill() : false
-        });
+    document.querySelectorAll(`#${g.id} .campo-descricao`).forEach(el => {
+      const nome = el.getNome?.() || el.querySelector(".campo-nome")?.value;
+      if (nome) {
+        optgroup.appendChild(new Option(nome, nome));
+      }
     });
 
-
-        if (optgroup.children.length) {
-            select.appendChild(optgroup);
-        }
-    });
+    if (optgroup.children.length) {
+      select.appendChild(optgroup);
+    }
+  });
 }
 
 // 🔧 GARANTIA: função global para não quebrar o app
