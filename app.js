@@ -15,18 +15,16 @@ const listas = {
 };
 
 const PERMISSOES = [
-    "Administrador do Módulo de PABX",
-    "Agente de Call Center",
-    "Supervisor(a) de Call Center",
-    "CRM",
-    "CRM Owner",
-    "Administrador do Módulo de Omnichannel",
-    "Agente Omnichannel",
-    "Supervisor(a) Omnichannel",
-    "Super Administrador"
+  "Administrador do Módulo de PABX",
+  "Agente de Call Center",
+  "Supervisor(a) de Call Center",
+  "CRM",
+  "CRM Owner",
+  "Administrador do Módulo de Omnichannel",
+  "Agente Omnichannel",
+  "Supervisor(a) Omnichannel",
+  "Super Administrador"
 ];
-
-const DUVIDAS = {
 
   const DUVIDAS = {
 
