@@ -609,6 +609,24 @@ function gerarAgentesAPartirUsuarios() {
     });
 }
 
+// ===== MULTISKILL =====
+    const btnMultiskill = document.createElement("button");
+    btnMultiskill.textContent = "Multiskill";
+    btnMultiskill.className = "btn-multiskill";
+    btnMultiskill.dataset.ativo = "false";
+    
+    btnMultiskill.onclick = () => {
+      const ativo = btnMultiskill.dataset.ativo === "true";
+      btnMultiskill.dataset.ativo = (!ativo).toString();
+      btnMultiskill.classList.toggle("ativo", !ativo);
+    };
+    
+    wrap.append(btnMultiskill);
+    
+    // getter do multiskill
+    wrap.isMultiskill = () => btnMultiskill.dataset.ativo === "true";
+
+
 /* ================= DESTINOS URA ================= */
 
 function atualizarSelectAgentesFila() {
