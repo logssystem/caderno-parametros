@@ -664,3 +664,32 @@ body.dark .chat-card.active {
   border: 1px solid #cbd5e1;
   font-size: 13px;
 }
+
+#btnDuvidas {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+
+  margin: 24px 0 16px 0;
+}
+
+#btnDuvidas {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 14px 22px;
+  font-size: 15px;
+  font-weight: 600;
+
+  background-color: var(--btn-primary-bg);
+  color: #fff;
+
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
