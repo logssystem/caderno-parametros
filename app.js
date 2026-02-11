@@ -28,6 +28,8 @@ const PERMISSOES = [
 
 const DUVIDAS = {
 
+  const DUVIDAS = {
+
   cliente: {
     titulo: "Dados do Cliente",
     blocos: [
@@ -71,28 +73,30 @@ const DUVIDAS = {
       },
       {
         tipo: "lista",
-          texto: "Permissões disponíveis e suas funções:",
-          itens: [
-            "Administrador do Módulo de PABX: acesso total às configurações de voz (ramais, URA, filas, agentes e regras de tempo).",
-            "Agente de Call Center: utilizado para usuários que realizam atendimento telefônico.",
-            "Supervisor(a) de Call Center: pode acompanhar agentes e filas do call center.",
-            "CRM: acesso ao módulo de CRM, sem permissões administrativas.",
-            "CRM Owner: acesso total ao módulo de CRM.",
-            "Administrador do Módulo de Omnichannel: acesso total às configurações de chat e canais digitais.",
-            "Agente Omnichannel: utilizado para usuários que realizam atendimento via chat.",
-            "Supervisor(a) Omnichannel: pode acompanhar agentes e atendimentos do chat.",
-            "Super Administrador: acesso total a todos os módulos e configurações do sistema."
-          ]
-          },
-        {
+        texto: "Permissões disponíveis e suas funções:",
+        itens: [
+          "Administrador do Módulo de PABX: acesso total às configurações de voz (ramais, URA, filas, agentes e regras de tempo).",
+          "Agente de Call Center: utilizado para usuários que realizam atendimento telefônico.",
+          "Supervisor(a) de Call Center: pode acompanhar agentes e filas do call center.",
+          "CRM: acesso ao módulo de CRM, sem permissões administrativas.",
+          "CRM Owner: acesso total ao módulo de CRM.",
+          "Administrador do Módulo de Omnichannel: acesso total às configurações de chat e canais digitais.",
+          "Agente Omnichannel: utilizado para usuários que realizam atendimento via chat.",
+          "Supervisor(a) Omnichannel: pode acompanhar agentes e atendimentos do chat.",
+          "Super Administrador: acesso total a todos os módulos e configurações do sistema."
+        ]
+      },
+      {
         tipo: "alerta",
         texto: "Evite conceder permissão de Administrador para usuários que não são responsáveis técnicos."
       },
       {
         tipo: "campo",
         texto: "Marcar como Agente: permite que o usuário atenda chamadas e exige vínculo obrigatório com um ramal."
-      },
-        {
+      }
+    ]
+  },
+
   ramais: {
     titulo: "Ramais",
     blocos: [
@@ -114,7 +118,7 @@ const DUVIDAS = {
       },
       {
         tipo: "exemplo",
-        texto: "Exemplo: ramais no mesmo grupo permitem o uso do *8 para captura de chamadas em ring."
+        texto: "Exemplo: ramais no mesmo grupo permitem o uso do *8 para captura de chamadas."
       }
     ]
   },
@@ -128,23 +132,15 @@ const DUVIDAS = {
       },
       {
         tipo: "campo",
-        texto: "Origem do agente: todo agente é criado a partir de um Usuário Web marcado como agente."
+        texto: "Todo agente é criado a partir de um Usuário Web marcado como agente."
       },
       {
         tipo: "campo",
-        texto: "Vínculo com ramal: todo agente deve obrigatoriamente estar associado a um ramal."
-      },
-      {
-        tipo: "campo",
-        texto: "Um agente pode participar de múltiplas filas simultaneamente."
+        texto: "Todo agente deve obrigatoriamente estar associado a um ramal."
       },
       {
         tipo: "alerta",
         texto: "Agentes sem ramal vinculado não conseguem receber chamadas."
-      },
-      {
-        tipo: "exemplo",
-        texto: "Exemplo: um agente pode atender as filas Comercial e Suporte ao mesmo tempo."
       }
     ]
   },
@@ -158,23 +154,7 @@ const DUVIDAS = {
       },
       {
         tipo: "campo",
-        texto: "Nome da fila: utilizado apenas para identificação."
-      },
-      {
-        tipo: "campo",
-        texto: "Agentes da fila: selecione os agentes que atenderão as chamadas."
-      },
-      {
-        tipo: "campo",
-        texto: "Distribuição de chamadas: ocorre conforme a estratégia definida no sistema."
-      },
-      {
-        tipo: "alerta",
         texto: "Filas sem agentes configurados não realizam atendimento."
-      },
-      {
-        tipo: "exemplo",
-        texto: "Exemplo: uma fila de Suporte pode tocar para vários agentes ao mesmo tempo."
       }
     ]
   },
@@ -187,24 +167,8 @@ const DUVIDAS = {
         texto: "Regras de Tempo definem os dias e horários em que o atendimento estará ativo."
       },
       {
-        tipo: "campo",
-        texto: "Nome da regra: utilizado para identificar o horário configurado."
-      },
-      {
-        tipo: "campo",
-        texto: "Dias da semana: selecione os dias em que a regra será válida."
-      },
-      {
-        tipo: "campo",
-        texto: "Horário inicial e final: define o período de funcionamento."
-      },
-      {
-        tipo: "alerta",
-        texto: "Chamadas fora do horário definido devem ser direcionadas para outro destino."
-      },
-      {
         tipo: "exemplo",
-        texto: "Exemplo: horário comercial de segunda a sexta, das 08:00 às 18:00."
+        texto: "Exemplo: segunda a sexta, das 08:00 às 18:00."
       }
     ]
   },
@@ -217,14 +181,6 @@ const DUVIDAS = {
         texto: "A URA é o atendimento automático responsável por direcionar as chamadas dos clientes."
       },
       {
-        tipo: "campo",
-        texto: "Mensagem: áudio ou texto reproduzido quando o cliente liga."
-      },
-      {
-        tipo: "campo",
-        texto: "Opções: cada tecla deve obrigatoriamente possuir um destino configurado, Lembrando que as teclas aceitam apenas números, não sendo permitido o uso de letras ou caracteres especiais."
-      },
-      {
         tipo: "lista",
         texto: "Destinos possíveis:",
         itens: [
@@ -234,10 +190,6 @@ const DUVIDAS = {
           "Outra URA",
           "Regra de Tempo"
         ]
-      },
-      {
-        tipo: "alerta",
-        texto: "URA sem opções configuradas não direciona chamadas corretamente."
       }
     ]
   },
@@ -251,23 +203,11 @@ const DUVIDAS = {
       },
       {
         tipo: "campo",
-        texto: "Tipo de integração: define se o atendimento será apenas Chat ou Voz + Chat."
-      },
-      {
-        tipo: "campo",
-        texto: "API e Conta: definem o provedor e a conta utilizada para integração."
-      },
-      {
-        tipo: "campo",
-        texto: "Canais: selecione quais canais digitais estarão ativos."
-      },
-      {
-        tipo: "campo",
-        texto: "Agentes Chat: devem obrigatoriamente estar vinculados a um departamento."
+        texto: "Agentes omnichannel devem obrigatoriamente estar vinculados a um departamento."
       },
       {
         tipo: "alerta",
-        texto: "Agentes sem departamento configurado não conseguem atender chats."
+        texto: "Sem departamento configurado, o agente não consegue atender chats."
       }
     ]
   }
