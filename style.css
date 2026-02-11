@@ -602,33 +602,6 @@ body.dark .chat-card.active {
   font-weight: 500;      /* um pouco mais de presença */
 }
 
-#btnDuvidas {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  margin: 24px 0 16px 0; /* espaço acima e abaixo */
-  padding: 14px 22px;
-
-  font-size: 15px;
-  font-weight: 600;
-
-  background-color: var(--btn-primary-bg); /* mesma do Salvar */
-  color: #fff;
-
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-#btnDuvidas:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.18);
-}
-
 /* ===== Painel de Dúvidas ===== */
 .painel-duvidas {
   position: fixed;
@@ -665,21 +638,16 @@ body.dark .chat-card.active {
   font-size: 13px;
 }
 
-#btnDuvidas {
-  position: static !important;
-  top: auto !important;
-  right: auto !important;
-  left: auto !important;
-
+/* ================= BOTÃO DÚVIDAS ================= */
+.btn-duvidas {
+  position: relative;
   margin: 24px 0 16px 0;
-}
+  padding: 14px 22px;
 
-#btnDuvidas {
   display: inline-flex;
   align-items: center;
   gap: 8px;
 
-  padding: 14px 22px;
   font-size: 15px;
   font-weight: 600;
 
@@ -691,5 +659,10 @@ body.dark .chat-card.active {
   cursor: pointer;
 
   box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+.btn-duvidas:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+}
