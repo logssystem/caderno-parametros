@@ -70,8 +70,7 @@ const DUVIDAS = {
         texto: "Senha: deve conter no mínimo 11 caracteres, com letra maiúscula, número e caractere especial."
       },
       {
-        {
-          tipo: "lista",
+        tipo: "lista",
           texto: "Permissões disponíveis e suas funções:",
           itens: [
             "Administrador do Módulo de PABX: acesso total às configurações de voz (ramais, URA, filas, agentes e regras de tempo).",
@@ -84,21 +83,16 @@ const DUVIDAS = {
             "Supervisor(a) Omnichannel: pode acompanhar agentes e atendimentos do chat.",
             "Super Administrador: acesso total a todos os módulos e configurações do sistema."
           ]
-        }
-
-        ]
-      },
-    
+          },
+        {
         tipo: "alerta",
         texto: "Evite conceder permissão de Administrador para usuários que não são responsáveis técnicos."
       },
       {
         tipo: "campo",
         texto: "Marcar como Agente: permite que o usuário atenda chamadas e exige vínculo obrigatório com um ramal."
-      }
-    ]
-  },
-
+      },
+        {
   ramais: {
     titulo: "Ramais",
     blocos: [
