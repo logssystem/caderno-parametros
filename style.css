@@ -562,6 +562,39 @@ body.dark .chat-card.active {
   margin-top: 18px;
 }
 
+/* ================= AGENTE MULTISKILL ================= */
+
+.btn-multiskill {
+  margin-top: 6px;
+  align-self: flex-start;
+
+  padding: 4px 10px;
+  font-size: 11px;
+  line-height: 1;
+
+  border-radius: 14px;
+  border: 1px solid #bbb;
+  background: #f5f5f5;
+
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+/* hover leve */
+.btn-multiskill:hover {
+  opacity: 1;
+  border-color: #888;
+}
+
+/* ativo */
+.btn-multiskill.ativo {
+  background: #2e7d32;
+  border-color: #2e7d32;
+  color: #fff;
+  opacity: 1;
+}
+
 /* ================= AGENTE MULTISKILL – FLAG LIMPA ================= */
 
 .btn-multiskill {
