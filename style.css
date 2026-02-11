@@ -605,7 +605,7 @@ body.dark .chat-card.active {
 /* ===== Painel de Dúvidas ===== */
 .painel-duvidas {
   position: fixed;
-  top: 200px;
+  top: 250px;
   right: 24px;
   width: 320px;
   max-height: 70vh;
