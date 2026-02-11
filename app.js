@@ -1415,17 +1415,33 @@ window.explorar = function () {
         /* ================= JSON FINAL ================= */
 
         const dados = {
-            cliente: { empresa, dominio },
-            voz: {
+              cliente: { empresa, dominio },
+              voz: {
                 usuarios,
                 ramais,
                 agentes,
                 filas,
-                regras_tempo
-                pausas: coletarPausas(),
-                pesquisaSatisfacao: coletarPesquisaSatisfacao()
-            }
-        };
+                regras_tempo,
+            
+                pausas: (() => {
+                  try {
+                    return coletarPausas();
+                  } catch (e) {
+                    mostrarToast(e.message, true);
+                    throw e;
+                  }
+                })(),
+            
+                pesquisaSatisfacao: (() => {
+                  try {
+                    return coletarPesquisaSatisfacao();
+                  } catch (e) {
+                    mostrarToast(e.message, true);
+                    throw e;
+                  }
+                })()
+              }
+            };
 
         // 👉 SALVAR CHAT NO JSON
         if (chat) {
