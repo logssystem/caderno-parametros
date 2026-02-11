@@ -627,3 +627,14 @@ body.dark .chat-card.active {
   color: #fff;
   opacity: 1;
 }
+
+/* ================= AGENTE MULTISKILL – COR DO TEXTO ================= */
+
+.btn-multiskill {
+  color: #444; /* mesmo tom usado nos labels/campos */
+}
+
+/* quando ativo, mantém branco (já está correto) */
+.btn-multiskill.ativo {
+  color: #fff;
+}
