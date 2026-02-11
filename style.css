@@ -528,3 +528,36 @@ body.dark .chat-card.active {
   margin-top: 16px;
 }
 
+/* ================= PAUSAS DO CALL CENTER ================= */
+
+.opcao-pausa {
+  display: grid;
+  grid-template-columns: 1fr 160px 40px; /* nome | timeout | lixeira */
+  gap: 16px;                             /* separação real */
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+/* Nome da pausa — maior */
+.opcao-pausa input {
+  width: 100%;
+  height: 40px;
+}
+
+/* Timeout */
+.opcao-pausa select {
+  width: 160px;
+  height: 40px;
+}
+
+/* Botão remover */
+.opcao-pausa button {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+}
+
+/* AFASTAR o botão + Adicionar pausa */
+#listaPausas + .btn-add {
+  margin-top: 18px;
+}
