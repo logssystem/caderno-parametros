@@ -199,13 +199,14 @@ function atualizarDestinosURA(select) {
         const optgroup = document.createElement("optgroup");
         optgroup.label = g.label;
 
-        document.querySelectorAll(`#${g.id} .campo-nome`).forEach(i => {
-            if (i.value) {
-                const opt = new Option(i.value, i.value);
-                opt.dataset.tipo = g.tipo;
-                optgroup.appendChild(opt);
-            }
+        document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+            agentes.push({
+            nome: a.querySelector(".campo-nome")?.value || "",
+            ramal: a.getRamal ? a.getRamal() : "",
+            multiskill: a.isMultiskill ? a.isMultiskill() : false
         });
+    });
+
 
         if (optgroup.children.length) {
             select.appendChild(optgroup);
