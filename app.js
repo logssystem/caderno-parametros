@@ -102,6 +102,14 @@ window.adicionarCampo = function (tipo) {
 
 /* ================= PESQUISA DE SATISFAÇÃO ================= */
 
+function togglePesquisaSatisfacao() {
+  const bloco = document.getElementById("pesquisaSatisfacaoConteudo");
+  if (!bloco) return;
+
+  bloco.style.display =
+    bloco.style.display === "none" ? "block" : "none";
+}
+
 function adicionarRespostaPesquisa() {
   const lista = document.getElementById("listaRespostasPesquisa");
   if (!lista) return;
