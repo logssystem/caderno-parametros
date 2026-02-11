@@ -271,10 +271,6 @@ const DUVIDAS = {
 
 };
 
-const DUVIDAS = {
-  // todo o objeto gigante que você já colou
-};
-
 // ⬇️ COLE ISSO AQUI, LOGO ABAIXO ⬇️
 function renderizarDuvidas(chave) {
   const container = document.getElementById("conteudoDuvida");
@@ -311,22 +307,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-function toggleDuvidas() {
+window.toggleDuvidas = function () {
   const painel = document.getElementById("painelDuvidas");
   if (!painel) return;
-
   painel.hidden = !painel.hidden;
-}
-
-const selectDuvida = document.getElementById("selectDuvida");
-const conteudoDuvida = document.getElementById("conteudoDuvida");
-
-if (selectDuvida && conteudoDuvida) {
-  selectDuvida.addEventListener("change", () => {
-    const chave = selectDuvida.value;
-    conteudoDuvida.innerHTML = DUVIDAS[chave] || "";
-  });
-}
+};
 
 /* ================= DADOS DO CLIENTE ================= */
 
