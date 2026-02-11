@@ -63,7 +63,7 @@ const DUVIDAS = {
       },
       {
         tipo: "campo",
-        texto: "Nome e e-mail: usados para identificação e login."
+        texto: "Nome e e-mail: usados para identificação e login no sistema."
       },
       {
         tipo: "campo",
@@ -73,10 +73,10 @@ const DUVIDAS = {
         tipo: "lista",
         texto: "Permissões disponíveis:",
         itens: [
-          "Administrador: acesso total ao sistema.",
+          "Administrador: acesso total ao sistema e às configurações.",
           "Supervisor: acompanha filas e agentes, sem alterar regras críticas.",
           "Operador: acesso básico, apenas operacional.",
-          "Relatórios: apenas visualização de dados."
+          "Relatórios: apenas visualização de dados e métricas."
         ]
       },
       {
@@ -85,7 +85,7 @@ const DUVIDAS = {
       },
       {
         tipo: "campo",
-        texto: "Marcar como Agente: permite que o usuário atenda chamadas e exige vínculo com um ramal."
+        texto: "Marcar como Agente: permite que o usuário atenda chamadas e exige vínculo obrigatório com um ramal."
       }
     ]
   },
@@ -99,19 +99,79 @@ const DUVIDAS = {
       },
       {
         tipo: "campo",
-        texto: "Número do ramal: deve conter apenas números."
+        texto: "Número do ramal: deve conter apenas números e será usado para chamadas internas."
       },
       {
         tipo: "campo",
-        texto: "Senha do ramal: usada para registro SIP e segue as mesmas regras de segurança."
+        texto: "Senha do ramal: utilizada para o registro SIP e segue as mesmas regras de segurança."
       },
       {
         tipo: "campo",
-        texto: "Grupo de chamada: permite captura e organização entre ramais."
+        texto: "Grupo de chamada: permite organização e captura de chamadas entre ramais."
       },
       {
         tipo: "exemplo",
-        texto: "Exemplo: ramais no mesmo grupo permitem uso do *8 para captura de chamadas."
+        texto: "Exemplo: ramais no mesmo grupo permitem uso do *8 para captura de chamadas em ring."
+      }
+    ]
+  },
+
+  agentes: {
+    titulo: "Agentes",
+    blocos: [
+      {
+        tipo: "info",
+        texto: "Agentes são os usuários responsáveis por atender chamadas telefônicas e/ou chats."
+      },
+      {
+        tipo: "campo",
+        texto: "Criação do agente: todo agente é originado a partir de um Usuário Web marcado como agente."
+      },
+      {
+        tipo: "campo",
+        texto: "Vínculo com ramal: todo agente deve obrigatoriamente estar associado a um ramal válido."
+      },
+      {
+        tipo: "campo",
+        texto: "Um agente pode participar de múltiplas filas ao mesmo tempo."
+      },
+      {
+        tipo: "alerta",
+        texto: "Agentes sem ramal vinculado não conseguem receber chamadas."
+      },
+      {
+        tipo: "exemplo",
+        texto: "Exemplo: um agente pode atender simultaneamente a fila Comercial e a fila Suporte."
+      }
+    ]
+  },
+
+  filas: {
+    titulo: "Filas",
+    blocos: [
+      {
+        tipo: "info",
+        texto: "Filas organizam o atendimento distribuindo chamadas entre vários agentes."
+      },
+      {
+        tipo: "campo",
+        texto: "Nome da fila: utilizado apenas para identificação da fila."
+      },
+      {
+        tipo: "campo",
+        texto: "Agentes da fila: selecione quais agentes irão atender as chamadas dessa fila."
+      },
+      {
+        tipo: "campo",
+        texto: "Distribuição de chamadas: as chamadas são entregues aos agentes disponíveis conforme a estratégia configurada."
+      },
+      {
+        tipo: "alerta",
+        texto: "Filas sem agentes configurados não atendem chamadas."
+      },
+      {
+        tipo: "exemplo",
+        texto: "Exemplo: uma fila de Suporte pode tocar para três agentes ao mesmo tempo."
       }
     ]
   },
@@ -121,11 +181,11 @@ const DUVIDAS = {
     blocos: [
       {
         tipo: "info",
-        texto: "A URA é o atendimento automático que direciona as chamadas do cliente."
+        texto: "A URA é o atendimento automático responsável por direcionar as chamadas."
       },
       {
         tipo: "campo",
-        texto: "Mensagem: áudio ou texto que será reproduzido ao ligar."
+        texto: "Mensagem: áudio ou texto reproduzido quando o cliente liga."
       },
       {
         tipo: "campo",
@@ -144,7 +204,7 @@ const DUVIDAS = {
       },
       {
         tipo: "alerta",
-        texto: "URA sem opções configuradas não direciona chamadas."
+        texto: "URA sem opções configuradas não direciona chamadas corretamente."
       }
     ]
   },
@@ -154,19 +214,19 @@ const DUVIDAS = {
     blocos: [
       {
         tipo: "info",
-        texto: "O módulo de Chat permite atendimento por canais digitais integrados."
+        texto: "O módulo de Chat permite atendimento por canais digitais integrados ao sistema."
       },
       {
         tipo: "campo",
-        texto: "Tipo de integração: define se o sistema usará apenas Chat ou Voz + Chat."
+        texto: "Tipo de integração: define se o sistema utilizará apenas Chat ou Voz + Chat."
       },
       {
         tipo: "campo",
-        texto: "API e Conta: definem o provedor e a conta utilizada."
+        texto: "API e Conta: definem o provedor e a conta utilizada para integração."
       },
       {
         tipo: "campo",
-        texto: "Canais: selecione quais canais estarão ativos."
+        texto: "Canais: selecione quais canais digitais estarão ativos."
       },
       {
         tipo: "campo",
@@ -174,7 +234,7 @@ const DUVIDAS = {
       },
       {
         tipo: "alerta",
-        texto: "Agentes sem departamento não conseguem atender chats."
+        texto: "Agentes sem departamento configurado não conseguem atender chats."
       }
     ]
   }
