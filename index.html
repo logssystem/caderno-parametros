@@ -121,42 +121,50 @@
     <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
   </section>
   
-  <!-- ================= PESQUISA DE SATISFAÇÃO ================= -->
+<!-- ================= PESQUISA DE SATISFAÇÃO ================= -->
 <section class="card">
   <h2>Pesquisa de Satisfação</h2>
 
-  <div class="campo-descricao">
-
-    <div class="bloco-campo">
-      <label>Nome da Pesquisa</label>
-      <input id="pesquisaNome" placeholder="Ex: Pesquisa de Satisfação – Atendimento">
-    </div>
-
-    <div class="bloco-campo">
-      <label>Áudio de Introdução (texto)</label>
-      <textarea id="pesquisaAudioIntro" rows="3"
-        placeholder="Olá, seja bem-vindo à pesquisa de satisfação da {nome da empresa}. Por gentileza, avalie o atendimento recebido selecionando uma das notas abaixo."></textarea>
-    </div>
-
-    <div class="bloco-campo">
-      <label>Pergunta da Pesquisa</label>
-      <input id="pesquisaPergunta"
-        placeholder="De 0 a 10, o quanto você ficou satisfeito com o atendimento recebido?">
-    </div>
-
+  <div class="acoes-card">
+    <button class="btn-add" onclick="togglePesquisaSatisfacao()">+</button>
   </div>
 
-  <h3 style="margin-top:20px;">Respostas da Pesquisa</h3>
-  <div id="listaRespostasPesquisa"></div>
+  <div id="pesquisaSatisfacaoConteudo" style="display:none;">
 
-  <button class="btn-add" onclick="adicionarRespostaPesquisa()">+ Adicionar nota</button>
+    <div class="campo-descricao">
 
-  <div class="campo-descricao" style="margin-top:20px;">
-    <div class="bloco-campo">
-      <label>Áudio de Agradecimento (texto)</label>
-      <textarea id="pesquisaAudioFim" rows="3"
-        placeholder="Agradecemos por avaliar o nosso atendimento. Sua opinião é muito importante para continuarmos melhorando."></textarea>
+      <div class="bloco-campo">
+        <label>Nome da Pesquisa</label>
+        <input id="pesquisaNome" placeholder="Ex: Pesquisa de Satisfação – Atendimento">
+      </div>
+
+      <div class="bloco-campo">
+        <label>Áudio de Introdução (texto)</label>
+        <textarea id="pesquisaAudioIntro" rows="3"
+          placeholder="Olá, seja bem-vindo à pesquisa de satisfação da {nome da empresa}. Por gentileza, avalie o atendimento recebido selecionando uma das notas abaixo."></textarea>
+      </div>
+
+      <div class="bloco-campo">
+        <label>Pergunta da Pesquisa</label>
+        <input id="pesquisaPergunta"
+          placeholder="De 0 a 10, o quanto você ficou satisfeito com o atendimento recebido?">
+      </div>
+
     </div>
+
+    <h3 style="margin-top:20px;">Respostas da Pesquisa</h3>
+    <div id="listaRespostasPesquisa"></div>
+
+    <button class="btn-add" onclick="adicionarRespostaPesquisa()">+ Adicionar nota</button>
+
+    <div class="campo-descricao" style="margin-top:20px;">
+      <div class="bloco-campo">
+        <label>Áudio de Agradecimento (texto)</label>
+        <textarea id="pesquisaAudioFim" rows="3"
+          placeholder="Agradecemos por avaliar o nosso atendimento. Sua opinião é muito importante para continuarmos melhorando."></textarea>
+      </div>
+    </div>
+
   </div>
 </section>
   
@@ -340,6 +348,7 @@
 
 </body>
 </html>
+
 
 
 
