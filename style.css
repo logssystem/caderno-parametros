@@ -497,3 +497,26 @@ body.dark .chat-card.active {
   max-width: 520px;
   font-size: 14px;
 }
+
+/* ================= PESQUISA DE SATISFAÇÃO ================= */
+
+.opcao-pesquisa {
+  display: grid;
+  grid-template-columns: 80px 1fr 40px;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.opcao-pesquisa input[type="number"] {
+  text-align: center;
+}
+
+.opcao-pesquisa input {
+  height: 38px;
+}
+
+.opcao-pesquisa button {
+  height: 38px;
+  border-radius: 8px;
+}
