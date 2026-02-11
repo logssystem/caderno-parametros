@@ -561,3 +561,23 @@ body.dark .chat-card.active {
 #listaPausas + .btn-add {
   margin-top: 18px;
 }
+
+/* ================= AGENTE MULTISKILL ================= */
+
+.btn-multiskill {
+  margin-top: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px dashed #999;
+  background: transparent;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.btn-multiskill.ativo {
+  background: #4caf50;
+  border-color: #4caf50;
+  color: #fff;
+  opacity: 1;
+}
