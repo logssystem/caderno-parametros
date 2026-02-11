@@ -605,7 +605,7 @@ body.dark .chat-card.active {
 /* ===== Painel de Dúvidas ===== */
 .painel-duvidas {
   position: fixed;
-  top: 90px;
+  top: 130px;
   right: 24px;
   width: 320px;
   max-height: 70vh;
@@ -641,7 +641,7 @@ body.dark .chat-card.active {
 /* ================= BOTÃO DÚVIDAS (FIXO) ================= */
 .btn-duvidas {
   position: fixed;
-  top: 80px;              /* distância segura do header */
+  top: 180px;              /* distância segura do header */
   right: 24px;
   z-index: 1100;
 
@@ -654,7 +654,7 @@ body.dark .chat-card.active {
   font-weight: 600;
 
   background-color: var(--btn-primary-bg);
-  color: #fff;
+  color: #000;
 
   opacity: 1;
   filter: none;
