@@ -27,36 +27,158 @@ const PERMISSOES = [
 ];
 
 const DUVIDAS = {
-  cliente: `
-    <h4>Dados do Cliente</h4>
-    <p><strong>Nome da empresa:</strong> informe o nome oficial do cliente.</p>
-    <p><strong>Domínio:</strong> deve terminar com <code>.sobreip.com.br</code>.</p>
-    <p><strong>CNPJ:</strong> utilizado para identificação do cliente.</p>
-  `,
-  usuarios: `
-    <h4>Usuários Web</h4>
-    <p>Usuários que acessarão o sistema.</p>
-    <p>Marque como agente apenas quem irá atender chamadas ou chats.</p>
-  `,
-  ramais: `
-    <h4>Ramais</h4>
-    <p>O ramal deve conter apenas números.</p>
-    <p>A senha deve seguir o padrão de segurança.</p>
-  `,
-  agentes: `
-    <h4>Agentes</h4>
-    <p>Os agentes são gerados automaticamente a partir dos usuários.</p>
-    <p><strong>Multiskill:</strong> permite atender mais de uma fila.</p>
-  `,
-  ura: `
-    <h4>URA</h4>
-    <p>Configure a mensagem inicial e as opções de atendimento.</p>
-  `,
-  chat: `
-    <h4>Chat / Omnichannel</h4>
-    <p>Selecione tipo, API, conta e canais.</p>
-    <p>Agentes devem estar vinculados a departamentos.</p>
-  `
+
+  cliente: {
+    titulo: "Dados do Cliente",
+    blocos: [
+      {
+        tipo: "info",
+        texto: "Esses dados identificam a empresa dentro do sistema e são usados em integrações de voz e chat."
+      },
+      {
+        tipo: "campo",
+        texto: "Nome da empresa: usado apenas para identificação interna."
+      },
+      {
+        tipo: "campo",
+        texto: "Domínio do cliente: obrigatório. Deve seguir o padrão empresa.sobreip.com.br."
+      },
+      {
+        tipo: "alerta",
+        texto: "Domínios inválidos impedem autenticação e integrações do sistema."
+      },
+      {
+        tipo: "campo",
+        texto: "CNPJ: utilizado apenas para controle e registro interno."
+      }
+    ]
+  },
+
+  usuarios: {
+    titulo: "Usuários Web",
+    blocos: [
+      {
+        tipo: "info",
+        texto: "Usuários Web são as pessoas que terão acesso ao painel administrativo do sistema."
+      },
+      {
+        tipo: "campo",
+        texto: "Nome e e-mail: usados para identificação e login."
+      },
+      {
+        tipo: "campo",
+        texto: "Senha: deve conter no mínimo 11 caracteres, com letra maiúscula, número e caractere especial."
+      },
+      {
+        tipo: "lista",
+        texto: "Permissões disponíveis:",
+        itens: [
+          "Administrador: acesso total ao sistema.",
+          "Supervisor: acompanha filas e agentes, sem alterar regras críticas.",
+          "Operador: acesso básico, apenas operacional.",
+          "Relatórios: apenas visualização de dados."
+        ]
+      },
+      {
+        tipo: "alerta",
+        texto: "Evite conceder permissão de Administrador para usuários que não são responsáveis técnicos."
+      },
+      {
+        tipo: "campo",
+        texto: "Marcar como Agente: permite que o usuário atenda chamadas e exige vínculo com um ramal."
+      }
+    ]
+  },
+
+  ramais: {
+    titulo: "Ramais",
+    blocos: [
+      {
+        tipo: "info",
+        texto: "Ramais são os pontos de atendimento telefônico do sistema."
+      },
+      {
+        tipo: "campo",
+        texto: "Número do ramal: deve conter apenas números."
+      },
+      {
+        tipo: "campo",
+        texto: "Senha do ramal: usada para registro SIP e segue as mesmas regras de segurança."
+      },
+      {
+        tipo: "campo",
+        texto: "Grupo de chamada: permite captura e organização entre ramais."
+      },
+      {
+        tipo: "exemplo",
+        texto: "Exemplo: ramais no mesmo grupo permitem uso do *8 para captura de chamadas."
+      }
+    ]
+  },
+
+  ura: {
+    titulo: "URA",
+    blocos: [
+      {
+        tipo: "info",
+        texto: "A URA é o atendimento automático que direciona as chamadas do cliente."
+      },
+      {
+        tipo: "campo",
+        texto: "Mensagem: áudio ou texto que será reproduzido ao ligar."
+      },
+      {
+        tipo: "campo",
+        texto: "Opções: cada tecla deve possuir um destino configurado."
+      },
+      {
+        tipo: "lista",
+        texto: "Destinos possíveis:",
+        itens: [
+          "Ramal",
+          "Fila",
+          "Grupo de Ring",
+          "Outra URA",
+          "Regra de Tempo"
+        ]
+      },
+      {
+        tipo: "alerta",
+        texto: "URA sem opções configuradas não direciona chamadas."
+      }
+    ]
+  },
+
+  chat: {
+    titulo: "Chat / Omnichannel",
+    blocos: [
+      {
+        tipo: "info",
+        texto: "O módulo de Chat permite atendimento por canais digitais integrados."
+      },
+      {
+        tipo: "campo",
+        texto: "Tipo de integração: define se o sistema usará apenas Chat ou Voz + Chat."
+      },
+      {
+        tipo: "campo",
+        texto: "API e Conta: definem o provedor e a conta utilizada."
+      },
+      {
+        tipo: "campo",
+        texto: "Canais: selecione quais canais estarão ativos."
+      },
+      {
+        tipo: "campo",
+        texto: "Agentes Chat: devem obrigatoriamente estar vinculados a um departamento."
+      },
+      {
+        tipo: "alerta",
+        texto: "Agentes sem departamento não conseguem atender chats."
+      }
+    ]
+  }
+
 };
 
 function toggleDuvidas() {
