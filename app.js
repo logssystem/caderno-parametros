@@ -70,14 +70,22 @@ const DUVIDAS = {
         texto: "Senha: deve conter no mínimo 11 caracteres, com letra maiúscula, número e caractere especial."
       },
       {
-        tipo: "lista",
-        texto: "Permissões disponíveis:",
-        itens: [
-          "Administrador: acesso total às configurações do sistema.",
-            
-          "Supervisor: acompanha agentes e filas, sem alterar regras críticas.",
+        {
+          tipo: "lista",
+          texto: "Permissões disponíveis e suas funções:",
+          itens: [
+            "Administrador do Módulo de PABX: acesso total às configurações de voz (ramais, URA, filas, agentes e regras de tempo).",
+            "Agente de Call Center: utilizado para usuários que realizam atendimento telefônico.",
+            "Supervisor(a) de Call Center: pode acompanhar agentes e filas do call center.",
+            "CRM: acesso ao módulo de CRM, sem permissões administrativas.",
+            "CRM Owner: acesso total ao módulo de CRM.",
+            "Administrador do Módulo de Omnichannel: acesso total às configurações de chat e canais digitais.",
+            "Agente Omnichannel: utilizado para usuários que realizam atendimento via chat.",
+            "Supervisor(a) Omnichannel: pode acompanhar agentes e atendimentos do chat.",
+            "Super Administrador: acesso total a todos os módulos e configurações do sistema."
+          ]
+        }
 
-          "Operador: acesso básico, apenas operacional.",
         ]
       },
       {
