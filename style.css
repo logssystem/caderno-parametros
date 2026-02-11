@@ -638,3 +638,24 @@ body.dark .chat-card.active {
 .btn-multiskill.ativo {
   color: #fff;
 }
+
+/* ================= AGENTE MULTISKILL – VISUAL FINAL ================= */
+
+.btn-multiskill {
+  color: #1f2937;          /* mesmo tom dos labels */
+  background: transparent;
+  border: 1px solid #d1d5db; /* borda neutra igual inputs */
+  font-weight: 500;
+}
+
+/* hover discreto */
+.btn-multiskill:hover {
+  background: #f9fafb;
+}
+
+/* ativo */
+.btn-multiskill.ativo {
+  background: #e6f4ea;     /* verde bem leve */
+  border-color: #34a853;
+  color: #1f2937;          /* NÃO branco */
+}
