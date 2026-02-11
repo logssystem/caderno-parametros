@@ -659,3 +659,31 @@ body.dark .chat-card.active {
   border-color: #34a853;
   color: #1f2937;          /* NÃO branco */
 }
+
+/* ================= AGENTE MULTISKILL – FLAG LIMPA ================= */
+
+.btn-multiskill {
+  all: unset;                  /* 🔥 zera estilo de botão */
+  display: inline-block;
+
+  margin-top: 6px;
+  padding: 0;
+
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;              /* MESMO tom dos labels */
+
+  cursor: pointer;
+}
+
+/* hover = sublinhado sutil (indica clicável) */
+.btn-multiskill:hover {
+  text-decoration: underline;
+}
+
+/* ativo = check visual, SEM verde feio */
+.btn-multiskill.ativo::after {
+  content: " ✓";
+  color: #16a34a;
+  font-weight: 600;
+}
