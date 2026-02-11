@@ -82,11 +82,12 @@ if (cnpjInput) {
 
 window.adicionarCampo = function (tipo) {
 
-    // 👉 AGENTE NÃO É CRIADO NA MÃO — É GERADO DOS USUÁRIOS
+    // 👉 BOTÃO DE AGENTE É APENAS INFORMATIVO
     if (tipo === "agente") {
-        gerarAgentesAPartirUsuarios();
-        atualizarSelectAgentesFila();
-        mostrarToast("Agentes atualizados a partir dos usuários");
+        mostrarToast(
+          "Os agentes são gerados automaticamente a partir dos usuários marcados como agente.",
+          true
+        );
         return;
     }
 
