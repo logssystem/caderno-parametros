@@ -32,11 +32,27 @@
 <main id="app-content" class="form-container" style="display:none">
 
   <button class="btn-duvidas" onclick="toggleDuvidas()">
-  Dúvidas no preenchimento?
-</button>
+    Dúvidas no preenchimento?
+  </button>
 
-<div id="painelDuvidas" class="painel-duvidas" hidden></div>
+  <div id="painelDuvidas" class="painel-duvidas" hidden>
 
+    <select id="selectDuvida">
+      <option value="">Selecione o assunto</option>
+      <option value="cliente">Dados do Cliente</option>
+      <option value="usuarios">Usuários Web</option>
+      <option value="ramais">Ramais</option>
+      <option value="agentes">Agentes</option>
+      <option value="ura">URA</option>
+      <option value="chat">Chat / Omnichannel</option>
+    </select>
+
+    <div id="conteudoDuvida"></div>
+
+  </div>
+
+</main>
+  
   <!-- ================= DADOS DO CLIENTE ================= -->
   <section class="card">
   <h2>Dados do Cliente</h2>
@@ -382,6 +398,7 @@
 
 </body>
 </html>
+
 
 
 
