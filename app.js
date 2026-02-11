@@ -303,6 +303,10 @@ function criarCampo(tipo) {
         chkAgente = document.createElement("input");
         chkAgente.type = "checkbox";
 
+        chkAgente.addEventListener("change", () => {
+            syncTudo();
+            });
+        
         const txt = document.createElement("span");
         txt.textContent = "Este usuário é agente de call center";
 
