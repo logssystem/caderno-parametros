@@ -602,31 +602,31 @@ body.dark .chat-card.active {
   font-weight: 500;      /* um pouco mais de presença */
 }
 
-/* Botão Dúvidas */
 #btnDuvidas {
-  position: fixed;
-  top: 110px;              /* AFASTA do topo / botão voltar */
-  right: 24px;
-  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 
-  padding: 14px 20px;      /* AUMENTA tamanho */
+  margin: 24px 0 16px 0; /* espaço acima e abaixo */
+  padding: 14px 22px;
+
   font-size: 15px;
   font-weight: 600;
 
-  background-color: var(--btn-primary-bg); /* MESMA cor do salvar */
+  background-color: var(--btn-primary-bg); /* mesma do Salvar */
   color: #fff;
 
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
 
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 #btnDuvidas:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.18);
 }
 
 /* ===== Painel de Dúvidas ===== */
