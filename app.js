@@ -1057,36 +1057,55 @@ function coletarPausas() {
 
 function coletarPesquisaSatisfacao() {
   const container = document.getElementById("pesquisaSatisfacaoConteudo");
-  if (!container || container.style.display === "none") return null;
 
-  const nome = document.getElementById("pesquisaNome")?.value.trim();
-  const intro = document.getElementById("pesquisaAudioIntro")?.value.trim();
-  const pergunta = document.getElementById("pesquisaPergunta")?.value.trim();
-  const fim = document.getElementById("pesquisaAudioFim")?.value.trim();
-
-  if (!nome || !pergunta) {
-    throw new Error("Preencha a Pesquisa de Satisfação.");
+  // 🔒 Se o módulo não existe ou está oculto, ignora
+  if (!container || container.style.display === "none") {
+    console.log("Pesquisa de Satisfação não configurada – ignorando");
+    return null;
   }
+
+  const nome = document.getElementById("pesquisaNome")?.value?.trim() || "";
+  const introducao = document.getElementById("pesquisaAudioIntro")?.value?.trim() || "";
+  const pergunta = document.getElementById("pesquisaPergunta")?.value?.trim() || "";
+  const encerramento = document.getElementById("pesquisaAudioFim")?.value?.trim() || "";
 
   const respostas = [];
-  document.querySelectorAll("#listaRespostasPesquisa .campo-descricao").forEach(r => {
-    const nota = r.querySelector("input[type=number]")?.value;
-    const desc = r.querySelector("input[type=text]")?.value?.trim();
-    if (nota !== "" && desc) {
-      respostas.push({ nota: Number(nota), descricao: desc });
-    }
-  });
 
-  if (!respostas.length) {
-    throw new Error("Adicione respostas na Pesquisa de Satisfação.");
+  document
+    .querySelectorAll("#listaRespostasPesquisa .campo-descricao")
+    .forEach(r => {
+      const nota = r.querySelector("input[type=number]")?.value;
+      const desc = r.querySelector("input[type=text]")?.value?.trim();
+
+      if (nota !== "" && desc) {
+        respostas.push({
+          nota: Number(nota),
+          descricao: desc
+        });
+      }
+    });
+
+  // 🔒 Existe o bloco, mas está incompleto
+  if (!nome || !pergunta || respostas.length === 0) {
+    console.warn("Pesquisa de Satisfação incompleta – salvando como inativa");
+    return {
+      ativa: false,
+      nome,
+      introducao,
+      pergunta,
+      encerramento,
+      respostas: []
+    };
   }
 
+  // ✅ Pesquisa válida
   return {
+    ativa: true,
     nome,
-    introducao: intro,
+    introducao,
     pergunta,
-    respostas,
-    encerramento: fim
+    encerramento,
+    respostas
   };
 }
 
