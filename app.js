@@ -1039,7 +1039,7 @@ window.criarRangeRamais = function () {
 
 function coletarPausas() {
   const container = document.getElementById("pausasConteudo");
-  if (!container || container.style.display === "none") return null;
+  if (!container) return null;
 
   const nomeGrupo = document.getElementById("nomeGrupoPausas")?.value.trim();
   if (!nomeGrupo) return null;
@@ -1047,8 +1047,15 @@ function coletarPausas() {
   const pausas = [];
 
   document.querySelectorAll("#listaPausas .opcao-pausa").forEach(p => {
-    const nome = p.querySelector("input")?.value.trim();
-    if (nome) pausas.push({ nome });
+    const nome = p.querySelector("input[type=text]")?.value.trim();
+    const tempo = p.querySelector("select")?.value;
+
+    if (nome) {
+      pausas.push({
+        nome,
+        tempo: tempo === "0" ? "Sem limite" : `${tempo} min`
+      });
+    }
   });
 
   if (!pausas.length) return null;
