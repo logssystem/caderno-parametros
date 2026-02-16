@@ -1,5 +1,9 @@
 console.log("APP.JS FINAL – CONSOLIDADO DEFINITIVO (URA + REGRA DE TEMPO + FILA + GRUPO RING + AGENTES)");
 
+window.addEventListener("error", (e) => {
+  console.warn("Erro externo ignorado:", e.message);
+});
+
 /* ================= CONFIG ================= */
 
 const LIMITE = 600;
