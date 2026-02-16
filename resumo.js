@@ -1,12 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
   const raw = localStorage.getItem("CONFIG_CADERNO");
-  if (!raw) return;
+  if (!raw) {
+    console.warn("CONFIG_CADERNO não encontrado");
+    return;
+  }
 
   let dados;
   try {
     dados = JSON.parse(raw);
   } catch (e) {
-    console.error("Erro ao ler CONFIG_CADERNO", e);
+    console.error("Erro ao parsear CONFIG_CADERNO", e);
     return;
   }
 
@@ -30,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const voz = dados.voz || {};
 
-  /* ================= USUÁRIOS ================= */
+  /* ================= USUÁRIOS WEB ================= */
 
   if (voz.usuarios?.length) {
     resumo.innerHTML += `
@@ -58,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ${voz.ramais.map(r => `
           <p>
             <b>Ramal:</b> ${r.ramal}<br>
-            <b>Senha:</b> <code>${r.senha || "-"}</code>
+            <b>Senha:</b> <code>${r.senha}</code>
           </p>
           <hr>
         `).join("")}
@@ -75,7 +78,8 @@ document.addEventListener("DOMContentLoaded", () => {
         ${voz.agentes.map(a => `
           <p>
             <b>Nome:</b> ${a.nome}<br>
-            <b>Ramal:</b> ${a.ramal}
+            <b>Ramal:</b> ${a.ramal}<br>
+            <b>Multiskill:</b> ${a.multiskill ? "Sim" : "Não"}
           </p>
           <hr>
         `).join("")}
@@ -109,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ${voz.regras_tempo.map(r => `
           <p>
             <b>Nome:</b> ${r.nome}<br>
-            <b>Dias:</b> ${r.dias.join(", ")}<br>
+            <b>Dias:</b> ${r.dias?.join(", ")}<br>
             <b>Horário:</b> ${r.hora_inicio} → ${r.hora_fim}
           </p>
           <hr>
@@ -118,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ================= URA ================= */
+  /* ================= URAs ================= */
 
   if (voz.uras?.length) {
     resumo.innerHTML += `
@@ -129,9 +133,19 @@ document.addEventListener("DOMContentLoaded", () => {
             <b>Nome:</b> ${u.nome}<br>
             <b>Mensagem:</b> ${u.mensagem || "-"}<br>
             <b>Opções:</b><br>
-            ${u.opcoes.map(o =>
-              `• Tecla ${o.tecla} → ${o.destino} ${o.descricao ? `(${o.descricao})` : ""}`
-            ).join("<br>")}
+            ${
+              u.opcoes?.length
+                ? u.opcoes.map(o => {
+                    let tipo = "Destino";
+                    if (voz.filas?.some(f => f.nome === o.destino)) tipo = "Fila";
+                    else if (voz.grupo_ring?.some(g => g.nome === o.destino)) tipo = "Grupo de Ring";
+                    else if (voz.uras?.some(x => x.nome === o.destino)) tipo = "URA";
+                    else if (voz.regras_tempo?.some(r => r.nome === o.destino)) tipo = "Regra de Tempo";
+
+                    return `• Tecla ${o.tecla} → ${tipo}: ${o.destino}`;
+                  }).join("<br>")
+                : "Nenhuma opção configurada"
+            }
           </p>
           <hr>
         `).join("")}
@@ -149,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>
             <b>Nome:</b> ${g.nome}<br>
             <b>Estratégia:</b> ${g.estrategia}<br>
-            <b>Ramais:</b> ${g.ramais.join(", ")}
+            <b>Ramais:</b> ${g.ramais?.join(", ") || "Nenhum"}
           </p>
           <hr>
         `).join("")}
@@ -157,12 +171,12 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ================= ENTRADAS ================= */
+  /* ================= NÚMEROS DE ENTRADA ================= */
 
   if (voz.entradas?.length) {
     resumo.innerHTML += `
       <div class="card">
-        <h2>📲 Números de Entrada</h2>
+        <h2>🔢 Números de Entrada</h2>
         ${voz.entradas.map(e => `
           <p><b>Número:</b> ${e.numero}</p>
           <hr>
@@ -173,33 +187,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= PAUSAS ================= */
 
-  if (voz.pausas && voz.pausas.itens?.length) {
-  resumo.innerHTML += `
-    <div class="card">
-      <h2>⏸️ Pausas do Call Center</h2>
-      <p><b>Grupo:</b> ${voz.pausas.grupo}</p>
-      <ul>
-        ${voz.pausas.itens.map(p => `<li>${p.nome}</li>`).join("")}
-      </ul>
-    </div>
-  `;
-}
+  if (voz.pausas) {
+    resumo.innerHTML += `
+      <div class="card">
+        <h2>⏸️ Pausas do Call Center</h2>
+        <p><b>Grupo:</b> ${voz.pausas.grupo}</p>
+        ${
+          voz.pausas.itens?.length
+            ? voz.pausas.itens.map(p => `<p>• ${p.nome}</p>`).join("")
+            : "<p>Nenhuma pausa configurada</p>"
+        }
+      </div>
+    `;
+  }
 
-  /* ================= PESQUISA ================= */
+  /* ================= PESQUISA DE SATISFAÇÃO ================= */
 
   if (voz.pesquisaSatisfacao) {
     const p = voz.pesquisaSatisfacao;
-
     resumo.innerHTML += `
       <div class="card">
         <h2>⭐ Pesquisa de Satisfação</h2>
         <p><b>Status:</b> ${p.ativa ? "Ativa" : "Inativa"}</p>
-        <p><b>Nome:</b> ${p.nome || "-"}</p>
-        <p><b>Pergunta:</b> ${p.pergunta || "-"}</p>
+        <p><b>Nome:</b> ${p.nome}</p>
+        <p><b>Pergunta:</b> ${p.pergunta}</p>
         <p><b>Respostas:</b></p>
-        ${p.respostas?.length
-          ? p.respostas.map(r => `<p>• ${r.nota} - ${r.descricao}</p>`).join("")
-          : "<p>Nenhuma resposta configurada</p>"
+        ${
+          p.respostas?.length
+            ? p.respostas.map(r => `<p>• ${r.nota} - ${r.descricao}</p>`).join("")
+            : "<p>Nenhuma resposta configurada</p>"
         }
       </div>
     `;
@@ -208,13 +224,14 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ================= CHAT ================= */
 
   if (dados.chat) {
+    const c = dados.chat;
     resumo.innerHTML += `
       <div class="card">
-        <h2>💬 Chat / Omnichannel</h2>
-        <p><b>Tipo:</b> ${dados.chat.tipo}</p>
-        <p><b>API:</b> ${dados.chat.api || "-"}</p>
-        <p><b>Conta:</b> ${dados.chat.conta || "-"}</p>
-        <p><b>Canais:</b> ${dados.chat.canais?.join(", ") || "-"}</p>
+        <h2>💬 Atendimento por Chat</h2>
+        <p><b>Tipo:</b> ${c.tipo}</p>
+        <p><b>API:</b> ${c.api}</p>
+        <p><b>Conta:</b> ${c.conta}</p>
+        <p><b>Canais:</b> ${c.canais?.join(", ")}</p>
       </div>
     `;
   }
