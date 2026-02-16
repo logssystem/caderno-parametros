@@ -1061,11 +1061,7 @@ function coletarPausas() {
 
 function coletarPesquisaSatisfacao() {
   const container = document.getElementById("pesquisaSatisfacaoConteudo");
-
-  // se não existe ou está fechado, ignora
-  if (!container || container.style.display === "none") {
-    return null;
-  }
+  if (!container) return null;
 
   const nome = document.getElementById("pesquisaNome")?.value?.trim() || "";
   const introducao =
@@ -1091,7 +1087,12 @@ function coletarPesquisaSatisfacao() {
       }
     });
 
-  // pesquisa incompleta → salva como inativa
+  // nada preenchido → não salva
+  if (!nome && !pergunta && respostas.length === 0) {
+    return null;
+  }
+
+  // pesquisa incompleta → inativa
   if (!nome || !pergunta || respostas.length === 0) {
     return {
       ativa: false,
@@ -1099,7 +1100,7 @@ function coletarPesquisaSatisfacao() {
       introducao,
       pergunta,
       encerramento,
-      respostas: []
+      respostas
     };
   }
 
