@@ -328,7 +328,7 @@ window.adicionarCampo = function (tipo) {
     const container = document.getElementById(listas[tipo]);
     if (!container || container.children.length >= LIMITE) return;
 
-   ontainer.appendChild(criarCampo(tipo));
+   container.appendChild(criarCampo(tipo));
 
     if (tipo === "ring") {
       precisaRegerarAgentes = true;
