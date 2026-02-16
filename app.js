@@ -583,8 +583,13 @@ if (tipo === "ring") {
         "O ramal não pode iniciar com 0 e deve ter entre 3 e 6 dígitos.";
 
     nome.addEventListener("input", () => {
-        nome.value = nome.value.replace(/\D/g, "");
-        const v = nome.value;
+    nome.value = nome.value.replace(/\D/g, "");
+
+    // 🔔 avisa que ramais mudaram
+    precisaRegerarAgentes = true;
+    syncTudo("ring");
+});
+
 
         if (!v.length) {
             nome.classList.remove("campo-obrigatorio-erro");
