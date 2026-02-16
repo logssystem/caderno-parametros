@@ -188,18 +188,20 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ================= PAUSAS ================= */
 
   if (voz.pausas) {
-    resumo.innerHTML += `
-      <div class="card">
-        <h2>⏸️ Pausas do Call Center</h2>
-        <p><b>Grupo:</b> ${voz.pausas.grupo}</p>
-        ${
-          voz.pausas.itens?.length
-            ? voz.pausas.itens.map(p => `<p>• ${p.nome}</p>`).join("")
-            : "<p>Nenhuma pausa configurada</p>"
-        }
-      </div>
-    `;
-  }
+  resumo.innerHTML += `
+    <div class="card">
+      <h2>⏸️ Pausas do Call Center</h2>
+      <p><b>Grupo:</b> ${voz.pausas.grupo || "-"}</p>
+      ${
+        voz.pausas.itens && voz.pausas.itens.length
+          ? voz.pausas.itens
+              .map(p => `<p>• ${p.nome} (${p.tempo})</p>`)
+              .join("")
+          : "<p>Nenhuma pausa configurada</p>"
+      }
+    </div>
+  `;
+}
 
   /* ================= PESQUISA DE SATISFAÇÃO ================= */
 
