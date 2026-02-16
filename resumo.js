@@ -1,9 +1,16 @@
-(function aplicarTemaResumo() {
+document.addEventListener("DOMContentLoaded", () => {
+  // ===== APLICA TEMA SALVO =====
   const temaSalvo = localStorage.getItem("tema");
+
   if (temaSalvo === "dark") {
     document.body.classList.add("dark");
+  } else {
+    document.body.classList.remove("dark");
   }
-})();
+
+  // 🔍 DEBUG (confirme no console)
+  console.log("Tema aplicado no resumo:", temaSalvo);
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   const raw = localStorage.getItem("CONFIG_CADERNO");
