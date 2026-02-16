@@ -1418,11 +1418,13 @@ window.explorar = function () {
 
         const agentes = [];
         document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
-            agentes.push({
-                nome: a.querySelector(".campo-nome")?.value || "",
-                ramal: a.getRamal ? a.getRamal() : ""
-            });
+          agentes.push({
+            nome: a.querySelector(".campo-nome")?.value || "",
+            ramal: a.getRamal ? a.getRamal() : "",
+            multiskill: a.isMultiskill ? a.isMultiskill() : false
+          });
         });
+
 
         const agentesSemRamal = agentes.filter(a => !a.ramal);
         if (agentesSemRamal.length) {
