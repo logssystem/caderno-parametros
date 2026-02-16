@@ -1062,21 +1062,23 @@ function coletarPausas() {
 function coletarPesquisaSatisfacao() {
   const container = document.getElementById("pesquisaSatisfacaoConteudo");
 
-  // 🔒 Se o módulo não existe ou está oculto, ignora
+  // se não existe ou está fechado, ignora
   if (!container || container.style.display === "none") {
-    console.log("Pesquisa de Satisfação não configurada – ignorando");
     return null;
   }
 
   const nome = document.getElementById("pesquisaNome")?.value?.trim() || "";
-  const introducao = document.getElementById("pesquisaAudioIntro")?.value?.trim() || "";
-  const pergunta = document.getElementById("pesquisaPergunta")?.value?.trim() || "";
-  const encerramento = document.getElementById("pesquisaAudioFim")?.value?.trim() || "";
+  const introducao =
+    document.getElementById("pesquisaAudioIntro")?.value?.trim() || "";
+  const pergunta =
+    document.getElementById("pesquisaPergunta")?.value?.trim() || "";
+  const encerramento =
+    document.getElementById("pesquisaAudioFim")?.value?.trim() || "";
 
   const respostas = [];
 
   document
-    .querySelectorAll("#listaRespostasPesquisa .campo-descricao")
+    .querySelectorAll("#listaRespostasPesquisa .opcao-pesquisa")
     .forEach(r => {
       const nota = r.querySelector("input[type=number]")?.value;
       const desc = r.querySelector("input[type=text]")?.value?.trim();
@@ -1089,9 +1091,8 @@ function coletarPesquisaSatisfacao() {
       }
     });
 
-  // 🔒 Existe o bloco, mas está incompleto
+  // pesquisa incompleta → salva como inativa
   if (!nome || !pergunta || respostas.length === 0) {
-    console.warn("Pesquisa de Satisfação incompleta – salvando como inativa");
     return {
       ativa: false,
       nome,
@@ -1102,7 +1103,7 @@ function coletarPesquisaSatisfacao() {
     };
   }
 
-  // ✅ Pesquisa válida
+  // pesquisa válida
   return {
     ativa: true,
     nome,
