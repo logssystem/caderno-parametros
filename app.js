@@ -328,10 +328,17 @@ window.adicionarCampo = function (tipo) {
     const container = document.getElementById(listas[tipo]);
     if (!container || container.children.length >= LIMITE) return;
 
-    container.appendChild(criarCampo(tipo));
+   ontainer.appendChild(criarCampo(tipo));
+
+    if (tipo === "ring") {
+      precisaRegerarAgentes = true;
+      syncTudo("ring"); // ✅ força agente a enxergar ramais
+      return;
+    }
+    
     atualizarTodosDestinosURA();
     syncTudo();
-};
+  };
 
 /* ================= PESQUISA DE SATISFAÇÃO ================= */
 
