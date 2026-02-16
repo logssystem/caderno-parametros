@@ -1,3 +1,10 @@
+(function aplicarTemaResumo() {
+  const temaSalvo = localStorage.getItem("tema");
+  if (temaSalvo === "dark") {
+    document.body.classList.add("dark");
+  }
+})();
+
 document.addEventListener("DOMContentLoaded", () => {
   const raw = localStorage.getItem("CONFIG_CADERNO");
   if (!raw) {
