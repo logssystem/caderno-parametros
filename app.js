@@ -1042,21 +1042,21 @@ function coletarPausas() {
   if (!container || container.style.display === "none") return null;
 
   const nomeGrupo = document.getElementById("nomeGrupoPausas")?.value.trim();
-  if (!nomeGrupo) {
-    throw new Error("Informe o nome do Grupo de Pausas.");
-  }
+  if (!nomeGrupo) return null;
 
   const pausas = [];
-  document.querySelectorAll("#listaPausas .campo-descricao").forEach(p => {
+
+  document.querySelectorAll("#listaPausas .opcao-pausa").forEach(p => {
     const nome = p.querySelector("input")?.value.trim();
     if (nome) pausas.push({ nome });
   });
-    
-    if (!pausas.length) {
-  return null;
-}
-    
-  return { grupo: nomeGrupo, itens: pausas };
+
+  if (!pausas.length) return null;
+
+  return {
+    grupo: nomeGrupo,
+    itens: pausas
+  };
 }
 
 function coletarPesquisaSatisfacao() {
