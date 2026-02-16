@@ -763,3 +763,45 @@ body.dark #intro-screen .intro-actions button:hover {
   font-weight: 800;
   cursor: pointer;
 }
+
+/* ================= HEADER DO RESUMO ================= */
+
+.resumo-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* garante alinhamento correto */
+.resumo-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+
+  padding: 12px 24px;
+}
+
+/* LOGO – tamanho controlado */
+.resumo-header .app-logo {
+  height: 48px;          /* ⬅️ AQUI resolve o “logo zuado” */
+  width: auto;
+  object-fit: contain;
+}
+
+/* TÍTULO CENTRAL */
+.resumo-header .app-title {
+  margin: 0;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* BOTÃO VOLTAR */
+.resumo-header .btn-voltar-intro {
+  white-space: nowrap;
+}
