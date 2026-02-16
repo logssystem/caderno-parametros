@@ -773,35 +773,36 @@ body.dark #intro-screen .intro-actions button:hover {
 
   background: var(--header-bg);
   border-bottom: 1px solid var(--border);
-
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-}
 
-/* garante alinhamento correto */
-.resumo-header {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr auto auto; /* 👈 VOLTOU AO PADRÃO */
   align-items: center;
+  gap: 16px;
 
   padding: 12px 24px;
 }
 
-/* LOGO – tamanho controlado */
+/* LOGO */
 .resumo-header .app-logo {
-  height: 48px;          /* ⬅️ AQUI resolve o “logo zuado” */
+  height: 48px;
   width: auto;
   object-fit: contain;
 }
 
 /* TÍTULO CENTRAL */
 .resumo-header .app-title {
-  margin: 0;
+  grid-column: 2 / 4;      /* 👈 força centralização real */
   text-align: center;
+  margin: 0;
   font-size: 18px;
   font-weight: 800;
 }
 
 /* BOTÃO VOLTAR */
 .resumo-header .btn-voltar-intro {
+  grid-column: 4;
+  justify-self: end;
   white-space: nowrap;
 }
+
