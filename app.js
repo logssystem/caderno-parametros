@@ -1382,8 +1382,13 @@ function processarCSV(tipo, texto) {
         }
 
         if (d.agente === "1" || d.agente?.toLowerCase() === "sim") {
-            campo.querySelector("input[type=checkbox]").checked = true;
-        }
+        const chk = campo.querySelector("input[type=checkbox]");
+        chk.checked = true;
+      
+        // 🔔 avisa o sistema que usuários mudaram
+        precisaRegerarAgentes = true;
+      }
+
     }
 
     if (tipo === "ring") {
