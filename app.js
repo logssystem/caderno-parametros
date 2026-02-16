@@ -803,12 +803,17 @@ function gerarAgentesAPartirUsuarios() {
     const listaAgentes = document.getElementById("listaAgentes");
     if (!listaAgentes) return;
 
-    // 🔒 salva ramais já escolhidos
-    const ramaisSalvos = {};
+   // 🔒 salva estado dos agentes (ramal + multiskill)
+    const estadoAgentes = {};
+    
     listaAgentes.querySelectorAll(".campo-descricao").forEach(a => {
-        const nome = a.querySelector(".campo-nome")?.value;
-        const ramal = a.getRamal ? a.getRamal() : "";
-        if (nome && ramal) ramaisSalvos[nome] = ramal;
+      const nome = a.querySelector(".campo-nome")?.value;
+      if (!nome) return;
+    
+      estadoAgentes[nome] = {
+        ramal: a.getRamal ? a.getRamal() : "",
+        multiskill: a.isMultiskill ? a.isMultiskill() : false
+      };
     });
 
     listaAgentes.innerHTML = "";
@@ -839,10 +844,13 @@ function gerarAgentesAPartirUsuarios() {
                 }
             });
 
-            // ♻ restaura ramal se já existia
-            if (ramaisSalvos[u.getNome()]) {
-                selectRamal.value = ramaisSalvos[u.getNome()];
-            }
+           // ♻ restaura ramal e multiskill se já existiam
+              const estado = estadoAgentes[u.getNome()];
+              if (estado) {
+                if (estado.ramal) {
+                  selectRamal.value = estado.ramal;
+                }
+              }
 
             wrap.append(selectRamal);
 
