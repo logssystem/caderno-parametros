@@ -1113,6 +1113,58 @@ function coletarPesquisaSatisfacao() {
   };
 }
 
+function coletarURAs() {
+  const uras = [];
+
+  document.querySelectorAll("#listaURAs .campo-descricao").forEach(ura => {
+    const nome = ura.querySelector(".campo-nome")?.value || "";
+    const mensagem = ura.querySelector("textarea")?.value || "";
+
+    const opcoes = [];
+    ura.querySelectorAll(".opcao-ura").forEach(o => {
+      const inputs = o.querySelectorAll("input");
+      opcoes.push({
+        tecla: inputs[0]?.value || "",
+        destino: o.querySelector("select")?.value || "",
+        descricao: inputs[1]?.value || ""
+      });
+    });
+
+    if (nome) {
+      uras.push({ nome, mensagem, opcoes });
+    }
+  });
+
+  return uras;
+}
+
+function coletarGrupoRing() {
+  const grupos = [];
+
+  document.querySelectorAll("#listaGrupoRing .campo-descricao").forEach(g => {
+    grupos.push({
+      nome: g.querySelector(".campo-nome")?.value || "",
+      estrategia: g.dataset.estrategia || "",
+      ramais: JSON.parse(g.dataset.ramais || "[]")
+    });
+  });
+
+  return grupos;
+}
+
+function coletarEntradas() {
+  const entradas = [];
+
+  document.querySelectorAll("#listaEntradas .campo-descricao").forEach(e => {
+    entradas.push({
+      numero: e.querySelector(".campo-nome")?.value || ""
+    });
+  });
+
+  return entradas;
+}
+
+
 /* ================= MOTOR ================= */
 
 function syncTudo() {
@@ -1436,34 +1488,24 @@ window.explorar = function () {
         /* ================= JSON FINAL ================= */
 
         const dados = {
-              cliente: { empresa, dominio },
+              cliente: {
+              empresa,
+              dominio,
+              cnpj: document.getElementById("cnpjCliente")?.value || ""
+            },
               voz: {
-                usuarios,
-                ramais,
-                agentes,
-                filas,
-                regras_tempo,
-            
-                pausas: (() => {
-                  try {
-                    return coletarPausas();
-                  } catch (e) {
-                    mostrarToast(e.message, true);
-                    throw e;
-                  }
-                })(),
-            
-                pesquisaSatisfacao: (() => {
-                  try {
-                    return coletarPesquisaSatisfacao();
-                  } catch (e) {
-                    mostrarToast(e.message, true);
-                    throw e;
-                  }
-                })()
-              }
-            };
-
+              usuarios,
+              ramais,
+              agentes,
+              filas,
+              regras_tempo,
+              uras: coletarURAs(),
+              grupo_ring: coletarGrupoRing(),
+              entradas: coletarEntradas(),
+              pausas: coletarPausas(),
+              pesquisaSatisfacao: coletarPesquisaSatisfacao()
+            }
+                
         // 👉 SALVAR CHAT NO JSON
         if (chat) {
           dados.chat = chat;
