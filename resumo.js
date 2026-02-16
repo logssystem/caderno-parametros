@@ -173,17 +173,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= PAUSAS ================= */
 
-  if (voz.pausas?.itens?.length) {
-    resumo.innerHTML += `
-      <div class="card">
-        <h2>⏸️ Pausas do Call Center</h2>
-        <p><b>Grupo:</b> ${voz.pausas.grupo}</p>
-        ${voz.pausas.itens.map(p => `
-          <p>• ${p.nome}</p>
-        `).join("")}
-      </div>
-    `;
-  }
+  if (voz.pausas && voz.pausas.itens?.length) {
+  resumo.innerHTML += `
+    <div class="card">
+      <h2>⏸️ Pausas do Call Center</h2>
+      <p><b>Grupo:</b> ${voz.pausas.grupo}</p>
+      <ul>
+        ${voz.pausas.itens.map(p => `<li>${p.nome}</li>`).join("")}
+      </ul>
+    </div>
+  `;
+}
 
   /* ================= PESQUISA ================= */
 
