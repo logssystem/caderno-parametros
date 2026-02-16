@@ -845,23 +845,12 @@ function gerarAgentesAPartirUsuarios() {
             const selectRamal = document.createElement("select");
             selectRamal.innerHTML = `<option value="">Ramal (obrigatório)</option>`;
 
-            const ramais = [];
-
-            document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
-              const nomeRamal =
-                typeof r.getNome === "function"
-                  ? r.getNome()
-                  : r.querySelector(".campo-nome")?.value;
-            
-              if (nomeRamal) {
-                ramais.push(nomeRamal);
-              }
-            });
-            
-            ramais.forEach(ramal => {
+            document.querySelectorAll("#listaRings .campo-nome").forEach(input => {
+            const ramal = input.value?.trim();
+            if (ramal) {
               selectRamal.add(new Option(ramal, ramal));
-            });
-
+            }
+          });
 
            // ♻ restaura ramal e multiskill se já existiam
               const estado = estadoAgentes[u.getNome()];
