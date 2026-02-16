@@ -1184,18 +1184,45 @@ function coletarEntradas() {
 
 /* ================= MOTOR ================= */
 
-function syncTudo() {
+let precisaRegerarAgentes = true;
+
+function syncTudo(origem = "") {
+
+  // 🔁 só recria agentes se usuários web mudaram
+  if (origem === "usuario_web" || precisaRegerarAgentes) {
     gerarAgentesAPartirUsuarios();
-    atualizarSelectAgentesFila();
-    atualizarSelectRamaisGrupo();
-    atualizarTodosDestinosURA();
+    precisaRegerarAgentes = false;
+  }
+
+  atualizarSelectAgentesFila();
+  atualizarSelectRamaisGrupo();
+  atualizarTodosDestinosURA();
 }
 
+
 document.addEventListener("input", e => {
-    if (e.target.closest(".campo-descricao")) syncTudo();
+  const campo = e.target.closest(".campo-descricao");
+  if (!campo) return;
+
+  // só usuários web disparam regeneração
+  if (campo.closest("#listaUsuariosWeb")) {
+    precisaRegerarAgentes = true;
+    syncTudo("usuario_web");
+  } else {
+    syncTudo();
+  }
 });
+
 document.addEventListener("change", e => {
-    if (e.target.closest(".campo-descricao")) syncTudo();
+  const campo = e.target.closest(".campo-descricao");
+  if (!campo) return;
+
+  if (campo.closest("#listaUsuariosWeb")) {
+    precisaRegerarAgentes = true;
+    syncTudo("usuario_web");
+  } else {
+    syncTudo();
+  }
 });
 
 /* ================= TEMPLATE CSV USUÁRIOS WEB ================= */
