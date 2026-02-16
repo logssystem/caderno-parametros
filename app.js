@@ -1426,6 +1426,8 @@ window.explorar = function () {
         });
 
 
+
+
         const agentesSemRamal = agentes.filter(a => !a.ramal);
         if (agentesSemRamal.length) {
             mostrarToast("Existe agente sem ramal vinculado", true);
