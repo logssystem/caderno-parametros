@@ -1488,28 +1488,29 @@ window.explorar = function () {
         /* ================= JSON FINAL ================= */
 
         const dados = {
-              cliente: {
-              empresa,
-              dominio,
-              cnpj: document.getElementById("cnpjCliente")?.value || ""
-            },
-              voz: {
-              usuarios,
-              ramais,
-              agentes,
-              filas,
-              regras_tempo,
-              uras: coletarURAs(),
-              grupo_ring: coletarGrupoRing(),
-              entradas: coletarEntradas(),
-              pausas: coletarPausas(),
-              pesquisaSatisfacao: coletarPesquisaSatisfacao()
-            }
-                
-        // 👉 SALVAR CHAT NO JSON
-        if (chat) {
-          dados.chat = chat;
+        cliente: {
+          empresa,
+          dominio,
+          cnpj: document.getElementById("cnpjCliente")?.value || ""
+        },
+        voz: {
+          usuarios,
+          ramais,
+          agentes,
+          filas,
+          regras_tempo,
+          uras: coletarURAs(),
+          grupo_ring: coletarGrupoRing(),
+          entradas: coletarEntradas(),
+          pausas: coletarPausas(),
+          pesquisaSatisfacao: coletarPesquisaSatisfacao()
         }
+      };
+      
+      // 👉 SALVAR CHAT NO JSON
+      if (chat) {
+        dados.chat = chat;
+      }
                 
         document.getElementById("resultado").textContent =
             JSON.stringify(dados, null, 2);
