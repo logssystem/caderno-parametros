@@ -844,13 +844,20 @@ function gerarAgentesAPartirUsuarios() {
 
             const selectRamal = document.createElement("select");
             selectRamal.innerHTML = `<option value="">Ramal (obrigatório)</option>`;
-
+            
+            // 🔴 JEITO ANTIGO, SIMPLES, FUNCIONAL
             document.querySelectorAll("#listaRings .campo-nome").forEach(input => {
-            const ramal = input.value?.trim();
-            if (ramal) {
-              selectRamal.add(new Option(ramal, ramal));
-            }
-          });
+              const ramal = input.value?.trim();
+              if (ramal) {
+                selectRamal.add(new Option(ramal, ramal));
+              }
+            });
+            
+            wrap.append(selectRamal);
+            
+            // getters
+            wrap.getRamal = () => selectRamal.value;
+
 
            // ♻ restaura ramal e multiskill se já existiam
               const estado = estadoAgentes[u.getNome()];
