@@ -323,8 +323,10 @@ window.adicionarCampo = function (tipo) {
         return;
     }
 
-    if (!listas[tipo]) return mostrarToast(`Tipo inválido: ${tipo}`, true);
-
+   if (!listas[tipo]) {
+  mostrarToast(`Tipo inválido: ${tipo}`, true);
+  return;
+}
     const container = document.getElementById(listas[tipo]);
     if (!container || container.children.length >= LIMITE) return;
 
