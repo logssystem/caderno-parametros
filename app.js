@@ -568,60 +568,47 @@ function criarCampo(tipo) {
     }
 
 /* ===== RAMAL ===== */
-if (tipo === "ring") {
+nome.addEventListener("input", () => {
+  let v = nome.value.replace(/\D/g, "");
+  nome.value = v;
 
-  nome.style.width = "260px";
-  nome.type = "text";
-  nome.inputMode = "numeric";
-  nome.placeholder = "Digite o número do ramal";
+  // ✅ RECRIA AGENTES SEMPRE QUE RAMAL MUDA
+  gerarAgentesAPartirUsuarios();
 
-  const infoRamal = document.createElement("div");
-  infoRamal.className = "regra-neutra";
-  infoRamal.style.marginTop = "6px";
-  infoRamal.textContent =
-    "O ramal não pode iniciar com 0 e deve ter entre 3 e 6 dígitos.";
-
-  nome.addEventListener("input", () => {
-    let v = nome.value.replace(/\D/g, "");
-    nome.value = v;
-
-    precisaRegerarAgentes = true;
-    syncTudo("ring");
-
-    if (!v.length) {
-      nome.classList.remove("campo-obrigatorio-erro");
-      infoRamal.className = "regra-neutra";
-      infoRamal.textContent =
-        "O ramal não pode iniciar com 0 e deve ter entre 3 e 6 dígitos.";
-      return;
-    }
-
-    if (v.startsWith("0")) {
-      nome.classList.add("campo-obrigatorio-erro");
-      infoRamal.className = "regra-erro";
-      infoRamal.textContent = "O ramal não pode iniciar com 0.";
-      return;
-    }
-
-    if (v.length < 3) {
-      nome.classList.add("campo-obrigatorio-erro");
-      infoRamal.className = "regra-erro";
-      infoRamal.textContent = "O ramal deve ter no mínimo 3 dígitos.";
-      return;
-    }
-
-    if (v.length > 6) {
-      nome.classList.add("campo-obrigatorio-erro");
-      infoRamal.className = "regra-erro";
-      infoRamal.textContent = "O ramal pode ter no máximo 6 dígitos.";
-      return;
-    }
-
+  if (!v.length) {
     nome.classList.remove("campo-obrigatorio-erro");
-    infoRamal.className = "regra-ok";
-    infoRamal.textContent = "Ramal válido.";
-  });
+    infoRamal.className = "regra-neutra";
+    infoRamal.textContent =
+      "O ramal não pode iniciar com 0 e deve ter entre 3 e 6 dígitos.";
+    return;
+  }
 
+  if (v.startsWith("0")) {
+    nome.classList.add("campo-obrigatorio-erro");
+    infoRamal.className = "regra-erro";
+    infoRamal.textContent = "O ramal não pode iniciar com 0.";
+    return;
+  }
+
+  if (v.length < 3) {
+    nome.classList.add("campo-obrigatorio-erro");
+    infoRamal.className = "regra-erro";
+    infoRamal.textContent = "O ramal deve ter no mínimo 3 dígitos.";
+    return;
+  }
+
+  if (v.length > 6) {
+    nome.classList.add("campo-obrigatorio-erro");
+    infoRamal.className = "regra-erro";
+    infoRamal.textContent = "O ramal pode ter no máximo 6 dígitos.";
+    return;
+  }
+
+  nome.classList.remove("campo-obrigatorio-erro");
+  infoRamal.className = "regra-ok";
+  infoRamal.textContent = "Ramal válido.";
+});
+  
   senhaInput = document.createElement("input");
   senhaInput.placeholder = "Senha do ramal";
   senhaInput.classList.add("campo-senha");
@@ -1199,16 +1186,7 @@ function coletarEntradas() {
 
 /* ================= MOTOR ================= */
 
-let precisaRegerarAgentes = true;
-
-function syncTudo(origem = "") {
-
-  // 🔁 só recria agentes se usuários web mudaram
-  if (origem === "usuario_web" || precisaRegerarAgentes) {
-    gerarAgentesAPartirUsuarios();
-    precisaRegerarAgentes = false;
-  }
-
+function syncTudo() {
   atualizarSelectAgentesFila();
   atualizarSelectRamaisGrupo();
   atualizarTodosDestinosURA();
