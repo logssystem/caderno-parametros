@@ -620,7 +620,6 @@ nome.addEventListener("input", () => {
   senhaInput.oninput = () => validarSenha(senhaInput, regras);
 
   wrap.append(senhaInput, regras, infoRamal);
-}
 
     /* ===== URA ===== */
     if (tipo === "ura") {
