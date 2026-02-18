@@ -31,9 +31,7 @@
 <!-- ================= CONTEÚDO ================= -->
 <main id="app-content" class="form-container" style="display:none">
 
-  <button class="btn-duvidas" onclick="toggleDuvidas()">
-    Dúvidas no preenchimento?
-  </button>
+  <button class="btn-duvidas" onclick="toggleDuvidas()">Dúvidas no preenchimento?</button>
 
   <div id="painelDuvidas" class="painel-duvidas" hidden>
     <select id="selectDuvida">
@@ -76,7 +74,6 @@
   <!-- ================= VOZ / PBX ================= -->
   <section id="voz-area" style="display:none">
 
-    <!-- Usuários Web -->
     <section class="card">
       <h2>Usuários Web</h2>
       <div class="acoes-card">
@@ -88,71 +85,58 @@
       <div id="listaUsuariosWeb"></div>
     </section>
 
-    <!-- Ramais -->
     <section class="card">
-      <h2>Ramais (Range)</h2>
-
+      <h2>Ramais</h2>
       <div class="acoes-card">
-        <input id="ramalInicio" placeholder="Ramal inicial (ex: 1000)">
-        <input id="ramalFim" placeholder="Ramal final (ex: 1020)">
+        <input id="ramalInicio" placeholder="Ramal inicial">
+        <input id="ramalFim" placeholder="Ramal final">
         <button class="btn-add" onclick="criarRangeRamais()">Criar range</button>
       </div>
-
       <div class="acoes-card">
         <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
         <button class="btn-import" onclick="acionarImportacao('ring')">📥 Importar</button>
         <button class="btn-import" onclick="baixarTemplateRamais()">📥 Baixar template CSV</button>
         <input type="file" id="importRamais" hidden>
       </div>
-
       <div id="listaRings"></div>
     </section>
 
-    <!-- Agentes -->
     <section class="card">
       <h2>Agentes</h2>
       <div id="listaAgentes"></div>
-      <button class="btn-add" onclick="adicionarCampo('agente')">
-        🔄 Atualizar agentes
-      </button>
+      <button class="btn-add" onclick="adicionarCampo('agente')">🔄 Atualizar agentes</button>
     </section>
 
-    <!-- Entradas -->
     <section class="card">
-      <h2>Números de Entrada</h2>
+      <h2>Entradas</h2>
       <div id="listaEntradas"></div>
       <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
     </section>
 
-    <!-- Grupo Ring -->
     <section class="card">
       <h2>Grupo de Ring</h2>
       <div id="listaGrupoRing"></div>
       <button class="btn-add" onclick="adicionarCampo('grupo_ring')">+</button>
     </section>
 
-    <!-- Filas -->
     <section class="card">
       <h2>Filas</h2>
       <div id="listaFilas"></div>
       <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
     </section>
 
-    <!-- Regras de Tempo -->
     <section class="card">
       <h2>Regras de Tempo</h2>
       <button class="btn-add" onclick="adicionarRegraTempo()">+ Nova regra</button>
       <div id="listaRegrasTempo"></div>
     </section>
 
-    <!-- URA -->
     <section class="card">
       <h2>URAs</h2>
       <div id="listaURAs"></div>
       <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
     </section>
 
-    <!-- Pesquisa de Satisfação -->
     <section class="card">
       <h2>Pesquisa de Satisfação</h2>
       <button class="btn-add" onclick="togglePesquisaSatisfacao()">+</button>
@@ -160,30 +144,19 @@
       <div id="pesquisaSatisfacaoConteudo" style="display:none">
         <div class="campo-descricao">
           <input id="pesquisaNome" placeholder="Ex: Pesquisa de Atendimento Telefônico">
-          <textarea id="pesquisaAudioIntro"
-            placeholder="Ex: Sua opinião é muito importante para nós."></textarea>
-          <textarea id="pesquisaPergunta"
-            placeholder="Ex: De 0 a 5, como você avalia nosso atendimento?"></textarea>
-
+          <textarea id="pesquisaAudioIntro" placeholder="Ex: Sua opinião é muito importante para nós."></textarea>
+          <textarea id="pesquisaPergunta" placeholder="Ex: De 0 a 5, como você avalia nosso atendimento?"></textarea>
           <div id="listaRespostasPesquisa"></div>
-
           <button class="btn-add" onclick="adicionarRespostaPesquisa()">+ Adicionar resposta</button>
-
-          <p style="opacity:.7;font-size:13px">
-            Exemplo: 0-Péssimo | 1-Ruim | 2-Regular | 3-Bom | 4-Muito Bom | 5-Excelente
-          </p>
-
-          <textarea id="pesquisaAudioFim"
-            placeholder="Ex: Obrigado por participar da nossa pesquisa."></textarea>
+          <p style="opacity:.7;font-size:13px">Ex: 0-Péssimo | 1-Ruim | 2-Regular | 3-Bom | 4-Muito Bom | 5-Excelente</p>
+          <textarea id="pesquisaAudioFim" placeholder="Ex: Obrigado por participar da nossa pesquisa."></textarea>
         </div>
       </div>
     </section>
 
-    <!-- Pausas -->
     <section class="card">
       <h2>Pausas do Call Center</h2>
       <button class="btn-add" onclick="togglePausas()">+</button>
-
       <div id="pausasConteudo" style="display:none">
         <div class="campo-descricao">
           <input id="nomeGrupoPausas" placeholder="Ex: Pausas Operacionais">
@@ -200,23 +173,30 @@
 
     <section id="modulochat" style="display:block">
 
-      <!-- Configuração -->
+      <!-- USUÁRIOS CHAT -->
+      <section class="card">
+        <h2>Usuários Omnichannel</h2>
+        <div class="acoes-card">
+          <button class="btn-add" onclick="adicionarUsuarioChat()">+</button>
+          <button class="btn-import" onclick="acionarImportacaoUsuariosChat()">📥 Importar</button>
+          <button class="btn-import" onclick="baixarTemplateUsuariosChat()">📥 Baixar template CSV</button>
+          <input type="file" id="importUsuariosChat" hidden>
+        </div>
+        <div id="listaUsuariosChat"></div>
+      </section>
+
+      <!-- CONFIG CHAT -->
       <section class="card">
         <h2>Configuração de Chat</h2>
 
         <div class="chat-section">
           <h3>Tipo de Integração</h3>
           <div class="chat-grid">
-            <div class="chat-card tipo" data-tipo="api"
-              onclick="selecionarTipoChat(this,'api')">
-              <img src="./assets/APIS.png">
-              <h4>API Oficial</h4>
+            <div class="chat-card tipo" data-tipo="api" onclick="selecionarTipoChat(this,'api')">
+              <img src="./assets/APIS.png"><h4>API Oficial</h4>
             </div>
-
-            <div class="chat-card tipo" data-tipo="qr"
-              onclick="selecionarTipoChat(this,'qr')">
-              <img src="./assets/qrcode.png">
-              <h4>QR Code</h4>
+            <div class="chat-card tipo" data-tipo="qr" onclick="selecionarTipoChat(this,'qr')">
+              <img src="./assets/qrcode.png"><h4>QR Code</h4>
             </div>
           </div>
         </div>
@@ -224,16 +204,13 @@
         <div id="api-oficial" class="chat-section" style="display:none">
           <h3>Fornecedor</h3>
           <div class="chat-grid">
-            <div class="chat-card" data-api="meta"
-              onclick="selecionarApi(this,'meta')">
+            <div class="chat-card" data-api="meta" onclick="selecionarApi(this,'meta')">
               <img src="./assets/Meta.png"><h4>Meta</h4>
             </div>
-            <div class="chat-card" data-api="360"
-              onclick="selecionarApi(this,'360')">
-              <img src="./assets/360.png"><h4>360</h4>
+            <div class="chat-card" data-api="360" onclick="selecionarApi(this,'360')">
+              <img src="./assets/360.png"><h4>360 Dialog</h4>
             </div>
-            <div class="chat-card" data-api="gupshup"
-              onclick="selecionarApi(this,'gupshup')">
+            <div class="chat-card" data-api="gupshup" onclick="selecionarApi(this,'gupshup')">
               <img src="./assets/gupshup.png"><h4>Gupshup</h4>
             </div>
           </div>
@@ -242,51 +219,41 @@
         <div id="bloco-conta-api" class="chat-section" style="display:none">
           <h3>Conta</h3>
           <div class="chat-grid">
-            <div class="chat-card" data-conta="cliente"
-              onclick="selecionarConta(this,'cliente')">Cliente</div>
-            <div class="chat-card" data-conta="era"
-              onclick="selecionarConta(this,'era')">ERA</div>
+            <div class="chat-card" data-conta="cliente" onclick="selecionarConta(this,'cliente')">Cliente</div>
+            <div class="chat-card" data-conta="era" onclick="selecionarConta(this,'era')">ERA</div>
           </div>
         </div>
 
         <div id="chat-canais" class="chat-section" style="display:none">
-        <h3>Canais Integrados</h3>
-      
-        <div class="chat-grid">
-      
-          <div class="chat-card" data-canal="whatsapp" onclick="toggleCanal(this)">
-            <img src="./assets/whats.png">
-            <h4>WhatsApp</h4>
-          </div>
-      
-          <div class="chat-card" data-canal="instagram" onclick="toggleCanal(this)">
-            <img src="./assets/instagram.png">
-            <h4>Instagram</h4>
-          </div>
-      
-          <div class="chat-card" data-canal="messenger" onclick="toggleCanal(this)">
-            <img src="./assets/messenger.png">
-            <h4>Messenger</h4>
-          </div>
-      
-          <div class="chat-card" data-canal="telegram" onclick="toggleCanal(this)">
-            <img src="./assets/telegram.png">
-            <h4>Telegram</h4>
-          </div>
-      
-          <div class="chat-card" data-canal="email" onclick="toggleCanal(this)">
-            <img src="./assets/email.png">
-            <h4>E-mail</h4>
-          </div>
-      
-          <div class="chat-card" data-canal="google_chat" onclick="toggleCanal(this)">
-            <img src="./assets/google.png">
-            <h4>Google Chat</h4>
-          </div>
-      
-        </div>
-      </div>
+          <h3>Canais Integrados</h3>
+          <div class="chat-grid">
 
+            <div class="chat-card" data-canal="whatsapp" onclick="toggleCanal(this)">
+              <img src="./assets/whats.png"><h4>WhatsApp</h4>
+            </div>
+
+            <div class="chat-card" data-canal="instagram" onclick="toggleCanal(this)">
+              <img src="./assets/instagram.png"><h4>Instagram</h4>
+            </div>
+
+            <div class="chat-card" data-canal="messenger" onclick="toggleCanal(this)">
+              <img src="./assets/messenger.png"><h4>Messenger</h4>
+            </div>
+
+            <div class="chat-card" data-canal="telegram" onclick="toggleCanal(this)">
+              <img src="./assets/telegram.png"><h4>Telegram</h4>
+            </div>
+
+            <div class="chat-card" data-canal="email" onclick="toggleCanal(this)">
+              <img src="./assets/email.png"><h4>E-mail</h4>
+            </div>
+
+            <div class="chat-card" data-canal="google_chat" onclick="toggleCanal(this)">
+              <img src="./assets/google.png"><h4>Google Chat</h4>
+            </div>
+
+          </div>
+        </div>
 
         <div id="chat-qr" class="chat-section" style="display:none">
           <h3>Número WhatsApp</h3>
@@ -316,4 +283,3 @@
 
 </body>
 </html>
-
