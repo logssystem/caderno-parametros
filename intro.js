@@ -11,7 +11,7 @@ let digitando = false;
 
 function iniciarIntro() {
   const el = document.getElementById("intro-text");
-  if (!el || digitando) return;
+  if (!el) return;
 
   el.innerHTML = "";
   pos = 0;
@@ -64,15 +64,15 @@ function mostrarApp(modo) {
 
 /* ================= AÇÕES ================= */
 
-window.selecionarModo = modo => {
-  localStorage.setItem("modo_atendimento", modo);
-  mostrarApp(modo);
-};
+document.addEventListener("DOMContentLoaded", () => {
+  const modo = localStorage.getItem("modo_atendimento");
 
-window.resetarIntro = () => {
-  localStorage.removeItem("modo_atendimento");
-  mostrarIntro();
-};
+  if (modo === "voz" || modo === "chat" || modo === "ambos") {
+    mostrarApp(modo);
+  } else {
+    mostrarIntro();
+  }
+});
 
 /* ================= INIT ================= */
 
