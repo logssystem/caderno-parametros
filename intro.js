@@ -51,14 +51,16 @@ function mostrarApp(modo) {
   if (intro) intro.style.display = "none";
   if (app) app.style.display = "block";
 
-  if (voz) {
-    voz.style.display =
-      modo === "voz" || modo === "ambos" ? "block" : "none";
+  // sempre limpa primeiro
+  if (voz) voz.style.display = "none";
+  if (chat) chat.style.display = "none";
+
+  if (modo === "voz" || modo === "ambos") {
+    if (voz) voz.style.display = "block";
   }
 
-  if (chat) {
-    chat.style.display =
-      modo === "chat" || modo === "ambos" ? "block" : "none";
+  if (modo === "chat" || modo === "ambos") {
+    if (chat) chat.style.display = "block";
   }
 }
 
@@ -70,8 +72,24 @@ window.selecionarModo = modo => {
 };
 
 window.resetarIntro = () => {
+  // limpa modo
   localStorage.removeItem("modo_atendimento");
-  mostrarIntro();
+
+  // limpa estado de chat
+  delete window.chatState;
+
+  // esconde áreas
+  const voz = document.getElementById("voz-area");
+  const chat = document.getElementById("chat-area");
+  const app = document.getElementById("app-content");
+  const intro = document.getElementById("intro-screen");
+
+  if (voz) voz.style.display = "none";
+  if (chat) chat.style.display = "none";
+  if (app) app.style.display = "none";
+  if (intro) intro.style.display = "flex";
+
+  iniciarIntro();
 };
 
 /* ================= INIT ================= */
@@ -85,15 +103,3 @@ document.addEventListener("DOMContentLoaded", () => {
     mostrarIntro();
   }
 });
-
-/* ================= DARK MODE (INTRO) ================= */
-
-(function aplicarTemaIntro() {
-  const tema = localStorage.getItem("tema_caderno") || "light";
-
-  if (tema === "dark") {
-    document.body.classList.add("dark");
-  } else {
-    document.body.classList.remove("dark");
-  }
-})();
