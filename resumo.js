@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  /* ================= TEMA ================= */
+  /* ===== TEMA ===== */
   const temaSalvo = localStorage.getItem("tema");
   document.body.classList.toggle("dark", temaSalvo === "dark");
 
-  /* ================= DADOS ================= */
+  /* ===== DADOS ===== */
   const raw = localStorage.getItem("CONFIG_CADERNO");
   if (!raw) return;
 
@@ -19,136 +19,69 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!resumo) return;
   resumo.innerHTML = "";
 
-  /* ================= CLIENTE ================= */
+  /* ===== CLIENTE ===== */
   if (dados.cliente) {
     resumo.innerHTML += `
       <div class="card">
         <h2>🏢 Dados do Cliente</h2>
-        <p><b>Empresa:</b> ${dados.cliente.empresa || "-"}</p>
-        <p><b>Domínio:</b> ${dados.cliente.dominio || "-"}</p>
-        <p><b>CNPJ:</b> ${dados.cliente.cnpj || "-"}</p>
+        <div><strong>Empresa:</strong> ${dados.cliente.empresa}</div>
+        <div><strong>Domínio:</strong> ${dados.cliente.dominio}</div>
+        <div><strong>CNPJ:</strong> ${dados.cliente.cnpj}</div>
       </div>
     `;
   }
 
-  const voz = dados.voz || {};
-
-  /* ================= USUÁRIOS ================= */
-  if (voz.usuarios?.length) {
-    resumo.innerHTML += `
-      <div class="card">
-        <h2>👤 Usuários Web</h2>
-        ${voz.usuarios.map(u => `
-          <p>
-            <b>Nome:</b> ${u.nome}<br>
-            <b>Email:</b> ${u.email}<br>
-            <b>Permissão:</b> ${u.permissao}<br>
-            <b>Agente:</b> ${u.agente ? "Sim" : "Não"}
-          </p><hr>
-        `).join("")}
-      </div>
-    `;
-  }
-
-  /* ================= RAMAIS ================= */
-  if (voz.ramais?.length) {
-    resumo.innerHTML += `
-      <div class="card">
-        <h2>📞 Ramais</h2>
-        ${voz.ramais.map(r => `
-          <p><b>Ramal:</b> ${r.ramal}<br><b>Senha:</b> <code>${r.senha}</code></p><hr>
-        `).join("")}
-      </div>
-    `;
-  }
-
-  /* ================= AGENTES ================= */
-  if (voz.agentes?.length) {
-    resumo.innerHTML += `
-      <div class="card">
-        <h2>🎧 Agentes</h2>
-        ${voz.agentes.map(a => `
-          <p>
-            <b>Nome:</b> ${a.nome}<br>
-            <b>Ramal:</b> ${a.ramal}
-          </p><hr>
-        `).join("")}
-      </div>
-    `;
-  }
-
-  /* ================= CHAT ================= */
+  /* ===== CHAT ===== */
   if (dados.chat) {
-  const chat = dados.chat;
+    const chat = dados.chat;
 
-  resumo.innerHTML += `
-    <div class="card chat-card">
-      <h2>💬 Atendimento por Chat</h2>
+    resumo.innerHTML += `
+      <div class="card chat-card">
+        <h2>💬 Atendimento por Chat</h2>
 
-      <div class="chat-grid">
-        <div><span>Tipo</span>${chat.tipo}</div>
-        <div><span>API</span>${chat.api}</div>
-        <div><span>Conta</span>${chat.conta}</div>
-        <div><span>Canais</span>${(chat.canais || []).join(", ")}</div>
-      </div>
+        <div class="chat-grid">
+          <div><span>Tipo</span>${chat.tipo}</div>
+          <div><span>API</span>${chat.api}</div>
+          <div><span>Conta</span>${chat.conta}</div>
+          <div><span>Canais</span>${(chat.canais || []).join(", ")}</div>
+        </div>
 
-      ${
-        chat.departamentos?.length
-          ? `
-          <div class="chat-section">
+        ${
+          chat.departamentos?.length
+            ? `
             <h3>🏷️ Departamentos</h3>
-
             ${chat.departamentos.map(dep => `
               <div class="chat-box">
-                <div class="chat-box-title">
-                  Departamento: <strong>${dep.nome}</strong>
-                </div>
-
+                <strong>${dep.nome}</strong>
                 <div class="chat-users">
-                  ${(dep.agentes || []).map(a => `
-                    <span class="chip-user">👤 ${a}</span>
-                  `).join("")}
+                  ${(dep.agentes || []).map(a => `<span class="chip-user">${a}</span>`).join("")}
                 </div>
               </div>
             `).join("")}
-          </div>
-        `
-          : ""
-      }
+          `
+            : ""
+        }
 
-      ${
-        chat.agentes?.length
-          ? `
-          <div class="chat-section">
+        ${
+          chat.agentes?.length
+            ? `
             <h3>🎧 Agentes</h3>
-
             ${chat.agentes.map(a => `
               <div class="chat-box">
-                <div class="linha">
-                  <span>Usuário</span>
-                  <strong>${a.nome}</strong>
-                </div>
-
-                <div class="linha">
-                  <span>Email</span>
-                  ${a.usuario}
-                </div>
-
-                <div class="linha">
-                  <span>Departamentos</span>
-                  ${(a.departamentos || []).join(", ")}
-                </div>
+                <div><strong>Usuário:</strong> ${a.nome}</div>
+                <div><strong>Email:</strong> ${a.usuario}</div>
+                <div><strong>Departamentos:</strong> ${(a.departamentos || []).join(", ")}</div>
               </div>
             `).join("")}
-          </div>
-        `
-          : ""
-      }
-    </div>
-  `;
-}
-  
-/* ================= VOLTAR ================= */
-window.voltar = function () {
+          `
+            : ""
+        }
+      </div>
+    `;
+  }
+});
+
+/* ===== VOLTAR ===== */
+window.voltar = () => {
   window.location.href = "index.html";
 };
