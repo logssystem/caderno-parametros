@@ -1183,3 +1183,40 @@ body.dark #intro-screen .intro-actions button:hover {
   color: #000;
   margin-left: 6px;
 }
+
+.resumo-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+}
+
+.resumo-card .titulo {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.info-linha {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.info-linha span {
+  font-weight: 500;
+  color: #222;
+}
+
+.lista {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  background: #f2f4f7;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
