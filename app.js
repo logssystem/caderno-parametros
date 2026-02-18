@@ -1064,7 +1064,7 @@ function coletarPausas() {
     grupo: nomeGrupo,
     itens: pausas
   };
-}
+} // ✅ ESSA CHAVE É O QUE FALTAVA
 
 function coletarPesquisaSatisfacao() {
   const container = document.getElementById("pesquisaSatisfacaoConteudo");
