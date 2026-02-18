@@ -1246,30 +1246,6 @@ window.baixarTemplateRamais = function () {
   URL.revokeObjectURL(url);
 };
 
-/* ================= TEMPLATE CSV RAMAIS ================= */
-
-window.baixarTemplateRamais = function () {
-  const csv = [
-    "ramal;senha",
-    "1001;Senha@12345"
-  ].join("\n");
-
-  const blob = new Blob([csv], {
-    type: "text/csv;charset=utf-8;"
-  });
-
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "template_ramais.csv";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-
-  URL.revokeObjectURL(url);
-};
-
 /* ================= IMPORTAÇÃO CSV ================= */
 
 window.acionarImportacao = function (tipo) {
@@ -1488,49 +1464,30 @@ window.explorar = function () {
         /* ================= JSON FINAL ================= */
 
         const dados = {
-              cliente: {
-              empresa,
-              dominio,
-              cnpj: document.getElementById("cnpjCliente")?.value || ""
-            },
-              voz: {
-              usuarios,
-              ramais,
-              agentes,
-              filas,
-              regras_tempo,
-              uras: coletarURAs(),
-              grupo_ring: coletarGrupoRing(),
-              entradas: coletarEntradas(),
-              pausas: coletarPausas(),
-              pesquisaSatisfacao: coletarPesquisaSatisfacao()
-            }
-
-            
-                pausas: (() => {
-                  try {
-                    return coletarPausas();
-                  } catch (e) {
-                    mostrarToast(e.message, true);
-                    throw e;
-                  }
-                })(),
-            
-                pesquisaSatisfacao: (() => {
-                  try {
-                    return coletarPesquisaSatisfacao();
-                  } catch (e) {
-                    mostrarToast(e.message, true);
-                    throw e;
-                  }
-                })()
-              }
-            };
-
+          cliente: {
+            empresa,
+            dominio,
+            cnpj: document.getElementById("cnpjCliente")?.value || ""
+          },
+          voz: {
+            usuarios,
+            ramais,
+            agentes,
+            filas,
+            regras_tempo,
+            uras: coletarURAs(),
+            grupo_ring: coletarGrupoRing(),
+            entradas: coletarEntradas(),
+            pausas: coletarPausas(),
+            pesquisaSatisfacao: coletarPesquisaSatisfacao()
+          }
+        };
+        
         // 👉 SALVAR CHAT NO JSON
         if (chat) {
           dados.chat = chat;
         }
+
                 
         document.getElementById("resultado").textContent =
             JSON.stringify(dados, null, 2);
