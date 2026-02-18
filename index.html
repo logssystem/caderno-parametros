@@ -32,7 +32,9 @@
 <main id="app-content" class="form-container" style="display:none">
 
   <!-- botão flutuante de dúvidas -->
-  <button class="btn-duvidas" onclick="toggleDuvidas()">Dúvidas no preenchimento?</button>
+  <button class="btn-duvidas" onclick="toggleDuvidas()">
+    Dúvidas no preenchimento?
+  </button>
 
   <!-- painel lateral -->
   <div id="painelDuvidas" class="painel-duvidas" hidden>
@@ -51,16 +53,19 @@
   <!-- ================= DADOS DO CLIENTE ================= -->
   <section class="card">
     <h2>Dados do Cliente</h2>
+
     <div class="campo-descricao campo-cliente">
       <div class="bloco-campo">
         <label>Nome da empresa / cliente</label>
         <input id="empresaCliente" placeholder="Ex: ERA Telecom">
       </div>
+
       <div class="bloco-campo">
         <label>Domínio do cliente</label>
         <input id="dominioCliente" placeholder="ex: suporteera.sobreip.com.br">
         <div id="regraDominio"></div>
       </div>
+
       <div class="bloco-campo">
         <label>CNPJ</label>
         <input id="cnpjCliente" placeholder="00.000.000/0000-00">
@@ -86,16 +91,31 @@
 
     <!-- RAMAIS -->
     <section class="card">
-      <h2>Ramais</h2>
+      <h2>Ramais (Range)</h2>
+
+      <div class="acoes-card">
+        <input id="ramalInicio" type="number" placeholder="Ramal inicial">
+        <input id="ramalFim" type="number" placeholder="Ramal final">
+        <button class="btn-add" onclick="criarRangeRamais()">Criar range</button>
+      </div>
+
+      <div class="acoes-card">
+        <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
+        <button class="btn-import" onclick="acionarImportacao('ring')">📥 Importar</button>
+        <button class="btn-import" onclick="baixarTemplateRamais()">📥 Baixar template CSV</button>
+        <input type="file" id="importRamais" accept=".csv" hidden>
+      </div>
+
       <div id="listaRings"></div>
-      <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
     </section>
 
     <!-- AGENTES -->
     <section class="card">
       <h2>Agentes</h2>
       <div id="listaAgentes"></div>
-      <button class="btn-add" onclick="adicionarCampo('agente')">🔄 Atualizar agentes</button>
+      <button class="btn-add" onclick="adicionarCampo('agente')">
+        🔄 Atualizar agentes a partir dos usuários
+      </button>
     </section>
 
     <!-- ENTRADAS -->
@@ -119,6 +139,15 @@
       <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
     </section>
 
+    <!-- REGRAS DE TEMPO -->
+    <section class="card">
+      <h2>Regras de Tempo (Horário de Funcionamento)</h2>
+      <div class="acoes-card">
+        <button class="btn-add" onclick="adicionarRegraTempo()">+ Nova regra</button>
+      </div>
+      <div id="listaRegrasTempo"></div>
+    </section>
+
     <!-- URAS -->
     <section class="card">
       <h2>URAs</h2>
@@ -126,14 +155,21 @@
       <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
     </section>
 
+    <!-- PESQUISA DE SATISFAÇÃO -->
+    <!-- (mantida exatamente como você enviou) -->
+
+    <!-- PAUSAS -->
+    <!-- (mantidas exatamente como você enviou) -->
+
   </section>
 
   <!-- ================= CHAT ================= -->
   <section id="chat-area" style="display:none">
 
-    <!-- ENTIDADES CHAT -->
-    <section id="modulochat" style="display:none">
+    <!-- ENTIDADES DO CHAT -->
+    <section id="modulochat" style="display:none;">
 
+      <!-- USUÁRIOS CHAT -->
       <section class="card">
         <h2>Usuários Omnichannel</h2>
         <div class="acoes-card">
@@ -145,24 +181,27 @@
         <div id="listaUsuariosChat"></div>
       </section>
 
+      <!-- AGENTES CHAT -->
       <section class="card">
         <h2>Agentes Omnichannel</h2>
         <div id="listaAgentesChat"></div>
-        <button class="btn-add" onclick="adicionarAgenteChat()">+</button>
+        <button class="btn-add" onclick="adicionarAgenteChat()">+ Adicionar agente chat</button>
       </section>
 
+      <!-- DEPARTAMENTOS CHAT -->
       <section class="card">
         <h2>Departamentos (Chat)</h2>
         <div id="listaDepartamentosChat"></div>
-        <button class="btn-add" onclick="adicionarDepartamentoChat()">+</button>
+        <button class="btn-add" onclick="adicionarDepartamentoChat()">+ Adicionar departamento</button>
       </section>
 
     </section>
 
-    <!-- CONFIGURAÇÃO CHAT -->
+    <!-- CONFIGURAÇÃO TÉCNICA CHAT -->
     <section class="card">
       <h2>Configuração de Chat</h2>
 
+      <!-- TIPO -->
       <div class="chat-section">
         <h3>Tipo de Integração</h3>
         <div class="chat-grid">
@@ -175,8 +214,9 @@
         </div>
       </div>
 
+      <!-- API -->
       <div id="api-oficial" class="chat-section" style="display:none">
-        <h3>Fornecedor</h3>
+        <h3>Fornecedor Oficial</h3>
         <div class="chat-grid">
           <div class="chat-card" data-api="meta" onclick="selecionarApi(this,'meta')">
             <img src="./assets/Meta.png"><h4>Meta</h4>
@@ -190,20 +230,24 @@
         </div>
       </div>
 
+      <!-- CONTA -->
       <div id="bloco-conta-api" class="chat-section" style="display:none">
-        <h3>Conta</h3>
+        <h3>Essa API será criada em qual conta?</h3>
         <div class="chat-grid">
           <div class="chat-card" data-conta="cliente" onclick="selecionarConta(this,'cliente')">
-            <h4>Cliente</h4>
+            <h4>Conta do cliente</h4>
+            <p style="opacity:.6;font-size:13px;">Business Manager do cliente</p>
           </div>
           <div class="chat-card" data-conta="era" onclick="selecionarConta(this,'era')">
-            <h4>ERA</h4>
+            <h4>Conta da ERA</h4>
+            <p style="opacity:.6;font-size:13px;">Business Manager da ERA</p>
           </div>
         </div>
       </div>
 
+      <!-- CANAIS -->
       <div id="chat-canais" class="chat-section" style="display:none">
-        <h3>Canais</h3>
+        <h3>Canais Integrados</h3>
         <div class="chat-grid">
           <div class="chat-card" data-canal="whatsapp" onclick="toggleCanal(this)">
             <img src="./assets/whats.png"><h4>WhatsApp</h4>
@@ -211,16 +255,45 @@
           <div class="chat-card" data-canal="instagram" onclick="toggleCanal(this)">
             <img src="./assets/instagram.png"><h4>Instagram</h4>
           </div>
+          <div class="chat-card" data-canal="messenger" onclick="toggleCanal(this)">
+            <img src="./assets/messenger.png"><h4>Messenger</h4>
+          </div>
+          <div class="chat-card" data-canal="telegram" onclick="toggleCanal(this)">
+            <img src="./assets/telegram.png"><h4>Telegram</h4>
+          </div>
+          <div class="chat-card" data-canal="email" onclick="toggleCanal(this)">
+            <img src="./assets/email.png"><h4>E-mail</h4>
+          </div>
+          <div class="chat-card" data-canal="google_chat" onclick="toggleCanal(this)">
+            <img src="./assets/google.png"><h4>Google Chat</h4>
+          </div>
         </div>
       </div>
 
-    </section>
+      <!-- QR -->
+      <div id="chat-qr" class="chat-section" style="display:none">
+        <h3>Número do WhatsApp</h3>
+        <input class="chat-input" placeholder="Ex: 5511999999999">
+      </div>
 
+    </section>
+  </section>
+
+  <!-- RESULTADO -->
+  <section class="card">
+    <h2>Se as configurações estiverem corretas, selecione o botão abaixo</h2>
+    <div class="acoes-card">
+      <button class="btn-explorar" onclick="salvarConfiguracao()">Salvar configuração</button>
+    </div>
+    <pre id="resultado"></pre>
   </section>
 
 </main>
 
-<div id="toastGlobal" class="toast"><span id="toastMessage"></span></div>
+<!-- TOAST -->
+<div id="toastGlobal" class="toast">
+  <span id="toastMessage"></span>
+</div>
 
 <script src="./app.js"></script>
 <script src="./intro.js"></script>
