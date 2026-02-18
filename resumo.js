@@ -90,7 +90,22 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
     }
-
+  
+    if (dados.voz.grupo_ring?.length) {
+    resumo.innerHTML += `
+      <div class="card">
+        <h2>🔔 Grupo de Ring</h2>
+        ${dados.voz.grupo_ring.map(g => `
+          <div class="linha">
+            <strong>${g.nome}</strong><br>
+            Estratégia: ${g.estrategia}<br>
+            Ramais: ${(g.ramais || []).join(", ")}
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+    
     // URAs
     if (dados.voz.uras?.length) {
       resumo.innerHTML += `
@@ -107,6 +122,72 @@ document.addEventListener("DOMContentLoaded", () => {
 
   }
   
+  if (dados.voz.pausas?.itens?.length) {
+  resumo.innerHTML += `
+    <div class="card">
+      <h2>⏸️ Pausas do Call Center</h2>
+      <strong>Grupo:</strong> ${dados.voz.pausas.grupo}<br><br>
+      ${dados.voz.pausas.itens.map(p => `
+        <div class="linha">
+          ${p.nome} — ${p.tempo}
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+  if (dados.voz.pesquisaSatisfacao?.ativa) {
+  const p = dados.voz.pesquisaSatisfacao;
+
+  resumo.innerHTML += `
+    <div class="card">
+      <h2>⭐ Pesquisa de Satisfação</h2>
+      <div><strong>${p.nome}</strong></div>
+      <div>${p.pergunta}</div>
+      <br>
+      ${p.respostas.map(r => `
+        <div class="linha">
+          ${r.nota} — ${r.descricao}
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+  if (dados.voz.uras?.length) {
+  resumo.innerHTML += `
+    <div class="card">
+      <h2>📞 URAs</h2>
+      ${dados.voz.uras.map(u => `
+        <div class="linha">
+          <strong>${u.nome}</strong>
+          <div class="sub">
+            ${u.opcoes.map(o => `
+              <div>
+                Tecla ${o.tecla} → ${o.destino} (${o.descricao})
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+  if (dados.voz.agentes?.length) {
+  resumo.innerHTML += `
+    <div class="card">
+      <h2>🎧 Agentes</h2>
+      ${dados.voz.agentes.map(a => `
+        <div class="linha">
+          <strong>${a.nome}</strong> — Ramal ${a.ramal}
+          ${a.multiskill ? `<span class="badge">Multiskill</span>` : ""}
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
   /* ===== CHAT ===== */
   if (dados.chat) {
     const chat = dados.chat;
