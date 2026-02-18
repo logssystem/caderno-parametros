@@ -1039,44 +1039,49 @@ window.criarRangeRamais = function () {
 
 function coletarPausas() {
   const container = document.getElementById("pausasConteudo");
-  if (!container || container.style.display === "none") return null;
+  if (!container) return null;
 
   const nomeGrupo = document.getElementById("nomeGrupoPausas")?.value.trim();
-  if (!nomeGrupo) {
-    throw new Error("Informe o nome do Grupo de Pausas.");
-  }
+  if (!nomeGrupo) return null;
 
   const pausas = [];
-  document.querySelectorAll("#listaPausas .campo-descricao").forEach(p => {
-    const nome = p.querySelector("input")?.value.trim();
-    if (nome) pausas.push({ nome });
+
+  document.querySelectorAll("#listaPausas .opcao-pausa").forEach(p => {
+    const nome = p.querySelector("input[type=text]")?.value.trim();
+    const tempo = p.querySelector("select")?.value;
+
+    if (nome) {
+      pausas.push({
+        nome,
+        tempo: tempo === "0" ? "Sem limite" : `${tempo} min`
+      });
+    }
   });
-    
-    if (!pausas.length) {
-  return null;
-}
-    
-  return { grupo: nomeGrupo, itens: pausas };
+
+  if (!pausas.length) return null;
+
+  return {
+    grupo: nomeGrupo,
+    itens: pausas
+  };
 }
 
 function coletarPesquisaSatisfacao() {
   const container = document.getElementById("pesquisaSatisfacaoConteudo");
-
-  // 🔒 Se o módulo não existe ou está oculto, ignora
-  if (!container || container.style.display === "none") {
-    console.log("Pesquisa de Satisfação não configurada – ignorando");
-    return null;
-  }
+  if (!container) return null;
 
   const nome = document.getElementById("pesquisaNome")?.value?.trim() || "";
-  const introducao = document.getElementById("pesquisaAudioIntro")?.value?.trim() || "";
-  const pergunta = document.getElementById("pesquisaPergunta")?.value?.trim() || "";
-  const encerramento = document.getElementById("pesquisaAudioFim")?.value?.trim() || "";
+  const introducao =
+    document.getElementById("pesquisaAudioIntro")?.value?.trim() || "";
+  const pergunta =
+    document.getElementById("pesquisaPergunta")?.value?.trim() || "";
+  const encerramento =
+    document.getElementById("pesquisaAudioFim")?.value?.trim() || "";
 
   const respostas = [];
 
   document
-    .querySelectorAll("#listaRespostasPesquisa .campo-descricao")
+    .querySelectorAll("#listaRespostasPesquisa .opcao-pesquisa")
     .forEach(r => {
       const nota = r.querySelector("input[type=number]")?.value;
       const desc = r.querySelector("input[type=text]")?.value?.trim();
@@ -1089,20 +1094,35 @@ function coletarPesquisaSatisfacao() {
       }
     });
 
-  // 🔒 Existe o bloco, mas está incompleto
+  // nada preenchido → não salva
+  if (!nome && !pergunta && respostas.length === 0) {
+    return null;
+  }
+
+  // pesquisa incompleta → inativa
   if (!nome || !pergunta || respostas.length === 0) {
-    console.warn("Pesquisa de Satisfação incompleta – salvando como inativa");
     return {
       ativa: false,
       nome,
       introducao,
       pergunta,
       encerramento,
-      respostas: []
+      respostas
     };
   }
 
-  // ✅ Pesquisa válida
+  // pesquisa válida
+  return {
+    ativa: true,
+    nome,
+    introducao,
+    pergunta,
+    encerramento,
+    respostas
+  };
+}
+
+  // pesquisa válida
   return {
     ativa: true,
     nome,
