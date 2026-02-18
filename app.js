@@ -1356,13 +1356,15 @@ function processarCSV(tipo, texto) {
             });
         }
 
-        if (d.agente === "1" || d.agente?.toLowerCase() === "sim") {
-        const chk = campo.querySelector("input[type=checkbox]");
-        chk.checked = true;
-      
-        // 🔔 avisa o sistema que usuários mudaram
-        precisaRegerarAgentes = true;
-      }
+      if (d.agente === "1" || d.agente?.toLowerCase() === "sim") {
+      const chk = campo.querySelector("input[type=checkbox]");
+      chk.checked = true;
+    
+      // ✅ OBRIGATÓRIO
+      gerarAgentesAPartirUsuarios();
+      atualizarSelectRamaisAgentes();
+    }
+
 
     }
 
