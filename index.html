@@ -159,34 +159,61 @@
   </section>
 
   <!-- ================= PESQUISA DE SATISFAÇÃO ================= -->
-  <section class="card">
-    <h2>Pesquisa de Satisfação</h2>
+<section class="card">
+  <h2>Pesquisa de Satisfação</h2>
 
-    <div class="acoes-card">
-      <button class="btn-add" onclick="togglePesquisaSatisfacao()">+</button>
-    </div>
+  <div class="acoes-card">
+    <button class="btn-add" onclick="togglePesquisaSatisfacao()">+</button>
+  </div>
 
-    <div id="pesquisaSatisfacaoConteudo" style="display:none;">
-      <!-- conteúdo interno INALTERADO -->
-    </div>
-  </section>
+  <div id="pesquisaSatisfacaoConteudo" style="display:none; margin-top:12px;">
+    <input id="pesquisaNome" placeholder="Nome da pesquisa">
+
+    <textarea
+      id="pesquisaPergunta"
+      placeholder="Pergunta da pesquisa (ex: De 0 a 5, como você avalia nosso atendimento?)"
+      style="margin-top:8px"
+    ></textarea>
+
+    <div id="listaRespostasPesquisa" style="margin-top:8px;"></div>
+
+    <button
+      class="btn-add"
+      style="margin-top:8px"
+      onclick="adicionarRespostaPesquisa()"
+    >
+      + Adicionar resposta
+    </button>
+  </div>
+</section>
 
   <!-- ================= PAUSAS DO CALL CENTER ================= -->
-  <section class="card">
-    <h2>Pausas do Call Center</h2>
-    <p style="opacity:.7;margin-top:-6px;">
-      Crie os motivos de pausa que poderão ser utilizados nas filas de Call Center.
-    </p>
+<section class="card">
+  <h2>Pausas do Call Center</h2>
+  <p style="opacity:.7;margin-top:-6px;">
+    Crie os motivos de pausa que poderão ser utilizados nas filas de Call Center.
+  </p>
 
-    <div class="acoes-card">
-      <button class="btn-add" onclick="togglePausas()">+</button>
-    </div>
+  <div class="acoes-card">
+    <button class="btn-add" onclick="togglePausas()">+</button>
+  </div>
 
-    <div id="pausasConteudo" style="display:none;">
-      <!-- conteúdo interno INALTERADO -->
-    </div>
-  </section>
+  <div id="pausasConteudo" style="display:none; margin-top:12px;">
+    <input
+      id="nomeGrupoPausas"
+      placeholder="Nome do grupo de pausas"
+    >
 
+    <div id="listaPausas" style="margin-top:8px;"></div>
+
+    <button
+      class="btn-add"
+      style="margin-top:8px"
+      onclick="adicionarPausa()"
+    >
+      + Adicionar pausa
+    </button>
+  </div>
 </section>
 
   <!-- ================= CHAT ================= -->
@@ -348,6 +375,7 @@
 
 </body>
 </html>
+
 
 
 
