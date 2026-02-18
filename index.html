@@ -176,12 +176,19 @@
       >
 
       <textarea
+        id="pesquisaAudioIntro"
+        placeholder="Áudio de introdução (ex: Sua opinião é muito importante para nós...)"
+        style="margin-top:8px"
+      ></textarea>
+
+      <textarea
         id="pesquisaPergunta"
         placeholder="Pergunta da pesquisa (ex: De 0 a 5, como você avalia nosso atendimento?)"
         style="margin-top:8px"
       ></textarea>
 
-      <div id="listaRespostasPesquisa" style="margin-top:8px;"></div>
+      <h4 style="margin-top:12px">Respostas</h4>
+      <div id="listaRespostasPesquisa"></div>
 
       <button
         class="btn-add"
@@ -190,6 +197,12 @@
       >
         + Adicionar resposta
       </button>
+
+      <textarea
+        id="pesquisaAudioFim"
+        placeholder="Áudio de encerramento (ex: Obrigado por participar da nossa pesquisa)"
+        style="margin-top:12px"
+      ></textarea>
 
     </div>
   </div>
@@ -389,6 +402,7 @@
 
 </body>
 </html>
+
 
 
 
