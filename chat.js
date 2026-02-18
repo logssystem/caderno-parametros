@@ -335,37 +335,40 @@ function validarSenha(input, regrasEl) {
    COLETA FINAL PARA O JSON (SALVAR)
    ===================================================== */
 window.coletarChatDoDOM = function () {
-  const usuarios = [];
-  const agentes = [];
-  const departamentos = [];
+  const chat = {
+    tipo: window.chatState?.tipo || null,
+    api: window.chatState?.api || null,
+    conta: window.chatState?.conta || null,
+    canais: window.chatState?.canais || [],
+    usuarios: [],
+    agentes: [],
+    departamentos: []
+  };
 
-  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
-    const d = u.getData?.();
-    if (d) usuarios.push(d);
+  // usuários
+  document.querySelectorAll(".usuario-chat").forEach(el => {
+    chat.usuarios.push({
+      nome: el.querySelector(".nome")?.value || "",
+      email: el.querySelector(".email")?.value || ""
+    });
   });
 
-  document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
-    const d = a.getData?.();
-    if (d) agentes.push(d);
+  // agentes
+  document.querySelectorAll(".agente-chat").forEach(el => {
+    chat.agentes.push({
+      nome: el.dataset.nome,
+      usuario: el.dataset.usuario,
+      departamentos: JSON.parse(el.dataset.departamentos || "[]")
+    });
   });
 
-  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
-    const dep = d.getData?.();
-    if (dep) departamentos.push(dep);
+  // departamentos
+  document.querySelectorAll(".departamento-chat").forEach(el => {
+    chat.departamentos.push({
+      nome: el.dataset.nome,
+      agentes: JSON.parse(el.dataset.agentes || "[]")
+    });
   });
 
-  // 🔥 AQUI ESTÁ O BUG QUE FOI CORRIGIDO
-  agentes.forEach(agente => {
-    agente.departamentos = departamentos
-      .filter(dep => dep.agentes.includes(agente.nome))
-      .map(dep => dep.nome);
-  });
-
-  window.chatState.usuarios = usuarios;
-  window.chatState.agentes = agentes;
-  window.chatState.departamentos = departamentos;
-
-  console.log("CHAT STATE FINAL:", window.chatState);
-
-  return window.chatState;
+  return chat;
 };
