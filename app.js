@@ -1659,6 +1659,16 @@ document.addEventListener("DOMContentLoaded", () => {
   blocoAgentesChat.insertBefore(info, blocoAgentesChat.children[1]);
 });
 
+/* ================= PAUSAS E PESQUISA (EXPOSIÇÃO HTML) ================= */
+
+// Pausas do Call Center
+window.togglePausas = togglePausas;
+window.adicionarPausa = adicionarPausa;
+
+// Pesquisa de Satisfação
+window.togglePesquisaSatisfacao = togglePesquisaSatisfacao;
+window.adicionarRespostaPesquisa = adicionarRespostaPesquisa;
+
 /* ================= MODO ESCURO ================= */
 
 (function initTema() {
