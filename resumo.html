@@ -1,27 +1,36 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Resumo da Configuração</title>
-  <link rel="stylesheet" href="./style.css">
+
+  <!-- CSS principal -->
+  <link rel="stylesheet" href="./style.css" />
+
+  <!-- Garante responsividade -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
+
 <body>
 
-<header class="app-header resumo-header">
-  <img src="./assets/image.png" class="app-logo" />
+  <!-- ================= HEADER ================= -->
+  <header class="app-header resumo-header">
+    <img src="./assets/image.png" class="app-logo" alt="Logo" />
 
-  <h1 class="app-title">Resumo da Configuração</h1>
+    <h1 class="app-title">Resumo da Configuração</h1>
 
-  <button class="btn-voltar-intro" onclick="voltar()">
-    ← Voltar ao início
-  </button>
-</header>
+    <button class="btn-voltar-intro" onclick="voltar()">
+      ← Voltar ao início
+    </button>
+  </header>
 
-<main class="form-container" id="resumo"></main>
+  <!-- ================= CONTEÚDO ================= -->
+  <!-- ⚠️ TUDO será renderizado aqui pelo resumo.js -->
+  <main class="form-container" id="resumo"></main>
 
-<script src="resumo.js"></script>
-<div id="resumoCliente"></div>
-<div id="resumoVoz"></div>
-<div id="resumoChat"></div>
+  <!-- ================= SCRIPT ================= -->
+  <!-- ⚠️ SEM HTML depois disso -->
+  <script src="resumo.js"></script>
+
 </body>
 </html>
