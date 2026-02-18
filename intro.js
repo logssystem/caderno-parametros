@@ -43,33 +43,39 @@ function mostrarIntro() {
 }
 
 function selecionarModo(modo) {
-  document.getElementById("intro-screen").style.display = "none";
-  document.getElementById("app-content").style.display = "block";
+  const intro = document.getElementById("intro-screen");
+  const app = document.getElementById("app-content");
+
+  if (intro) intro.style.display = "none";
+  if (app) app.style.display = "block";
 
   const voz = document.getElementById("voz-area");
   const chat = document.getElementById("chat-area");
 
-  voz.style.display = "none";
-  chat.style.display = "none";
+  if (voz) voz.style.display = "none";
+  if (chat) chat.style.display = "none";
 
+  // garante estado global
   window.chatState = window.chatState || {};
 
   if (modo === "voz") {
-    voz.style.display = "block";
+    if (voz) voz.style.display = "block";
     window.chatState.tipo = null;
-    atualizarModuloChat();
   }
 
   if (modo === "chat") {
-    chat.style.display = "block";
+    if (chat) chat.style.display = "block";
     window.chatState.tipo = "api";
-    atualizarModuloChat();
   }
 
   if (modo === "ambos") {
-    voz.style.display = "block";
-    chat.style.display = "block";
+    if (voz) voz.style.display = "block";
+    if (chat) chat.style.display = "block";
     window.chatState.tipo = "api";
+  }
+
+  // atualiza visibilidade do módulo de chat
+  if (typeof atualizarModuloChat === "function") {
     atualizarModuloChat();
   }
 }
