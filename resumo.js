@@ -84,48 +84,66 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= CHAT ================= */
   if (dados.chat) {
-    const chat = dados.chat;
+  const chat = dados.chat;
 
-    resumo.innerHTML += `
-      <div class="card">
-        <h2>💬 Atendimento por Chat</h2>
-        <p><b>Tipo:</b> ${chat.tipo}</p>
-        <p><b>API:</b> ${chat.api}</p>
-        <p><b>Conta:</b> ${chat.conta}</p>
-        <p><b>Canais:</b> ${(chat.canais || []).join(", ")}</p>
+  resumo.innerHTML += `
+    <div class="card chat-card">
+      <h2>💬 Atendimento por Chat</h2>
 
-        ${
-          chat.departamentos?.length
-            ? `<hr><strong>Departamentos</strong>
-               <ul>
-                 ${chat.departamentos.map(d => `
-                   <li>
-                     <strong>${d.nome}</strong>
-                     <ul>${(d.agentes || []).map(a => `<li>${a}</li>`).join("")}</ul>
-                   </li>
-                 `).join("")}
-               </ul>`
-            : ""
-        }
-
-        ${
-          chat.agentes?.length
-            ? `<hr><strong>Agentes</strong>
-               <ul>
-                 ${chat.agentes.map(a => `
-                   <li>
-                     ${a.nome} — Usuário: ${a.usuario}
-                     <br><small>Departamentos: ${(a.departamentos || []).join(", ")}</small>
-                   </li>
-                 `).join("")}
-               </ul>`
-            : ""
-        }
+      <div class="chat-info">
+        <div><strong>Tipo:</strong> ${chat.tipo}</div>
+        <div><strong>API:</strong> ${chat.api}</div>
+        <div><strong>Conta:</strong> ${chat.conta}</div>
+        <div><strong>Canais:</strong> ${(chat.canais || []).join(", ")}</div>
       </div>
-    `;
-  }
-});
 
+      ${
+        chat.departamentos?.length
+          ? `
+            <div class="chat-section">
+              <h3>🏷️ Departamentos</h3>
+              ${chat.departamentos
+                .map(
+                  d => `
+                    <div class="chat-departamento">
+                      <strong>${d.nome}</strong>
+                      <ul>
+                        ${(d.agentes || []).map(a => `<li>${a}</li>`).join("")}
+                      </ul>
+                    </div>
+                  `
+                )
+                .join("")}
+            </div>
+          `
+          : ""
+      }
+
+      ${
+        chat.agentes?.length
+          ? `
+            <div class="chat-section">
+              <h3>🎧 Agentes</h3>
+              ${chat.agentes
+                .map(
+                  a => `
+                    <div class="chat-agente">
+                      <strong>${a.nome}</strong>
+                      <div class="chat-agente-sub">
+                        Usuário: ${a.usuario}<br>
+                        Departamentos: ${(a.departamentos || []).join(", ")}
+                      </div>
+                    </div>
+                  `
+                )
+                .join("")}
+            </div>
+          `
+          : ""
+      }
+    </div>
+  `;
+}
 /* ================= VOLTAR (GLOBAL) ================= */
 window.voltar = function () {
   window.location.href = "index.html";
