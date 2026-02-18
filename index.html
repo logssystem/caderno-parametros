@@ -31,266 +31,8 @@
 <!-- ================= CONTEÚDO ================= -->
 <main id="app-content" class="form-container" style="display:none">
 
-  <!-- botão flutuante de dúvidas -->
-  <button class="btn-duvidas" onclick="toggleDuvidas()">
-    Dúvidas no preenchimento?
-  </button>
-
-  <!-- painel lateral -->
-  <div id="painelDuvidas" class="painel-duvidas" hidden>
-    <select id="selectDuvida">
-      <option value="">Selecione o assunto</option>
-      <option value="cliente">Dados do Cliente</option>
-      <option value="usuarios">Usuários Web</option>
-      <option value="ramais">Ramais</option>
-      <option value="agentes">Agentes</option>
-      <option value="ura">URA</option>
-      <option value="chat">Chat / Omnichannel</option>
-    </select>
-
-    <div id="conteudoDuvida"></div>
-  </div>
-  
-  <!-- ================= DADOS DO CLIENTE ================= -->
-  <section class="card">
-  <h2>Dados do Cliente</h2>
-
-  <div class="campo-descricao campo-cliente">
-
-    <div class="bloco-campo">
-      <label>Nome da empresa / cliente</label>
-      <input id="empresaCliente" placeholder="Ex: ERA Telecom">
-    </div>
-
-    <div class="bloco-campo">
-      <label>Domínio do cliente</label>
-      <input id="dominioCliente" placeholder="ex: suporteera.sobreip.com.br">
-      <div id="regraDominio"></div>
-    </div>
-
-    <div class="bloco-campo">
-      <label>CNPJ</label>
-      <input id="cnpjCliente" placeholder="00.000.000/0000-00">
-      <div id="regraCNPJ"></div>
-    </div>
-
-  </div> 
-
-</section>
-
- <section id="voz-area" style="display:none">
-
-  <!-- ================= USUÁRIOS WEB ================= -->
-  <section class="card">
-    <h2>Usuários Web</h2>
-    <div class="acoes-card">
-      <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
-      <button class="btn-import" onclick="acionarImportacao('usuario_web')">📥 Importar</button>
-      <button class="btn-import" onclick="baixarTemplateUsuarios()">📥 Baixar template CSV</button>
-      <input type="file" id="importUsuarios" accept=".csv" hidden>
-    </div>
-    <div id="listaUsuariosWeb"></div>
-  </section>
-
-  <!-- ================= RAMAIS ================= -->
-  <section class="card">
-    <h2>Ramais (Range)</h2>
-
-    <div class="acoes-card">
-      <input id="ramalInicio" type="number" placeholder="Ramal inicial">
-      <input id="ramalFim" type="number" placeholder="Ramal final">
-      <button class="btn-add" onclick="criarRangeRamais()">Criar range</button>
-    </div>
-
-    <div class="acoes-card">
-      <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
-      <button class="btn-import" onclick="acionarImportacao('ring')">📥 Importar</button>
-      <button class="btn-import" onclick="baixarTemplateRamais()">📥 Baixar template CSV</button>
-      <input type="file" id="importRamais" accept=".csv" hidden>
-    </div>
-
-    <div id="listaRings"></div>
-  </section>
-
-  <!-- ================= AGENTES ================= -->
-  <section class="card">
-    <h2>Agentes</h2>
-    <div id="listaAgentes"></div>
-    <button class="btn-add" onclick="adicionarCampo('agente')">
-      🔄 Atualizar agentes a partir dos usuários
-    </button>
-  </section>
-
-  <!-- ================= ENTRADAS ================= -->
-  <section class="card">
-    <h2>Números de Entrada</h2>
-    <div id="listaEntradas"></div>
-    <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
-  </section>
-
-  <!-- ================= GRUPO DE RING ================= -->
-  <section class="card">
-    <h2>Grupo de Ring</h2>
-    <div id="listaGrupoRing"></div>
-    <button class="btn-add" onclick="adicionarCampo('grupo_ring')">+</button>
-  </section>
-
-  <!-- ================= FILAS ================= -->
-  <section class="card">
-    <h2>Filas</h2>
-    <div id="listaFilas"></div>
-    <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
-  </section>
-
-  <!-- ================= REGRAS DE TEMPO ================= -->
-  <section class="card">
-    <h2>Regras de Tempo (Horário de Funcionamento)</h2>
-    <div class="acoes-card">
-      <button class="btn-add" onclick="adicionarRegraTempo()">+ Nova regra</button>
-    </div>
-    <div id="listaRegrasTempo"></div>
-  </section>
-
-  <!-- ================= URAs ================= -->
-  <section class="card">
-    <h2>URAs</h2>
-    <div id="listaURAs"></div>
-    <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
-  </section>
-
-  <!-- ================= PESQUISA DE SATISFAÇÃO ================= -->
-<section class="card">
-  <h2>Pesquisa de Satisfação</h2>
-
-  <div class="acoes-card">
-    <button class="btn-add" onclick="togglePesquisaSatisfacao()">+</button>
-  </div>
-
-  <div id="pesquisaSatisfacaoConteudo" style="display:none; margin-top:12px;">
-    <div class="campo-descricao">
-
-      <input
-        id="pesquisaNome"
-        class="campo-nome"
-        placeholder="Nome da pesquisa"
-      >
-
-      <textarea
-        id="pesquisaAudioIntro"
-        placeholder="Áudio de introdução (ex: Sua opinião é muito importante para nós...)"
-        style="margin-top:8px"
-      ></textarea>
-
-      <textarea
-        id="pesquisaPergunta"
-        placeholder="Pergunta da pesquisa (ex: De 0 a 5, como você avalia nosso atendimento?)"
-        style="margin-top:8px"
-      ></textarea>
-
-      <h4 style="margin-top:12px">Respostas</h4>
-      <div id="listaRespostasPesquisa"></div>
-
-      <button
-        class="btn-add"
-        style="margin-top:8px"
-        onclick="adicionarRespostaPesquisa()"
-      >
-        + Adicionar resposta
-      </button>
-
-      <textarea
-        id="pesquisaAudioFim"
-        placeholder="Áudio de encerramento (ex: Obrigado por participar da nossa pesquisa)"
-        style="margin-top:12px"
-      ></textarea>
-
-    </div>
-  </div>
-</section>
-
-  <!-- ================= PAUSAS DO CALL CENTER ================= -->
-<section class="card">
-  <h2>Pausas do Call Center</h2>
-
-  <p style="opacity:.7;margin-top:-6px;">
-    Crie os motivos de pausa que poderão ser utilizados nas filas de Call Center.
-  </p>
-
-  <div class="acoes-card">
-    <button class="btn-add" onclick="togglePausas()">+</button>
-  </div>
-
-  <div id="pausasConteudo" style="display:none; margin-top:12px;">
-    <div class="campo-descricao">
-
-      <input
-        id="nomeGrupoPausas"
-        class="campo-nome"
-        placeholder="Nome do grupo de pausas"
-      >
-
-      <div id="listaPausas" style="margin-top:8px;"></div>
-
-      <button
-        class="btn-add"
-        style="margin-top:8px"
-        onclick="adicionarPausa()"
-      >
-        + Adicionar pausa
-      </button>
-
-    </div>
-  </div>
-</section>
-
   <!-- ================= CHAT ================= -->
   <section id="chat-area" style="display:none">
-
-    <!-- 🔹 ENTIDADES DO CHAT (PADRÃO PABX) -->
-    <section id="modulochat" style="display:none;">
-
-      <!-- 1️⃣ USUÁRIOS -->
-     <section class="card">
-  <h2>Usuários Omnichannel</h2>
-
-  <div class="acoes-card">
-    <button class="btn-add" onclick="adicionarUsuarioChat()">+</button>
-
-    <button class="btn-import" onclick="acionarImportacaoUsuariosChat()">
-      📥 Importar
-    </button>
-
-    <button class="btn-import" onclick="baixarTemplateUsuariosChat()">
-      📥 Baixar template CSV
-    </button>
-
-    <input type="file" id="importUsuariosChat" accept=".csv" hidden>
-  </div>
-
-  <div id="listaUsuariosChat"></div>
-</section>
-
-    
-      <!-- 2️⃣ AGENTES -->
-      <section class="card">
-        <h2>Agentes Omnichannel</h2>
-        <div id="listaAgentesChat"></div>
-        <button onclick="adicionarAgenteChat()" class="btn-add">
-          + Adicionar agente chat
-        </button>
-      </section>
-    
-      <!-- 3️⃣ DEPARTAMENTOS -->
-      <section class="card">
-        <h2>Departamentos (Chat)</h2>
-        <div id="listaDepartamentosChat"></div>
-        <button onclick="adicionarDepartamentoChat()" class="btn-add">
-          + Adicionar departamento
-        </button>
-      </section>
-    
-    </section>
-
 
     <!-- 🔹 CONFIGURAÇÃO TÉCNICA DO CHAT -->
     <section class="card">
@@ -300,14 +42,21 @@
       <div class="chat-section">
         <h3>Tipo de Integração</h3>
         <div class="chat-grid">
-          <div class="chat-card tipo" onclick="selecionarTipoChat(this, 'api')">
+
+          <div class="chat-card tipo"
+               data-tipo="api"
+               onclick="selecionarTipoChat(this, 'api')">
             <img src="./assets/APIS.png">
             <h4>API Oficial</h4>
           </div>
-          <div class="chat-card tipo" onclick="selecionarTipoChat(this, 'qr')">
+
+          <div class="chat-card tipo"
+               data-tipo="qr"
+               onclick="selecionarTipoChat(this, 'qr')">
             <img src="./assets/qrcode.png">
             <h4>QR Code</h4>
           </div>
+
         </div>
       </div>
 
@@ -315,15 +64,25 @@
       <div id="api-oficial" class="chat-section" style="display:none">
         <h3>Fornecedor Oficial</h3>
         <div class="chat-grid">
-          <div class="chat-card" onclick="selecionarApi(this,'meta')">
+
+          <div class="chat-card"
+               data-api="meta"
+               onclick="selecionarApi(this,'meta')">
             <img src="./assets/Meta.png"><h4>Meta</h4>
           </div>
-          <div class="chat-card" onclick="selecionarApi(this,'360')">
+
+          <div class="chat-card"
+               data-api="360"
+               onclick="selecionarApi(this,'360')">
             <img src="./assets/360.png"><h4>360 Dialog</h4>
           </div>
-          <div class="chat-card" onclick="selecionarApi(this,'gupshup')">
+
+          <div class="chat-card"
+               data-api="gupshup"
+               onclick="selecionarApi(this,'gupshup')">
             <img src="./assets/gupshup.png"><h4>Gupshup</h4>
           </div>
+
         </div>
       </div>
 
@@ -331,14 +90,21 @@
       <div id="bloco-conta-api" class="chat-section" style="display:none;">
         <h3>Essa API será criada em qual conta?</h3>
         <div class="chat-grid">
-          <div class="chat-card" onclick="selecionarConta(this,'cliente')">
+
+          <div class="chat-card"
+               data-conta="cliente"
+               onclick="selecionarConta(this,'cliente')">
             <h4>Conta do cliente</h4>
             <p style="opacity:.6;font-size:13px;">Business Manager do cliente</p>
           </div>
-          <div class="chat-card" onclick="selecionarConta(this,'era')">
+
+          <div class="chat-card"
+               data-conta="era"
+               onclick="selecionarConta(this,'era')">
             <h4>Conta da ERA</h4>
             <p style="opacity:.6;font-size:13px;">Business Manager da ERA</p>
           </div>
+
         </div>
       </div>
 
@@ -346,25 +112,31 @@
       <div id="chat-canais" class="chat-section" style="display:none">
         <h3>Canais Integrados</h3>
         <div class="chat-grid">
+
           <div class="chat-card" data-canal="whatsapp" onclick="toggleCanal(this)">
             <img src="./assets/whats.png"><h4>WhatsApp</h4>
           </div>
+
           <div class="chat-card" data-canal="instagram" onclick="toggleCanal(this)">
             <img src="./assets/instagram.png"><h4>Instagram</h4>
           </div>
+
           <div class="chat-card" data-canal="messenger" onclick="toggleCanal(this)">
             <img src="./assets/messenger.png"><h4>Messenger</h4>
           </div>
+
           <div class="chat-card" data-canal="telegram" onclick="toggleCanal(this)">
             <img src="./assets/telegram.png"><h4>Telegram</h4>
           </div>
+
           <div class="chat-card" data-canal="email" onclick="toggleCanal(this)">
             <img src="./assets/email.png"><h4>E-mail</h4>
           </div>
+
           <div class="chat-card" data-canal="google_chat" onclick="toggleCanal(this)">
-          <img src="./assets/google.png">
-           <h4>Google Chat</h4>
+            <img src="./assets/google.png"><h4>Google Chat</h4>
           </div>
+
         </div>
       </div>
 
@@ -376,18 +148,6 @@
 
     </section>
   </section>
-
-  <!-- ================= RESULTADO JSON ================= -->
-<section class="card">
-  <h2>Se as configurações estiverem corretas, selecione o botão abaixo</h2>
-  <div class="acoes-card">
-    <button class="btn-explorar" onclick="salvarConfiguracao()">
-      Salvar configuração
-    </button>
-  </div>
-  <pre id="resultado"
-       style="max-height:500px;overflow:auto;background:#00000010;padding:16px;border-radius:12px;"></pre>
-</section>
 
 </main>
 
@@ -402,10 +162,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
