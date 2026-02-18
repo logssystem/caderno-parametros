@@ -46,7 +46,7 @@
     <div id="conteudoDuvida"></div>
   </div>
 
-  <!-- ================= CLIENTE ================= -->
+  <!-- ================= DADOS DO CLIENTE ================= -->
   <section class="card">
     <h2>Dados do Cliente</h2>
     <div class="campo-descricao campo-cliente">
@@ -108,7 +108,7 @@
     </section>
 
     <section class="card">
-      <h2>Entradas</h2>
+      <h2>Números de Entrada</h2>
       <div id="listaEntradas"></div>
       <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
     </section>
@@ -171,9 +171,9 @@
   <!-- ================= CHAT ================= -->
   <section id="chat-area" style="display:none">
 
-    <section id="modulochat" style="display:block">
+    <section id="modulochat">
 
-      <!-- USUÁRIOS CHAT -->
+      <!-- USUÁRIOS -->
       <section class="card">
         <h2>Usuários Omnichannel</h2>
         <div class="acoes-card">
@@ -185,7 +185,21 @@
         <div id="listaUsuariosChat"></div>
       </section>
 
-      <!-- CONFIG CHAT -->
+      <!-- AGENTES -->
+      <section class="card">
+        <h2>Agentes Omnichannel</h2>
+        <div id="listaAgentesChat"></div>
+        <button class="btn-add" onclick="adicionarAgenteChat()">+ Adicionar agente chat</button>
+      </section>
+
+      <!-- DEPARTAMENTOS -->
+      <section class="card">
+        <h2>Departamentos (Chat)</h2>
+        <div id="listaDepartamentosChat"></div>
+        <button class="btn-add" onclick="adicionarDepartamentoChat()">+ Adicionar departamento</button>
+      </section>
+
+      <!-- CONFIGURAÇÃO -->
       <section class="card">
         <h2>Configuração de Chat</h2>
 
@@ -227,31 +241,24 @@
         <div id="chat-canais" class="chat-section" style="display:none">
           <h3>Canais Integrados</h3>
           <div class="chat-grid">
-
             <div class="chat-card" data-canal="whatsapp" onclick="toggleCanal(this)">
               <img src="./assets/whats.png"><h4>WhatsApp</h4>
             </div>
-
             <div class="chat-card" data-canal="instagram" onclick="toggleCanal(this)">
               <img src="./assets/instagram.png"><h4>Instagram</h4>
             </div>
-
             <div class="chat-card" data-canal="messenger" onclick="toggleCanal(this)">
               <img src="./assets/messenger.png"><h4>Messenger</h4>
             </div>
-
             <div class="chat-card" data-canal="telegram" onclick="toggleCanal(this)">
               <img src="./assets/telegram.png"><h4>Telegram</h4>
             </div>
-
             <div class="chat-card" data-canal="email" onclick="toggleCanal(this)">
               <img src="./assets/email.png"><h4>E-mail</h4>
             </div>
-
             <div class="chat-card" data-canal="google_chat" onclick="toggleCanal(this)">
               <img src="./assets/google.png"><h4>Google Chat</h4>
             </div>
-
           </div>
         </div>
 
