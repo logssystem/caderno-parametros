@@ -31,6 +31,82 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
+    /* ===== VOZ ===== */
+  if (dados.voz) {
+
+    // Usuários Web
+    if (dados.voz.usuarios?.length) {
+      resumo.innerHTML += `
+        <div class="card">
+          <h2>👤 Usuários Web</h2>
+          ${dados.voz.usuarios.map(u => `
+            <div>
+              <strong>${u.nome}</strong> — ${u.permissao}
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    // Ramais
+    if (dados.voz.ramais?.length) {
+      resumo.innerHTML += `
+        <div class="card">
+          <h2>☎️ Ramais</h2>
+          ${dados.voz.ramais.map(r => `
+            <div>
+              <strong>Ramal:</strong> ${r.ramal}
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    // Agentes
+    if (dados.voz.agentes?.length) {
+      resumo.innerHTML += `
+        <div class="card">
+          <h2>🎧 Agentes</h2>
+          ${dados.voz.agentes.map(a => `
+            <div>
+              <strong>${a.nome}</strong> — Ramal: ${a.ramal}
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    // Filas
+    if (dados.voz.filas?.length) {
+      resumo.innerHTML += `
+        <div class="card">
+          <h2>👥 Filas</h2>
+          ${dados.voz.filas.map(f => `
+            <div>
+              <strong>${f.nome}</strong><br>
+              Agentes: ${(f.agentes || []).join(", ")}
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    // URAs
+    if (dados.voz.uras?.length) {
+      resumo.innerHTML += `
+        <div class="card">
+          <h2>📞 URAs</h2>
+          ${dados.voz.uras.map(u => `
+            <div>
+              <strong>${u.nome}</strong>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+  }
+  
   /* ===== CHAT ===== */
   if (dados.chat) {
     const chat = dados.chat;
