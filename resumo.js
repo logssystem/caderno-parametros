@@ -240,18 +240,43 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ================= CHAT ================= */
 
   if (dados.chat) {
-    const c = dados.chat;
-    resumo.innerHTML += `
-      <div class="card">
-        <h2>💬 Atendimento por Chat</h2>
-        <p><b>Tipo:</b> ${c.tipo}</p>
-        <p><b>API:</b> ${c.api}</p>
-        <p><b>Conta:</b> ${c.conta}</p>
-        <p><b>Canais:</b> ${c.canais?.join(", ")}</p>
-      </div>
-    `;
+  const chat = dados.chat;
+
+  let html = `
+    <p><strong>Tipo:</strong> ${chat.tipo}</p>
+    <p><strong>API:</strong> ${chat.api}</p>
+    <p><strong>Conta:</strong> ${chat.conta}</p>
+    <p><strong>Canais:</strong> ${chat.canais.join(", ")}</p>
+  `;
+
+  // 🔹 DEPARTAMENTOS
+  if (chat.departamentos?.length) {
+    html += `<hr><strong>Departamentos:</strong><ul>`;
+    chat.departamentos.forEach(dep => {
+      html += `<li>
+        <strong>${dep.nome}</strong>
+        <ul>
+          ${dep.agentes.map(a => `<li>${a}</li>`).join("")}
+        </ul>
+      </li>`;
+    });
+    html += `</ul>`;
   }
-});
+
+  // 🔹 AGENTES
+  if (chat.agentes?.length) {
+    html += `<hr><strong>Agentes:</strong><ul>`;
+    chat.agentes.forEach(a => {
+      html += `<li>
+        ${a.nome} — Usuário: ${a.usuario}
+        <br><small>Departamentos: ${a.departamentos.join(", ")}</small>
+      </li>`;
+    });
+    html += `</ul>`;
+  }
+
+  document.getElementById("resumo-chat").innerHTML = html;
+}
 
 /* ================= VOLTAR ================= */
 
