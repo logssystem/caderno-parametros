@@ -31,8 +31,60 @@
 <!-- ================= CONTEÚDO ================= -->
 <main id="app-content" class="form-container" style="display:none">
 
+  <!-- botão flutuante de dúvidas -->
+  <button class="btn-duvidas" onclick="toggleDuvidas()">Dúvidas no preenchimento?</button>
+
+  <!-- painel lateral -->
+  <div id="painelDuvidas" class="painel-duvidas" hidden>
+    <select id="selectDuvida">
+      <option value="">Selecione o assunto</option>
+      <option value="cliente">Dados do Cliente</option>
+      <option value="usuarios">Usuários Web</option>
+      <option value="ramais">Ramais</option>
+      <option value="agentes">Agentes</option>
+      <option value="ura">URA</option>
+      <option value="chat">Chat / Omnichannel</option>
+    </select>
+    <div id="conteudoDuvida"></div>
+  </div>
+
+  <!-- ================= DADOS DO CLIENTE ================= -->
+  <section class="card">
+    <h2>Dados do Cliente</h2>
+    <div class="campo-descricao campo-cliente">
+
+      <div class="bloco-campo">
+        <label>Nome da empresa / cliente</label>
+        <input id="empresaCliente" placeholder="Ex: ERA Telecom">
+      </div>
+
+      <div class="bloco-campo">
+        <label>Domínio do cliente</label>
+        <input id="dominioCliente" placeholder="ex: suporteera.sobreip.com.br">
+        <div id="regraDominio"></div>
+      </div>
+
+      <div class="bloco-campo">
+        <label>CNPJ</label>
+        <input id="cnpjCliente" placeholder="00.000.000/0000-00">
+        <div id="regraCNPJ"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= VOZ ================= -->
+  <section id="voz-area" style="display:none">
+    <!-- (toda a parte de voz permanece exatamente como você tinha) -->
+  </section>
+
   <!-- ================= CHAT ================= -->
   <section id="chat-area" style="display:none">
+
+    <!-- 🔹 ENTIDADES DO CHAT -->
+    <section id="modulochat" style="display:none;">
+      <!-- usuários, agentes e departamentos (inalterados) -->
+    </section>
 
     <!-- 🔹 CONFIGURAÇÃO TÉCNICA DO CHAT -->
     <section class="card">
