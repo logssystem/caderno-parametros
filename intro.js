@@ -42,23 +42,42 @@ function mostrarIntro() {
   iniciarIntro();
 }
 
-function mostrarApp(modo) {
-  const intro = document.getElementById("intro-screen");
-  const app = document.getElementById("app-content");
+function selecionarModo(modo) {
+  document.getElementById("intro-screen").style.display = "none";
+  document.getElementById("app-content").style.display = "block";
+
   const voz = document.getElementById("voz-area");
   const chat = document.getElementById("chat-area");
 
-  if (intro) intro.style.display = "none";
-  if (app) app.style.display = "block";
+  voz.style.display = "none";
+  chat.style.display = "none";
 
-  if (voz) {
-    voz.style.display =
-      modo === "voz" || modo === "ambos" ? "block" : "none";
+  // garante estado global do chat
+  window.chatState = window.chatState || {};
+
+  if (modo === "voz") {
+    voz.style.display = "block";
+
+    // chat realmente desligado
+    window.chatState.tipo = null;
+    atualizarModuloChat();
   }
 
-  if (chat) {
-    chat.style.display =
-      modo === "chat" || modo === "ambos" ? "block" : "none";
+  if (modo === "chat") {
+    chat.style.display = "block";
+
+    // 🔥 ATIVA CHAT
+    window.chatState.tipo = "api"; // padrão inicial
+    atualizarModuloChat();
+  }
+
+  if (modo === "ambos") {
+    voz.style.display = "block";
+    chat.style.display = "block";
+
+    // 🔥 ATIVA CHAT
+    window.chatState.tipo = "api";
+    atualizarModuloChat();
   }
 }
 
