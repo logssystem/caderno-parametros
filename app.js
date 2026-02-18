@@ -1071,12 +1071,9 @@ function coletarPesquisaSatisfacao() {
   if (!container) return null;
 
   const nome = document.getElementById("pesquisaNome")?.value?.trim() || "";
-  const introducao =
-    document.getElementById("pesquisaAudioIntro")?.value?.trim() || "";
-  const pergunta =
-    document.getElementById("pesquisaPergunta")?.value?.trim() || "";
-  const encerramento =
-    document.getElementById("pesquisaAudioFim")?.value?.trim() || "";
+  const introducao = document.getElementById("pesquisaAudioIntro")?.value?.trim() || "";
+  const pergunta = document.getElementById("pesquisaPergunta")?.value?.trim() || "";
+  const encerramento = document.getElementById("pesquisaAudioFim")?.value?.trim() || "";
 
   const respostas = [];
 
@@ -1094,12 +1091,10 @@ function coletarPesquisaSatisfacao() {
       }
     });
 
-  // nada preenchido → não salva
   if (!nome && !pergunta && respostas.length === 0) {
     return null;
   }
 
-  // pesquisa incompleta → inativa
   if (!nome || !pergunta || respostas.length === 0) {
     return {
       ativa: false,
@@ -1111,18 +1106,6 @@ function coletarPesquisaSatisfacao() {
     };
   }
 
-  // pesquisa válida
-  return {
-    ativa: true,
-    nome,
-    introducao,
-    pergunta,
-    encerramento,
-    respostas
-  };
-}
-
-  // pesquisa válida
   return {
     ativa: true,
     nome,
