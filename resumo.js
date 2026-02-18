@@ -124,15 +124,16 @@ document.addEventListener("DOMContentLoaded", () => {
   
   if (dados.voz.pausas?.itens?.length) {
   resumo.innerHTML += `
-    <div class="card">
+    <section class="resumo-section">
       <h2>⏸️ Pausas do Call Center</h2>
-      <strong>Grupo:</strong> ${dados.voz.pausas.grupo}<br><br>
-      ${dados.voz.pausas.itens.map(p => `
-        <div class="linha">
-          ${p.nome} — ${p.tempo}
-        </div>
-      `).join("")}
-    </div>
+      <div class="resumo-list">
+        ${dados.voz.pausas.itens.map(p => `
+          <div class="resumo-item">
+            ${p.nome} — ${p.tempo}
+          </div>
+        `).join("")}
+      </div>
+    </section>
   `;
 }
 
@@ -140,51 +141,53 @@ document.addEventListener("DOMContentLoaded", () => {
   const p = dados.voz.pesquisaSatisfacao;
 
   resumo.innerHTML += `
-    <div class="card">
+    <section class="resumo-section">
       <h2>⭐ Pesquisa de Satisfação</h2>
-      <div><strong>${p.nome}</strong></div>
-      <div>${p.pergunta}</div>
-      <br>
-      ${p.respostas.map(r => `
-        <div class="linha">
-          ${r.nota} — ${r.descricao}
+      <div class="resumo-item">
+        <strong>${p.pergunta}</strong>
+        <div class="resumo-sub">
+          ${p.respostas.map(r => `${r.nota} — ${r.descricao}`).join("<br>")}
         </div>
-      `).join("")}
-    </div>
+      </div>
+    </section>
   `;
 }
 
   if (dados.voz.uras?.length) {
   resumo.innerHTML += `
-    <div class="card">
-      <h2>📞 URAs</h2>
-      ${dados.voz.uras.map(u => `
-        <div class="linha">
-          <strong>${u.nome}</strong>
-          <div class="sub">
-            ${u.opcoes.map(o => `
-              <div>
-                Tecla ${o.tecla} → ${o.destino} (${o.descricao})
-              </div>
-            `).join("")}
+    <section class="resumo-section">
+      <h2>☎️ URAs</h2>
+      <div class="resumo-list">
+        ${dados.voz.uras.map(u => `
+          <div class="resumo-item">
+            <strong>${u.nome}</strong>
+            <div class="resumo-sub">
+              ${u.opcoes.map(o => `
+                <div>Tecla ${o.tecla} → ${o.destino}</div>
+              `).join("")}
+            </div>
           </div>
-        </div>
-      `).join("")}
-    </div>
+        `).join("")}
+      </div>
+    </section>
   `;
 }
 
   if (dados.voz.agentes?.length) {
   resumo.innerHTML += `
-    <div class="card">
+    <section class="resumo-section">
       <h2>🎧 Agentes</h2>
-      ${dados.voz.agentes.map(a => `
-        <div class="linha">
-          <strong>${a.nome}</strong> — Ramal ${a.ramal}
-          ${a.multiskill ? `<span class="badge">Multiskill</span>` : ""}
-        </div>
-      `).join("")}
-    </div>
+      <div class="resumo-list">
+        ${dados.voz.agentes.map(a => `
+          <div class="resumo-item">
+            <strong>${a.nome}
+              ${a.multiskill ? `<span class="badge">Multiskill</span>` : ""}
+            </strong>
+            <div class="resumo-sub">Ramal: ${a.ramal}</div>
+          </div>
+        `).join("")}
+      </div>
+    </section>
   `;
 }
 
