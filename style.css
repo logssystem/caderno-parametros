@@ -806,3 +806,51 @@ body.dark #intro-screen .intro-actions button:hover {
   white-space: nowrap;
 }
 
+/* ===== CHAT RESUMO ===== */
+
+.chat-card h2 {
+  margin-bottom: 12px;
+}
+
+.chat-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px 16px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.chat-section {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.chat-section h3 {
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.chat-departamento {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+}
+
+.chat-departamento ul {
+  margin: 6px 0 0 16px;
+}
+
+.chat-agente {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+}
+
+.chat-agente-sub {
+  font-size: 13px;
+  color: #555;
+  margin-top: 4px;
+}
