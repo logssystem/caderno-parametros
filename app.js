@@ -1171,6 +1171,51 @@ function coletarEntradas() {
   return entradas;
 }
 
+/* ================= CHAT – COLETA FINAL ================= */
+
+window.coletarChatDoDOM = function () {
+
+  const chat = {
+    tipo: window.chatState?.tipo || null,
+    api: window.chatState?.api || null,
+    conta: window.chatState?.conta || null,
+    canais: window.chatState?.canais || [],
+    usuarios: [],
+    agentes: [],
+    departamentos: []
+  };
+
+  // usuários chat
+  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
+    chat.usuarios.push({
+      nome: u.getNome?.() || "",
+      email: u.getEmail?.() || "",
+      permissao: u.getPermissao?.() || ""
+    });
+  });
+
+  // departamentos
+  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
+    const nome = d.querySelector(".campo-nome")?.value || "";
+    if (!nome) return;
+
+    chat.departamentos.push({
+      nome,
+      agentes: JSON.parse(d.dataset.agentes || "[]")
+    });
+  });
+
+  // agentes chat
+  document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
+    chat.agentes.push({
+      nome: a.querySelector(".campo-nome")?.value || "",
+      usuario: a.dataset.usuario || "",
+      departamentos: JSON.parse(a.dataset.departamentos || "[]")
+    });
+  });
+
+  return chat;
+};
 
 /* ================= MOTOR ================= */
 
@@ -1420,34 +1465,30 @@ window.explorar = function () {
        /* ================= CHAT (COLETA REAL – MODELO PABX) ================= */
 
         let chat = null;
-        
-        // só tenta salvar chat se a função existir
+
         if (typeof window.coletarChatDoDOM === "function") {
-        
-          const chatData = window.coletarChatDoDOM();
+          const chatData = coletarChatDoDOM();
         
           const chatAtivo =
-            chatData?.tipo ||
-            chatData?.api ||
-            chatData?.conta ||
-            chatData?.canais?.length ||
-            chatData?.departamentos?.length ||
-            chatData?.agentes?.length;
+            chatData.tipo ||
+            chatData.api ||
+            chatData.conta ||
+            chatData.canais.length;
         
           if (chatAtivo) {
         
-            if (!chatData.departamentos?.length) {
+            if (!chatData.departamentos.length) {
               mostrarToast("Chat ativo sem departamentos", true);
               return;
             }
         
-            if (!chatData.agentes?.length) {
+            if (!chatData.agentes.length) {
               mostrarToast("Chat ativo sem agentes", true);
               return;
             }
         
             chatData.agentes.forEach(a => {
-              if (!a.departamentos?.length) {
+              if (!a.departamentos.length) {
                 mostrarToast(`Agente ${a.nome} sem departamento`, true);
                 throw new Error("Agente sem departamento");
               }
@@ -1457,14 +1498,7 @@ window.explorar = function () {
               }
             });
         
-            chat = {
-              tipo: chatData.tipo || "",
-              api: chatData.api || "",
-              conta: chatData.conta || "",
-              canais: chatData.canais || [],
-              departamentos: chatData.departamentos,
-              agentes: chatData.agentes
-            };
+            chat = chatData;
           }
         }
     
