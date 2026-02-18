@@ -7,7 +7,7 @@
   <!-- CSS principal -->
   <link rel="stylesheet" href="./style.css" />
 
-  <!-- Garante responsividade -->
+  <!-- Responsividade -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 
@@ -15,22 +15,23 @@
 
   <!-- ================= HEADER ================= -->
   <header class="app-header resumo-header">
-    <img src="./assets/image.png" class="app-logo" alt="Logo" />
+    <img src="./assets/image.png" class="app-logo" alt="Logo ERA" />
 
     <h1 class="app-title">Resumo da Configuração</h1>
 
-    <button class="btn-voltar-intro" onclick="voltar()">
+    <!-- botão simples, depende só do JS -->
+    <button type="button" class="btn-voltar-intro" onclick="voltar()">
       ← Voltar ao início
     </button>
   </header>
 
   <!-- ================= CONTEÚDO ================= -->
-  <!-- ⚠️ TUDO será renderizado aqui pelo resumo.js -->
-  <main class="form-container" id="resumo"></main>
+  <!-- TODO o resumo é injetado pelo resumo.js -->
+  <main id="resumo" class="form-container"></main>
 
-  <!-- ================= SCRIPT ================= -->
-  <!-- ⚠️ SEM HTML depois disso -->
-  <script src="resumo.js"></script>
+  <!-- ================= JS ================= -->
+  <!-- SEM HTML depois disso -->
+  <script src="./resumo.js"></script>
 
 </body>
 </html>
