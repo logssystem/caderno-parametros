@@ -1064,6 +1064,7 @@ function coletarPausas() {
     grupo: nomeGrupo,
     itens: pausas
   };
+}
 
 function coletarPesquisaSatisfacao() {
   const container = document.getElementById("pesquisaSatisfacaoConteudo");
