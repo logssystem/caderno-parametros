@@ -551,8 +551,10 @@ function criarCampo(tipo) {
         chkAgente.type = "checkbox";
 
         chkAgente.addEventListener("change", () => {
+            gerarAgentesAPartirUsuarios();
             syncTudo();
-            });
+        });
+
         
         const txt = document.createElement("span");
         txt.textContent = "Este usuário é agente de call center";
