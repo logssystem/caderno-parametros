@@ -1,3 +1,7 @@
+document.addEventListener("DOMContentLoaded", () => {
+  window.initCaderno();
+});
+
 console.log("APP.JS FINAL – CONSOLIDADO DEFINITIVO (URA + REGRA DE TEMPO + FILA + GRUPO RING + AGENTES)");
 
 window.addEventListener("error", (e) => {
@@ -1747,3 +1751,33 @@ window.adicionarRespostaPesquisa = adicionarRespostaPesquisa;
     btn.textContent = isDark ? "☀️" : "🌙";
   });
 })();
+
+// ================= INIT GLOBAL BLINDADO =================
+window.initCaderno = function () {
+
+  // 🔒 estado base do chat (NUNCA undefined)
+  window.chatState = window.chatState || {
+    tipo: null,
+    api: null,
+    conta: null,
+    canais: [],
+    usuarios: [],
+    agentes: [],
+    departamentos: []
+  };
+
+  const modo = localStorage.getItem("modo_atendimento");
+
+  if (!modo) {
+    mostrarIntro();
+    return;
+  }
+
+  mostrarApp(modo);
+
+  if (modo === "chat" || modo === "ambos") {
+    if (typeof window.inicializarChatUI === "function") {
+      window.inicializarChatUI();
+    }
+  }
+};
