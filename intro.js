@@ -52,30 +52,23 @@ function selecionarModo(modo) {
   voz.style.display = "none";
   chat.style.display = "none";
 
-  // garante estado global do chat
   window.chatState = window.chatState || {};
 
   if (modo === "voz") {
     voz.style.display = "block";
-
-    // chat realmente desligado
     window.chatState.tipo = null;
     atualizarModuloChat();
   }
 
   if (modo === "chat") {
     chat.style.display = "block";
-
-    // 🔥 ATIVA CHAT
-    window.chatState.tipo = "api"; // padrão inicial
+    window.chatState.tipo = "api";
     atualizarModuloChat();
   }
 
   if (modo === "ambos") {
     voz.style.display = "block";
     chat.style.display = "block";
-
-    // 🔥 ATIVA CHAT
     window.chatState.tipo = "api";
     atualizarModuloChat();
   }
