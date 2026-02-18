@@ -79,46 +79,75 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= CHAT ================= */
   if (dados.chat) {
-    const chat = dados.chat;
-    let html = `
-      <div class="card chat-card">
-        <h2>💬 Atendimento por Chat</h2>
-        <p><b>Tipo:</b> ${chat.tipo}</p>
-        <p><b>API:</b> ${chat.api}</p>
-        <p><b>Conta:</b> ${chat.conta}</p>
-        <p><b>Canais:</b> ${(chat.canais || []).join(", ")}</p>
-    `;
+  const chat = dados.chat;
 
-    if (chat.departamentos?.length) {
-      html += `<hr><h3>🏷️ Departamentos</h3>`;
-      chat.departamentos.forEach(d => {
-        html += `
-          <div>
-            <strong>${d.nome}</strong>
-            <ul>${(d.agentes || []).map(a => `<li>${a}</li>`).join("")}</ul>
+  resumo.innerHTML += `
+    <div class="card chat-card">
+      <h2>💬 Atendimento por Chat</h2>
+
+      <div class="chat-grid">
+        <div><span>Tipo</span>${chat.tipo}</div>
+        <div><span>API</span>${chat.api}</div>
+        <div><span>Conta</span>${chat.conta}</div>
+        <div><span>Canais</span>${(chat.canais || []).join(", ")}</div>
+      </div>
+
+      ${
+        chat.departamentos?.length
+          ? `
+          <div class="chat-section">
+            <h3>🏷️ Departamentos</h3>
+
+            ${chat.departamentos.map(dep => `
+              <div class="chat-box">
+                <div class="chat-box-title">
+                  Departamento: <strong>${dep.nome}</strong>
+                </div>
+
+                <div class="chat-users">
+                  ${(dep.agentes || []).map(a => `
+                    <span class="chip-user">👤 ${a}</span>
+                  `).join("")}
+                </div>
+              </div>
+            `).join("")}
           </div>
-        `;
-      });
-    }
+        `
+          : ""
+      }
 
-    if (chat.agentes?.length) {
-      html += `<hr><h3>🎧 Agentes</h3>`;
-      chat.agentes.forEach(a => {
-        html += `
-          <div>
-            <strong>${a.nome}</strong><br>
-            Usuário: ${a.usuario}<br>
-            Departamentos: ${(a.departamentos || []).join(", ")}
+      ${
+        chat.agentes?.length
+          ? `
+          <div class="chat-section">
+            <h3>🎧 Agentes</h3>
+
+            ${chat.agentes.map(a => `
+              <div class="chat-box">
+                <div class="linha">
+                  <span>Usuário</span>
+                  <strong>${a.nome}</strong>
+                </div>
+
+                <div class="linha">
+                  <span>Email</span>
+                  ${a.usuario}
+                </div>
+
+                <div class="linha">
+                  <span>Departamentos</span>
+                  ${(a.departamentos || []).join(", ")}
+                </div>
+              </div>
+            `).join("")}
           </div>
-        `;
-      });
-    }
-
-    html += `</div>`;
-    resumo.innerHTML += html;
-  }
-});
-
+        `
+          : ""
+      }
+    </div>
+  `;
+}
+  
 /* ================= VOLTAR ================= */
 window.voltar = function () {
   window.location.href = "index.html";
