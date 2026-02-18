@@ -2,20 +2,16 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ================= TEMA ================= */
   const temaSalvo = localStorage.getItem("tema");
   document.body.classList.toggle("dark", temaSalvo === "dark");
-  console.log("Tema aplicado no resumo:", temaSalvo);
 
   /* ================= DADOS ================= */
   const raw = localStorage.getItem("CONFIG_CADERNO");
-  if (!raw) {
-    console.warn("CONFIG_CADERNO não encontrado");
-    return;
-  }
+  if (!raw) return;
 
   let dados;
   try {
     dados = JSON.parse(raw);
-  } catch (e) {
-    console.error("Erro ao parsear CONFIG_CADERNO", e);
+  } catch {
+    console.error("JSON inválido");
     return;
   }
 
@@ -74,8 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ${voz.agentes.map(a => `
           <p>
             <b>Nome:</b> ${a.nome}<br>
-            <b>Ramal:</b> ${a.ramal}<br>
-            <b>Multiskill:</b> ${a.multiskill ? "Sim" : "Não"}
+            <b>Ramal:</b> ${a.ramal}
           </p><hr>
         `).join("")}
       </div>
@@ -84,67 +79,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= CHAT ================= */
   if (dados.chat) {
-  const chat = dados.chat;
+    const chat = dados.chat;
+    let html = `
+      <div class="card chat-card">
+        <h2>💬 Atendimento por Chat</h2>
+        <p><b>Tipo:</b> ${chat.tipo}</p>
+        <p><b>API:</b> ${chat.api}</p>
+        <p><b>Conta:</b> ${chat.conta}</p>
+        <p><b>Canais:</b> ${(chat.canais || []).join(", ")}</p>
+    `;
 
-  resumo.innerHTML += `
-    <div class="card chat-card">
-      <h2>💬 Atendimento por Chat</h2>
+    if (chat.departamentos?.length) {
+      html += `<hr><h3>🏷️ Departamentos</h3>`;
+      chat.departamentos.forEach(d => {
+        html += `
+          <div>
+            <strong>${d.nome}</strong>
+            <ul>${(d.agentes || []).map(a => `<li>${a}</li>`).join("")}</ul>
+          </div>
+        `;
+      });
+    }
 
-      <div class="chat-info">
-        <div><strong>Tipo:</strong> ${chat.tipo}</div>
-        <div><strong>API:</strong> ${chat.api}</div>
-        <div><strong>Conta:</strong> ${chat.conta}</div>
-        <div><strong>Canais:</strong> ${(chat.canais || []).join(", ")}</div>
-      </div>
+    if (chat.agentes?.length) {
+      html += `<hr><h3>🎧 Agentes</h3>`;
+      chat.agentes.forEach(a => {
+        html += `
+          <div>
+            <strong>${a.nome}</strong><br>
+            Usuário: ${a.usuario}<br>
+            Departamentos: ${(a.departamentos || []).join(", ")}
+          </div>
+        `;
+      });
+    }
 
-      ${
-        chat.departamentos?.length
-          ? `
-            <div class="chat-section">
-              <h3>🏷️ Departamentos</h3>
-              ${chat.departamentos
-                .map(
-                  d => `
-                    <div class="chat-departamento">
-                      <strong>${d.nome}</strong>
-                      <ul>
-                        ${(d.agentes || []).map(a => `<li>${a}</li>`).join("")}
-                      </ul>
-                    </div>
-                  `
-                )
-                .join("")}
-            </div>
-          `
-          : ""
-      }
+    html += `</div>`;
+    resumo.innerHTML += html;
+  }
+});
 
-      ${
-        chat.agentes?.length
-          ? `
-            <div class="chat-section">
-              <h3>🎧 Agentes</h3>
-              ${chat.agentes
-                .map(
-                  a => `
-                    <div class="chat-agente">
-                      <strong>${a.nome}</strong>
-                      <div class="chat-agente-sub">
-                        Usuário: ${a.usuario}<br>
-                        Departamentos: ${(a.departamentos || []).join(", ")}
-                      </div>
-                    </div>
-                  `
-                )
-                .join("")}
-            </div>
-          `
-          : ""
-      }
-    </div>
-  `;
-}
-/* ================= VOLTAR (GLOBAL) ================= */
+/* ================= VOLTAR ================= */
 window.voltar = function () {
   window.location.href = "index.html";
 };
