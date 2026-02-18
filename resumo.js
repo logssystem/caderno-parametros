@@ -239,44 +239,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= CHAT ================= */
 
-  if (dados.chat) {
-  const chat = dados.chat;
+   if (dados.chat) {
+    const chat = dados.chat;
 
-  let html = `
-    <p><strong>Tipo:</strong> ${chat.tipo}</p>
-    <p><strong>API:</strong> ${chat.api}</p>
-    <p><strong>Conta:</strong> ${chat.conta}</p>
-    <p><strong>Canais:</strong> ${chat.canais.join(", ")}</p>
-  `;
+    let html = `
+      <p><strong>Tipo:</strong> ${chat.tipo}</p>
+      <p><strong>API:</strong> ${chat.api}</p>
+      <p><strong>Conta:</strong> ${chat.conta}</p>
+      <p><strong>Canais:</strong> ${chat.canais.join(", ")}</p>
+    `;
 
-  // 🔹 DEPARTAMENTOS
-  if (chat.departamentos?.length) {
-    html += `<hr><strong>Departamentos:</strong><ul>`;
-    chat.departamentos.forEach(dep => {
-      html += `<li>
-        <strong>${dep.nome}</strong>
-        <ul>
-          ${dep.agentes.map(a => `<li>${a}</li>`).join("")}
-        </ul>
-      </li>`;
-    });
-    html += `</ul>`;
+    // 🔹 DEPARTAMENTOS
+    if (chat.departamentos?.length) {
+      html += `<hr><strong>Departamentos:</strong><ul>`;
+      chat.departamentos.forEach(dep => {
+        html += `<li>
+          <strong>${dep.nome}</strong>
+          <ul>
+            ${(dep.agentes || []).map(a => `<li>${a}</li>`).join("")}
+          </ul>
+        </li>`;
+      });
+      html += `</ul>`;
+    }
+
+    // 🔹 AGENTES
+    if (chat.agentes?.length) {
+      html += `<hr><strong>Agentes:</strong><ul>`;
+      chat.agentes.forEach(a => {
+        html += `<li>
+          ${a.nome} — Usuário: ${a.usuario}
+          <br><small>Departamentos: ${(a.departamentos || []).join(", ")}</small>
+        </li>`;
+      });
+      html += `</ul>`;
+    }
+
+    const resumoChat = document.getElementById("resumo-chat");
+    if (resumoChat) resumoChat.innerHTML = html;
   }
 
-  // 🔹 AGENTES
-  if (chat.agentes?.length) {
-    html += `<hr><strong>Agentes:</strong><ul>`;
-    chat.agentes.forEach(a => {
-      html += `<li>
-        ${a.nome} — Usuário: ${a.usuario}
-        <br><small>Departamentos: ${a.departamentos.join(", ")}</small>
-      </li>`;
-    });
-    html += `</ul>`;
-  }
-
-  document.getElementById("resumo-chat").innerHTML = html;
-}
+}); // ✅ 🔥 FECHAMENTO DO DOMContentLoaded (ERA ISSO QUE FALTAVA)
 
 /* ================= VOLTAR ================= */
 
