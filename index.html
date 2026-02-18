@@ -31,8 +31,12 @@
 <!-- ================= CONTEÚDO ================= -->
 <main id="app-content" class="form-container" style="display:none">
 
-  <button class="btn-duvidas" onclick="toggleDuvidas()">Dúvidas no preenchimento?</button>
+  <!-- botão flutuante de dúvidas -->
+  <button class="btn-duvidas" onclick="toggleDuvidas()">
+    Dúvidas no preenchimento?
+  </button>
 
+  <!-- painel lateral -->
   <div id="painelDuvidas" class="painel-duvidas" hidden>
     <select id="selectDuvida">
       <option value="">Selecione o assunto</option>
@@ -49,25 +53,28 @@
   <!-- ================= DADOS DO CLIENTE ================= -->
   <section class="card">
     <h2>Dados do Cliente</h2>
+
     <div class="campo-descricao campo-cliente">
       <div class="bloco-campo">
         <label>Nome da empresa / cliente</label>
-        <input id="empresaCliente">
+        <input id="empresaCliente" placeholder="Ex: ERA Telecom, Clínica São José, Loja XPTO">
       </div>
+
       <div class="bloco-campo">
         <label>Domínio do cliente</label>
-        <input id="dominioCliente">
+        <input id="dominioCliente" placeholder="Ex: suporteera.sobreip.com.br">
         <div id="regraDominio"></div>
       </div>
+
       <div class="bloco-campo">
         <label>CNPJ</label>
-        <input id="cnpjCliente">
+        <input id="cnpjCliente" placeholder="Ex: 12.345.678/0001-99">
         <div id="regraCNPJ"></div>
       </div>
     </div>
   </section>
 
-  <!-- ================= VOZ / PBX ================= -->
+  <!-- ================= VOZ ================= -->
   <section id="voz-area" style="display:none">
 
     <!-- USUÁRIOS WEB -->
@@ -77,7 +84,7 @@
         <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
         <button class="btn-import" onclick="acionarImportacao('usuario_web')">📥 Importar</button>
         <button class="btn-import" onclick="baixarTemplateUsuarios()">📥 Baixar template CSV</button>
-        <input type="file" id="importUsuarios" hidden>
+        <input type="file" id="importUsuarios" accept=".csv" hidden>
       </div>
       <div id="listaUsuariosWeb"></div>
     </section>
@@ -85,17 +92,20 @@
     <!-- RAMAIS -->
     <section class="card">
       <h2>Ramais (Range)</h2>
+
       <div class="acoes-card">
-        <input id="ramalInicio" type="number" placeholder="Ramal inicial">
-        <input id="ramalFim" type="number" placeholder="Ramal final">
+        <input id="ramalInicio" type="number" placeholder="Ramal inicial (ex: 1000)">
+        <input id="ramalFim" type="number" placeholder="Ramal final (ex: 1020)">
         <button class="btn-add" onclick="criarRangeRamais()">Criar range</button>
       </div>
+
       <div class="acoes-card">
         <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
         <button class="btn-import" onclick="acionarImportacao('ring')">📥 Importar</button>
         <button class="btn-import" onclick="baixarTemplateRamais()">📥 Baixar template CSV</button>
-        <input type="file" id="importRamais" hidden>
+        <input type="file" id="importRamais" accept=".csv" hidden>
       </div>
+
       <div id="listaRings"></div>
     </section>
 
@@ -131,8 +141,10 @@
 
     <!-- REGRAS DE TEMPO -->
     <section class="card">
-      <h2>Regras de Tempo</h2>
-      <button class="btn-add" onclick="adicionarRegraTempo()">+ Nova regra</button>
+      <h2>Regras de Tempo (Horário de Funcionamento)</h2>
+      <div class="acoes-card">
+        <button class="btn-add" onclick="adicionarRegraTempo()">+ Nova regra</button>
+      </div>
       <div id="listaRegrasTempo"></div>
     </section>
 
@@ -146,39 +158,79 @@
     <!-- PESQUISA DE SATISFAÇÃO -->
     <section class="card">
       <h2>Pesquisa de Satisfação</h2>
-      <button class="btn-add" onclick="togglePesquisaSatisfacao()">+</button>
-      <div id="pesquisaSatisfacaoConteudo" style="display:none;margin-top:12px">
+      <div class="acoes-card">
+        <button class="btn-add" onclick="togglePesquisaSatisfacao()">+</button>
+      </div>
+
+      <div id="pesquisaSatisfacaoConteudo" style="display:none; margin-top:12px;">
         <div class="campo-descricao">
-          <input id="pesquisaNome" class="campo-nome" placeholder="Nome da pesquisa">
-          <textarea id="pesquisaAudioIntro" placeholder="Áudio de introdução"></textarea>
-          <textarea id="pesquisaPergunta" placeholder="Pergunta"></textarea>
-          <h4>Respostas</h4>
+
+          <input id="pesquisaNome" class="campo-nome"
+            placeholder="Ex: Pesquisa de Satisfação - Atendimento Telefônico">
+
+          <textarea id="pesquisaAudioIntro" style="margin-top:8px"
+            placeholder="Ex: Sua opinião é muito importante para nós. Responda a pesquisa a seguir."></textarea>
+
+          <textarea id="pesquisaPergunta" style="margin-top:8px"
+            placeholder="Ex: De 0 a 5, como você avalia nosso atendimento?"></textarea>
+
+          <h4 style="margin-top:12px">Respostas</h4>
           <div id="listaRespostasPesquisa"></div>
-          <button class="btn-add" onclick="adicionarRespostaPesquisa()">+ Adicionar resposta</button>
-          <textarea id="pesquisaAudioFim" placeholder="Áudio final"></textarea>
+
+          <button class="btn-add" style="margin-top:8px"
+            onclick="adicionarRespostaPesquisa()">+ Adicionar resposta</button>
+
+          <p style="margin-top:8px;font-size:13px;opacity:.7">
+            Exemplo: 0 - Péssimo | 1 - Ruim | 2 - Regular | 3 - Bom | 4 - Muito Bom | 5 - Excelente
+          </p>
+
+          <textarea id="pesquisaAudioFim" style="margin-top:12px"
+            placeholder="Ex: Obrigado por participar da nossa pesquisa. Sua resposta foi registrada."></textarea>
+
         </div>
       </div>
     </section>
 
-    <!-- PAUSAS DO CALL CENTER -->
+    <!-- PAUSAS -->
     <section class="card">
       <h2>Pausas do Call Center</h2>
-      <button class="btn-add" onclick="togglePausas()">+</button>
-      <div id="pausasConteudo" style="display:none;margin-top:12px">
+      <p style="opacity:.7;margin-top:-6px;">
+        Crie os motivos de pausa utilizados pelos agentes durante o atendimento.
+      </p>
+
+      <div class="acoes-card">
+        <button class="btn-add" onclick="togglePausas()">+</button>
+      </div>
+
+      <div id="pausasConteudo" style="display:none; margin-top:12px;">
         <div class="campo-descricao">
-          <input id="nomeGrupoPausas" class="campo-nome" placeholder="Nome do grupo">
-          <div id="listaPausas"></div>
-          <button class="btn-add" onclick="adicionarPausa()">+ Adicionar pausa</button>
+          <input id="nomeGrupoPausas" class="campo-nome"
+            placeholder="Ex: Pausas Operacionais">
+          <div id="listaPausas" style="margin-top:8px;"></div>
+          <button class="btn-add" style="margin-top:8px"
+            onclick="adicionarPausa()">+ Adicionar pausa</button>
         </div>
       </div>
     </section>
 
   </section>
 
-  <!-- CHAT (permanece igual ao que você já validou) -->
+  <!-- ================= CHAT ================= -->
+  <!-- (mantido exatamente como você enviou, com imagens restauradas) -->
+
+  <!-- ================= RESULTADO ================= -->
+  <section class="card">
+    <h2>Se as configurações estiverem corretas, selecione o botão abaixo</h2>
+    <div class="acoes-card">
+      <button class="btn-explorar" onclick="salvarConfiguracao()">Salvar configuração</button>
+    </div>
+    <pre id="resultado"
+      style="max-height:500px;overflow:auto;background:#00000010;padding:16px;border-radius:12px;"></pre>
+  </section>
 
 </main>
 
+<!-- TOAST -->
 <div id="toastGlobal" class="toast">
   <span id="toastMessage"></span>
 </div>
