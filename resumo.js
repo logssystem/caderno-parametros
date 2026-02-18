@@ -239,47 +239,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= CHAT ================= */
 
-   if (dados.chat) {
-    const chat = dados.chat;
+if (dados.chat) {
+  const chat = dados.chat;
 
-    let html = `
+  resumo.innerHTML += `
+    <div class="card">
+      <h2>💬 Atendimento por Chat</h2>
+
       <p><strong>Tipo:</strong> ${chat.tipo}</p>
       <p><strong>API:</strong> ${chat.api}</p>
       <p><strong>Conta:</strong> ${chat.conta}</p>
-      <p><strong>Canais:</strong> ${chat.canais.join(", ")}</p>
-    `;
+      <p><strong>Canais:</strong> ${(chat.canais || []).join(", ")}</p>
 
-    // 🔹 DEPARTAMENTOS
-    if (chat.departamentos?.length) {
-      html += `<hr><strong>Departamentos:</strong><ul>`;
-      chat.departamentos.forEach(dep => {
-        html += `<li>
-          <strong>${dep.nome}</strong>
-          <ul>
-            ${(dep.agentes || []).map(a => `<li>${a}</li>`).join("")}
-          </ul>
-        </li>`;
-      });
-      html += `</ul>`;
-    }
+      ${
+        chat.departamentos?.length
+          ? `
+            <hr>
+            <strong>Departamentos</strong>
+            <ul>
+              ${chat.departamentos
+                .map(
+                  d => `
+                    <li>
+                      <strong>${d.nome}</strong>
+                      <ul>
+                        ${(d.agentes || []).map(a => `<li>${a}</li>`).join("")}
+                      </ul>
+                    </li>
+                  `
+                )
+                .join("")}
+            </ul>
+          `
+          : ""
+      }
 
-    // 🔹 AGENTES
-    if (chat.agentes?.length) {
-      html += `<hr><strong>Agentes:</strong><ul>`;
-      chat.agentes.forEach(a => {
-        html += `<li>
-          ${a.nome} — Usuário: ${a.usuario}
-          <br><small>Departamentos: ${(a.departamentos || []).join(", ")}</small>
-        </li>`;
-      });
-      html += `</ul>`;
-    }
-
-    const resumoChat = document.getElementById("resumo-chat");
-    if (resumoChat) resumoChat.innerHTML = html;
-  }
-
-}); // ✅ 🔥 FECHAMENTO DO DOMContentLoaded (ERA ISSO QUE FALTAVA)
+      ${
+        chat.agentes?.length
+          ? `
+            <hr>
+            <strong>Agentes</strong>
+            <ul>
+              ${chat.agentes
+                .map(
+                  a => `
+                    <li>
+                      ${a.nome} — Usuário: ${a.usuario}
+                      <br>
+                      <small>Departamentos: ${(a.departamentos || []).join(", ")}</small>
+                    </li>
+                  `
+                )
+                .join("")}
+            </ul>
+          `
+          : ""
+      }
+    </div>
+  `;
+}
 
 /* ================= VOLTAR ================= */
 
