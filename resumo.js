@@ -104,7 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="resumo-card">
               <strong>${f.nome}</strong>
               <div class="linha">
-                Agentes:<br>${f.agentes.join(", ")}
+                <strong>Agentes:</strong><br>
+                ${f.agentes.join(", ")}
               </div>
             </div>
           `).join("")}
@@ -122,8 +123,8 @@ document.addEventListener("DOMContentLoaded", () => {
           ${voz.grupo_ring.map(g => `
             <div class="resumo-card">
               <strong>${g.nome}</strong>
-              <div class="linha">Estratégia: ${g.estrategia}</div>
-              <div class="linha">Ramais: ${g.ramais.join(", ")}</div>
+              <div class="linha"><strong>Estratégia:</strong> ${g.estrategia}</div>
+              <div class="linha"><strong>Ramais:</strong> ${g.ramais.join(", ")}</div>
             </div>
           `).join("")}
         </div>
@@ -131,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ===== URAs ===== */
+  /* ===== URAS ===== */
   if (voz.uras?.length) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
@@ -140,9 +141,13 @@ document.addEventListener("DOMContentLoaded", () => {
           ${voz.uras.map(u => `
             <div class="resumo-card">
               <strong>${u.nome}</strong>
-              ${u.opcoes.map(o => `
-                <div class="linha">Tecla ${o.tecla} → ${o.destino}</div>
-              `).join("")}
+              ${u.mensagem ? `<div class="linha"><strong>Mensagem:</strong> ${u.mensagem}</div>` : ""}
+              <div class="linha">
+                <strong>Opções:</strong><br>
+                ${u.opcoes.map(o =>
+                  `• Tecla ${o.tecla} — ${o.descricao || "Sem descrição"} → ${o.destino}`
+                ).join("<br>")}
+              </div>
             </div>
           `).join("")}
         </div>
@@ -155,28 +160,32 @@ document.addEventListener("DOMContentLoaded", () => {
     resumo.innerHTML += `
       <section class="resumo-bloco">
         <h2>⏸️ Pausas do Call Center</h2>
-        <div class="resumo-grid">
-          ${voz.pausas.itens.map(p => `
-            <div class="resumo-card">
-              ${p.nome} — ${p.tempo}
-            </div>
-          `).join("")}
+        <div class="resumo-card">
+          <div class="linha"><strong>Grupo:</strong> ${voz.pausas.grupo}</div>
+          <div class="linha">
+            <strong>Pausas:</strong><br>
+            ${voz.pausas.itens.map(p => `• ${p.nome} — ${p.tempo}`).join("<br>")}
+          </div>
         </div>
       </section>
     `;
   }
 
-  /* ===== PESQUISA ===== */
+  /* ===== PESQUISA DE SATISFAÇÃO ===== */
   if (voz.pesquisaSatisfacao?.ativa) {
     const p = voz.pesquisaSatisfacao;
     resumo.innerHTML += `
       <section class="resumo-bloco">
         <h2>⭐ Pesquisa de Satisfação</h2>
         <div class="resumo-card">
-          <strong>${p.pergunta}</strong>
+          <div class="linha"><strong>Nome:</strong> ${p.nome}</div>
+          ${p.introducao ? `<div class="linha"><strong>Mensagem inicial:</strong> ${p.introducao}</div>` : ""}
+          <div class="linha"><strong>Pergunta:</strong> ${p.pergunta}</div>
           <div class="linha">
-            ${p.respostas.map(r => `${r.nota} — ${r.descricao}`).join("<br>")}
+            <strong>Respostas:</strong><br>
+            ${p.respostas.map(r => `• ${r.nota} — ${r.descricao}`).join("<br>")}
           </div>
+          ${p.encerramento ? `<div class="linha"><strong>Mensagem final:</strong> ${p.encerramento}</div>` : ""}
         </div>
       </section>
     `;
@@ -184,15 +193,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ===== CHAT ===== */
   if (dados.chat) {
-    const c = dados.chat;
+    const chat = dados.chat;
     resumo.innerHTML += `
       <section class="resumo-bloco">
         <h2>💬 Atendimento por Chat</h2>
         <div class="resumo-card">
-          <div>Tipo: ${c.tipo}</div>
-          <div>API: ${c.api}</div>
-          <div>Conta: ${c.conta}</div>
-          <div>Canais: ${(c.canais || []).join(", ")}</div>
+          <div><strong>Tipo:</strong> ${chat.tipo}</div>
+          <div><strong>API:</strong> ${chat.api}</div>
+          <div><strong>Conta:</strong> ${chat.conta}</div>
+          <div><strong>Canais:</strong> ${(chat.canais || []).join(", ")}</div>
         </div>
       </section>
     `;
