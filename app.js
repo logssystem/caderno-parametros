@@ -1412,7 +1412,60 @@ window.explorar = function () {
         document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
             if (r.getData) regras_tempo.push(r.getData());
         });
-
+        
+        function inicializarChatUI() {
+        const moduloChat = document.getElementById("modulochat");
+        if (!moduloChat) return;
+      
+        // garante estado
+        window.chatState = window.chatState || {};
+      
+        // mostra módulo
+        moduloChat.style.display = "block";
+      
+        // limpa seleções visuais
+        document
+          .querySelectorAll(".chat-card")
+          .forEach(c => c.classList.remove("active"));
+      
+        // restaura seleções se existirem
+        if (window.chatState.tipo) {
+          const tipoCard = document.querySelector(
+            `.tipo-chat .chat-card[data-tipo="${window.chatState.tipo}"]`
+          );
+          if (tipoCard) tipoCard.classList.add("active");
+        }
+      
+        if (window.chatState.api) {
+          const apiCard = document.querySelector(
+            `#api-oficial .chat-card[data-api="${window.chatState.api}"]`
+          );
+          if (apiCard) apiCard.classList.add("active");
+      
+          const blocoConta = document.getElementById("bloco-conta-api");
+          if (blocoConta) blocoConta.style.display = "block";
+        }
+      
+        if (window.chatState.conta) {
+          const contaCard = document.querySelector(
+            `#bloco-conta-api .chat-card[data-conta="${window.chatState.conta}"]`
+          );
+          if (contaCard) contaCard.classList.add("active");
+      
+          const canais = document.getElementById("chat-canais");
+          if (canais) canais.style.display = "block";
+        }
+      
+        if (Array.isArray(window.chatState.canais)) {
+          window.chatState.canais.forEach(canal => {
+            const canalEl = document.querySelector(
+              `.chat-card[data-canal="${canal}"]`
+            );
+            if (canalEl) canalEl.classList.add("active");
+          });
+        }
+      }
+      
        /* ================= CHAT (COLETA REAL – MODELO PABX) ================= */
 
         let chat = null;
@@ -1641,7 +1694,8 @@ window.toggleCanal = window.toggleCanal;
 window.informarAgenteChat = window.informarAgenteChat;
 
 document.addEventListener("DOMContentLoaded", () => {
-  const blocoAgentesChat = document.querySelector("#listaAgentesChat")?.parentElement;
+  const blocoAgentesChat =
+    document.querySelector("#listaAgentesChat")?.parentElement;
   if (!blocoAgentesChat) return;
 
   // evita duplicar
