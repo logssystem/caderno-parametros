@@ -1091,3 +1091,49 @@ body.dark #intro-screen .intro-actions button:hover {
   font-size: 12px;
   margin-left: 6px;
 }
+
+.resumo-section {
+  margin-bottom: 32px;
+}
+
+.resumo-section h2 {
+  font-size: 18px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 6px;
+}
+
+.resumo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.resumo-item {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #fafafa;
+  border: 1px solid #eee;
+}
+
+.resumo-item strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.resumo-sub {
+  font-size: 13px;
+  color: #555;
+  margin-left: 12px;
+}
+
+.badge {
+  display: inline-block;
+  background: #d6ff00;
+  color: #000;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 6px;
+}
