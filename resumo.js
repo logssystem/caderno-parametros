@@ -72,21 +72,43 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
 
-    if (voz.ramais?.length) {
-      resumo.innerHTML += `
-        <section class="resumo-bloco">
-          <h2>📞 Ramais</h2>
-          <div class="resumo-grid">
-            ${voz.ramais.map(r => `
+    if (dados.voz.ramais?.length) {
+  
+    // cria um mapa de usuários por nome ou id
+    const usuariosMap = {};
+    (dados.voz.usuarios || []).forEach(u => {
+      usuariosMap[u.nome] = u;
+      usuariosMap[u.id] = u;
+    });
+  
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>📞 Ramais</h2>
+        <div class="resumo-grid">
+          ${dados.voz.ramais.map(r => {
+  
+            // ajuste aqui se o campo tiver outro nome
+            const usuarioVinculado =
+              usuariosMap[r.usuario] ||
+              usuariosMap[r.usuarioId] ||
+              null;
+  
+            return `
               <div class="resumo-card">
                 <div class="titulo">Ramal ${r.ramal}</div>
                 <div class="info-linha">🔐 ${r.senha}</div>
+                <div class="info-linha">
+                  👤 Usuário:
+                  <span>
+                    ${usuarioVinculado ? usuarioVinculado.nome : "Não vinculado"}
+                  </span>
+                </div>
               </div>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }
+            `;
+          }).join("")}
+        </div>
+      </section>
+    `;
   }
 
   /* ================= CHAT ================= */
