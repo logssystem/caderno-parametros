@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="resumo-grid">
           ${voz.filas.map(f => `
             <div class="resumo-card">
-              <div class="titulo">${f.nome}</div>
+              <div class="titulo">Nome Da Fila: ${f.nome}</div>
               <div class="lista">
                 ${(f.agentes || []).map(a =>
                   `<span class="chip">${a}</span>`
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="resumo-grid">
           ${voz.grupo_ring.map(g => `
             <div class="resumo-card">
-              <div class="titulo">${g.nome}</div>
+              <div class="titulo">Nome: ${g.nome}</div>
               <div class="info-linha">
                 Estratégia: <strong>${g.estrategia}</strong>
               </div>
@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="resumo-grid">
             ${voz.ramais.map(r => `
               <div class="resumo-card">
-                <div class="titulo">Ramal ${r.ramal}</div>
+                <div class="titulo">Ramal: ${r.ramal}</div>
                 <div class="info-linha">🔐 ${r.senha}</div>
                 <div class="info-linha">
                   👤 Usuário:
