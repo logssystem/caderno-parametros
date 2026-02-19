@@ -1411,82 +1411,68 @@ window.explorar = function () {
     }
 
     if (!validarDominioCliente()) {
-      mostrarToast("O domínio deve obrigatoriamente terminar com .sobreip.com.br", true);
-      dominioInput?.focus();
+      mostrarToast(
+        "O domínio deve obrigatoriamente terminar com .sobreip.com.br",
+        true
+      );
       return null;
     }
 
-/* ================= VOZ ================= */
+    /* ================= VOZ (COLETA REAL) ================= */
 
-const usuarios = [];
-document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
-  usuarios.push({
-    nome: u.getNome(),
-    email: u.getEmail(),
-    senha: u.getSenha(),
-    permissao: u.getPermissao(),
-    agente: u.isAgente()
-  });
-});
+    const usuarios = [];
+    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+      usuarios.push({
+        nome: u.getNome(),
+        email: u.getEmail(),
+        senha: u.getSenha(),
+        permissao: u.getPermissao(),
+        agente: u.isAgente()
+      });
+    });
 
-const ramais = [];
-document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
-  ramais.push({
-    ramal: r.getNome(),
-    senha: r.getSenha()
-  });
-});
+    const ramais = [];
+    document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+      ramais.push({
+        ramal: r.getNome(),
+        senha: r.getSenha()
+      });
+    });
 
-const agentes = [];
-document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
-  agentes.push({
-    nome: a.querySelector(".campo-nome")?.value || "",
-    ramal: a.getRamal ? a.getRamal() : ""
-  });
-});
+    const agentes = [];
+    document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+      agentes.push({
+        nome: a.querySelector(".campo-nome")?.value || "",
+        ramal: a.getRamal ? a.getRamal() : "",
+        multiskill: a.isMultiskill ? a.isMultiskill() : false
+      });
+    });
 
-if (agentes.some(a => !a.ramal)) {
-  mostrarToast("Existe agente sem ramal vinculado", true);
-  return null;
-}
-
-const filas = [];
-document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
-  filas.push({
-    nome: f.querySelector(".campo-nome")?.value || "",
-    agentes: JSON.parse(f.dataset.agentes || "[]")
-  });
-});
-
-const regras_tempo = [];
-document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
-  if (r.getData) regras_tempo.push(r.getData());
-});
-
-    /* ================= CHAT (OPCIONAL) ================= */
-
-let chat = null;
-
-if (typeof window.coletarChatDoDOM === "function") {
-  const chatData = coletarChatDoDOM();
-
-  const chatAtivo =
-    chatData.tipo ||
-    chatData.api ||
-    chatData.conta ||
-    (chatData.canais && chatData.canais.length);
-
-  if (chatAtivo) {
-    if (!chatData.agentes.length) {
-      mostrarToast("Chat ativo sem agentes", true);
-    } else if (!chatData.departamentos.length) {
-      mostrarToast("Chat ativo sem departamentos", true);
-    } else {
-      chat = chatData;
+    const agentesSemRamal = agentes.filter(a => !a.ramal);
+    if (agentesSemRamal.length) {
+      mostrarToast("Existe agente sem ramal vinculado", true);
+      return null;
     }
-  }
-}
-    
+
+    const filas = [];
+    document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
+      filas.push({
+        nome: f.querySelector(".campo-nome")?.value || "",
+        agentes: JSON.parse(f.dataset.agentes || "[]")
+      });
+    });
+
+    const regras_tempo = [];
+    document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
+      if (r.getData) regras_tempo.push(r.getData());
+    });
+
+    /* ================= CHAT (COLETA OFICIAL) ================= */
+
+    const chat = window.coletarChatDoDOM
+      ? window.coletarChatDoDOM()
+      : null;
+
     /* ================= JSON FINAL ================= */
 
     const dados = {
@@ -1509,7 +1495,7 @@ if (typeof window.coletarChatDoDOM === "function") {
       }
     };
 
-    if (chat) {
+    if (chat && chat.tipo) {
       dados.chat = chat;
     }
 
