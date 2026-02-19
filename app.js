@@ -1477,6 +1477,16 @@ window.explorar = function () {
         
           if (chatAtivo) {
 
+          // 1️⃣ GERAR AGENTES DE CHAT A PARTIR DOS AGENTES DE VOZ
+          if (!chatData.agentes.length && agentes.length) {
+            chatData.agentes = agentes.map(a => ({
+              nome: a.nome,
+              usuario: a.nome,
+              departamentos: [] // preenche depois
+            }));
+          }
+        
+          // 2️⃣ GARANTIR DEPARTAMENTO PADRÃO
           if (!chatData.departamentos.length) {
             chatData.departamentos.push({
               nome: "Atendimento Geral",
@@ -1484,24 +1494,20 @@ window.explorar = function () {
             });
           }
         
-          if (!chatData.agentes.length && agentes.length) {
-            chatData.agentes = agentes.map(a => ({
-              nome: a.nome,
-              usuario: a.nome,
-              departamentos: chatData.departamentos.map(d => d.nome)
-            }));
-          }
+          // 3️⃣ VINCULAR AGENTES AO DEPARTAMENTO
+          chatData.agentes.forEach(a => {
+            if (!a.departamentos.length) {
+              a.departamentos = chatData.departamentos.map(d => d.nome);
+            }
+          });
         
+          // 4️⃣ VALIDAÇÕES FINAIS
           if (!chatData.agentes.length) {
             mostrarToast("Chat ativo sem agentes", true);
             return;
           }
         
           chatData.agentes.forEach(a => {
-            if (!a.departamentos.length) {
-              mostrarToast(`Agente ${a.nome} sem departamento`, true);
-              throw new Error("Agente sem departamento");
-            }
             if (!a.usuario) {
               mostrarToast(`Agente ${a.nome} sem usuário`, true);
               throw new Error("Agente sem usuário");
