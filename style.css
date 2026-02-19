@@ -1220,3 +1220,86 @@ body.dark #intro-screen .intro-actions button:hover {
   border-radius: 999px;
   font-size: 12px;
 }
+
+/* =======================
+   RESUMO – AJUSTE VISUAL
+   ======================= */
+
+.resumo-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Card base */
+.resumo-card {
+  background: var(--card-bg, #fff);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* Título do card */
+.resumo-card h4 {
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Textos comuns */
+.resumo-card p {
+  margin: 0 0 6px 0;
+}
+
+/* Destaques internos (Mensagem, Opções, Agentes etc) */
+.resumo-card strong {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+/* Listas */
+.resumo-card ul {
+  margin: 6px 0 10px 0;
+  padding-left: 18px;
+}
+
+.resumo-card li {
+  margin-bottom: 4px;
+}
+
+/* Chips (Agentes, Ramais, Filas etc) */
+.resumo-chip {
+  display: inline-block;
+  background: var(--chip-bg, #eef2f7);
+  color: var(--chip-color, #333);
+  border-radius: 12px;
+  padding: 3px 8px;
+  font-size: 12px;
+  margin: 2px 4px 2px 0;
+  white-space: nowrap;
+}
+
+/* Separação visual leve entre blocos internos */
+.resumo-secao {
+  margin-top: 8px;
+}
+
+/* Texto longo (URA / Pesquisa) */
+.resumo-texto {
+  margin-left: 6px;
+}
+
+/* Modo escuro (não quebra se já existir) */
+body.dark .resumo-card {
+  background: #1e1e1e;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+body.dark .resumo-chip {
+  background: #2c2c2c;
+  color: #ddd;
+}
