@@ -1445,7 +1445,6 @@ document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
   });
 });
 
-// validação obrigatória do PABX
 if (agentes.some(a => !a.ramal)) {
   mostrarToast("Existe agente sem ramal vinculado", true);
   return null;
@@ -1475,20 +1474,16 @@ if (typeof window.coletarChatDoDOM === "function") {
     chatData.tipo ||
     chatData.api ||
     chatData.conta ||
-    chatData.canais.length;
+    (chatData.canais && chatData.canais.length);
 
   if (chatAtivo) {
     if (!chatData.agentes.length) {
       mostrarToast("Chat ativo sem agentes", true);
-      return null;
-    }
-
-    if (!chatData.departamentos.length) {
+    } else if (!chatData.departamentos.length) {
       mostrarToast("Chat ativo sem departamentos", true);
-      return null;
+    } else {
+      chat = chatData;
     }
-
-    chat = chatData;
   }
 }
     
