@@ -39,15 +39,17 @@ document.addEventListener("DOMContentLoaded", () => {
      🎧 VOZ
   ====================================================== */
   if (!dados.voz) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco">
-        <h2>⚠️ Voz</h2>
-        <div class="resumo-card">
-          Nenhuma configuração de voz foi encontrada.
-        </div>
-      </section>
-    `;
-  } else {
+  resumo.innerHTML += `
+    <section class="resumo-bloco">
+      <h2>⚠️ Voz</h2>
+      <div class="resumo-card">
+        Nenhuma configuração de voz foi preenchida.
+      </div>
+    </section>
+  `;
+} else {
+  // mantém o resto do código normalmente
+}
 
     /* ================= USUÁRIOS WEB ================= */
     if (dados.voz.usuarios?.length) {
