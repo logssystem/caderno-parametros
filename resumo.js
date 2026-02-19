@@ -92,9 +92,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="titulo">Ramal ${r.ramal}</div>
                 <div class="info-linha">🔐 ${r.senha}</div>
                 <div class="info-linha">
-                  👤 Usuário:
-                  <span>Usuário ${mapaRamalUsuario[r.ramal] || "Não vinculado"}</span>
-                </div>
+              👤 Usuário:
+              <span>${mapaRamalUsuario[r.ramal] || "Não vinculado"}</span>
+            </div>
                 </div>
               </div>
             `).join("")}
