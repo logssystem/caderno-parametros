@@ -73,27 +73,27 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
 
-    /* ===== RAMAIS + USUÁRIO VINCULADO ===== */
-   if (voz.ramais?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco">
-        <h2>📞 Ramais</h2>
-        <div class="resumo-grid">
-          ${voz.ramais.map(r => `
-            <div class="resumo-card">
-              <div class="titulo">Ramal ${r.ramal}</div>
-              <div class="info-linha">🔐 ${r.senha}</div>
-              <div class="info-linha">
-                👤 Usuário:
-                <span>${r.usuario || r.usuarioNome || "Não vinculado"}</span>
+    /* ===== RAMAIS ===== */
+    if (voz.ramais?.length) {
+      resumo.innerHTML += `
+        <section class="resumo-bloco">
+          <h2>📞 Ramais</h2>
+          <div class="resumo-grid">
+            ${voz.ramais.map(r => `
+              <div class="resumo-card">
+                <div class="titulo">Ramal ${r.ramal}</div>
+                <div class="info-linha">🔐 ${r.senha}</div>
+                <div class="info-linha">
+                  👤 Usuário:
+                  <span>${r.usuario || r.usuarioNome || "Não vinculado"}</span>
+                </div>
               </div>
-            </div>
-          `).join("")}
-        </div>
-      </section>
-    `;
-  }
-
+            `).join("")}
+          </div>
+        </section>
+      `;
+    }
+  } // 👈 FECHA VOZ CORRETAMENTE
 
   /* ================= CHAT ================= */
   if (dados.chat) {
@@ -110,8 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </section>
     `;
   }
-
-}); // 👈 FECHA DOMContentLoaded
+});
 
 /* ===== VOLTAR ===== */
 window.voltar = () => {
