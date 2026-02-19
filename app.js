@@ -1398,182 +1398,152 @@ function mostrarToast(msg, error = false) {
     }, 3000);
 }
 
+/* ================= SALVAR / EXPLORAR ================= */
+
 window.explorar = function () {
-    try {
-        const empresa = document.getElementById("empresaCliente")?.value.trim();
-        const dominio = document.getElementById("dominioCliente")?.value.trim();
+  try {
+    const empresa = document.getElementById("empresaCliente")?.value.trim();
+    const dominio = document.getElementById("dominioCliente")?.value.trim();
 
-        if (!empresa || !dominio) {
-            mostrarToast("Preencha o nome da empresa e o domínio do cliente", true);
-            return;
-        }
-
-        if (!validarDominioCliente()) {
-            mostrarToast("O domínio deve obrigatoriamente terminar com .sobreip.com.br", true);
-            dominioInput?.focus();
-            return;
-        }
-
-        /* ================= VOZ ================= */
-
-        const usuarios = [];
-        document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
-            usuarios.push({
-                nome: u.getNome(),
-                email: u.getEmail(),
-                senha: u.getSenha(),
-                permissao: u.getPermissao(),
-                agente: u.isAgente()
-            });
-        });
-
-        const ramais = [];
-        document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
-            ramais.push({
-                ramal: r.getNome(),
-                senha: r.getSenha()
-            });
-        });
-
-        const agentes = [];
-        document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
-            agentes.push({
-                nome: a.querySelector(".campo-nome")?.value || "",
-                ramal: a.getRamal ? a.getRamal() : ""
-            });
-        });
-
-        const agentesSemRamal = agentes.filter(a => !a.ramal);
-        if (agentesSemRamal.length) {
-            mostrarToast("Existe agente sem ramal vinculado", true);
-            return;
-        }
-
-        const filas = [];
-        document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
-            filas.push({
-                nome: f.querySelector(".campo-nome")?.value || "",
-                agentes: JSON.parse(f.dataset.agentes || "[]")
-            });
-        });
-
-        const regras_tempo = [];
-        document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
-            if (r.getData) regras_tempo.push(r.getData());
-        });
-      
-       /* ================= CHAT (COLETA REAL – MODELO PABX) ================= */
-
-        let chat = null;
-
-        if (typeof window.coletarChatDoDOM === "function") {
-          const chatData = coletarChatDoDOM();
-        
-          const chatAtivo =
-            chatData.tipo ||
-            chatData.api ||
-            chatData.conta ||
-            chatData.canais.length;
-        
-          if (chatAtivo) {
-
-          // 1️⃣ GERAR AGENTES DE CHAT A PARTIR DOS AGENTES DE VOZ
-          if (!chatData.agentes.length && agentes.length) {
-            chatData.agentes = agentes.map(a => ({
-              nome: a.nome,
-              usuario: a.nome,
-              departamentos: [] // preenche depois
-            }));
-          }
-        
-          // 2️⃣ GARANTIR DEPARTAMENTO PADRÃO
-          if (!chatData.departamentos.length) {
-            chatData.departamentos.push({
-              nome: "Atendimento Geral",
-              agentes: chatData.agentes.map(a => a.nome)
-            });
-          }
-        
-          // 3️⃣ VINCULAR AGENTES AO DEPARTAMENTO
-          chatData.agentes.forEach(a => {
-            if (!a.departamentos.length) {
-              a.departamentos = chatData.departamentos.map(d => d.nome);
-            }
-          });
-        
-          // 4️⃣ VALIDAÇÕES FINAIS
-          if (!chatData.agentes.length) {
-            mostrarToast("Chat ativo sem agentes", true);
-            return;
-          }
-        
-          chatData.agentes.forEach(a => {
-            if (!a.usuario) {
-              mostrarToast(`Agente ${a.nome} sem usuário`, true);
-              throw new Error("Agente sem usuário");
-            }
-          });
-        
-          chat = chatData;
-        }
-
-    
-        /* ================= JSON FINAL ================= */
-
-        const dados = {
-          cliente: {
-            empresa,
-            dominio,
-            cnpj: document.getElementById("cnpjCliente")?.value || ""
-          },
-          voz: {
-            usuarios,
-            ramais,
-            agentes,
-            filas,
-            regras_tempo,
-            uras: coletarURAs(),
-            grupo_ring: coletarGrupoRing(),
-            entradas: coletarEntradas(),
-            pausas: coletarPausas(),
-            pesquisaSatisfacao: coletarPesquisaSatisfacao()
-          }
-        };
-        
-        // 👉 SALVAR CHAT NO JSON
-        if (chat) {
-          dados.chat = chat;
-        }
-
-                
-        document.getElementById("resultado").textContent =
-            JSON.stringify(dados, null, 2);
-
-        mostrarToast("JSON gerado com sucesso!");
-
-    } catch (e) {
-        console.error(e);
-        mostrarToast("Erro ao gerar JSON", true);
+    if (!empresa || !dominio) {
+      mostrarToast("Preencha o nome da empresa e o domínio do cliente", true);
+      return null;
     }
-};
 
-window.selecionarTipoChat = function (el, tipo) {
-    window.chatState = window.chatState || {};
-    window.chatState.tipo = tipo;
+    if (!validarDominioCliente()) {
+      mostrarToast("O domínio deve obrigatoriamente terminar com .sobreip.com.br", true);
+      dominioInput?.focus();
+      return null;
+    }
 
-    document
-        .querySelectorAll(".tipo-chat .chat-card, .chat-section .chat-card")
-        .forEach(c => c.classList.remove("active"));
+    /* ================= VOZ ================= */
 
-    el.classList.add("active");
+    const usuarios = [];
+    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+      usuarios.push({
+        nome: u.getNome(),
+        email: u.getEmail(),
+        senha: u.getSenha(),
+        permissao: u.getPermissao(),
+        agente: u.isAgente()
+      });
+    });
 
-    const apiBox = document.getElementById("api-oficial");
-    const qrBox = document.getElementById("chat-qr");
+    const ramais = [];
+    document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+      ramais.push({
+        ramal: r.getNome(),
+        senha: r.getSenha()
+      });
+    });
 
-    if (apiBox) apiBox.style.display = tipo === "api" ? "block" : "none";
-    if (qrBox) qrBox.style.display = tipo === "qr" ? "block" : "none";
+    const agentes = [];
+    document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+      agentes.push({
+        nome: a.querySelector(".campo-nome")?.value || "",
+        ramal: a.getRamal ? a.getRamal() : ""
+      });
+    });
 
-    atualizarModuloChat();
+    if (agentes.some(a => !a.ramal)) {
+      mostrarToast("Existe agente sem ramal vinculado", true);
+      return null;
+    }
+
+    const filas = [];
+    document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
+      filas.push({
+        nome: f.querySelector(".campo-nome")?.value || "",
+        agentes: JSON.parse(f.dataset.agentes || "[]")
+      });
+    });
+
+    const regras_tempo = [];
+    document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
+      if (r.getData) regras_tempo.push(r.getData());
+    });
+
+    /* ================= CHAT ================= */
+
+    let chat = null;
+
+    if (typeof window.coletarChatDoDOM === "function") {
+      const chatData = coletarChatDoDOM();
+
+      const chatAtivo =
+        chatData.tipo ||
+        chatData.api ||
+        chatData.conta ||
+        chatData.canais.length;
+
+      if (chatAtivo) {
+        if (!chatData.agentes.length && agentes.length) {
+          chatData.agentes = agentes.map(a => ({
+            nome: a.nome,
+            usuario: a.nome,
+            departamentos: []
+          }));
+        }
+
+        if (!chatData.departamentos.length) {
+          chatData.departamentos.push({
+            nome: "Atendimento Geral",
+            agentes: chatData.agentes.map(a => a.nome)
+          });
+        }
+
+        chatData.agentes.forEach(a => {
+          if (!a.departamentos.length) {
+            a.departamentos = chatData.departamentos.map(d => d.nome);
+          }
+        });
+
+        if (!chatData.agentes.length) {
+          mostrarToast("Chat ativo sem agentes", true);
+          return null;
+        }
+
+        chat = chatData;
+      }
+    }
+
+    /* ================= JSON FINAL ================= */
+
+    const dados = {
+      cliente: {
+        empresa,
+        dominio,
+        cnpj: document.getElementById("cnpjCliente")?.value || ""
+      },
+      voz: {
+        usuarios,
+        ramais,
+        agentes,
+        filas,
+        regras_tempo,
+        uras: coletarURAs(),
+        grupo_ring: coletarGrupoRing(),
+        entradas: coletarEntradas(),
+        pausas: coletarPausas(),
+        pesquisaSatisfacao: coletarPesquisaSatisfacao()
+      }
+    };
+
+    if (chat) {
+      dados.chat = chat;
+    }
+
+    document.getElementById("resultado").textContent =
+      JSON.stringify(dados, null, 2);
+
+    mostrarToast("JSON gerado com sucesso!");
+    return dados;
+
+  } catch (e) {
+    console.error(e);
+    mostrarToast("Erro ao gerar JSON", true);
+    return null;
+  }
 };
 
 // ================= CHAT – SELECIONAR API =================
