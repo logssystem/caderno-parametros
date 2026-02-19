@@ -1546,6 +1546,37 @@ window.explorar = function () {
   }
 };
 
+  // ================= CHAT – SELECIONAR TIPO =================
+  window.selecionarTipoChat = function (el, tipo) {
+    window.chatState = window.chatState || {};
+    window.chatState.tipo = tipo;
+  
+    // remove seleção anterior
+    document
+      .querySelectorAll(".tipo-chat .chat-card")
+      .forEach(c => c.classList.remove("active"));
+  
+    // marca o selecionado
+    el.classList.add("active");
+  
+    // mostra o bloco correto
+    const apiBox = document.getElementById("api-oficial");
+    const qrBox = document.getElementById("chat-qr");
+  
+    if (apiBox) apiBox.style.display = tipo === "api" ? "block" : "none";
+    if (qrBox) qrBox.style.display = tipo === "qr" ? "block" : "none";
+  
+    // esconde blocos abaixo até escolher
+    const blocoConta = document.getElementById("bloco-conta-api");
+    const canais = document.getElementById("chat-canais");
+  
+    if (blocoConta) blocoConta.style.display = "none";
+    if (canais) canais.style.display = "none";
+  
+    console.log("Tipo de chat selecionado:", tipo);
+  };
+
+
 // ================= CHAT – SELECIONAR API =================
 window.selecionarApi = function (el, api) {
     window.chatState = window.chatState || {};
