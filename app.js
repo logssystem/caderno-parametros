@@ -1416,52 +1416,81 @@ window.explorar = function () {
       return null;
     }
 
-        /* ================= VOZ ================= */
+/* ================= VOZ ================= */
 
-    const usuarios = [];
-    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
-      usuarios.push({
-        nome: u.getNome(),
-        email: u.getEmail(),
-        senha: u.getSenha(),
-        permissao: u.getPermissao(),
-        agente: u.isAgente()
-      });
-    });
+const usuarios = [];
+document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+  usuarios.push({
+    nome: u.getNome(),
+    email: u.getEmail(),
+    senha: u.getSenha(),
+    permissao: u.getPermissao(),
+    agente: u.isAgente()
+  });
+});
 
-    const ramais = [];
-    document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
-      ramais.push({
-        ramal: r.getNome(),
-        senha: r.getSenha()
-      });
-    });
+const ramais = [];
+document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+  ramais.push({
+    ramal: r.getNome(),
+    senha: r.getSenha()
+  });
+});
 
-    const agentes = [];
-    document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
-      agentes.push({
-        nome: a.querySelector(".campo-nome")?.value || "",
-        ramal: a.getRamal ? a.getRamal() : ""
-      });
-    });
+const agentes = [];
+document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+  agentes.push({
+    nome: a.querySelector(".campo-nome")?.value || "",
+    ramal: a.getRamal ? a.getRamal() : ""
+  });
+});
 
-    if (agentes.some(a => !a.ramal)) {
-      mostrarToast("Existe agente sem ramal vinculado", true);
+// validação obrigatória do PABX
+if (agentes.some(a => !a.ramal)) {
+  mostrarToast("Existe agente sem ramal vinculado", true);
+  return null;
+}
+
+const filas = [];
+document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
+  filas.push({
+    nome: f.querySelector(".campo-nome")?.value || "",
+    agentes: JSON.parse(f.dataset.agentes || "[]")
+  });
+});
+
+const regras_tempo = [];
+document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
+  if (r.getData) regras_tempo.push(r.getData());
+});
+
+    /* ================= CHAT (OPCIONAL) ================= */
+
+let chat = null;
+
+if (typeof window.coletarChatDoDOM === "function") {
+  const chatData = coletarChatDoDOM();
+
+  const chatAtivo =
+    chatData.tipo ||
+    chatData.api ||
+    chatData.conta ||
+    chatData.canais.length;
+
+  if (chatAtivo) {
+    if (!chatData.agentes.length) {
+      mostrarToast("Chat ativo sem agentes", true);
       return null;
     }
 
-    const filas = [];
-    document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
-      filas.push({
-        nome: f.querySelector(".campo-nome")?.value || "",
-        agentes: JSON.parse(f.dataset.agentes || "[]")
-      });
-    });
+    if (!chatData.departamentos.length) {
+      mostrarToast("Chat ativo sem departamentos", true);
+      return null;
+    }
 
-    const regras_tempo = [];
-    document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
-      if (r.getData) regras_tempo.push(r.getData());
-    });
+    chat = chatData;
+  }
+}
     
     /* ================= JSON FINAL ================= */
 
