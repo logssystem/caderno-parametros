@@ -1476,42 +1476,41 @@ window.explorar = function () {
             chatData.canais.length;
         
           if (chatAtivo) {
-        
-            if (!chatData.departamentos.length) {
+
+          if (!chatData.departamentos.length) {
             chatData.departamentos.push({
               nome: "Atendimento Geral",
               agentes: chatData.agentes.map(a => a.nome)
             });
           }
-          
-          // 🔁 AUTO-GERAR AGENTES DE CHAT A PARTIR DOS AGENTES DE VOZ
-            if (!chatData.agentes.length && agentes.length) {
-              chatData.agentes = agentes.map(a => ({
-                nome: a.nome,
-                usuario: a.nome,
-                departamentos: chatData.departamentos.map(d => d.nome)
-              }));
-            }
-            
-            if (!chatData.agentes.length) {
-              mostrarToast("Chat ativo sem agentes", true);
-              return;
-            }
         
-            chatData.agentes.forEach(a => {
-              if (!a.departamentos.length) {
-                mostrarToast(`Agente ${a.nome} sem departamento`, true);
-                throw new Error("Agente sem departamento");
-              }
-              if (!a.usuario) {
-                mostrarToast(`Agente ${a.nome} sem usuário`, true);
-                throw new Error("Agente sem usuário");
-              }
-            });
-        
-            chat = chatData;
+          if (!chatData.agentes.length && agentes.length) {
+            chatData.agentes = agentes.map(a => ({
+              nome: a.nome,
+              usuario: a.nome,
+              departamentos: chatData.departamentos.map(d => d.nome)
+            }));
           }
+        
+          if (!chatData.agentes.length) {
+            mostrarToast("Chat ativo sem agentes", true);
+            return;
+          }
+        
+          chatData.agentes.forEach(a => {
+            if (!a.departamentos.length) {
+              mostrarToast(`Agente ${a.nome} sem departamento`, true);
+              throw new Error("Agente sem departamento");
+            }
+            if (!a.usuario) {
+              mostrarToast(`Agente ${a.nome} sem usuário`, true);
+              throw new Error("Agente sem usuário");
+            }
+          });
+        
+          chat = chatData;
         }
+
     
         /* ================= JSON FINAL ================= */
 
