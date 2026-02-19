@@ -68,8 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
             ${voz.usuarios.map(u => `
               <div class="resumo-card">
                 <div class="titulo">Usuário: ${u.nome}</div>
-                <div class="info-linha">📧 ${u.email}</div>
-                <div class="info-linha">🔐 ${u.senha}</div>
+                <div class="info-linha">Email: 📧 ${u.email}</div>
+                <div class="info-linha">Senha: 🔐 ${u.senha}</div>
                 <div class="info-linha">
                   ${u.permissao}
                   ${u.agente ? `<span class="badge">Agente</span>` : ""}
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="resumo-grid">
           ${voz.agentes.map(a => `
             <div class="resumo-card">
-              <div class="titulo">Agente ${a.nome}</div>
+              <div class="titulo">Nome Do Agente: ${a.nome}</div>
               <div class="info-linha">📞 Ramal: ${a.ramal || "Não vinculado"}</div>
               ${
                 a.multiskill
