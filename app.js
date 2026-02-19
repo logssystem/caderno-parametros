@@ -1633,22 +1633,25 @@ window.informarAgenteChat = function () {
 
 // ================= SALVAR CONFIGURAÇÃO =================
 window.salvarConfiguracao = function () {
-    // gera o JSON
-    if (typeof explorar === "function") {
-        explorar();
-    }
+  if (typeof explorar !== "function") {
+    mostrarToast("Função explorar não encontrada", true);
+    return;
+  }
 
-    const resultado = document.getElementById("resultado")?.textContent;
+  const dados = explorar();
 
-    if (!resultado || !resultado.trim()) {
-        mostrarToast("Gere a configuração antes de salvar", true);
-        return;
-    }
+  if (!dados) {
+    // explorar já mostrou o erro
+    return;
+  }
 
-    localStorage.setItem("CONFIG_CADERNO", resultado);
-    console.log("CONFIG_CADERNO salvo:", resultado);
+  localStorage.setItem(
+    "CONFIG_CADERNO",
+    JSON.stringify(dados)
+  );
 
-    window.location.href = "resumo.html";
+  console.log("CONFIG_CADERNO salvo:", dados);
+  window.location.href = "resumo.html";
 };
 
 // ================= VISIBILIDADE DO MÓDULO CHAT ================= 
