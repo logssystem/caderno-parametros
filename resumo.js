@@ -152,32 +152,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* ================= URAS ================= */
-    if (dados.voz.uras?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco">
-        <h2>☎️ URAs</h2>
-        <div class="resumo-grid">
-          ${dados.voz.uras.map(u => `
-            <div class="resumo-card">
-              <div class="titulo">${u.nome}</div>
-  
-              <div class="info-linha"><strong>📢 Mensagem da URA</strong></div>
-              <div class="info-linha destaque">${u.mensagem}</div>
-  
-              <div class="info-linha"><strong>🎯 Opções</strong></div>
-              ${u.opcoes.map(o => `
-                <div class="info-linha">
-                  Tecla <strong>${o.tecla}</strong> →
-                  <span class="badge">${o.tipo}</span>
-                  ${o.destino}
-                </div>
-              `).join("")}
+if (dados.voz?.uras?.length) {
+  resumo.innerHTML += `
+    <section class="resumo-bloco">
+      <h2>☎️ URAs</h2>
+      <div class="resumo-grid">
+        ${dados.voz.uras.map(u => `
+          <div class="resumo-card">
+            <div class="titulo">${u.nome}</div>
+
+            <div class="info-linha">
+              <strong>Mensagem da URA:</strong>
             </div>
-          `).join("")}
-        </div>
-      </section>
-    `;
-  }
+            <div class="info-linha">
+              ${u.mensagem || "-"}
+            </div>
+
+            <div class="info-linha">
+              <strong>Opções:</strong>
+            </div>
+
+            ${(u.opcoes || []).map(o => `
+              <div class="info-linha">
+                Tecla ${o.tecla} → ${o.destino}
+              </div>
+            `).join("")}
+          </div>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
 
     if (dados.voz.regras_tempo?.length) {
   resumo.innerHTML += `
