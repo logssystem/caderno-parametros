@@ -1,6 +1,9 @@
-* { box-sizing: border-box; }
+/* ================= RESET ================= */
+* {
+  box-sizing: border-box;
+}
 
-/* ===== CLARO ===== */
+/* ================= CORES ================= */
 :root {
   --bg: #f5f7fa;
   --text: #1f2933;
@@ -11,16 +14,16 @@
   --accent: #c6ff00;
 }
 
-/* ===== ESCURO ===== */
 body.dark {
-  --bg: #0b1220;
-  --text: #e6edf3;
-  --header-bg: #0f172a;
-  --card-bg: #111c33;
-  --border: #24304a;
+  --bg: #050b18;
+  --text: #e5e7eb;
+  --header-bg: #020617;
+  --card-bg: #0b1220;
+  --border: #1e293b;
   --field-border: #334155;
 }
 
+/* ================= BASE ================= */
 body {
   margin: 0;
   font-family: Inter, Arial, sans-serif;
@@ -29,352 +32,178 @@ body {
   transition: 0.3s;
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
 .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  padding: 16px 24px;
   gap: 16px;
+  padding: 14px 24px;
 }
 
-.app-logo { height: 72px; }
+.app-logo {
+  height: 56px;
+}
+
 .app-title {
-  justify-self: center;
   text-align: center;
   margin: 0;
+  font-size: 22px;
+  font-weight: 800;
 }
 
-.theme-toggle {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-/* BOTÃO VOLTAR */
 .btn-voltar-intro {
   background: transparent;
   border: 2px dashed var(--border);
   border-radius: 10px;
-  padding: 10px 16px;
+  padding: 10px 18px;
   font-weight: 800;
   cursor: pointer;
-  margin-right: 12px;
 }
 
-/* CONTEÚDO */
+/* ================= CONTAINER ================= */
 .form-container {
-  max-width: 900px;
-  margin: 56px auto;
-}
-
-/* CARD */
-.card {
-  background: var(--card-bg);
-  border-radius: 14px;
-  padding: 24px;
-  margin-bottom: 28px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.2);
-}
-
-.card h2 { margin-bottom: 16px; }
-
-/* AÇÕES */
-.acoes-card {
+  max-width: 980px;
+  margin: 40px auto;
   display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ================= RESUMO ================= */
+.resumo-bloco {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.resumo-bloco h2 {
+  font-size: 20px;
+  font-weight: 800;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+/* ================= GRID ================= */
+.resumo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+/* ================= CARD ================= */
+.resumo-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 16px rgba(0,0,0,.08);
+
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+/* ================= TITULO CARD ================= */
+.resumo-card .titulo {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+/* ================= LINHAS ================= */
+.info-linha {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #444;
+}
+
+.info-linha span {
+  font-weight: 600;
+  color: #111;
+}
+
+/* ================= LISTAS ================= */
+.lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* ================= CHIPS ================= */
+.chip {
+  background: #f2f4f7;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ================= BADGE ================= */
+.badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #000;
+  font-size: 14px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-left: 8px;
+  font-weight: 800;
+}
+
+/* ================= CHAT ================= */
+.chat-card {
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  border-left: 6px solid #7b5cff;
+  border-radius: 18px;
+  padding: 22px;
+}
+
+.chat-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
   margin-bottom: 16px;
 }
 
-/* CAMPOS */
-.campo-descricao {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 18px;
-  padding-bottom: 14px;
-  border-bottom: 1px dashed var(--border);
-}
-
-.linha-principal {
-  display: flex;
-  gap: 10px;
-}
-
-/* INPUTS */
-input, textarea, select {
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--field-border);
-  background: var(--card-bg);
-  color: var(--text);
-  font-weight: 600;
-}
-
-/* SENHA */
-input.campo-senha {
-  width: 280px !important;
-  max-width: 280px !important;
-}
-
-/* PERMISSÃO */
-select.campo-permissao {
-  width: 280px !important;
-}
-
-/* REGRAS */
-.regra-erro {
-  background: #ef4444;
-  color: #fff;
-  padding: 8px;
-  border-radius: 6px;
-}
-
-.regra-ok {
-  background: #22c55e;
-  color: #052e16;
-  padding: 8px;
-  border-radius: 6px;
-}
-
-/* BOTÕES */
-.btn-add, .btn-import {
-  height: 42px;
-  padding: 0 16px;
+.chat-info div {
+  background: rgba(0,0,0,0.04);
+  padding: 12px 14px;
   border-radius: 10px;
-  border: 2px dashed var(--border);
-  background: transparent;
-  cursor: pointer;
-  font-weight: 800;
-}
-
-.btn-explorar {
-  margin: 40px auto;
-  padding: 16px 40px;
-  border-radius: 14px;
-  background: var(--accent);
-  font-weight: 900;
-}
-
-/* TOAST */
-.toast {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  padding: 16px 22px;
-  background: #22c55e;
-  border-radius: 12px;
-  font-weight: 800;
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: 0.3s;
-}
-
-.toast.show { opacity: 1; transform: translateY(0); }
-.toast.error { background: #ef4444; }
-
-/* ================= INTRO ================= */
-#intro-screen {
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.intro-box {
-  background: var(--card-bg);
-  padding: 48px;
-  border-radius: 18px;
-  max-width: 600px;
-  width: 90%;
-  box-shadow: 0 20px 60px rgba(0,0,0,.4);
-  text-align: center;
-}
-
-.intro-box h1 {
-  font-size: 22px;
-  min-height: 120px;
-  margin-bottom: 32px;
-}
-
-.intro-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.intro-actions button {
-  padding: 14px;
-  border-radius: 12px;
   font-size: 16px;
-  font-weight: 800;
-  cursor: pointer;
-  border: 2px solid var(--border);
-  background: transparent;
-}
-
-/* ================= CHAT ================= */
-
-.chat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.chat-card {
-  background: var(--card-bg);
-  border: 2px solid var(--border);
-  border-radius: 18px;
-  padding: 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: 0.25s;
-}
-
-.chat-card img {
-  height: 48px;
-  margin-bottom: 12px;
-}
-
-.chat-card h4 {
-  margin: 0;
-  font-weight: 800;
-}
-
-.chat-card.active {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37,99,235,.25);
 }
 
 .chat-section {
-  margin-top: 32px;
+  margin-top: 20px;
 }
 
 .chat-section h3 {
-  margin-bottom: 12px;
-}
-
-/* input whatsapp */
-.chat-input {
-  width: 100%;
-  max-width: 320px;
-  padding: 14px;
-  border-radius: 12px;
-  border: 1px solid var(--field-border);
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
+  margin-bottom: 10px;
+  color: #7b5cff;
 }
 
-/* ===== CHAT CARDS ===== */
-
-.chat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 20px;
-}
-
-.chat-card {
-  background: var(--card-bg);
-  border: 2px solid var(--border);
-  border-radius: 18px;
-  padding: 24px 16px;
-  text-align: center;
-  cursor: pointer;
-  transition: all .25s ease;
-  user-select: none;
-}
-
-.chat-card:hover {
-  border-color: #2563eb;
-  transform: translateY(-3px);
-}
-
-.chat-card.active {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37,99,235,.25);
-}
-
-.chat-card img {
-  height: 48px;
-  margin-bottom: 12px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.chat-card h4 {
-  margin: 0;
-  font-weight: 800;
-}
-
-/* input whatsapp */
-.chat-input {
-  width: 100%;
-  max-width: 320px;
-  padding: 14px;
-  border-radius: 12px;
-  border: 1px solid var(--field-border);
-  font-size: 16px;
-  font-weight: 700;
-}
-
-/* ===== AJUSTE FINO DAS IMAGENS DO CHAT ===== */
-
-.chat-card img {
-  height: 64px;        /* ⬅ aumentamos aqui (antes ~52px) */
-  max-width: 160px;    /* ⬅ permite logos mais largas */
-  object-fit: contain;
-  margin-bottom: 16px;
-  transition: transform .25s ease;
-}
-
-/* efeito ao passar o mouse */
-.chat-card:hover img {
-  transform: scale(1.08);
-  filter: grayscale(0%);
-}
-
-/* quando selecionado */
-.chat-card.active img {
-  transform: scale(1.18); /* antes ~1.12 */
-}
-
-.chat-card {
-  min-height: 150px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+.chat-departamento,
+.chat-agente {
+  background: rgba(0,0,0,0.03);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
 }
 
 /* ================= REGRA DE TEMPO ================= */
-
 .btn-dia {
-  padding: 10px;
-  border-radius: 10px;
-  border: 2px solid var(--border);
-  background: transparent;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.btn-dia.ativo {
-  background: #2563eb;
-  color: #fff;
-  border-color: #2563eb;
-}
-
-/* ===== REGRAS DE TEMPO ===== */
-
-.btn-dia {
-  padding: 10px;
-  border-radius: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
   border: 2px solid var(--border);
   background: transparent;
   font-weight: 800;
@@ -387,919 +216,23 @@ select.campo-permissao {
   color: #000;
 }
 
-    /* ================= DARK MODE FIX ================= */
-
-body.dark {
-  --bg: #050b18;
-  --text: #e5e7eb;
-  --header-bg: #020617;
-  --card-bg: #0b1220;
-  --border: #1e293b;
-  --field-border: #334155;
-}
-
-/* textos gerais */
-body.dark,
-body.dark p,
-body.dark span,
-body.dark label,
-body.dark h1,
-body.dark h2,
-body.dark h3,
-body.dark h4 {
-  color: #e5e7eb;
-}
-
-/* títulos dos cards */
-body.dark .card h2,
-body.dark .card h3 {
-  color: #f8fafc;
-}
-
-/* inputs */
-body.dark input,
-body.dark textarea,
-body.dark select {
-  background: #020617;
-  color: #f1f5f9;
-  border-color: #334155;
-}
-
-/* placeholder */
-body.dark input::placeholder,
-body.dark textarea::placeholder {
-  color: #94a3b8;
-}
-
-/* cards */
-body.dark .card {
-  background: linear-gradient(180deg, #0b1220, #020617);
-  box-shadow: 0 20px 60px rgba(0,0,0,.6);
-}
-
-/* botões padrão */
-body.dark .btn-add,
-body.dark .btn-import,
-body.dark .btn-dia,
-body.dark .btn-voltar-intro {
-  color: #e5e7eb;
-  border-color: #334155;
-}
-
-/* botões hover */
-body.dark .btn-add:hover,
-body.dark .btn-import:hover,
-body.dark .btn-dia:hover {
-  border-color: #38bdf8;
-  color: #38bdf8;
-}
-
-/* chat cards */
-body.dark .chat-card {
-  background: #020617;
-  border-color: #1e293b;
-}
-
-body.dark .chat-card h4 {
-  color: #f1f5f9;
-}
-
-/* regra ativa */
-body.dark .chat-card.active {
-  border-color: #38bdf8;
-  box-shadow: 0 0 0 3px rgba(56,189,248,.35);
-}
-
-#empresaCliente,
-#dominioCliente {
-  width: 100%;
-  max-width: 520px;
-  font-size: 14px;
-}
-
-    .campo-cliente {
-  gap: 18px;
-}
-
-.bloco-campo {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.bloco-campo label {
-  font-weight: 800;
-  font-size: 13px;
-  opacity: 0.75;
-}
-
-#empresaCliente,
-#dominioCliente {
-  width: 100%;
-  max-width: 520px;
-  font-size: 14px;
-}
-
-/* ================= PESQUISA DE SATISFAÇÃO ================= */
-
-.opcao-pesquisa {
-  display: flex;
-  align-items: center;
-  gap: 14px;              /* AFASTAMENTO ENTRE OS CAMPOS */
-  margin-bottom: 14px;   /* ESPAÇO ENTRE AS LINHAS */
-}
-
-.opcao-pesquisa input[type="number"] {
-  width: 70px;           /* Nota pequena */
-  text-align: center;
-}
-
-.opcao-pesquisa input[type="text"],
-.opcao-pesquisa input:not([type]) {
-  flex: 1;               /* Descrição ocupa o resto */
-}
-
-.opcao-pesquisa button {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-}
-
-/* AFASTAR O BOTÃO + ADICIONAR NOTA */
-#listaRespostasPesquisa + .btn-add {
-  margin-top: 16px;
-}
-
-/* ================= PAUSAS DO CALL CENTER ================= */
-
-.opcao-pausa {
-  display: grid;
-  grid-template-columns: 1fr 160px 40px; /* nome | timeout | lixeira */
-  gap: 16px;                             /* separação real */
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-/* Nome da pausa — maior */
-.opcao-pausa input {
-  width: 100%;
-  height: 40px;
-}
-
-/* Timeout */
-.opcao-pausa select {
-  width: 160px;
-  height: 40px;
-}
-
-/* Botão remover */
-.opcao-pausa button {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-}
-
-/* AFASTAR o botão + Adicionar pausa */
-#listaPausas + .btn-add {
-  margin-top: 18px;
-}
-
-/* ================= AGENTE MULTISKILL ================= */
-
-.btn-multiskill {
-  margin-top: 6px;
-  align-self: flex-start;
-
-  padding: 4px 10px;
-  font-size: 11px;
-  line-height: 1;
-
-  border-radius: 14px;
-  border: 1px solid #bbb;
-  background: #f5f5f5;
-
-  cursor: pointer;
-  opacity: 0.7;
-  transition: all 0.2s ease;
-}
-
-/* hover leve */
-.btn-multiskill:hover {
-  opacity: 1;
-  border-color: #888;
-}
-
-/* ativo */
-.btn-multiskill.ativo {
-  background: #2e7d32;
-  border-color: #2e7d32;
-  color: #fff;
-  opacity: 1;
-}
-
-/* ===== Multiskill – ajuste fino visual ===== */
-.btn-multiskill {
-  font-size: 14px;        /* antes devia estar 12/13 */
-  color: #111827;        /* preto mais escuro (padrão Tailwind text-gray-900) */
-  font-weight: 500;      /* um pouco mais de presença */
-}
-
-/* ===== Painel de Dúvidas ===== */
-.painel-duvidas {
-  position: fixed;
-  top: 250px;
-  right: 24px;
-  width: 320px;
-  max-height: 70vh;
-  overflow-y: auto;
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.15);
-  font-size: 13px;
-  line-height: 1.5;
-  color: #334155;
-}
-
-.painel-duvidas h4 {
-  margin: 12px 0 6px;
-  font-size: 14px;
-  color: #0f172a;
-}
-
-.painel-duvidas p {
-  margin: 4px 0;
-}
-
-#selectDuvida {
-  width: 100%;
-  padding: 6px 10px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  font-size: 13px;
-}
-
-/* ================= BOTÃO DÚVIDAS (FIXO) ================= */
-.btn-duvidas {
-  position: fixed;
-  top: 180px;              /* distância segura do header */
-  right: 24px;
-  
-  z-index: 1100;
-
-  padding: 14px 22px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  font-size: 15px;
-  font-weight: 600;
-
-  background-color: var(--accent);
-  color: #000;
-
-  opacity: 1;
-  filter: none;
-  pointer-events: auto;
-
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-
-  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
-}
-
-.btn-duvidas:hover {
-  box-shadow: 0 8px 22px rgba(0,0,0,0.25);
-}
-
-/* ================= INTRO – AJUSTE TEXTO NO MODO ESCURO ================= */
-
-body.dark #intro-screen .intro-actions button {
-  color: #e5e7eb; /* texto claro (cinza/branco suave) */
-}
-
-/* ícones dentro do botão (emoji ou svg) */
-body.dark #intro-screen .intro-actions button span,
-body.dark #intro-screen .intro-actions button i {
-  color: #e5e7eb;
-}
-
-/* hover no modo escuro */
-body.dark #intro-screen .intro-actions button:hover {
-  color: #ffffff;
-}
-
-.btn-remover {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  opacity: 0.6;
-}
-
-.btn-remover:hover {
-  opacity: 1;
-  color: #e11d48;
-}
-
-/* ===== BOTÃO REMOVER DEPARTAMENTO ===== */
-.btn-remover {
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 6px 8px;
-  cursor: pointer;
-  font-size: 15px;
-  line-height: 1;
-  transition: all 0.2s ease;
-}
-
-.btn-remover:hover {
-  background: #fee2e2;
-  border-color: #fca5a5;
-  color: #b91c1c;
-  transform: scale(1.05);
-}
-
-/* ===== ANIMAÇÃO DE REMOÇÃO ===== */
-.campo-descricao.removendo {
-  opacity: 0;
-  transform: translateX(10px);
-  transition: all 0.18s ease;
-}
-
-/* HEADER (INDEX + RESUMO) */
-.app-header {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  padding: 16px 24px;
-  gap: 16px;
-}
-
-/* LOGO */
-.app-logo {
-  height: 64px;
-}
-
-/* TÍTULO CENTRAL */
-.app-title {
-  justify-self: center;
-  text-align: center;
-  margin: 0;
-  font-size: 20px;
-  font-weight: 800;
-}
-
-/* BOTÃO VOLTAR */
-.btn-voltar-intro {
-  justify-self: end;
-  background: transparent;
-  border: 2px dashed var(--border);
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-/* ================= HEADER DO RESUMO ================= */
-
-.resumo-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-
-  background: var(--header-bg);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-
-  display: grid;
-  grid-template-columns: auto 1fr auto auto; /* 👈 VOLTOU AO PADRÃO */
-  align-items: center;
-  gap: 16px;
-
-  padding: 12px 24px;
-}
-
-/* LOGO */
-.resumo-header .app-logo {
-  height: 48px;
-  width: auto;
-  object-fit: contain;
-}
-
-/* TÍTULO CENTRAL */
-.resumo-header .app-title {
-  grid-column: 2 / 4;      /* 👈 força centralização real */
-  text-align: center;
-  margin: 0;
-  font-size: 18px;
-  font-weight: 800;
-}
-
-/* BOTÃO VOLTAR */
-.resumo-header .btn-voltar-intro {
-  grid-column: 4;
-  justify-self: end;
-  white-space: nowrap;
-}
-
-/* ===== CHAT RESUMO ===== */
-
-.chat-card h2 {
-  margin-bottom: 12px;
-}
-
-.chat-info {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 8px 16px;
-  margin-bottom: 16px;
-  font-size: 14px;
-}
-
-.chat-section {
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid #e5e7eb;
-}
-
-.chat-section h3 {
-  margin-bottom: 8px;
-  font-size: 15px;
-}
-
-.chat-departamento {
-  background: #f9fafb;
-  border-radius: 8px;
-  padding: 8px 12px;
-  margin-bottom: 8px;
-}
-
-.chat-departamento ul {
-  margin: 6px 0 0 16px;
-}
-
-.chat-agente {
-  background: #f9fafb;
-  border-radius: 8px;
-  padding: 8px 12px;
-  margin-bottom: 8px;
-}
-
-.chat-agente-sub {
-  font-size: 13px;
-  color: #555;
-  margin-top: 4px;
-}
-
-/* ================= RESUMO ================= */
-
-.form-container {
-  max-width: 900px;
-  margin: 40px auto;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-/* ================= CARD BASE ================= */
-
-.card {
-  background: var(--card-bg, #fff);
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
-.dark .card {
-  background: #1e1e1e;
-}
-
-/* ================= TITULOS ================= */
-
-.card h2 {
-  margin-bottom: 16px;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
-  padding-bottom: 10px;
-}
-
-.dark .card h2 {
-  border-color: rgba(255,255,255,0.1);
-}
-
-/* ================= CHAT ================= */
-
-.chat-card {
-  border-left: 6px solid #7b5cff;
-}
-
-.chat-info {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.chat-info div {
-  background: rgba(0,0,0,0.04);
-  padding: 10px 12px;
-  border-radius: 8px;
-  font-size: 14px;
-}
-
-.dark .chat-info div {
-  background: rgba(255,255,255,0.06);
-}
-
-/* ================= SEÇÕES ================= */
-
-.chat-section {
-  margin-top: 20px;
-}
-
-.chat-section h3 {
-  margin-bottom: 10px;
-  font-size: 15px;
-  color: #7b5cff;
-}
-
-/* ================= DEPARTAMENTOS ================= */
-
-.chat-departamento {
-  padding: 12px;
-  border-radius: 8px;
-  background: rgba(0,0,0,0.03);
-  margin-bottom: 10px;
-}
-
-.chat-departamento ul {
-  margin-top: 6px;
-  padding-left: 18px;
-}
-
-.dark .chat-departamento {
-  background: rgba(255,255,255,0.05);
-}
-
-/* ================= AGENTES ================= */
-
-.chat-agente {
-  padding: 12px;
-  border-radius: 8px;
-  background: rgba(0,0,0,0.03);
-  margin-bottom: 10px;
-}
-
-.chat-agente-sub {
-  font-size: 13px;
-  opacity: 0.8;
-  margin-top: 4px;
-}
-
-.dark .chat-agente {
-  background: rgba(255,255,255,0.05);
-}
-
-/* ================= CHAT PABX ================= */
-
-.chat-card {
-  border-left: 6px solid #7b5cff;
-}
-
-.chat-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  margin-bottom: 24px;
-}
-
-.chat-grid div {
-  background: rgba(0,0,0,0.04);
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 14px;
-}
-
-.chat-grid span {
-  display: block;
-  font-size: 12px;
-  opacity: 0.6;
-  margin-bottom: 2px;
-}
-
-.dark .chat-grid div {
-  background: rgba(255,255,255,0.06);
-}
-
-/* ================= SEÇÕES ================= */
-
-.chat-section {
-  margin-top: 26px;
-}
-
-.chat-section h3 {
-  margin-bottom: 12px;
-  font-size: 15px;
-  color: #7b5cff;
-}
-
-/* ================= BOX ================= */
-
-.chat-box {
-  background: rgba(0,0,0,0.03);
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin-bottom: 12px;
-}
-
-.dark .chat-box {
-  background: rgba(255,255,255,0.05);
-}
-
-.chat-box-title {
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-
-/* ================= LINHAS ================= */
-
-.linha {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  margin-bottom: 6px;
-}
-
-.linha span {
-  opacity: 0.6;
-}
-
-/* ================= USUÁRIOS ================= */
-
-.chat-users {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.chip-user {
-  background: #7b5cff;
-  color: #fff;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-}
-
-.card {
-  margin-bottom: 24px;
-  padding: 20px;
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 6px 16px rgba(0,0,0,.08);
-}
-
-.card h2 {
-  margin-bottom: 12px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 6px;
-}
-
-.linha {
-  margin-bottom: 6px;
-}
-
-.sub {
-  margin-left: 16px;
-  margin-top: 6px;
-  font-size: 14px;
-  color: #444;
-}
-
-.badge {
-  background: #7CFF00;
-  color: #000;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  margin-left: 6px;
-}
-
-.resumo-section {
-  margin-bottom: 32px;
-}
-
-.resumo-section h2 {
-  font-size: 18px;
-  margin-bottom: 12px;
-  border-bottom: 1px solid #e5e5e5;
-  padding-bottom: 6px;
-}
-
-.resumo-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.resumo-item {
-  padding: 10px 14px;
-  border-radius: 8px;
-  background: #fafafa;
-  border: 1px solid #eee;
-}
-
-.resumo-item strong {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 4px;
-}
-
-.resumo-sub {
-  font-size: 13px;
-  color: #555;
-  margin-left: 12px;
-}
-
-.badge {
-  display: inline-block;
-  background: #d6ff00;
-  color: #000;
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 10px;
-  margin-left: 6px;
-}
-
-.resumo-bloco {
-  margin-bottom: 36px;
-}
-
-.resumo-bloco h2 {
-  font-size: 18px;
-  margin-bottom: 16px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.resumo-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
-}
-
-.resumo-card {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 14px 16px;
-  border: 1px solid #e5e7eb;
-}
-
-.resumo-card strong {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 6px;
-}
-
-.resumo-card .linha {
-  font-size: 13px;
-  color: #444;
-  margin-bottom: 4px;
-}
-
-.badge {
-  display: inline-block;
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 12px;
-  background: #eaff00;
-  color: #000;
-  margin-left: 6px;
-}
-
-.resumo-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,.06);
-}
-
-.resumo-card .titulo {
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.info-linha {
-  font-size: 13px;
-  color: #555;
-  margin-bottom: 6px;
-}
-
-.info-linha span {
-  font-weight: 500;
-  color: #222;
-}
-
-.lista {
-  margin-top: 8px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.chip {
-  background: #f2f4f7;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-}
-
-/* =======================
-   RESUMO – AJUSTE VISUAL
-   ======================= */
-
-.resumo-container {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-/* Card base */
-.resumo-card {
-  background: var(--card-bg, #fff);
-  border-radius: 10px;
-  padding: 14px 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-/* Título do card */
-.resumo-card h4 {
-  margin: 0 0 10px 0;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-/* Textos comuns */
-.resumo-card p {
-  margin: 0 0 6px 0;
-}
-
-/* Destaques internos (Mensagem, Opções, Agentes etc) */
-.resumo-card strong {
-  display: block;
-  margin-top: 10px;
-  margin-bottom: 4px;
-  font-weight: 600;
-}
-
-/* Listas */
-.resumo-card ul {
-  margin: 6px 0 10px 0;
-  padding-left: 18px;
-}
-
-.resumo-card li {
-  margin-bottom: 4px;
-}
-
-/* Chips (Agentes, Ramais, Filas etc) */
-.resumo-chip {
-  display: inline-block;
-  background: var(--chip-bg, #eef2f7);
-  color: var(--chip-color, #333);
-  border-radius: 12px;
-  padding: 3px 8px;
-  font-size: 12px;
-  margin: 2px 4px 2px 0;
-  white-space: nowrap;
-}
-
-/* Separação visual leve entre blocos internos */
-.resumo-secao {
-  margin-top: 8px;
-}
-
-/* Texto longo (URA / Pesquisa) */
+/* ================= PESQUISA ================= */
 .resumo-texto {
-  margin-left: 6px;
+  margin-left: 8px;
+  font-size: 16px;
 }
 
-/* Modo escuro (não quebra se já existir) */
+/* ================= DARK ================= */
 body.dark .resumo-card {
-  background: #1e1e1e;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  background: linear-gradient(180deg, #0b1220, #020617);
+  box-shadow: 0 10px 30px rgba(0,0,0,.6);
 }
 
-body.dark .resumo-chip {
-  background: #2c2c2c;
-  color: #ddd;
+body.dark .info-linha span {
+  color: #f1f5f9;
+}
+
+body.dark .chip {
+  background: #1e293b;
+  color: #e5e7eb;
 }
