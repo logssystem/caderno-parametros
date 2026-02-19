@@ -1478,9 +1478,12 @@ window.explorar = function () {
           if (chatAtivo) {
         
             if (!chatData.departamentos.length) {
-              mostrarToast("Chat ativo sem departamentos", true);
-              return;
-            }
+            chatData.departamentos.push({
+              nome: "Atendimento Geral",
+              agentes: chatData.agentes.map(a => a.nome)
+            });
+          }
+
         
             if (!chatData.agentes.length) {
               mostrarToast("Chat ativo sem agentes", true);
