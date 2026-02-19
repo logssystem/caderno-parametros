@@ -74,40 +74,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* ===== RAMAIS + USUÁRIO VINCULADO ===== */
-    if (voz.ramais?.length) {
-      const usuariosMap = {};
-      (voz.usuarios || []).forEach(u => {
-        usuariosMap[u.nome] = u;
-        usuariosMap[u.id] = u;
-      });
+   if (voz.ramais?.length) {
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>📞 Ramais</h2>
+        <div class="resumo-grid">
+          ${voz.ramais.map(r => `
+            <div class="resumo-card">
+              <div class="titulo">Ramal ${r.ramal}</div>
+              <div class="info-linha">🔐 ${r.senha}</div>
+              <div class="info-linha">
+                👤 Usuário:
+                <span>${r.usuario || r.usuarioNome || "Não vinculado"}</span>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
 
-      resumo.innerHTML += `
-        <section class="resumo-bloco">
-          <h2>📞 Ramais</h2>
-          <div class="resumo-grid">
-            ${voz.ramais.map(r => {
-              const usuarioVinculado =
-                usuariosMap[r.usuario] ||
-                usuariosMap[r.usuarioId] ||
-                null;
-
-              return `
-                <div class="resumo-card">
-                  <div class="titulo">Ramal ${r.ramal}</div>
-                  <div class="info-linha">🔐 ${r.senha}</div>
-                  <div class="info-linha">
-                    👤 Usuário:
-                    <span>${usuarioVinculado ? usuarioVinculado.nome : "Não vinculado"}</span>
-                  </div>
-                </div>
-              `;
-            }).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-  } // 👈 FECHA O else DA VOZ CORRETAMENTE
 
   /* ================= CHAT ================= */
   if (dados.chat) {
