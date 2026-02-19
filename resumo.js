@@ -147,30 +147,6 @@ document.addEventListener("DOMContentLoaded", () => {
       </section>
     `;
   }
-
-  /* ===== GRUPO DE RING ===== */
-  if (voz.grupo_ring?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco">
-        <h2>🔔 Grupo de Ring</h2>
-        <div class="resumo-grid">
-          ${voz.grupo_ring.map(g => `
-            <div class="resumo-card">
-              <div class="titulo">${g.nome}</div>
-              <div class="info-linha">
-                Estratégia: <strong>${g.estrategia}</strong>
-              </div>
-              <div class="lista">
-                ${(g.ramais || []).map(r =>
-                  `<span class="chip">${r}</span>`
-                ).join("")}
-              </div>
-            </div>
-          `).join("")}
-        </div>
-      </section>
-    `;
-  }
   
     /* ===== RAMAIS ===== */
     if (voz.ramais?.length) {
