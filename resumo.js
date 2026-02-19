@@ -51,7 +51,15 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     const voz = dados.voz;
 
-    /* ===== USUÁRIOS ===== */
+    /* ===== MAPA RAMAL → USUÁRIO (VEM DOS AGENTES) ===== */
+    const mapaRamalUsuario = {};
+    (voz.agentes || []).forEach(a => {
+      if (a.ramal && a.nome) {
+        mapaRamalUsuario[a.ramal] = a.nome;
+      }
+    });
+
+    /* ===== USUÁRIOS WEB ===== */
     if (voz.usuarios?.length) {
       resumo.innerHTML += `
         <section class="resumo-bloco">
@@ -85,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="info-linha">🔐 ${r.senha}</div>
                 <div class="info-linha">
                   👤 Usuário:
-                  <span>${r.usuario || r.usuarioNome || "Não vinculado"}</span>
+                  <span>${mapaRamalUsuario[r.ramal] || "Não vinculado"}</span>
                 </div>
               </div>
             `).join("")}
@@ -93,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </section>
       `;
     }
-  } // 👈 FECHA VOZ CORRETAMENTE
+  } // ← FECHA VOZ CORRETAMENTE
 
   /* ================= CHAT ================= */
   if (dados.chat) {
