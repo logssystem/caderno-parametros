@@ -235,19 +235,21 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =====================================================
      💬 CHAT
   ====================================================== */
-  if (dados.chat) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco">
-        <h2>💬 Atendimento por Chat</h2>
-        <div class="resumo-card">
-          <div class="info-linha">Tipo: ${dados.chat.tipo}</div>
-          <div class="info-linha">API: ${dados.chat.api}</div>
-          <div class="info-linha">Conta: ${dados.chat.conta}</div>
-          <div class="info-linha">Canais: ${(dados.chat.canais || []).join(", ")}</div>
-        </div>
-      </section>
-    `;
-  }
+ if (dados.chat) {
+  resumo.innerHTML += `
+    <section class="resumo-bloco">
+      <h2>💬 Atendimento por Chat</h2>
+      <div class="resumo-card">
+        <div class="info-linha">Tipo: ${dados.chat.tipo}</div>
+        <div class="info-linha">API: ${dados.chat.api}</div>
+        <div class="info-linha">Conta: ${dados.chat.conta}</div>
+        <div class="info-linha">Canais: ${(dados.chat.canais || []).join(", ")}</div>
+      </div>
+    </section>
+  `;
+}
+
+/* FECHA DOMContentLoaded */
 });
 
 /* ===== VOLTAR ===== */
