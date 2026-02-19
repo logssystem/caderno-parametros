@@ -1149,11 +1149,16 @@ function coletarGrupoRing() {
   const grupos = [];
 
   document.querySelectorAll("#listaGrupoRing .campo-descricao").forEach(g => {
-    grupos.push({
-      nome: g.querySelector(".campo-nome")?.value || "",
-      estrategia: g.dataset.estrategia || "",
-      ramais: JSON.parse(g.dataset.ramais || "[]")
-    });
+    const nome = g.querySelector(".campo-nome")?.value.trim();
+    const ramais = JSON.parse(g.dataset.ramais || "[]");
+
+    if (nome && ramais.length) {
+      grupos.push({
+        nome,
+        estrategia: g.dataset.estrategia || "",
+        ramais
+      });
+    }
   });
 
   return grupos;
@@ -1463,11 +1468,14 @@ if (agentesSemRamal.length) {
 
     const filas = [];
     document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
-      filas.push({
-        nome: f.querySelector(".campo-nome")?.value || "",
-        agentes: JSON.parse(f.dataset.agentes || "[]")
-      });
+      const nome = f.querySelector(".campo-nome")?.value.trim();
+      const agentes = JSON.parse(f.dataset.agentes || "[]");
+    
+      if (nome && agentes.length) {
+        filas.push({ nome, agentes });
+      }
     });
+
 
     const regras_tempo = [];
     document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
