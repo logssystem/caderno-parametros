@@ -80,7 +80,29 @@ document.addEventListener("DOMContentLoaded", () => {
         </section>
       `;
     }
-
+  
+  /* ===== AGENTES ===== */
+  if (voz.agentes?.length) {
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>🎧 Agentes</h2>
+        <div class="resumo-grid">
+          ${voz.agentes.map(a => `
+            <div class="resumo-card">
+              <div class="titulo">Agente ${a.nome}</div>
+              <div class="info-linha">📞 Ramal: ${a.ramal || "Não vinculado"}</div>
+              ${
+                a.multiskill
+                  ? `<span class="badge">Multiskill</span>`
+                  : ""
+              }
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+    
     /* ===== RAMAIS ===== */
     if (voz.ramais?.length) {
       resumo.innerHTML += `
