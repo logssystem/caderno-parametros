@@ -152,55 +152,50 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* ================= URAS ================= */
-if (dados.voz?.uras?.length) {
-  resumo.innerHTML += `
-    <section class="resumo-bloco">
-      <h2>☎️ URAs</h2>
-      <div class="resumo-grid">
-        ${dados.voz.uras.map(u => `
-          <div class="resumo-card">
-            <div class="titulo">${u.nome}</div>
-
-            <div class="info-linha">
-              <strong>Mensagem da URA:</strong>
+  if (dados.voz?.uras?.length) {
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>☎️ URAs</h2>
+        <div class="resumo-grid">
+          ${dados.voz.uras.map(u => `
+            <div class="resumo-card">
+              <div class="titulo">${u.nome}</div>
+  
+              <div class="info-linha"><strong>Mensagem:</strong></div>
+              <div class="info-linha">${u.mensagem || "-"}</div>
+  
+              <div class="info-linha"><strong>Opções:</strong></div>
+  
+              ${(u.opcoes || []).map(o => `
+                <div class="info-linha">
+                  Tecla ${o.tecla} → ${o.destino}
+                </div>
+              `).join("")}
             </div>
-            <div class="info-linha">
-              ${u.mensagem || "-"}
-            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
 
-            <div class="info-linha">
-              <strong>Opções:</strong>
-            </div>
-
-            ${(u.opcoes || []).map(o => `
-              <div class="info-linha">
-                Tecla ${o.tecla} → ${o.destino}
-              </div>
-            `).join("")}
-          </div>
-        `).join("")}
-      </div>
-    </section>
-  `;
-}
 
     if (dados.voz.regras_tempo?.length) {
-  resumo.innerHTML += `
-    <section class="resumo-bloco">
-      <h2>⏰ Regras de Tempo</h2>
-      <div class="resumo-grid">
-        ${dados.voz.regras_tempo.map(r => `
-          <div class="resumo-card">
-            <div class="titulo">${r.nome}</div>
-            <div class="info-linha">📅 Dias: ${r.dias.join(", ")}</div>
-            <div class="info-linha">⏱ Horário: ${r.inicio} → ${r.fim}</div>
-            <div class="info-linha">Destino: ${r.destino}</div>
-          </div>
-        `).join("")}
-      </div>
-    </section>
-  `;
-}
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>⏰ Regras de Tempo</h2>
+        <div class="resumo-grid">
+          ${dados.voz.regras_tempo.map(r => `
+            <div class="resumo-card">
+              <div class="titulo">${r.nome}</div>
+              <div class="info-linha">📅 Dias: ${r.dias.join(", ")}</div>
+              <div class="info-linha">⏱ Horário: ${r.inicio} → ${r.fim}</div>
+              <div class="info-linha">Destino: ${r.destino}</div>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
 
     if (dados.voz.pausas?.itens?.length) {
     resumo.innerHTML += `
