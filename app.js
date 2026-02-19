@@ -1449,10 +1449,17 @@ window.explorar = function () {
     });
 
     const agentesSemRamal = agentes.filter(a => !a.ramal);
-    if (agentesSemRamal.length) {
-      mostrarToast("Existe agente sem ramal vinculado", true);
-      return null;
-    }
+
+if (agentesSemRamal.length) {
+  mostrarToast(
+    "Existe agente sem ramal vinculado. Preencha todos os ramais antes de salvar.",
+    true
+  );
+
+  // ❗ NÃO RETORNA NULL — apenas bloqueia salvar
+  throw new Error("Agentes sem ramal");
+}
+
 
     const filas = [];
     document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
@@ -1623,10 +1630,12 @@ window.salvarConfiguracao = function () {
 
   const dados = explorar();
 
-  if (!dados) {
-    // explorar já mostrou o erro
-    return;
-  }
+console.log("DADOS GERADOS:", dados);
+
+if (!dados || !dados.voz) {
+  mostrarToast("Nenhum dado de voz encontrado. Verifique os campos.", true);
+  return;
+}
 
   localStorage.setItem(
     "CONFIG_CADERNO",
