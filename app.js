@@ -1483,8 +1483,16 @@ window.explorar = function () {
               agentes: chatData.agentes.map(a => a.nome)
             });
           }
-
-        
+          
+          // 🔁 AUTO-GERAR AGENTES DE CHAT A PARTIR DOS AGENTES DE VOZ
+            if (!chatData.agentes.length && agentes.length) {
+              chatData.agentes = agentes.map(a => ({
+                nome: a.nome,
+                usuario: a.nome,
+                departamentos: chatData.departamentos.map(d => d.nome)
+              }));
+            }
+            
             if (!chatData.agentes.length) {
               mostrarToast("Chat ativo sem agentes", true);
               return;
