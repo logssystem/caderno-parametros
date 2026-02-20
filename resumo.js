@@ -198,30 +198,53 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* ===== REGRAS DE TEMPO (SEM DESTINO) ===== */
-    if (voz.regras_tempo?.length) {
-      resumo.innerHTML += `
-        <section class="resumo-bloco">
-          <h2>⏰ Regras de Tempo</h2>
-          <div class="resumo-grid">
-            ${voz.regras_tempo.map(r => `
-              <div class="resumo-card">
-                <div class="titulo">${r.nome}</div>
-                <div class="info-linha">
-                  Dias: ${(r.dias || []).join(", ")}
-                </div>
-                ${
-                  r.horarios?.length
-                    ? r.horarios.map(h =>
-                        `<div class="info-linha">🕒 ${h.inicio} até ${h.fim}</div>`
-                      ).join("")
-                    : `<div class="info-linha">🕒 Horário não definido</div>`
+      if (voz.regras_tempo?.length) {
+        resumo.innerHTML += `
+          <section class="resumo-bloco">
+            <h2>⏰ Regras de Tempo</h2>
+            <div class="resumo-grid">
+              ${voz.regras_tempo.map(r => {
+      
+                let horariosHTML = "";
+      
+                // CASO 1 — horarios[]
+                if (r.horarios?.length) {
+                  horariosHTML = r.horarios
+                    .map(h => `🕒 ${h.inicio} até ${h.fim}`)
+                    .join("<br>");
                 }
-              </div>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }
+      
+                // CASO 2 — inicio / fim
+                else if (r.inicio && r.fim) {
+                  horariosHTML = `🕒 ${r.inicio} até ${r.fim}`;
+                }
+      
+                // CASO 3 — hora_inicio / hora_fim
+                else if (r.hora_inicio && r.hora_fim) {
+                  horariosHTML = `🕒 ${r.hora_inicio} até ${r.hora_fim}`;
+                }
+      
+                // FALLBACK
+                else {
+                  horariosHTML = "🕒 Horário não definido";
+                }
+      
+                return `
+                  <div class="resumo-card">
+                    <div class="titulo">${r.nome}</div>
+                    <div class="info-linha">
+                      Dias: ${(r.dias || []).join(", ")}
+                    </div>
+                    <div class="info-linha">
+                      ${horariosHTML}
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </section>
+        `;
+      }
 
     /* ===== PAUSAS ===== */
     if (voz.pausas?.length) {
