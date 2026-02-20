@@ -169,17 +169,25 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ===== PAUSAS ===== */
+  /* ===== PAUSAS (COM MINUTAGEM) ===== */
   if (voz.pausas) {
     const pausasLista = Array.isArray(voz.pausas) ? voz.pausas : [voz.pausas];
-    const pausasHTML = pausasLista.map(p => `
-      <div class="resumo-card">
-        <div class="titulo">${p.nome || p.grupo}</div>
-        ${(p.pausas || p.itens || []).map(i =>
-          `<div>• ${i.nome || i.codigo}</div>`
-        ).join("")}
-      </div>
-    `).join("");
+
+    const pausasHTML = pausasLista.map(p => {
+      const itens = p.pausas || p.itens || [];
+      const itensHTML = itens.map(i => {
+        const nome = i.nome || i.tipo || "Pausa";
+        const minutos = i.minutos || i.tempo || i.duracao;
+        return `<div>• ${nome}${minutos ? ` (${minutos} min)` : ""}</div>`;
+      }).join("");
+
+      return `
+        <div class="resumo-card">
+          <div class="titulo">${p.nome || p.grupo}</div>
+          ${itensHTML}
+        </div>
+      `;
+    }).join("");
 
     resumo.innerHTML += `
       <section class="resumo-bloco">
@@ -189,23 +197,32 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ===== PESQUISA DE SATISFAÇÃO ===== */
+  /* ===== PESQUISA DE SATISFAÇÃO (SEM UNDEFINED) ===== */
   if (voz.pesquisaSatisfacao) {
     const lista = Array.isArray(voz.pesquisaSatisfacao)
       ? voz.pesquisaSatisfacao
       : [voz.pesquisaSatisfacao];
 
-    const pesquisaHTML = lista.map(p => `
-      <div class="resumo-card">
-        <div class="titulo">${p.nome}</div>
-        <div><strong>Pergunta:</strong> ${p.pergunta}</div>
-        <div class="lista">
-          ${(p.respostas || []).map(r =>
-            `<span class="chip">${r.label || r.texto || r.valor}</span>`
-          ).join("")}
+    const pesquisaHTML = lista.map(p => {
+      const respostas = (p.respostas || []).map(r => {
+        if (typeof r === "number" || typeof r === "string") return r;
+        return r.nota ?? r.valor ?? r.texto ?? r.label;
+      }).filter(v => v !== undefined);
+
+      return `
+        <div class="resumo-card">
+          <div class="titulo">${p.nome}</div>
+          <div><strong>Pergunta:</strong> ${p.pergunta}</div>
+          ${
+            respostas.length
+              ? `<div class="lista">
+                  ${respostas.map(r => `<span class="chip">${r}</span>`).join("")}
+                </div>`
+              : `<div>Nenhuma resposta configurada</div>`
+          }
         </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
 
     resumo.innerHTML += `
       <section class="resumo-bloco">
