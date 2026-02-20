@@ -235,16 +235,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* ===== PAUSAS ===== */
-    const pausas = voz.pausas || [];
+    let pausasLista = [];
     
-    if (pausas.length) {
+    if (voz.pausas) {
+      if (Array.isArray(voz.pausas)) {
+        pausasLista = voz.pausas;
+      } else {
+        // quando vem como objeto único
+        pausasLista = [voz.pausas];
+      }
+    }
+    
+    if (pausasLista.length) {
       resumo.innerHTML += `
         <section class="resumo-bloco">
           <h2>⏸️ Pausas</h2>
           <div class="resumo-grid">
-            ${pausas.map(p => `
+            ${pausasLista.map(p => `
               <div class="resumo-card">
-                <div class="titulo">${p.grupo}</div>
+                <div class="titulo">${p.grupo || p.nome || "Grupo de Pausa"}</div>
                 ${(p.itens || []).map(i =>
                   `<div class="info-linha">• ${i}</div>`
                 ).join("")}
@@ -256,44 +265,53 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
   /* ===== PESQUISA DE SATISFAÇÃO ===== */
-    const pesquisas = voz.pesquisaSatisfacao || [];
-    
-    if (pesquisas.length) {
-      resumo.innerHTML += `
-        <section class="resumo-bloco">
-          <h2>📊 Pesquisa de Satisfação</h2>
-          <div class="resumo-grid">
-            ${pesquisas.map(p => `
-              <div class="resumo-card">
-                <div class="titulo">${p.nome}</div>
-    
-                ${p.introducao
-                  ? `<div class="info-linha"><em>${p.introducao}</em></div>`
-                  : ""
-                }
-    
-                ${p.pergunta
-                  ? `<div class="info-linha"><strong>Pergunta:</strong> ${p.pergunta}</div>`
-                  : ""
-                }
-    
-                ${(p.respostas || []).length
-                  ? `
-                    <div class="lista">
-                      ${(p.respostas || []).map(r =>
-                        `<span class="chip">${r}</span>`
-                      ).join("")}
-                    </div>
-                  `
-                  : ""
-                }
-              </div>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }
+let pesquisasLista = [];
 
+if (voz.pesquisaSatisfacao) {
+  if (Array.isArray(voz.pesquisaSatisfacao)) {
+    pesquisasLista = voz.pesquisaSatisfacao;
+  } else {
+    // quando vem como objeto único
+    pesquisasLista = [voz.pesquisaSatisfacao];
+  }
+}
+
+if (pesquisasLista.length) {
+  resumo.innerHTML += `
+    <section class="resumo-bloco">
+      <h2>📊 Pesquisa de Satisfação</h2>
+      <div class="resumo-grid">
+        ${pesquisasLista.map(p => `
+          <div class="resumo-card">
+            <div class="titulo">${p.nome || "Pesquisa de Satisfação"}</div>
+
+            ${p.introducao
+              ? `<div class="info-linha"><em>${p.introducao}</em></div>`
+              : ""
+            }
+
+            ${p.pergunta
+              ? `<div class="info-linha"><strong>Pergunta:</strong> ${p.pergunta}</div>`
+              : ""
+            }
+
+            ${(p.respostas || []).length
+              ? `
+                <div class="lista">
+                  ${(p.respostas || []).map(r =>
+                    `<span class="chip">${r}</span>`
+                  ).join("")}
+                </div>
+              `
+              : ""
+            }
+          </div>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+    
     /* ===== URAS ===== */
     if (voz.uras?.length) {
       resumo.innerHTML += `
