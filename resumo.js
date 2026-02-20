@@ -288,7 +288,7 @@ if (voz.pesquisaSatisfacao) {
         </div>
 
         <div class="info-linha">
-          <strong>Textos adicionais detectados:</strong><br>
+          <strong>Agradecimentos:</strong><br>
           ${
             textosLimpos.length
               ? textosLimpos.map(t => `<div>• ${t}</div>`).join("")
