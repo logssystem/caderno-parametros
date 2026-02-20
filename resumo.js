@@ -26,19 +26,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   resumo.innerHTML = "";
 
-  /* ===== FUNÇÃO AUXILIAR DESTINO ===== */
-  function identificarDestino(destino = "") {
-    if (!destino) return "Não definido";
+  /* ===== FUNÇÃO: IDENTIFICAR DESTINO PELO NOME ===== */
+  function identificarDestino(nome, voz) {
+    if (!nome) return "Não definido";
 
-    const d = destino.toLowerCase();
+    if (voz.regras_tempo?.some(r => r.nome === nome))
+      return `⏰ Regra de Tempo — ${nome}`;
 
-    if (d.includes("fila")) return `📞 Fila — ${destino}`;
-    if (d.includes("ramal")) return `☎️ Ramal — ${destino}`;
-    if (d.includes("ura")) return `🎙️ URA — ${destino}`;
-    if (d.includes("ring")) return `🔔 Grupo de Ring — ${destino}`;
-    if (d.includes("tempo")) return `⏰ Regra de Tempo — ${destino}`;
+    if (voz.filas?.some(f => f.nome === nome))
+      return `📞 Fila — ${nome}`;
 
-    return destino;
+    if (voz.uras?.some(u => u.nome === nome))
+      return `🎙️ URA — ${nome}`;
+
+    if (voz.grupo_ring?.some(g => g.nome === nome))
+      return `🔔 Grupo de Ring — ${nome}`;
+
+    if (voz.ramais?.some(r => String(r.ramal) === String(nome)))
+      return `☎️ Ramal — ${nome}`;
+
+    return nome;
   }
 
   /* ================= CLIENTE ================= */
@@ -66,12 +73,13 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     const voz = dados.voz;
 
+    /* ===== MAPA RAMAL → USUÁRIO ===== */
     const mapaRamalUsuario = {};
     (voz.agentes || []).forEach(a => {
       if (a.ramal && a.nome) mapaRamalUsuario[a.ramal] = a.nome;
     });
 
-    /* ===== USUÁRIOS ===== */
+    /* ===== USUÁRIOS WEB ===== */
     if (voz.usuarios?.length) {
       resumo.innerHTML += `
         <section class="resumo-bloco">
@@ -130,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
 
-    /* ===== GRUPO RING ===== */
+    /* ===== GRUPO DE RING ===== */
     if (voz.grupo_ring?.length) {
       resumo.innerHTML += `
         <section class="resumo-bloco">
@@ -160,7 +168,9 @@ document.addEventListener("DOMContentLoaded", () => {
               <div class="resumo-card">
                 <div class="titulo">Ramal ${r.ramal}</div>
                 <div class="info-linha">🔐 ${r.senha}</div>
-                <div class="info-linha">👤 Usuário: ${mapaRamalUsuario[r.ramal] || "Não vinculado"}</div>
+                <div class="info-linha">
+                  👤 Usuário: ${mapaRamalUsuario[r.ramal] || "Não vinculado"}
+                </div>
               </div>
             `).join("")}
           </div>
@@ -168,16 +178,18 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
 
-    /* ===== NÚMEROS ===== */
-    if (voz.numeros?.length) {
+    /* ===== NÚMEROS / ENTRADAS ===== */
+    if (voz.entradas?.length) {
       resumo.innerHTML += `
         <section class="resumo-bloco">
           <h2>📲 Números</h2>
           <div class="resumo-grid">
-            ${voz.numeros.map(n => `
+            ${voz.entradas.map(n => `
               <div class="resumo-card">
                 <div class="titulo">${n.numero}</div>
-                <div class="info-linha">Destino: ${identificarDestino(n.destino)}</div>
+                <div class="info-linha">
+                  Destino: ${identificarDestino(n.destino, voz)}
+                </div>
               </div>
             `).join("")}
           </div>
@@ -185,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
 
-    /* ===== REGRAS DE TEMPO ===== */
+    /* ===== REGRAS DE TEMPO (SEM DESTINO) ===== */
     if (voz.regras_tempo?.length) {
       resumo.innerHTML += `
         <section class="resumo-bloco">
@@ -194,17 +206,16 @@ document.addEventListener("DOMContentLoaded", () => {
             ${voz.regras_tempo.map(r => `
               <div class="resumo-card">
                 <div class="titulo">${r.nome}</div>
-                <div class="info-linha">Dias: ${(r.dias || []).join(", ")}</div>
-
+                <div class="info-linha">
+                  Dias: ${(r.dias || []).join(", ")}
+                </div>
                 ${
-                  r.periodos?.length
-                    ? r.periodos.map(p =>
-                        `<div class="info-linha">⏱ ${p.inicio} até ${p.fim}</div>`
+                  r.horarios?.length
+                    ? r.horarios.map(h =>
+                        `<div class="info-linha">🕒 ${h.inicio} até ${h.fim}</div>`
                       ).join("")
-                    : `<div class="info-linha">⏱ ${r.inicio} até ${r.fim}</div>`
+                    : `<div class="info-linha">🕒 Horário não definido</div>`
                 }
-
-                <div class="info-linha">Destino: ${identificarDestino(r.destino)}</div>
               </div>
             `).join("")}
           </div>
@@ -221,7 +232,9 @@ document.addEventListener("DOMContentLoaded", () => {
             ${voz.pausas.map(p => `
               <div class="resumo-card">
                 <div class="titulo">${p.grupo}</div>
-                ${(p.itens || []).map(i => `<div class="info-linha">• ${i}</div>`).join("")}
+                ${(p.itens || []).map(i =>
+                  `<div class="info-linha">• ${i}</div>`
+                ).join("")}
               </div>
             `).join("")}
           </div>
@@ -242,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="lista">
                   ${(u.opcoes || []).map(o =>
                     `<div class="chip">
-                      Tecla ${o.tecla} → ${identificarDestino(o.destino)}
+                      Tecla ${o.tecla} → ${identificarDestino(o.destino, voz)}
                     </div>`
                   ).join("")}
                 </div>
@@ -264,7 +277,9 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="info-linha"><strong>Tipo:</strong> ${chat.tipo}</div>
           <div class="info-linha"><strong>API:</strong> ${chat.api}</div>
           <div class="info-linha"><strong>Conta:</strong> ${chat.conta}</div>
-          <div class="info-linha"><strong>Canais:</strong> ${(chat.canais || []).join(", ")}</div>
+          <div class="info-linha">
+            <strong>Canais:</strong> ${(chat.canais || []).join(", ")}
+          </div>
         </div>
       </section>
     `;
