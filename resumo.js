@@ -234,69 +234,65 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
 
-    /* ===== PAUSAS (CALL CENTER) ===== */
-const pausas =
-  voz.callcenter?.pausas ||
-  [];
-
-if (pausas.length) {
-  resumo.innerHTML += `
-    <section class="resumo-bloco">
-      <h2>⏸️ Pausas</h2>
-      <div class="resumo-grid">
-        ${pausas.map(p => `
-          <div class="resumo-card">
-            <div class="titulo">${p.grupo}</div>
-            ${(p.itens || []).map(i =>
-              `<div class="info-linha">• ${i}</div>`
-            ).join("")}
+    /* ===== PAUSAS ===== */
+    const pausas = voz.pausas || [];
+    
+    if (pausas.length) {
+      resumo.innerHTML += `
+        <section class="resumo-bloco">
+          <h2>⏸️ Pausas</h2>
+          <div class="resumo-grid">
+            ${pausas.map(p => `
+              <div class="resumo-card">
+                <div class="titulo">${p.grupo}</div>
+                ${(p.itens || []).map(i =>
+                  `<div class="info-linha">• ${i}</div>`
+                ).join("")}
+              </div>
+            `).join("")}
           </div>
-        `).join("")}
-      </div>
-    </section>
-  `;
-}
+        </section>
+      `;
+    }
 
-    /* ===== PESQUISA DE SATISFAÇÃO ===== */
-const pesquisas =
-  voz.callcenter?.pesquisa ||
-  [];
-
-if (pesquisas.length) {
-  resumo.innerHTML += `
-    <section class="resumo-bloco">
-      <h2>📊 Pesquisa de Satisfação</h2>
-      <div class="resumo-grid">
-        ${pesquisas.map(p => `
-          <div class="resumo-card">
-            <div class="titulo">${p.nome}</div>
-
-            ${p.introducao
-              ? `<div class="info-linha"><em>${p.introducao}</em></div>`
-              : ""
-            }
-
-            ${p.pergunta
-              ? `<div class="info-linha"><strong>Pergunta:</strong> ${p.pergunta}</div>`
-              : ""
-            }
-
-            ${(p.respostas || []).length
-              ? `
-                <div class="lista">
-                  ${(p.respostas || []).map(r =>
-                    `<span class="chip">${r}</span>`
-                  ).join("")}
-                </div>
-              `
-              : ""
-            }
+  /* ===== PESQUISA DE SATISFAÇÃO ===== */
+    const pesquisas = voz.pesquisaSatisfacao || [];
+    
+    if (pesquisas.length) {
+      resumo.innerHTML += `
+        <section class="resumo-bloco">
+          <h2>📊 Pesquisa de Satisfação</h2>
+          <div class="resumo-grid">
+            ${pesquisas.map(p => `
+              <div class="resumo-card">
+                <div class="titulo">${p.nome}</div>
+    
+                ${p.introducao
+                  ? `<div class="info-linha"><em>${p.introducao}</em></div>`
+                  : ""
+                }
+    
+                ${p.pergunta
+                  ? `<div class="info-linha"><strong>Pergunta:</strong> ${p.pergunta}</div>`
+                  : ""
+                }
+    
+                ${(p.respostas || []).length
+                  ? `
+                    <div class="lista">
+                      ${(p.respostas || []).map(r =>
+                        `<span class="chip">${r}</span>`
+                      ).join("")}
+                    </div>
+                  `
+                  : ""
+                }
+              </div>
+            `).join("")}
           </div>
-        `).join("")}
-      </div>
-    </section>
-  `;
-}
+        </section>
+      `;
+    }
 
     /* ===== URAS ===== */
     if (voz.uras?.length) {
