@@ -197,90 +197,99 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ===== PESQUISA DE SATISFAÇÃO (LEITURA REAL DO FORMULÁRIO) ===== */
-if (voz.pesquisaSatisfacao) {
-  const pesquisas = Array.isArray(voz.pesquisaSatisfacao)
-    ? voz.pesquisaSatisfacao
-    : [voz.pesquisaSatisfacao];
-
-  const pesquisaHTML = pesquisas.map(p => {
-    const introducao =
-      p.introducao ??
-      p.textoIntroducao ??
-      p.descricao ??
-      "";
-
-    const pergunta =
-      p.pergunta ??
-      p.textoPergunta ??
-      "";
-
-    const mensagemFinal =
-      p.finalizacao ??
-      p.mensagemFinal ??
-      p.mensagem_final ??
-      p.agradecimento ??
-      p.textoFinal ??
-      "";
-
-    const respostasRaw = Array.isArray(p.respostas) ? p.respostas : [];
-
-    const respostasHTML = respostasRaw.length
-      ? respostasRaw.map((r, i) => {
-          let textoResposta = "";
-
-          if (typeof r === "string" || typeof r === "number") {
-            textoResposta = r;
-          } else if (typeof r === "object" && r !== null) {
-            textoResposta =
-              r.texto ??
-              r.label ??
-              r.descricao ??
-              r.nota ??
-              JSON.stringify(r);
-          }
-
-          return `<div>${i + 1} - ${textoResposta}</div>`;
-        }).join("")
-      : `<div><em>Nenhuma resposta cadastrada</em></div>`;
-
-    return `
-      <div class="resumo-card" style="max-width: 100%;">
-        <div class="titulo">${p.nome || "Pesquisa de Satisfação"}</div>
-
-        <div class="info-linha">
-          <strong>Introdução:</strong><br>
-          ${introducao || "<em>Não informada</em>"}
+ 
+/* ===== PESQUISA DE SATISFAÇÃO (COMPLETA E À PROVA DE FALHAS) ===== */
+  if (voz.pesquisaSatisfacao) {
+    const pesquisas = Array.isArray(voz.pesquisaSatisfacao)
+      ? voz.pesquisaSatisfacao
+      : [voz.pesquisaSatisfacao];
+  
+    const pesquisaHTML = pesquisas.map(p => {
+      const introducao =
+        p.introducao ??
+        p.textoIntroducao ??
+        p.descricao ??
+        "";
+  
+      const pergunta =
+        p.pergunta ??
+        p.textoPergunta ??
+        "";
+  
+      const mensagemFinal =
+        p.finalizacao ??
+        p.mensagemFinal ??
+        p.mensagem_final ??
+        p.agradecimento ??
+        p.textoFinal ??
+        p.textoMensagemFinal ??
+        p.mensagem ??
+        p.mensagemFinalPesquisa ??
+        p.textoFinalPesquisa ??
+        p.final ??
+        "";
+  
+      const respostasRaw = Array.isArray(p.respostas) ? p.respostas : [];
+  
+      const respostasHTML = respostasRaw.length
+        ? respostasRaw.map((r, i) => {
+            let texto = "";
+  
+            if (typeof r === "string" || typeof r === "number") {
+              texto = r;
+            } else if (typeof r === "object" && r !== null) {
+              texto =
+                r.texto ??
+                r.label ??
+                r.descricao ??
+                r.valor ??
+                r.nota ??
+                JSON.stringify(r);
+            } else {
+              texto = "Resposta não identificada";
+            }
+  
+            return `<div>${i + 1} - ${texto}</div>`;
+          }).join("")
+        : `<div><em>Nenhuma resposta cadastrada</em></div>`;
+  
+      return `
+        <div class="resumo-card" style="max-width: 100%;">
+          <div class="titulo">${p.nome || "Pesquisa de Satisfação"}</div>
+  
+          <div class="info-linha">
+            <strong>Introdução:</strong><br>
+            ${introducao || "<em>Não informada</em>"}
+          </div>
+  
+          <div class="info-linha">
+            <strong>Pergunta:</strong><br>
+            ${pergunta || "<em>Não informada</em>"}
+          </div>
+  
+          <div class="info-linha">
+            <strong>Respostas:</strong><br>
+            ${respostasHTML}
+          </div>
+  
+          <div class="info-linha">
+            <strong>Mensagem final:</strong><br>
+            ${mensagemFinal || "<em>Não informada</em>"}
+          </div>
         </div>
-
-        <div class="info-linha">
-          <strong>Pergunta:</strong><br>
-          ${pergunta || "<em>Não informada</em>"}
+      `;
+    }).join("");
+  
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>📊 Pesquisa de Satisfação</h2>
+        <div class="resumo-grid">
+          ${pesquisaHTML}
         </div>
-
-        <div class="info-linha">
-          <strong>Respostas:</strong><br>
-          ${respostasHTML}
-        </div>
-
-        <div class="info-linha">
-          <strong>Mensagem final:</strong><br>
-          ${mensagemFinal || "<em>Não informada</em>"}
-        </div>
-      </div>
+      </section>
     `;
-  }).join("");
-
-  resumo.innerHTML += `
-    <section class="resumo-bloco">
-      <h2>📊 Pesquisa de Satisfação</h2>
-      <div class="resumo-grid">
-        ${pesquisaHTML}
-      </div>
-    </section>
-  `;
-}
-
+  }
+  
   /* ===== URAS ===== */
   if (voz.uras?.length) {
     resumo.innerHTML += `
