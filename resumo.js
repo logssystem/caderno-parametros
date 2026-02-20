@@ -5,46 +5,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ===== DADOS ===== */
   const raw = localStorage.getItem("CONFIG_CADERNO");
-  if (!raw) {
-    console.warn("CONFIG_CADERNO não encontrado");
-    return;
-  }
+  if (!raw) return;
 
   let dados;
   try {
     dados = JSON.parse(raw);
-  } catch (e) {
-    console.error("JSON inválido", e);
+  } catch {
+    console.error("JSON inválido");
     return;
   }
 
   const resumo = document.getElementById("resumo");
-  if (!resumo) {
-    console.error("Elemento #resumo não encontrado");
-    return;
-  }
-
+  if (!resumo) return;
   resumo.innerHTML = "";
 
   /* ===== FUNÇÃO: IDENTIFICAR DESTINO ===== */
   function identificarDestino(nome, voz) {
     if (!nome) return "Não definido";
-
-    if (voz.regras_tempo?.some(r => r.nome === nome))
-      return `⏰ Regra de Tempo — ${nome}`;
-
-    if (voz.filas?.some(f => f.nome === nome))
-      return `📞 Fila — ${nome}`;
-
-    if (voz.uras?.some(u => u.nome === nome))
-      return `🎙️ URA — ${nome}`;
-
-    if (voz.grupo_ring?.some(g => g.nome === nome))
-      return `🔔 Grupo de Ring — ${nome}`;
-
-    if (voz.ramais?.some(r => String(r.ramal) === String(nome)))
-      return `☎️ Ramal — ${nome}`;
-
+    if (voz.regras_tempo?.some(r => r.nome === nome)) return `⏰ Regra de Tempo — ${nome}`;
+    if (voz.filas?.some(f => f.nome === nome)) return `📞 Fila — ${nome}`;
+    if (voz.uras?.some(u => u.nome === nome)) return `🎙️ URA — ${nome}`;
+    if (voz.grupo_ring?.some(g => g.nome === nome)) return `🔔 Grupo de Ring — ${nome}`;
+    if (voz.ramais?.some(r => String(r.ramal) === String(nome))) return `☎️ Ramal — ${nome}`;
     return nome;
   }
 
@@ -54,296 +36,204 @@ document.addEventListener("DOMContentLoaded", () => {
       <section class="resumo-bloco">
         <h2>🏢 Dados do Cliente</h2>
         <div class="resumo-card">
-          <div class="info-linha"><strong>Empresa:</strong> ${dados.cliente.empresa}</div>
-          <div class="info-linha"><strong>Domínio:</strong> ${dados.cliente.dominio}</div>
-          <div class="info-linha"><strong>CNPJ:</strong> ${dados.cliente.cnpj}</div>
+          <div><strong>Empresa:</strong> ${dados.cliente.empresa}</div>
+          <div><strong>Domínio:</strong> ${dados.cliente.dominio}</div>
+          <div><strong>CNPJ:</strong> ${dados.cliente.cnpj}</div>
         </div>
       </section>
     `;
   }
 
   /* ================= VOZ ================= */
-  if (!dados.voz) {
+  if (!dados.voz) return;
+  const voz = dados.voz;
+
+  /* ===== MAPA RAMAL → USUÁRIO ===== */
+  const mapaRamalUsuario = {};
+  (voz.agentes || []).forEach(a => {
+    if (a.ramal && a.nome) mapaRamalUsuario[a.ramal] = a.nome;
+  });
+
+  /* ===== USUÁRIOS ===== */
+  if (voz.usuarios?.length) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
-        <h2>⚠️ Voz</h2>
-        <div class="resumo-card">Nenhuma configuração de voz encontrada.</div>
+        <h2>👤 Usuários Web</h2>
+        <div class="resumo-grid">
+          ${voz.usuarios.map(u => `
+            <div class="resumo-card">
+              <div class="titulo">${u.nome}</div>
+              <div>📧 ${u.email}</div>
+              <div>🔐 ${u.senha}</div>
+              <div>${u.permissao} ${u.agente ? `<span class="badge">Agente</span>` : ""}</div>
+            </div>
+          `).join("")}
+        </div>
       </section>
     `;
-  } else {
-    const voz = dados.voz;
-
-    /* ===== MAPA RAMAL → USUÁRIO ===== */
-    const mapaRamalUsuario = {};
-    (voz.agentes || []).forEach(a => {
-      if (a.ramal && a.nome) mapaRamalUsuario[a.ramal] = a.nome;
-    });
-
-    /* ===== USUÁRIOS WEB ===== */
-    if (voz.usuarios?.length) {
-      resumo.innerHTML += `
-        <section class="resumo-bloco">
-          <h2>👤 Usuários Web</h2>
-          <div class="resumo-grid">
-            ${voz.usuarios.map(u => `
-              <div class="resumo-card">
-                <div class="titulo">Usuário: ${u.nome}</div>
-                <div class="info-linha">📧 ${u.email}</div>
-                <div class="info-linha">🔐 ${u.senha}</div>
-                <div class="info-linha">
-                  ${u.permissao}
-                  ${u.agente ? `<span class="badge">Agente</span>` : ""}
-                </div>
-              </div>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-    /* ===== AGENTES ===== */
-    if (voz.agentes?.length) {
-      resumo.innerHTML += `
-        <section class="resumo-bloco">
-          <h2>🎧 Agentes</h2>
-          <div class="resumo-grid">
-            ${voz.agentes.map(a => `
-              <div class="resumo-card">
-                <div class="titulo">Agente: ${a.nome}</div>
-                <div class="info-linha">📞 Ramal: ${a.ramal || "Não vinculado"}</div>
-                ${a.multiskill ? `<span class="badge">Multiskill</span>` : ""}
-              </div>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-    /* ===== FILAS ===== */
-    if (voz.filas?.length) {
-      resumo.innerHTML += `
-        <section class="resumo-bloco">
-          <h2>👥 Filas</h2>
-          <div class="resumo-grid">
-            ${voz.filas.map(f => `
-              <div class="resumo-card">
-                <div class="titulo">Fila: ${f.nome}</div>
-                <div class="lista">
-                  ${(f.agentes || []).map(a => `<span class="chip">${a}</span>`).join("")}
-                </div>
-              </div>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-    /* ===== GRUPO DE RING ===== */
-    if (voz.grupo_ring?.length) {
-      resumo.innerHTML += `
-        <section class="resumo-bloco">
-          <h2>🔔 Grupo de Ring</h2>
-          <div class="resumo-grid">
-            ${voz.grupo_ring.map(g => `
-              <div class="resumo-card">
-                <div class="titulo">${g.nome}</div>
-                <div class="info-linha">Estratégia: <strong>${g.estrategia}</strong></div>
-                <div class="lista">
-                  ${(g.ramais || []).map(r => `<span class="chip">${r}</span>`).join("")}
-                </div>
-              </div>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-    /* ===== RAMAIS ===== */
-    if (voz.ramais?.length) {
-      resumo.innerHTML += `
-        <section class="resumo-bloco">
-          <h2>📞 Ramais</h2>
-          <div class="resumo-grid">
-            ${voz.ramais.map(r => `
-              <div class="resumo-card">
-                <div class="titulo">Ramal ${r.ramal}</div>
-                <div class="info-linha">🔐 ${r.senha}</div>
-                <div class="info-linha">
-                  👤 Usuário: ${mapaRamalUsuario[r.ramal] || "Não vinculado"}
-                </div>
-              </div>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-    /* ===== NÚMEROS / ENTRADAS ===== */
-    if (voz.entradas?.length) {
-      resumo.innerHTML += `
-        <section class="resumo-bloco">
-          <h2>📲 Números</h2>
-          <div class="resumo-grid">
-            ${voz.entradas.map(n => `
-              <div class="resumo-card">
-                <div class="titulo">${n.numero}</div>
-                <div class="info-linha">
-                  Destino: ${identificarDestino(n.destino, voz)}
-                </div>
-              </div>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-    /* ===== REGRAS DE TEMPO ===== */
-    if (voz.regras_tempo?.length) {
-      resumo.innerHTML += `
-        <section class="resumo-bloco">
-          <h2>⏰ Regras de Tempo</h2>
-          <div class="resumo-grid">
-            ${voz.regras_tempo.map(r => {
-
-              let horariosHTML = "🕒 Horário não definido";
-
-              if (r.horarios?.length) {
-                horariosHTML = r.horarios
-                  .map(h => `🕒 ${h.inicio} até ${h.fim}`)
-                  .join("<br>");
-              } else if (r.inicio && r.fim) {
-                horariosHTML = `🕒 ${r.inicio} até ${r.fim}`;
-              } else if (r.hora_inicio && r.hora_fim) {
-                horariosHTML = `🕒 ${r.hora_inicio} até ${r.hora_fim}`;
-              }
-
-              return `
-                <div class="resumo-card">
-                  <div class="titulo">${r.nome}</div>
-                  <div class="info-linha">
-                    Dias: ${(r.dias || []).join(", ")}
-                  </div>
-                  <div class="info-linha">
-                    ${horariosHTML}
-                  </div>
-                </div>
-              `;
-            }).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-    /* ===== PAUSAS ===== */
-    let pausasLista = [];
-    
-    if (voz.pausas) {
-      pausasLista = Array.isArray(voz.pausas) ? voz.pausas : [voz.pausas];
-    }
-    
-    if (pausasLista.length) {
-      resumo.innerHTML += `
-        <section class="resumo-bloco">
-          <h2>⏸️ Pausas</h2>
-          <div class="resumo-grid">
-            ${pausasLista.map(p => `
-              <div class="resumo-card">
-                <div class="titulo">${p.nome || p.grupo}</div>
-                ${(p.pausas || p.itens || []).map(item =>
-                  `<div class="info-linha">• ${item.nome || item.codigo}</div>`
-                ).join("")}
-              </div>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-/* ===== PESQUISA DE SATISFAÇÃO ===== */
-let pesquisasLista = [];
-
-if (voz.pesquisaSatisfacao) {
-  pesquisasLista = Array.isArray(voz.pesquisaSatisfacao)
-    ? voz.pesquisaSatisfacao
-    : [voz.pesquisaSatisfacao];
-}
-
-if (pesquisasLista.length) {
-  resumo.innerHTML += `
-    <section class="resumo-bloco">
-      <h2>📊 Pesquisa de Satisfação</h2>
-      <div class="resumo-grid">
-        ${pesquisasLista.map(p => `
-          <div class="resumo-card">
-            <div class="titulo">${p.nome}</div>
-
-            ${p.pergunta
-              ? `<div class="info-linha"><strong>Pergunta:</strong> ${p.pergunta}</div>`
-              : ""
-            }
-
-            ${(p.respostas || []).length
-              ? `
-                <div class="lista">
-                  ${(p.respostas || []).map(r =>
-                    `<span class="chip">${r.label || r.texto || r.valor}</span>`
-                  ).join("")}
-                </div>
-              `
-              : ""
-            }
-          </div>
-        `).join("")}
-      </div>
-    </section>
-  `;
-}
-    
-    /* ===== URAS ===== */
-    if (voz.uras?.length) {
-      resumo.innerHTML += `
-        <section class="resumo-bloco">
-          <h2>🎙️ URAs</h2>
-          <div class="resumo-grid">
-            ${voz.uras.map(u => `
-              <div class="resumo-card">
-                <div class="titulo">${u.nome}</div>
-                <div class="info-linha"><em>${u.mensagem}</em></div>
-                <div class="lista">
-                  ${(u.opcoes || []).map(o =>
-                    `<div class="chip">
-                      Tecla ${o.tecla} → ${identificarDestino(o.destino, voz)}
-                    </div>`
-                  ).join("")}
-                </div>
-              </div>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }
   }
 
-  /* ================= CHAT ================= */
-  if (dados.chat) {
-    const chat = dados.chat;
+  /* ===== AGENTES ===== */
+  if (voz.agentes?.length) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
-        <h2>💬 Atendimento por Chat</h2>
+        <h2>🎧 Agentes</h2>
+        <div class="resumo-grid">
+          ${voz.agentes.map(a => `
+            <div class="resumo-card">
+              <div class="titulo">${a.nome}</div>
+              <div>📞 Ramal: ${a.ramal || "Não vinculado"}</div>
+              ${a.multiskill ? `<span class="badge">Multiskill</span>` : ""}
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  /* ===== FILAS ===== */
+  if (voz.filas?.length) {
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>👥 Filas</h2>
+        <div class="resumo-grid">
+          ${voz.filas.map(f => `
+            <div class="resumo-card">
+              <div class="titulo">${f.nome}</div>
+              <div class="lista">
+                ${(f.agentes || []).map(a => `<span class="chip">${a}</span>`).join("")}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  /* ===== RAMAIS ===== */
+  if (voz.ramais?.length) {
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>📞 Ramais</h2>
+        <div class="resumo-grid">
+          ${voz.ramais.map(r => `
+            <div class="resumo-card">
+              <div class="titulo">${r.ramal}</div>
+              <div>🔐 ${r.senha}</div>
+              <div>👤 ${mapaRamalUsuario[r.ramal] || "Não vinculado"}</div>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  /* ===== NÚMEROS ===== */
+  if (voz.entradas?.length) {
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>📲 Números</h2>
+        <div class="resumo-grid">
+          ${voz.entradas.map(n => `
+            <div class="resumo-card">
+              <div class="titulo">${n.numero}</div>
+              <div>${identificarDestino(n.destino, voz)}</div>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  /* ===== REGRAS DE TEMPO ===== */
+  if (voz.regras_tempo?.length) {
+    const regrasHTML = voz.regras_tempo.map(r => {
+      let horario = "🕒 Horário não definido";
+      if (r.horario) horario = `🕒 ${r.horario}`;
+      else if (r.inicio && r.fim) horario = `🕒 ${r.inicio} até ${r.fim}`;
+
+      return `
         <div class="resumo-card">
-          <div class="info-linha"><strong>Tipo:</strong> ${chat.tipo}</div>
-          <div class="info-linha"><strong>API:</strong> ${chat.api}</div>
-          <div class="info-linha"><strong>Conta:</strong> ${chat.conta}</div>
-          <div class="info-linha">
-            <strong>Canais:</strong> ${(chat.canais || []).join(", ")}
-          </div>
+          <div class="titulo">${r.nome}</div>
+          <div>Dias: ${(r.dias || []).join(", ")}</div>
+          <div>${horario}</div>
+        </div>
+      `;
+    }).join("");
+
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>⏰ Regras de Tempo</h2>
+        <div class="resumo-grid">${regrasHTML}</div>
+      </section>
+    `;
+  }
+
+  /* ===== PAUSAS ===== */
+  if (voz.pausas) {
+    const pausasLista = Array.isArray(voz.pausas) ? voz.pausas : [voz.pausas];
+    const pausasHTML = pausasLista.map(p => `
+      <div class="resumo-card">
+        <div class="titulo">${p.nome || p.grupo}</div>
+        ${(p.pausas || p.itens || []).map(i =>
+          `<div>• ${i.nome || i.codigo}</div>`
+        ).join("")}
+      </div>
+    `).join("");
+
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>⏸️ Pausas</h2>
+        <div class="resumo-grid">${pausasHTML}</div>
+      </section>
+    `;
+  }
+
+  /* ===== PESQUISA DE SATISFAÇÃO ===== */
+  if (voz.pesquisaSatisfacao) {
+    const lista = Array.isArray(voz.pesquisaSatisfacao)
+      ? voz.pesquisaSatisfacao
+      : [voz.pesquisaSatisfacao];
+
+    const pesquisaHTML = lista.map(p => `
+      <div class="resumo-card">
+        <div class="titulo">${p.nome}</div>
+        <div><strong>Pergunta:</strong> ${p.pergunta}</div>
+        <div class="lista">
+          ${(p.respostas || []).map(r =>
+            `<span class="chip">${r.label || r.texto || r.valor}</span>`
+          ).join("")}
+        </div>
+      </div>
+    `).join("");
+
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>📊 Pesquisa de Satisfação</h2>
+        <div class="resumo-grid">${pesquisaHTML}</div>
+      </section>
+    `;
+  }
+
+  /* ===== URAS ===== */
+  if (voz.uras?.length) {
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>🎙️ URAs</h2>
+        <div class="resumo-grid">
+          ${voz.uras.map(u => `
+            <div class="resumo-card">
+              <div class="titulo">${u.nome}</div>
+              <div><em>${u.mensagem}</em></div>
+              <div class="lista">
+                ${(u.opcoes || []).map(o =>
+                  `<span class="chip">Tecla ${o.tecla} → ${identificarDestino(o.destino, voz)}</span>`
+                ).join("")}
+              </div>
+            </div>
+          `).join("")}
         </div>
       </section>
     `;
   }
 });
-
-/* ===== VOLTAR ===== */
-window.voltar = () => {
-  window.location.href = "index.html";
-};
