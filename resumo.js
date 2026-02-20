@@ -197,33 +197,50 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ===== PESQUISA DE SATISFAÇÃO (COMPLETA, SEM OMITIR NADA) ===== */
+  /* ===== PESQUISA DE SATISFAÇÃO (LEITURA REAL DO FORMULÁRIO) ===== */
 if (voz.pesquisaSatisfacao) {
   const pesquisas = Array.isArray(voz.pesquisaSatisfacao)
     ? voz.pesquisaSatisfacao
     : [voz.pesquisaSatisfacao];
 
   const pesquisaHTML = pesquisas.map(p => {
+    const introducao =
+      p.introducao ??
+      p.textoIntroducao ??
+      p.descricao ??
+      "";
+
+    const pergunta =
+      p.pergunta ??
+      p.textoPergunta ??
+      "";
+
+    const mensagemFinal =
+      p.finalizacao ??
+      p.mensagemFinal ??
+      p.mensagem_final ??
+      p.agradecimento ??
+      p.textoFinal ??
+      "";
+
     const respostasRaw = Array.isArray(p.respostas) ? p.respostas : [];
 
     const respostasHTML = respostasRaw.length
       ? respostasRaw.map((r, i) => {
-          let texto = "";
+          let textoResposta = "";
 
           if (typeof r === "string" || typeof r === "number") {
-            texto = r;
+            textoResposta = r;
           } else if (typeof r === "object" && r !== null) {
-            texto =
+            textoResposta =
               r.texto ??
               r.label ??
-              r.valor ??
+              r.descricao ??
               r.nota ??
               JSON.stringify(r);
-          } else {
-            texto = "Resposta não identificada";
           }
 
-          return `<div>${i + 1} - ${texto}</div>`;
+          return `<div>${i + 1} - ${textoResposta}</div>`;
         }).join("")
       : `<div><em>Nenhuma resposta cadastrada</em></div>`;
 
@@ -233,12 +250,12 @@ if (voz.pesquisaSatisfacao) {
 
         <div class="info-linha">
           <strong>Introdução:</strong><br>
-          ${p.introducao || "<em>Não informada</em>"}
+          ${introducao || "<em>Não informada</em>"}
         </div>
 
         <div class="info-linha">
           <strong>Pergunta:</strong><br>
-          ${p.pergunta || "<em>Não informada</em>"}
+          ${pergunta || "<em>Não informada</em>"}
         </div>
 
         <div class="info-linha">
@@ -248,7 +265,7 @@ if (voz.pesquisaSatisfacao) {
 
         <div class="info-linha">
           <strong>Mensagem final:</strong><br>
-          ${p.finalizacao || "<em>Não informada</em>"}
+          ${mensagemFinal || "<em>Não informada</em>"}
         </div>
       </div>
     `;
