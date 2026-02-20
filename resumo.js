@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   resumo.innerHTML = "";
 
-  /* ===== FUNÇÃO: IDENTIFICAR DESTINO PELO NOME ===== */
+  /* ===== FUNÇÃO: IDENTIFICAR DESTINO ===== */
   function identificarDestino(nome, voz) {
     if (!nome) return "Não definido";
 
@@ -197,67 +197,105 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
 
-    /* ===== REGRAS DE TEMPO (SEM DESTINO) ===== */
-      if (voz.regras_tempo?.length) {
-        resumo.innerHTML += `
-          <section class="resumo-bloco">
-            <h2>⏰ Regras de Tempo</h2>
-            <div class="resumo-grid">
-              ${voz.regras_tempo.map(r => {
-      
-                let horariosHTML = "";
-      
-                // CASO 1 — horarios[]
-                if (r.horarios?.length) {
-                  horariosHTML = r.horarios
-                    .map(h => `🕒 ${h.inicio} até ${h.fim}`)
-                    .join("<br>");
-                }
-      
-                // CASO 2 — inicio / fim
-                else if (r.inicio && r.fim) {
-                  horariosHTML = `🕒 ${r.inicio} até ${r.fim}`;
-                }
-      
-                // CASO 3 — hora_inicio / hora_fim
-                else if (r.hora_inicio && r.hora_fim) {
-                  horariosHTML = `🕒 ${r.hora_inicio} até ${r.hora_fim}`;
-                }
-      
-                // FALLBACK
-                else {
-                  horariosHTML = "🕒 Horário não definido";
-                }
-      
-                return `
-                  <div class="resumo-card">
-                    <div class="titulo">${r.nome}</div>
-                    <div class="info-linha">
-                      Dias: ${(r.dias || []).join(", ")}
-                    </div>
-                    <div class="info-linha">
-                      ${horariosHTML}
-                    </div>
-                  </div>
-                `;
-              }).join("")}
-            </div>
-          </section>
-        `;
-      }
+    /* ===== REGRAS DE TEMPO ===== */
+    if (voz.regras_tempo?.length) {
+      resumo.innerHTML += `
+        <section class="resumo-bloco">
+          <h2>⏰ Regras de Tempo</h2>
+          <div class="resumo-grid">
+            ${voz.regras_tempo.map(r => {
 
-    /* ===== PAUSAS ===== */
-    if (voz.pausas?.length) {
+              let horariosHTML = "🕒 Horário não definido";
+
+              if (r.horarios?.length) {
+                horariosHTML = r.horarios
+                  .map(h => `🕒 ${h.inicio} até ${h.fim}`)
+                  .join("<br>");
+              } else if (r.inicio && r.fim) {
+                horariosHTML = `🕒 ${r.inicio} até ${r.fim}`;
+              } else if (r.hora_inicio && r.hora_fim) {
+                horariosHTML = `🕒 ${r.hora_inicio} até ${r.hora_fim}`;
+              }
+
+              return `
+                <div class="resumo-card">
+                  <div class="titulo">${r.nome}</div>
+                  <div class="info-linha">
+                    Dias: ${(r.dias || []).join(", ")}
+                  </div>
+                  <div class="info-linha">
+                    ${horariosHTML}
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+    /* ===== PAUSAS (ROBUSTO) ===== */
+    const pausas =
+      voz.pausas ||
+      voz.pausas_callcenter ||
+      voz.pausasCallCenter ||
+      voz.callcenter?.pausas ||
+      [];
+
+    if (pausas.length) {
       resumo.innerHTML += `
         <section class="resumo-bloco">
           <h2>⏸️ Pausas</h2>
           <div class="resumo-grid">
-            ${voz.pausas.map(p => `
+            ${pausas.map(p => `
               <div class="resumo-card">
-                <div class="titulo">${p.grupo}</div>
-                ${(p.itens || []).map(i =>
+                <div class="titulo">${p.grupo || p.nome}</div>
+                ${(p.itens || p.pausas || []).map(i =>
                   `<div class="info-linha">• ${i}</div>`
                 ).join("")}
+              </div>
+            `).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+    /* ===== PESQUISA DE SATISFAÇÃO ===== */
+    const pesquisas =
+      voz.pesquisa_satisfacao ||
+      voz.pesquisaSatisfacao ||
+      voz.pesquisa ||
+      [];
+
+    if (pesquisas.length) {
+      resumo.innerHTML += `
+        <section class="resumo-bloco">
+          <h2>📊 Pesquisa de Satisfação</h2>
+          <div class="resumo-grid">
+            ${pesquisas.map(p => `
+              <div class="resumo-card">
+                <div class="titulo">${p.nome}</div>
+
+                ${p.introducao
+                  ? `<div class="info-linha"><em>${p.introducao}</em></div>`
+                  : ""
+                }
+
+                ${p.pergunta
+                  ? `<div class="info-linha"><strong>Pergunta:</strong> ${p.pergunta}</div>`
+                  : ""
+                }
+
+                ${(p.respostas || []).length
+                  ? `
+                    <div class="lista">
+                      ${(p.respostas || []).map(r =>
+                        `<span class="chip">${r}</span>`
+                      ).join("")}
+                    </div>
+                  `
+                  : ""
+                }
               </div>
             `).join("")}
           </div>
