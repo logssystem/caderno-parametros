@@ -238,12 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let pausasLista = [];
     
     if (voz.pausas) {
-      if (Array.isArray(voz.pausas)) {
-        pausasLista = voz.pausas;
-      } else {
-        // quando vem como objeto único
-        pausasLista = [voz.pausas];
-      }
+      pausasLista = Array.isArray(voz.pausas) ? voz.pausas : [voz.pausas];
     }
     
     if (pausasLista.length) {
@@ -253,9 +248,9 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="resumo-grid">
             ${pausasLista.map(p => `
               <div class="resumo-card">
-                <div class="titulo">${p.grupo || p.nome || "Grupo de Pausa"}</div>
-                ${(p.itens || []).map(i =>
-                  `<div class="info-linha">• ${i}</div>`
+                <div class="titulo">${p.nome || p.grupo}</div>
+                ${(p.pausas || p.itens || []).map(item =>
+                  `<div class="info-linha">• ${item.nome || item.codigo}</div>`
                 ).join("")}
               </div>
             `).join("")}
@@ -264,16 +259,13 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
 
-  /* ===== PESQUISA DE SATISFAÇÃO ===== */
+/* ===== PESQUISA DE SATISFAÇÃO ===== */
 let pesquisasLista = [];
 
 if (voz.pesquisaSatisfacao) {
-  if (Array.isArray(voz.pesquisaSatisfacao)) {
-    pesquisasLista = voz.pesquisaSatisfacao;
-  } else {
-    // quando vem como objeto único
-    pesquisasLista = [voz.pesquisaSatisfacao];
-  }
+  pesquisasLista = Array.isArray(voz.pesquisaSatisfacao)
+    ? voz.pesquisaSatisfacao
+    : [voz.pesquisaSatisfacao];
 }
 
 if (pesquisasLista.length) {
@@ -283,12 +275,7 @@ if (pesquisasLista.length) {
       <div class="resumo-grid">
         ${pesquisasLista.map(p => `
           <div class="resumo-card">
-            <div class="titulo">${p.nome || "Pesquisa de Satisfação"}</div>
-
-            ${p.introducao
-              ? `<div class="info-linha"><em>${p.introducao}</em></div>`
-              : ""
-            }
+            <div class="titulo">${p.nome}</div>
 
             ${p.pergunta
               ? `<div class="info-linha"><strong>Pergunta:</strong> ${p.pergunta}</div>`
@@ -299,7 +286,7 @@ if (pesquisasLista.length) {
               ? `
                 <div class="lista">
                   ${(p.respostas || []).map(r =>
-                    `<span class="chip">${r}</span>`
+                    `<span class="chip">${r.label || r.texto || r.valor}</span>`
                   ).join("")}
                 </div>
               `
