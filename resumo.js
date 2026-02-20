@@ -26,6 +26,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   resumo.innerHTML = "";
 
+  /* ===== FUNÇÃO AUXILIAR DESTINO ===== */
+  function identificarDestino(destino = "") {
+    if (!destino) return "Não definido";
+
+    const d = destino.toLowerCase();
+
+    if (d.includes("fila")) return `📞 Fila — ${destino}`;
+    if (d.includes("ramal")) return `☎️ Ramal — ${destino}`;
+    if (d.includes("ura")) return `🎙️ URA — ${destino}`;
+    if (d.includes("ring")) return `🔔 Grupo de Ring — ${destino}`;
+    if (d.includes("tempo")) return `⏰ Regra de Tempo — ${destino}`;
+
+    return destino;
+  }
+
   /* ================= CLIENTE ================= */
   if (dados.cliente) {
     resumo.innerHTML += `
@@ -51,15 +66,12 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     const voz = dados.voz;
 
-    /* ===== MAPA RAMAL → USUÁRIO ===== */
     const mapaRamalUsuario = {};
     (voz.agentes || []).forEach(a => {
-      if (a.ramal && a.nome) {
-        mapaRamalUsuario[a.ramal] = a.nome;
-      }
+      if (a.ramal && a.nome) mapaRamalUsuario[a.ramal] = a.nome;
     });
 
-    /* ===== USUÁRIOS WEB ===== */
+    /* ===== USUÁRIOS ===== */
     if (voz.usuarios?.length) {
       resumo.innerHTML += `
         <section class="resumo-bloco">
@@ -118,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
 
-    /* ===== GRUPO DE RING ===== */
+    /* ===== GRUPO RING ===== */
     if (voz.grupo_ring?.length) {
       resumo.innerHTML += `
         <section class="resumo-bloco">
@@ -156,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
 
-    /* ===== NÚMEROS / ENTRADAS ===== */
+    /* ===== NÚMEROS ===== */
     if (voz.numeros?.length) {
       resumo.innerHTML += `
         <section class="resumo-bloco">
@@ -165,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ${voz.numeros.map(n => `
               <div class="resumo-card">
                 <div class="titulo">${n.numero}</div>
-                <div class="info-linha">Destino: ${n.destino}</div>
+                <div class="info-linha">Destino: ${identificarDestino(n.destino)}</div>
               </div>
             `).join("")}
           </div>
@@ -182,9 +194,17 @@ document.addEventListener("DOMContentLoaded", () => {
             ${voz.regras_tempo.map(r => `
               <div class="resumo-card">
                 <div class="titulo">${r.nome}</div>
-                <div class="info-linha">Dias: ${r.dias.join(", ")}</div>
-                <div class="info-linha">Horário: ${r.inicio} até ${r.fim}</div>
-                <div class="info-linha">Destino: ${r.destino}</div>
+                <div class="info-linha">Dias: ${(r.dias || []).join(", ")}</div>
+
+                ${
+                  r.periodos?.length
+                    ? r.periodos.map(p =>
+                        `<div class="info-linha">⏱ ${p.inicio} até ${p.fim}</div>`
+                      ).join("")
+                    : `<div class="info-linha">⏱ ${r.inicio} até ${r.fim}</div>`
+                }
+
+                <div class="info-linha">Destino: ${identificarDestino(r.destino)}</div>
               </div>
             `).join("")}
           </div>
@@ -221,7 +241,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="info-linha"><em>${u.mensagem}</em></div>
                 <div class="lista">
                   ${(u.opcoes || []).map(o =>
-                    `<div class="chip">Tecla ${o.tecla} → ${o.destino}</div>`
+                    `<div class="chip">
+                      Tecla ${o.tecla} → ${identificarDestino(o.destino)}
+                    </div>`
                   ).join("")}
                 </div>
               </div>
