@@ -330,6 +330,74 @@ if (voz.pesquisaSatisfacao) {
   }
 });
 
+/* ================= CHAT / OMNICHANNEL ================= */
+if (dados.chat) {
+  const chat = dados.chat;
+
+  let htmlChat = `
+    <section class="resumo-bloco">
+      <h2>💬 Atendimento por Chat</h2>
+      <div class="resumo-grid">
+  `;
+
+  /* ===== CONFIGURAÇÃO GERAL ===== */
+  htmlChat += `
+    <div class="resumo-card" style="max-width:100%">
+      <div class="titulo">Configuração do Chat</div>
+      <div><strong>Tipo:</strong> ${chat.tipo || "Não informado"}</div>
+      <div><strong>API:</strong> ${chat.api || "Não informada"}</div>
+      <div><strong>Conta:</strong> ${chat.conta || "Não informada"}</div>
+      <div><strong>Canais:</strong> ${(chat.canais || []).join(", ") || "Nenhum canal selecionado"}</div>
+    </div>
+  `;
+
+  /* ===== USUÁRIOS DO CHAT ===== */
+  if (chat.usuarios?.length) {
+    htmlChat += chat.usuarios.map(u => `
+      <div class="resumo-card">
+        <div class="titulo">${u.nome || "Usuário Chat"}</div>
+        <div>📧 ${u.email || "—"}</div>
+        <div>Permissões: ${(u.permissoes || []).join(", ") || "—"}</div>
+        ${u.agente ? `<span class="badge">Agente</span>` : ""}
+      </div>
+    `).join("");
+  }
+
+  /* ===== AGENTES OMNICHANNEL ===== */
+  if (chat.agentes?.length) {
+    htmlChat += chat.agentes.map(a => `
+      <div class="resumo-card">
+        <div class="titulo">${a.nome || "Agente Chat"}</div>
+        <div>👤 Usuário: ${a.usuario || "Não vinculado"}</div>
+        <div>
+          📂 Departamentos:
+          ${(a.departamentos || []).join(", ") || "Nenhum"}
+        </div>
+      </div>
+    `).join("");
+  }
+
+  /* ===== DEPARTAMENTOS ===== */
+  if (chat.departamentos?.length) {
+    htmlChat += chat.departamentos.map(d => `
+      <div class="resumo-card">
+        <div class="titulo">Departamento: ${d.nome}</div>
+        <div>
+          Agentes:
+          ${(d.agentes || []).join(", ") || "Nenhum agente vinculado"}
+        </div>
+      </div>
+    `).join("");
+  }
+
+  htmlChat += `
+      </div>
+    </section>
+  `;
+
+  resumo.innerHTML += htmlChat;
+}
+
 /*==============/*Voltar=============*/
 
 window.voltar = function () {
