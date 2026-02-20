@@ -262,8 +262,11 @@ if (voz.pesquisaSatisfacao) {
 
     // remove duplicados óbvios (introdução/pergunta)
     const textosLimpos = textosDetectados.filter(t =>
-      t !== introducao && t !== pergunta
-    );
+    t &&
+    t !== p.nome &&
+    t !== introducao &&
+    t !== pergunta
+  );
 
     return `
       <div class="resumo-card" style="max-width:100%">
@@ -326,3 +329,9 @@ if (voz.pesquisaSatisfacao) {
     `;
   }
 });
+
+/*==============/*Voltar=============*/
+
+window.voltar = function () {
+  window.location.href = "index.html";
+};
