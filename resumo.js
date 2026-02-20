@@ -197,33 +197,57 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ===== PESQUISA DE SATISFAÇÃO (SEM UNDEFINED) ===== */
+  /* ===== PESQUISA DE SATISFAÇÃO ===== */
   if (voz.pesquisaSatisfacao) {
     const lista = Array.isArray(voz.pesquisaSatisfacao)
       ? voz.pesquisaSatisfacao
       : [voz.pesquisaSatisfacao];
-
+  
     const pesquisaHTML = lista.map(p => {
-      const respostas = (p.respostas || []).map(r => {
-        if (typeof r === "number" || typeof r === "string") return r;
-        return r.nota ?? r.valor ?? r.texto ?? r.label;
-      }).filter(v => v !== undefined);
-
+      const respostasRaw = Array.isArray(p.respostas) ? p.respostas : [];
+  
+      const respostas = respostasRaw.map((r, i) => {
+        if (typeof r === "number" || typeof r === "string") {
+          return `(${i + 1}) ${r}`;
+        }
+        if (typeof r === "object" && r !== null) {
+          return `(${i + 1}) ${r.texto ?? r.label ?? r.valor ?? r.nota ?? "Resposta"}`;
+        }
+        return null;
+      }).filter(Boolean);
+  
       return `
         <div class="resumo-card">
-          <div class="titulo">${p.nome}</div>
-          <div><strong>Pergunta:</strong> ${p.pergunta}</div>
+          <div class="titulo">${p.nome || "Pesquisa de Satisfação"}</div>
+  
+          ${p.introducao
+            ? `<div class="info-linha"><em>${p.introducao}</em></div>`
+            : ""
+          }
+  
+          ${p.pergunta
+            ? `<div class="info-linha"><strong>Pergunta:</strong> ${p.pergunta}</div>`
+            : ""
+          }
+  
           ${
             respostas.length
-              ? `<div class="lista">
+              ? `
+                <div class="lista">
                   ${respostas.map(r => `<span class="chip">${r}</span>`).join("")}
-                </div>`
-              : `<div>Nenhuma resposta configurada</div>`
+                </div>
+              `
+              : `<div class="info-linha">⚠️ Nenhuma resposta configurada</div>`
+          }
+  
+          ${p.finalizacao
+            ? `<div class="info-linha"><em>${p.finalizacao}</em></div>`
+            : ""
           }
         </div>
       `;
     }).join("");
-
+  
     resumo.innerHTML += `
       <section class="resumo-bloco">
         <h2>📊 Pesquisa de Satisfação</h2>
