@@ -58,6 +58,7 @@ window.adicionarUsuarioChat = function () {
 
   const lbl = document.createElement("label");
   lbl.style.display = "flex";
+  lbl.style.alignItems = "center";
   lbl.style.gap = "6px";
   lbl.append(chkAgente, document.createTextNode(" Este usuário é agente omnichannel"));
 
@@ -126,20 +127,20 @@ window.adicionarDepartamentoChat = function () {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  const topo = document.createElement("div");
-  topo.style.display = "flex";
-  topo.style.gap = "8px";
+  const linhaTopo = document.createElement("div");
+  linhaTopo.style.display = "flex";
+  linhaTopo.style.gap = "8px";
 
-  const nome = document.createElement("input");
-  nome.placeholder = "Nome do departamento";
-  nome.style.flex = "1";
+  const inputNome = document.createElement("input");
+  inputNome.placeholder = "Nome do departamento";
+  inputNome.style.flex = "1";
 
-  const del = document.createElement("button");
-  del.textContent = "🗑";
-  del.onclick = () => wrap.remove();
+  const btnRemover = document.createElement("button");
+  btnRemover.textContent = "🗑";
+  btnRemover.onclick = () => wrap.remove();
 
-  topo.append(nome, del);
-  wrap.appendChild(topo);
+  linhaTopo.append(inputNome, btnRemover);
+  wrap.appendChild(linhaTopo);
 
   const listaAgentes = document.createElement("div");
   listaAgentes.style.marginTop = "8px";
@@ -155,18 +156,16 @@ window.adicionarDepartamentoChat = function () {
     const select = document.createElement("select");
     select.innerHTML = `<option value="">Selecione um agente</option>`;
 
-    document
-      .querySelectorAll("#listaAgentesChat .campo-descricao")
-      .forEach(a => {
-        const d = a.getData?.();
-        if (d?.nome) select.add(new Option(d.nome, d.nome));
-      });
+    document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
+      const d = a.getData?.();
+      if (d?.nome) select.add(new Option(d.nome, d.nome));
+    });
 
-    const x = document.createElement("button");
-    x.textContent = "✖";
-    x.onclick = () => linha.remove();
+    const del = document.createElement("button");
+    del.textContent = "✖";
+    del.onclick = () => linha.remove();
 
-    linha.append(select, x);
+    linha.append(select, del);
     listaAgentes.appendChild(linha);
   };
 
@@ -175,7 +174,7 @@ window.adicionarDepartamentoChat = function () {
     listaAgentes.querySelectorAll("select").forEach(s => {
       if (s.value) agentes.push(s.value);
     });
-    return { nome: nome.value.trim(), agentes };
+    return { nome: inputNome.value.trim(), agentes };
   };
 
   wrap.append(listaAgentes, btnAdd);
@@ -187,10 +186,11 @@ window.adicionarDepartamentoChat = function () {
    ===================================================== */
 function validarSenha(input, regrasEl) {
   const v = input.value || "";
+
   if (!v.length) {
     regrasEl.innerHTML =
       `<div class="regra-neutra">Mín. 11 | Maiúscula | Número | Especial</div>`;
-    return;
+    return false;
   }
 
   const ok =
@@ -202,10 +202,12 @@ function validarSenha(input, regrasEl) {
   regrasEl.innerHTML = ok
     ? `<div class="regra-ok">Senha válida</div>`
     : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
+
+  return ok;
 }
 
 /* =====================================================
-   COLETA FINAL PARA O JSON (SALVAR) ✅ AJUSTADA
+   🔥 COLETA FINAL – ÚNICA PARTE AJUSTADA 🔥
    ===================================================== */
 window.coletarChatDoDOM = function () {
   const chat = {
@@ -222,21 +224,21 @@ window.coletarChatDoDOM = function () {
     .querySelectorAll("#listaUsuariosChat .campo-descricao")
     .forEach(u => {
       const d = u.getData?.();
-      if (d?.nome) chat.usuarios.push(d);
+      if (d && d.nome) chat.usuarios.push(d);
     });
 
   document
     .querySelectorAll("#listaAgentesChat .campo-descricao")
     .forEach(a => {
       const d = a.getData?.();
-      if (d?.nome) chat.agentes.push(d);
+      if (d && d.nome) chat.agentes.push(d);
     });
 
   document
     .querySelectorAll("#listaDepartamentosChat .campo-descricao")
     .forEach(d => {
       const data = d.getData?.();
-      if (data?.nome) chat.departamentos.push(data);
+      if (data && data.nome) chat.departamentos.push(data);
     });
 
   return chat;
