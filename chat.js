@@ -361,3 +361,38 @@ window.coletarChatDoDOM = function () {
       .filter(Boolean)
   };
 };
+
+/* =====================================================
+   FUNÇÕES GLOBAIS ESPERADAS PELO HTML (API / QR)
+   ===================================================== */
+
+window.selecionarTipoChat = function (tipo) {
+  window.chatState.tipo = tipo;
+
+  // mantém compatibilidade visual
+  document.querySelectorAll("[data-tipo-chat]").forEach(el => {
+    el.classList.toggle("ativo", el.dataset.tipoChat === tipo);
+  });
+
+  console.log("Tipo de chat selecionado:", tipo);
+};
+
+window.selecionarApiChat = function (api) {
+  window.chatState.api = api;
+  console.log("API selecionada:", api);
+};
+
+window.selecionarContaChat = function (conta) {
+  window.chatState.conta = conta;
+  console.log("Conta selecionada:", conta);
+};
+
+window.toggleCanalChat = function (canal) {
+  const canais = window.chatState.canais;
+  const idx = canais.indexOf(canal);
+
+  if (idx >= 0) canais.splice(idx, 1);
+  else canais.push(canal);
+
+  console.log("Canais ativos:", canais);
+};
