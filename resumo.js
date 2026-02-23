@@ -4,15 +4,25 @@
 window.renderResumoChat = function (container, data) {
   if (!data || !data.chat || !data.chat.tipo) return;
 
-  const {
-    tipo,
-    api,
-    conta,
-    canais = [],
-    usuarios = [],
-    agentes = [],
-    departamentos = []
-  } = data.chat;
+  const chat = data.chat;
+
+  // 🔁 Compatibilidade com estrutura real do chat.js
+  const usuarios =
+    chat.usuarios ||
+    chat.usuariosChat ||
+    [];
+
+  const agentes =
+    chat.agentes ||
+    chat.agentesChat ||
+    [];
+
+  const departamentos =
+    chat.departamentos ||
+    chat.departamentosChat ||
+    [];
+
+  const canais = chat.canais || [];
 
   const section = document.createElement("section");
   section.className = "resumo-bloco";
@@ -21,24 +31,27 @@ window.renderResumoChat = function (container, data) {
     <h2>💬 Chat / Omnichannel</h2>
 
     <div class="resumo-card">
-      <div><strong>Tipo:</strong> ${tipo}</div>
-      ${api ? `<div><strong>API:</strong> ${api}</div>` : ""}
-      ${conta ? `<div><strong>Conta:</strong> ${conta}</div>` : ""}
+      <div class="resumo-linha"><strong>Tipo:</strong> ${chat.tipo}</div>
+      ${chat.api ? `<div class="resumo-linha"><strong>API:</strong> ${chat.api}</div>` : ""}
+      ${chat.conta ? `<div class="resumo-linha"><strong>Conta:</strong> ${chat.conta}</div>` : ""}
 
       ${
         canais.length
-          ? `<div class="lista">
-              ${canais.map(c => `<span class="chip">${c}</span>`).join("")}
+          ? `<div class="resumo-linha">
+              <strong>Canais:</strong>
+              <div class="lista">
+                ${canais.map(c => `<span class="chip">${c}</span>`).join("")}
+              </div>
             </div>`
           : ""
       }
 
       ${
         usuarios.length
-          ? `<div class="info-linha">
+          ? `<div class="resumo-linha">
               <strong>Usuários Chat:</strong>
               <ul>
-                ${usuarios.map(u => `<li>${u.nome} (${u.email})</li>`).join("")}
+                ${usuarios.map(u => `<li>${u.nome || u.email || u}</li>`).join("")}
               </ul>
             </div>`
           : ""
@@ -46,10 +59,10 @@ window.renderResumoChat = function (container, data) {
 
       ${
         agentes.length
-          ? `<div class="info-linha">
+          ? `<div class="resumo-linha">
               <strong>Agentes Chat:</strong>
               <ul>
-                ${agentes.map(a => `<li>${a.nome}</li>`).join("")}
+                ${agentes.map(a => `<li>${a.nome || a}</li>`).join("")}
               </ul>
             </div>`
           : ""
@@ -57,11 +70,11 @@ window.renderResumoChat = function (container, data) {
 
       ${
         departamentos.length
-          ? `<div class="info-linha">
+          ? `<div class="resumo-linha">
               <strong>Departamentos:</strong>
               ${departamentos.map(d => `
                 <div style="margin-top:6px">
-                  <strong>${d.nome}</strong>
+                  <strong>${d.nome || d}</strong>
                   <div class="lista">
                     ${(d.agentes || []).map(a => `<span class="chip">${a}</span>`).join("")}
                   </div>
