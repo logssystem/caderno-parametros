@@ -6,9 +6,22 @@ window.renderResumoChat = function (container, data) {
 
   const chat = data.chat;
 
-  const usuarios = Array.isArray(chat.usuarios) ? chat.usuarios : [];
-  const agentes = Array.isArray(chat.agentes) ? chat.agentes : [];
-  const departamentos = Array.isArray(chat.departamentos) ? chat.departamentos : [];
+  // ===== NORMALIZAÇÃO SEGURA (AJUSTE CRÍTICO) =====
+  const usuarios =
+    Array.isArray(chat.usuarios) && chat.usuarios.length
+      ? chat.usuarios
+      : [];
+
+  const agentes =
+    Array.isArray(chat.agentes) && chat.agentes.length
+      ? chat.agentes
+      : [];
+
+  const departamentos =
+    Array.isArray(chat.departamentos) && chat.departamentos.length
+      ? chat.departamentos
+      : [];
+
   const canais = Array.isArray(chat.canais) ? chat.canais : [];
 
   if (
@@ -187,82 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
               <div class="titulo">${a.nome}</div>
               <div>📞 Ramal: ${a.ramal || "Não vinculado"}</div>
               ${a.multiskill ? `<span class="badge">Multiskill</span>` : ""}
-            </div>
-          `).join("")}
-        </div>
-      </section>
-    `;
-  }
-
-  /* ===== FILAS ===== */
-  if (voz.filas?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco">
-        <h2>👥 Filas</h2>
-        <div class="resumo-grid">
-          ${voz.filas.map(f => `
-            <div class="resumo-card">
-              <div class="titulo">${f.nome}</div>
-              <div class="lista">
-                ${(f.agentes || []).map(a => `<span class="chip">${a}</span>`).join("")}
-              </div>
-            </div>
-          `).join("")}
-        </div>
-      </section>
-    `;
-  }
-
-  /* ===== RAMAIS ===== */
-  if (voz.ramais?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco">
-        <h2>📞 Ramais</h2>
-        <div class="resumo-grid">
-          ${voz.ramais.map(r => `
-            <div class="resumo-card">
-              <div class="titulo">${r.ramal}</div>
-              <div>🔐 ${r.senha}</div>
-              <div>👤 ${mapaRamalUsuario[r.ramal] || "Não vinculado"}</div>
-            </div>
-          `).join("")}
-        </div>
-      </section>
-    `;
-  }
-
-  /* ===== NÚMEROS ===== */
-  if (voz.entradas?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco">
-        <h2>📲 Números</h2>
-        <div class="resumo-grid">
-          ${voz.entradas.map(n => `
-            <div class="resumo-card">
-              <div class="titulo">${n.numero}</div>
-              <div>${identificarDestino(n.destino, voz)}</div>
-            </div>
-          `).join("")}
-        </div>
-      </section>
-    `;
-  }
-
-  /* ===== URAS ===== */
-  if (voz.uras?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco">
-        <h2>🎙️ URAs</h2>
-        <div class="resumo-grid">
-          ${voz.uras.map(u => `
-            <div class="resumo-card">
-              <div class="titulo">${u.nome}</div>
-              <div><em>${u.mensagem}</em></div>
-              <div class="lista">
-                ${(u.opcoes || []).map(o =>
-                  `<span class="chip">Tecla ${o.tecla} → ${identificarDestino(o.destino, voz)}</span>`
-                ).join("")}
-              </div>
             </div>
           `).join("")}
         </div>
