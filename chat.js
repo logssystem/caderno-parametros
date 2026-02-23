@@ -332,114 +332,43 @@ function validarSenha(input, regrasEl) {
 }
 
 /* =====================================================
-   COLETA FINAL PARA O JSON (SALVAR) – COMPATÍVEL
+   COLETA FINAL PARA O JSON (SALVAR)
    ===================================================== */
 window.coletarChatDoDOM = function () {
-  return {
+  const chat = {
     tipo: window.chatState?.tipo || null,
     api: window.chatState?.api || null,
     conta: window.chatState?.conta || null,
     canais: window.chatState?.canais || [],
-
-    // 👇 coleta REAL baseada no DOM atual
-    usuarios: Array.from(
-      document.querySelectorAll("#listaUsuariosChat .campo-descricao")
-    )
-      .map(u => u.getData?.())
-      .filter(Boolean),
-
-    agentes: Array.from(
-      document.querySelectorAll("#listaAgentesChat .campo-descricao")
-    )
-      .map(a => a.getData?.())
-      .filter(Boolean),
-
-    departamentos: Array.from(
-      document.querySelectorAll("#listaDepartamentosChat .campo-descricao")
-    )
-      .map(d => d.getData?.())
-      .filter(Boolean)
+    usuarios: [],
+    agentes: [],
+    departamentos: []
   };
-};
 
-/* =====================================================
-   FUNÇÕES GLOBAIS ESPERADAS PELO HTML (API / QR)
-   ===================================================== */
-
-window.selecionarTipoChat = function (tipo) {
-  window.chatState.tipo = tipo;
-
-  // mantém compatibilidade visual
-  document.querySelectorAll("[data-tipo-chat]").forEach(el => {
-    el.classList.toggle("ativo", el.dataset.tipoChat === tipo);
+  // usuários
+  document.querySelectorAll(".usuario-chat").forEach(el => {
+    chat.usuarios.push({
+      nome: el.querySelector(".nome")?.value || "",
+      email: el.querySelector(".email")?.value || ""
+    });
   });
 
-  console.log("Tipo de chat selecionado:", tipo);
+  // agentes
+  document.querySelectorAll(".agente-chat").forEach(el => {
+    chat.agentes.push({
+      nome: el.dataset.nome,
+      usuario: el.dataset.usuario,
+      departamentos: JSON.parse(el.dataset.departamentos || "[]")
+    });
+  });
+
+  // departamentos
+  document.querySelectorAll(".departamento-chat").forEach(el => {
+    chat.departamentos.push({
+      nome: el.dataset.nome,
+      agentes: JSON.parse(el.dataset.agentes || "[]")
+    });
+  });
+
+  return chat;
 };
-
-window.selecionarApiChat = function (api) {
-  window.chatState.api = api;
-  console.log("API selecionada:", api);
-};
-
-window.selecionarContaChat = function (conta) {
-  window.chatState.conta = conta;
-  console.log("Conta selecionada:", conta);
-};
-
-window.toggleCanalChat = function (canal) {
-  const canais = window.chatState.canais;
-  const idx = canais.indexOf(canal);
-
-  if (idx >= 0) canais.splice(idx, 1);
-  else canais.push(canal);
-
-  console.log("Canais ativos:", canais);
-};
-
-/* =====================================================
-   COMPATIBILIDADE GLOBAL (HTML ↔ CHAT)
-   ===================================================== */
-
-// Tipo de integração (API / QR)
-window.selecionarTipoChat = window.selecionarTipoChat || function (tipo) {
-  window.chatState.tipo = tipo;
-  console.log("[chat] tipo:", tipo);
-};
-
-// API (meta, zapi, etc)
-window.selecionarApiChat = window.selecionarApiChat || function (api) {
-  window.chatState.api = api;
-  console.log("[chat] api:", api);
-};
-
-// Conta
-window.selecionarContaChat = window.selecionarContaChat || function (conta) {
-  window.chatState.conta = conta;
-  console.log("[chat] conta:", conta);
-};
-
-// Canal (whatsapp, instagram, etc)
-window.toggleCanalChat = window.toggleCanalChat || function (canal) {
-  const c = window.chatState.canais;
-  const i = c.indexOf(canal);
-  if (i >= 0) c.splice(i, 1);
-  else c.push(canal);
-  console.log("[chat] canais:", c);
-};
-
-// CSV
-window.acionarImportacaoUsuariosChat =
-  window.acionarImportacaoUsuariosChat || function () {
-    console.warn("acionarImportacaoUsuariosChat não ligado");
-  };
-
-window.baixarTemplateUsuariosChat =
-  window.baixarTemplateUsuariosChat || function () {
-    console.warn("baixarTemplateUsuariosChat não ligado");
-  };
-
-// Toast (fallback)
-if (typeof window.mostrarToast !== "function") {
-  window.mostrarToast = msg => console.log("[toast]", msg);
-}
