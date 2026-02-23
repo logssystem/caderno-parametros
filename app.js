@@ -1179,7 +1179,6 @@ function coletarEntradas() {
 /* ================= CHAT – COLETA FINAL ================= */
 
 window.coletarChatDoDOM = function () {
-
   const chat = {
     tipo: window.chatState?.tipo || null,
     api: window.chatState?.api || null,
@@ -1190,31 +1189,27 @@ window.coletarChatDoDOM = function () {
     departamentos: []
   };
 
-  // usuários chat
-  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
+  /* ================= USUÁRIOS CHAT ================= */
+  document.querySelectorAll("[data-chat-usuario]").forEach(u => {
     chat.usuarios.push({
-      nome: u.getNome?.() || "",
-      email: u.getEmail?.() || "",
-      permissao: u.getPermissao?.() || ""
+      nome: u.dataset.nome || "",
+      email: u.dataset.email || "",
+      permissao: u.dataset.permissao || ""
     });
   });
 
-  // departamentos
-  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
-    const nome = d.querySelector(".campo-nome")?.value || "";
-    if (!nome) return;
-
+  /* ================= DEPARTAMENTOS ================= */
+  document.querySelectorAll("[data-chat-departamento]").forEach(d => {
     chat.departamentos.push({
-      nome,
+      nome: d.dataset.nome || "",
       agentes: JSON.parse(d.dataset.agentes || "[]")
     });
   });
 
-  // agentes chat
-  document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
+  /* ================= AGENTES CHAT ================= */
+  document.querySelectorAll("[data-chat-agente]").forEach(a => {
     chat.agentes.push({
-      nome: a.querySelector(".campo-nome")?.value || "",
-      usuario: a.dataset.usuario || "",
+      nome: a.dataset.nome || "",
       departamentos: JSON.parse(a.dataset.departamentos || "[]")
     });
   });
