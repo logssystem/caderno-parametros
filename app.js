@@ -1510,7 +1510,16 @@ if (agentesSemRamal.length) {
       }
     };
 
-    if (chat && chat.tipo) {
+   // ✅ salva chat sempre que houver qualquer dado relevante
+    if (
+      chat &&
+      (
+        chat.tipo ||
+        chat.usuarios.length ||
+        chat.agentes.length ||
+        chat.departamentos.length
+      )
+    ) {
       dados.chat = chat;
     }
 
