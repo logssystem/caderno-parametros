@@ -1178,16 +1178,20 @@ function coletarEntradas() {
 
 /* ================= CHAT – COLETA FINAL ================= */
 
+/* ================= CHAT – COLETA FINAL (CORRETA) ================= */
 window.coletarChatDoDOM = function () {
-  const chat = {
-    tipo: window.chatState?.tipo || null,
-    api: window.chatState?.api || null,
-    conta: window.chatState?.conta || null,
-    canais: window.chatState?.canais || [],
-    usuarios: [],
-    agentes: [],
-    departamentos: []
+  if (!window.chatState) return null;
+
+  return {
+    tipo: window.chatState.tipo || null,
+    api: window.chatState.api || null,
+    conta: window.chatState.conta || null,
+    canais: window.chatState.canais || [],
+    usuarios: window.chatState.usuarios || [],
+    agentes: window.chatState.agentes || [],
+    departamentos: window.chatState.departamentos || []
   };
+};
 
   /* ================= USUÁRIOS CHAT ================= */
   document.querySelectorAll("[data-chat-usuario]").forEach(u => {
