@@ -245,24 +245,47 @@ window.coletarChatDoDOM = function () {
 };
 
 /* =====================================================
-   ALIASES DE COMPATIBILIDADE – IMPORTAÇÃO CSV CHAT
-   (NÃO REMOVER)
+   COMPATIBILIDADE – IMPORTAÇÃO CSV CHAT (LEGADO)
+   NÃO REMOVER – usado pelo HTML antigo
    ===================================================== */
 
-// nome oficial
-window.acionarImportacaoUsuariosChat =
-  window.acionarImportacaoUsuariosChat || function () {
-    console.error("Função principal de importação não encontrada");
+// função base REAL (já existe no seu código)
+if (typeof window.acionarImportacaoUsuariosChat !== "function") {
+  window.acionarImportacaoUsuariosChat = function () {
+    const input = document.getElementById("importUsuariosChat");
+    if (!input) {
+      console.warn("Input importUsuariosChat não encontrado");
+      return;
+    }
+
+    input.value = "";
+    input.click();
+
+    input.onchange = () => {
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        if (typeof processarCSVUsuariosChat === "function") {
+          processarCSVUsuariosChat(e.target.result);
+        } else {
+          console.error("processarCSVUsuariosChat não encontrada");
+        }
+      };
+      reader.readAsText(file);
+    };
   };
+}
 
-// aliases para HTML antigo / typo
-window.acionarImporttacaoUsuariosChat =
+/* ===== ALIASES DE SEGURANÇA (HTML antigo) ===== */
+window.acionarImportacaoUsuariosChatCSV =
   window.acionarImportacaoUsuariosChat;
 
-window.acionarImportacaoUsuarioChat =
+window.importarUsuariosChat =
   window.acionarImportacaoUsuariosChat;
 
-window.acionarImportacaoUsuarios =
+window.importarUsuariosChatCSV =
   window.acionarImportacaoUsuariosChat;
 
-console.log("✅ Aliases de importação CSV Chat registrados");
+console.log("✅ Compatibilidade CSV Chat carregada");
