@@ -4,9 +4,14 @@ document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.toggle("dark", temaSalvo === "dark");
 
   /* ===== DADOS ===== */
-  const raw = localStorage.getItem("CONFIG_CADERNO");
+   const raw = localStorage.getItem("CONFIG_CADERNO");
   if (!raw) return;
-
+  
+  const data = JSON.parse(raw);
+  
+  // ⚠️ NÃO mexe em nada do PABX acima ou abaixo disso
+  renderResumoChat(containerResumo, data);
+  
   let dados;
   try {
     dados = JSON.parse(raw);
@@ -333,8 +338,8 @@ if (voz.pesquisaSatisfacao) {
 /* =======================
    RESUMO – CHAT / OMNICHANNEL
    ======================= */
-function renderResumoChat(container) {
-  if (!window.chatState || !window.chatState.tipo) return;
+function renderResumoChat(container, data) {
+  if (!data?.chat || !data.chat.tipo) return;
 
   const {
     tipo,
@@ -344,7 +349,7 @@ function renderResumoChat(container) {
     usuarios = [],
     agentes = [],
     departamentos = []
-  } = window.chatState;
+  } = data.chat;
 
   const card = document.createElement("div");
   card.className = "resumo-card";
@@ -358,7 +363,8 @@ function renderResumoChat(container) {
 
     ${
       canais.length
-        ? `<div class="resumo-linha"><strong>Canais:</strong>
+        ? `<div class="resumo-linha">
+            <strong>Canais:</strong>
             <div class="resumo-chips">
               ${canais.map(c => `<span class="chip">${c}</span>`).join("")}
             </div>
@@ -392,24 +398,18 @@ function renderResumoChat(container) {
       departamentos.length
         ? `<div class="resumo-bloco">
             <strong>Departamentos</strong>
-            ${departamentos
-              .map(
-                d => `
-                  <div class="resumo-departamento">
-                    <div><strong>${d.nome}</strong></div>
-                    ${
-                      d.agentes?.length
-                        ? `<div class="resumo-chips">
-                            ${d.agentes
-                              .map(a => `<span class="chip">${a}</span>`)
-                              .join("")}
-                          </div>`
-                        : `<div class="resumo-vazio">Sem agentes</div>`
-                    }
-                  </div>
-                `
-              )
-              .join("")}
+            ${departamentos.map(d => `
+              <div class="resumo-departamento">
+                <div><strong>${d.nome}</strong></div>
+                ${
+                  d.agentes?.length
+                    ? `<div class="resumo-chips">
+                        ${d.agentes.map(a => `<span class="chip">${a}</span>`).join("")}
+                      </div>`
+                    : `<div class="resumo-vazio">Sem agentes</div>`
+                }
+              </div>
+            `).join("")}
           </div>`
         : ""
     }
