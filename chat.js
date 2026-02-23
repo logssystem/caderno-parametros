@@ -1,12 +1,12 @@
-console.log("CHAT.JS FINAL – ESTÁVEL (STATE ÚNICO COESO)");
+console.log("CHAT.JS FINAL – ESTÁVEL (USUÁRIOS + AGENTES + DEPARTAMENTOS)");
 
 /* =====================================================
-   STATE ÚNICO DO CHAT (FONTE DA VERDADE)
+   STATE ÚNICO DO CHAT
    ===================================================== */
 window.chatState = window.chatState || {
-  tipo: null,
-  api: null,
-  conta: null,
+  tipo: "",
+  api: "",
+  conta: "",
   canais: [],
   usuarios: [],
   agentes: [],
@@ -25,7 +25,7 @@ window.adicionarUsuarioChat = function () {
 
   const nome = document.createElement("input");
   nome.placeholder = "Nome do usuário";
-  nome.className = "campo-nome";
+  nome.classList.add("campo-nome");
 
   const email = document.createElement("input");
   email.type = "email";
@@ -33,14 +33,21 @@ window.adicionarUsuarioChat = function () {
 
   const senha = document.createElement("input");
   senha.placeholder = "Senha";
-  senha.className = "campo-senha";
+  senha.classList.add("campo-senha");
 
   const regras = document.createElement("div");
   validarSenha(senha, regras);
   senha.oninput = () => validarSenha(senha, regras);
 
+  // ===== PERMISSÃO (MANUAL – PADRÃO PABX) =====
   const permissao = document.createElement("select");
-  permissao.append(new Option("Selecione a permissão (opcional)", ""));
+  permissao.style.marginTop = "8px";
+
+  const opt0 = new Option("Selecione a permissão (opcional)", "");
+  opt0.disabled = true;
+  opt0.selected = true;
+  permissao.appendChild(opt0);
+
   [
     "Administrador do Módulo de Omnichannel",
     "Supervisor(a) Omnichannel",
@@ -52,6 +59,7 @@ window.adicionarUsuarioChat = function () {
 
   const lbl = document.createElement("label");
   lbl.style.display = "flex";
+  lbl.style.alignItems = "center";
   lbl.style.gap = "6px";
   lbl.append(chkAgente, document.createTextNode(" Este usuário é agente omnichannel"));
 
@@ -59,9 +67,10 @@ window.adicionarUsuarioChat = function () {
   del.textContent = "✖";
   del.onclick = () => {
     wrap.remove();
-    syncChatStateFromDOM();
+    gerarAgentesChatAPartirUsuarios();
   };
 
+  // 🔹 DADOS PARA SALVAR
   wrap.getData = () => ({
     nome: nome.value.trim(),
     email: email.value.trim(),
@@ -70,155 +79,313 @@ window.adicionarUsuarioChat = function () {
     agente: chkAgente.checked
   });
 
-  chkAgente.onchange = syncChatStateFromDOM;
+  chkAgente.onchange = gerarAgentesChatAPartirUsuarios;
 
-  wrap.append(nome, email, senha, regras, permissao, lbl, del);
+  wrap.append(
+    nome,
+    email,
+    senha,
+    regras,
+    permissao,
+    lbl,
+    del
+  );
+
   lista.appendChild(wrap);
 
-  syncChatStateFromDOM();
+  return wrap; // 🔴 ESSENCIAL para importação CSV
 };
 
+/* ================= TEMPLATE CSV – USUÁRIOS CHAT (PADRÃO PABX) ================= */
+
+window.baixarTemplateUsuariosChat = function () {
+  const csv = [
+    "usuario;email;senha;permissao;agente;;;;permissoes_disponiveis",
+    "teste;teste@empresa.com;Senha@12345;Agente Omnichannel;sim;;;;",
+    ";;;;;;;;;Administrador do Modulo de Omnichannel",
+    ";;;;;;;;;Supervisor(a) Omnichannel",
+    ";;;;;;;;;Agente Omnichannel"
+  ].join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "template_usuarios_chat.csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  URL.revokeObjectURL(url);
+};
+
+/* ================= IMPORTAÇÃO CSV USUÁRIOS CHAT ================= */
+
+window.acionarImportacaoUsuariosChat = function () {
+  const input = document.getElementById("importUsuariosChat");
+  if (!input) return;
+
+  input.value = "";
+  input.click();
+
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => processarCSVUsuariosChat(e.target.result);
+    reader.readAsText(file);
+  };
+};
+
+function processarCSVUsuariosChat(texto) {
+  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
+  if (linhas.length < 2) return;
+
+  const sep = linhas[0].includes(";") ? ";" : ",";
+  const header = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
+
+  linhas.forEach(linha => {
+    const valores = linha.split(sep);
+    const d = {};
+    header.forEach((h, i) => d[h] = (valores[i] || "").trim());
+
+    // ❌ ignora usuário vazio
+    if (!d.usuario) return;
+
+    // ❌ evita duplicar
+    const existe = [...document.querySelectorAll("#listaUsuariosChat .campo-nome")]
+      .some(i => i.value === d.usuario);
+
+    if (existe) return;
+
+    const wrap = adicionarUsuarioChat(true);
+
+    wrap.querySelector(".campo-nome").value = d.usuario;
+    wrap.querySelector("input[type=email]").value = d.email || "";
+    wrap.querySelector(".campo-senha").value = d.senha || "";
+
+    // permissão
+    const select = wrap.querySelector("select");
+    if (select && d.permissao) {
+      [...select.options].forEach(opt => {
+        if (opt.value.toLowerCase() === d.permissao.toLowerCase()) {
+          opt.selected = true;
+        }
+      });
+    }
+
+    // agente
+    if (d.agente?.toLowerCase() === "sim") {
+      wrap.querySelector("input[type=checkbox]")?.click();
+    }
+  });
+
+  mostrarToast("Usuários do chat importados com sucesso!");
+}
+
 /* =====================================================
-   DEPARTAMENTOS CHAT
+   AGENTES CHAT (GERADOS DOS USUÁRIOS)
    ===================================================== */
-window.adicionarDepartamentoChat = function () {
+function gerarAgentesChatAPartirUsuarios() {
+  const lista = document.getElementById("listaAgentesChat");
+  if (!lista) return;
+
+  lista.innerHTML = "";
+
+  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
+    const data = u.getData?.();
+    if (data?.agente && data.nome) {
+      const wrap = document.createElement("div");
+      wrap.className = "campo-descricao";
+
+      const nome = document.createElement("input");
+      nome.value = data.nome;
+      nome.disabled = true;
+
+      wrap.getData = () => ({
+        nome: data.nome,
+        usuario: data.email,
+        senha: data.senha,
+        departamentos: [] // preenchido no salvar
+      });
+
+      wrap.append(nome);
+      lista.appendChild(wrap);
+    }
+  });
+}
+
+/* =====================================================
+   DEPARTAMENTOS CHAT (MODELO PABX)
+   ===================================================== */
+  window.adicionarDepartamentoChat = function () {
   const lista = document.getElementById("listaDepartamentosChat");
   if (!lista) return;
 
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  const topo = document.createElement("div");
-  topo.style.display = "flex";
-  topo.style.gap = "8px";
+  /* ===== LINHA TOPO (NOME + REMOVER) ===== */
+  const linhaTopo = document.createElement("div");
+  linhaTopo.style.display = "flex";
+  linhaTopo.style.gap = "8px";
+  linhaTopo.style.alignItems = "center";
 
-  const nome = document.createElement("input");
-  nome.placeholder = "Nome do departamento";
-  nome.style.flex = "1";
+  const inputNome = document.createElement("input");
+  inputNome.placeholder = "Nome do departamento";
+  inputNome.style.flex = "1";
 
-  const del = document.createElement("button");
-  del.textContent = "🗑";
-  del.onclick = () => {
+  const btnRemoverDepto = document.createElement("button");
+  btnRemoverDepto.textContent = "🗑";
+  btnRemoverDepto.title = "Remover departamento";
+  btnRemoverDepto.className = "btn-remover";
+
+  btnRemoverDepto.onclick = () => {
+  wrap.classList.add("removendo");
+
+  setTimeout(() => {
     wrap.remove();
-    syncChatStateFromDOM();
-  };
+  }, 180); // tempo da animação
+};
 
-  topo.append(nome, del);
-  wrap.appendChild(topo);
+  linhaTopo.append(inputNome, btnRemoverDepto);
+  wrap.appendChild(linhaTopo);
 
+  /* ===== LISTA DE AGENTES ===== */
   const listaAgentes = document.createElement("div");
   listaAgentes.style.marginTop = "8px";
 
-  const btnAdd = document.createElement("button");
-  btnAdd.textContent = "+ Adicionar agente";
-  btnAdd.onclick = () => {
+  const btnAddAgente = document.createElement("button");
+  btnAddAgente.textContent = "+ Adicionar agente";
+  btnAddAgente.className = "btn-add";
+  btnAddAgente.style.marginTop = "6px";
+
+  btnAddAgente.onclick = () => {
     const linha = document.createElement("div");
     linha.style.display = "flex";
     linha.style.gap = "6px";
+    linha.style.marginTop = "4px";
 
     const select = document.createElement("select");
-    select.append(new Option("Selecione um agente", ""));
+    select.innerHTML = `<option value="">Selecione um agente</option>`;
 
-    window.chatState.agentes.forEach(a =>
-      select.add(new Option(a.nome, a.nome))
-    );
+    document
+      .querySelectorAll("#listaAgentesChat .campo-descricao")
+      .forEach(a => {
+        const d = a.getData?.();
+        if (d?.nome) select.add(new Option(d.nome, d.nome));
+      });
 
-    select.onchange = syncChatStateFromDOM;
+    const remover = document.createElement("button");
+    remover.textContent = "✖";
+    remover.onclick = () => linha.remove();
 
-    const x = document.createElement("button");
-    x.textContent = "✖";
-    x.onclick = () => {
-      linha.remove();
-      syncChatStateFromDOM();
-    };
-
-    linha.append(select, x);
+    linha.append(select, remover);
     listaAgentes.appendChild(linha);
   };
 
+  /* ===== DATA PARA SALVAR ===== */
   wrap.getData = () => {
     const agentes = [];
     listaAgentes.querySelectorAll("select").forEach(s => {
       if (s.value) agentes.push(s.value);
     });
-    return { nome: nome.value.trim(), agentes };
+
+    return {
+      nome: inputNome.value.trim(),
+      agentes
+    };
   };
 
-  wrap.append(listaAgentes, btnAdd);
+  wrap.append(listaAgentes, btnAddAgente);
   lista.appendChild(wrap);
-
-  syncChatStateFromDOM();
 };
-
-/* =====================================================
-   SINCRONIZAÇÃO ÚNICA E DEFINITIVA
-   ===================================================== */
-function syncChatStateFromDOM() {
-  window.chatState.usuarios = [];
-  window.chatState.agentes = [];
-  window.chatState.departamentos = [];
-
-  // usuários
-  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
-    const d = u.getData?.();
-    if (d?.nome) window.chatState.usuarios.push(d);
-  });
-
-  // agentes (derivados dos usuários)
-  window.chatState.usuarios.forEach(u => {
-    if (u.agente) {
-      window.chatState.agentes.push({
-        nome: u.nome,
-        usuario: u.email,
-        departamentos: []
-      });
-    }
-  });
-
-  // departamentos
-  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
-    const dep = d.getData?.();
-    if (!dep?.nome) return;
-
-    window.chatState.departamentos.push(dep);
-
-    dep.agentes.forEach(nomeAgente => {
-      const ag = window.chatState.agentes.find(a => a.nome === nomeAgente);
-      if (ag && !ag.departamentos.includes(dep.nome)) {
-        ag.departamentos.push(dep.nome);
-      }
-    });
-  });
-
-  console.log("✅ chatState sincronizado:", window.chatState);
-}
 
 /* =====================================================
    SENHA – PADRÃO PABX
    ===================================================== */
 function validarSenha(input, regrasEl) {
   const v = input.value || "";
+
   if (!v.length) {
     regrasEl.innerHTML =
       `<div class="regra-neutra">Mín. 11 | Maiúscula | Número | Especial</div>`;
-    return;
+    input.classList.remove("campo-obrigatorio-erro");
+    return false;
   }
 
   const ok =
     v.length >= 11 &&
     /[A-Z]/.test(v) &&
+    /[a-z]/.test(v) &&
     /\d/.test(v) &&
     /[^A-Za-z0-9]/.test(v);
 
   regrasEl.innerHTML = ok
     ? `<div class="regra-ok">Senha válida</div>`
     : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
+
+  input.classList.toggle("campo-obrigatorio-erro", !ok);
+  return ok;
 }
 
 /* =====================================================
-   COLETA FINAL (USADA PELO app.js)
+   COLETA FINAL PARA O JSON (SALVAR) – COMPATÍVEL
    ===================================================== */
 window.coletarChatDoDOM = function () {
-  syncChatStateFromDOM();
-  return window.chatState;
+  return {
+    tipo: window.chatState?.tipo || null,
+    api: window.chatState?.api || null,
+    conta: window.chatState?.conta || null,
+    canais: window.chatState?.canais || [],
+
+    // 👇 coleta REAL baseada no DOM atual
+    usuarios: Array.from(
+      document.querySelectorAll("#listaUsuariosChat .campo-descricao")
+    )
+      .map(u => u.getData?.())
+      .filter(Boolean),
+
+    agentes: Array.from(
+      document.querySelectorAll("#listaAgentesChat .campo-descricao")
+    )
+      .map(a => a.getData?.())
+      .filter(Boolean),
+
+    departamentos: Array.from(
+      document.querySelectorAll("#listaDepartamentosChat .campo-descricao")
+    )
+      .map(d => d.getData?.())
+      .filter(Boolean)
+  };
+};
+
+  // usuários
+  document.querySelectorAll(".usuario-chat").forEach(el => {
+    chat.usuarios.push({
+      nome: el.querySelector(".nome")?.value || "",
+      email: el.querySelector(".email")?.value || ""
+    });
+  });
+
+  // agentes
+  document.querySelectorAll(".agente-chat").forEach(el => {
+    chat.agentes.push({
+      nome: el.dataset.nome,
+      usuario: el.dataset.usuario,
+      departamentos: JSON.parse(el.dataset.departamentos || "[]")
+    });
+  });
+
+  // departamentos
+  document.querySelectorAll(".departamento-chat").forEach(el => {
+    chat.departamentos.push({
+      nome: el.dataset.nome,
+      agentes: JSON.parse(el.dataset.agentes || "[]")
+    });
+  });
+
+  return chat;
 };
