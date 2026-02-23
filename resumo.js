@@ -330,72 +330,92 @@ if (voz.pesquisaSatisfacao) {
   }
 });
 
-/* ================= CHAT / OMNICHANNEL ================= */
-if (dados.chat) {
-  const chat = dados.chat;
+/* =======================
+   RESUMO – CHAT / OMNICHANNEL
+   ======================= */
+function renderResumoChat(container) {
+  if (!window.chatState || !window.chatState.tipo) return;
 
-  let htmlChat = `
-    <section class="resumo-bloco">
-      <h2>💬 Atendimento por Chat</h2>
-      <div class="resumo-grid">
+  const {
+    tipo,
+    api,
+    conta,
+    canais = [],
+    usuarios = [],
+    agentes = [],
+    departamentos = []
+  } = window.chatState;
+
+  const card = document.createElement("div");
+  card.className = "resumo-card";
+
+  card.innerHTML = `
+    <h3>Chat / Omnichannel</h3>
+
+    <div class="resumo-linha"><strong>Tipo:</strong> ${tipo}</div>
+    ${api ? `<div class="resumo-linha"><strong>API:</strong> ${api}</div>` : ""}
+    ${conta ? `<div class="resumo-linha"><strong>Conta:</strong> ${conta}</div>` : ""}
+
+    ${
+      canais.length
+        ? `<div class="resumo-linha"><strong>Canais:</strong>
+            <div class="resumo-chips">
+              ${canais.map(c => `<span class="chip">${c}</span>`).join("")}
+            </div>
+          </div>`
+        : ""
+    }
+
+    ${
+      usuarios.length
+        ? `<div class="resumo-bloco">
+            <strong>Usuários Chat</strong>
+            <ul>
+              ${usuarios.map(u => `<li>${u.nome} (${u.email})</li>`).join("")}
+            </ul>
+          </div>`
+        : ""
+    }
+
+    ${
+      agentes.length
+        ? `<div class="resumo-bloco">
+            <strong>Agentes Chat</strong>
+            <ul>
+              ${agentes.map(a => `<li>${a.nome}</li>`).join("")}
+            </ul>
+          </div>`
+        : ""
+    }
+
+    ${
+      departamentos.length
+        ? `<div class="resumo-bloco">
+            <strong>Departamentos</strong>
+            ${departamentos
+              .map(
+                d => `
+                  <div class="resumo-departamento">
+                    <div><strong>${d.nome}</strong></div>
+                    ${
+                      d.agentes?.length
+                        ? `<div class="resumo-chips">
+                            ${d.agentes
+                              .map(a => `<span class="chip">${a}</span>`)
+                              .join("")}
+                          </div>`
+                        : `<div class="resumo-vazio">Sem agentes</div>`
+                    }
+                  </div>
+                `
+              )
+              .join("")}
+          </div>`
+        : ""
+    }
   `;
 
-  /* ===== CONFIGURAÇÃO GERAL ===== */
-  htmlChat += `
-    <div class="resumo-card" style="max-width:100%">
-      <div class="titulo">Configuração do Chat</div>
-      <div><strong>Tipo:</strong> ${chat.tipo || "Não informado"}</div>
-      <div><strong>API:</strong> ${chat.api || "Não informada"}</div>
-      <div><strong>Conta:</strong> ${chat.conta || "Não informada"}</div>
-      <div><strong>Canais:</strong> ${(chat.canais || []).join(", ") || "Nenhum canal selecionado"}</div>
-    </div>
-  `;
-
-  /* ===== USUÁRIOS DO CHAT ===== */
-  if (chat.usuarios?.length) {
-    htmlChat += chat.usuarios.map(u => `
-      <div class="resumo-card">
-        <div class="titulo">${u.nome || "Usuário Chat"}</div>
-        <div>📧 ${u.email || "—"}</div>
-        <div>Permissões: ${(u.permissoes || []).join(", ") || "—"}</div>
-        ${u.agente ? `<span class="badge">Agente</span>` : ""}
-      </div>
-    `).join("");
-  }
-
-  /* ===== AGENTES OMNICHANNEL ===== */
-  if (chat.agentes?.length) {
-    htmlChat += chat.agentes.map(a => `
-      <div class="resumo-card">
-        <div class="titulo">${a.nome || "Agente Chat"}</div>
-        <div>👤 Usuário: ${a.usuario || "Não vinculado"}</div>
-        <div>
-          📂 Departamentos:
-          ${(a.departamentos || []).join(", ") || "Nenhum"}
-        </div>
-      </div>
-    `).join("");
-  }
-
-  /* ===== DEPARTAMENTOS ===== */
-  if (chat.departamentos?.length) {
-    htmlChat += chat.departamentos.map(d => `
-      <div class="resumo-card">
-        <div class="titulo">Departamento: ${d.nome}</div>
-        <div>
-          Agentes:
-          ${(d.agentes || []).join(", ") || "Nenhum agente vinculado"}
-        </div>
-      </div>
-    `).join("");
-  }
-
-  htmlChat += `
-      </div>
-    </section>
-  `;
-
-  resumo.innerHTML += htmlChat;
+  container.appendChild(card);
 }
 
 /*==============/*Voltar=============*/
