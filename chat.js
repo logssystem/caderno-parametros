@@ -86,6 +86,70 @@ window.adicionarUsuarioChat = function () {
 };
 
 /* =====================================================
+   PROCESSAMENTO CSV – USUÁRIOS CHAT
+   (FUNÇÃO BASE QUE ESTAVA FALTANDO)
+   ===================================================== */
+function processarCSVUsuariosChat(texto) {
+  const linhas = texto
+    .replace(/\r/g, "")
+    .split("\n")
+    .filter(l => l.trim());
+
+  if (linhas.length < 2) {
+    console.warn("CSV inválido ou vazio");
+    return;
+  }
+
+  const sep = linhas[0].includes(";") ? ";" : ",";
+  const headers = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
+
+  linhas.forEach(linha => {
+    const valores = linha.split(sep);
+    const row = {};
+
+    headers.forEach((h, i) => {
+      row[h] = (valores[i] || "").trim();
+    });
+
+    if (!row.usuario) return;
+
+    // evita duplicar usuário
+    const existe = [...document.querySelectorAll("#listaUsuariosChat .campo-nome")]
+      .some(i => i.value === row.usuario);
+
+    if (existe) return;
+
+    const wrap = adicionarUsuarioChat();
+
+    wrap.querySelector(".campo-nome").value = row.usuario;
+    wrap.querySelector("input[type=email]").value = row.email || "";
+    wrap.querySelector(".campo-senha").value = row.senha || "";
+
+    const select = wrap.querySelector("select");
+    if (select && row.permissao) {
+      [...select.options].forEach(opt => {
+        if (opt.value.toLowerCase() === row.permissao.toLowerCase()) {
+          opt.selected = true;
+        }
+      });
+    }
+
+    if (row.agente?.toLowerCase() === "sim") {
+      wrap.querySelector("input[type=checkbox]").checked = true;
+    }
+  });
+
+  // garante geração dos agentes
+  gerarAgentesChatAPartirUsuarios();
+
+  if (typeof mostrarToast === "function") {
+    mostrarToast("Usuários do chat importados com sucesso!");
+  } else {
+    console.log("Usuários do chat importados com sucesso!");
+  }
+}
+
+/* =====================================================
    AGENTES CHAT (GERADOS DOS USUÁRIOS)
    ===================================================== */
 function gerarAgentesChatAPartirUsuarios() {
@@ -289,3 +353,8 @@ window.importarUsuariosChatCSV =
   window.acionarImportacaoUsuariosChat;
 
 console.log("✅ Compatibilidade CSV Chat carregada");
+
+// =====================================================
+// EXPOR FUNÇÃO CSV PARA COMPATIBILIDADE GLOBAL
+// =====================================================
+window.processarCSVUsuariosChat = processarCSVUsuariosChat;
