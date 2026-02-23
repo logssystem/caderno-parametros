@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", () => {
   window.initCaderno();
 });
@@ -1176,6 +1177,52 @@ function coletarEntradas() {
   return entradas;
 }
 
+/* ================= CHAT – COLETA FINAL ================= */
+
+window.coletarChatDoDOM = function () {
+
+  const chat = {
+    tipo: window.chatState?.tipo || null,
+    api: window.chatState?.api || null,
+    conta: window.chatState?.conta || null,
+    canais: window.chatState?.canais || [],
+    usuarios: [],
+    agentes: [],
+    departamentos: []
+  };
+
+  // usuários chat
+  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
+    chat.usuarios.push({
+      nome: u.getNome?.() || "",
+      email: u.getEmail?.() || "",
+      permissao: u.getPermissao?.() || ""
+    });
+  });
+
+  // departamentos
+  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
+    const nome = d.querySelector(".campo-nome")?.value || "";
+    if (!nome) return;
+
+    chat.departamentos.push({
+      nome,
+      agentes: JSON.parse(d.dataset.agentes || "[]")
+    });
+  });
+
+  // agentes chat
+  document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
+    chat.agentes.push({
+      nome: a.querySelector(".campo-nome")?.value || "",
+      usuario: a.dataset.usuario || "",
+      departamentos: JSON.parse(a.dataset.departamentos || "[]")
+    });
+  });
+
+  return chat;
+};
+
 /* ================= MOTOR ================= */
 
 function syncTudo() {
@@ -1464,16 +1511,7 @@ if (agentesSemRamal.length) {
       }
     };
 
-   // ✅ salva chat sempre que houver qualquer dado relevante
-    if (
-      chat &&
-      (
-        chat.tipo ||
-        chat.usuarios.length ||
-        chat.agentes.length ||
-        chat.departamentos.length
-      )
-    ) {
+    if (chat && chat.tipo) {
       dados.chat = chat;
     }
 
