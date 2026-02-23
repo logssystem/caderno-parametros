@@ -247,3 +247,36 @@ window.coletarChatDoDOM = function () {
     departamentos: window.chatState.departamentos || []
   };
 };
+
+function syncChatStateFromDOM() {
+  // 🔄 limpa state
+  window.chatState.usuarios = [];
+  window.chatState.agentes = [];
+  window.chatState.departamentos = [];
+
+  // ===== USUÁRIOS CHAT =====
+  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
+    const data = u.getData?.();
+    if (data && data.nome) {
+      window.chatState.usuarios.push(data);
+    }
+  });
+
+  // ===== AGENTES CHAT =====
+  document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
+    const data = a.getData?.();
+    if (data && data.nome) {
+      window.chatState.agentes.push(data);
+    }
+  });
+
+  // ===== DEPARTAMENTOS CHAT =====
+  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
+    const data = d.getData?.();
+    if (data && data.nome) {
+      window.chatState.departamentos.push(data);
+    }
+  });
+
+  console.log("✅ chatState sincronizado:", window.chatState);
+}
