@@ -1176,51 +1176,6 @@ function coletarEntradas() {
   return entradas;
 }
 
-/* ================= CHAT – COLETA FINAL ================= */
-
-/* ================= CHAT – COLETA FINAL (CORRETA) ================= */
-window.coletarChatDoDOM = function () {
-  if (!window.chatState) return null;
-
-  return {
-    tipo: window.chatState.tipo || null,
-    api: window.chatState.api || null,
-    conta: window.chatState.conta || null,
-    canais: window.chatState.canais || [],
-    usuarios: window.chatState.usuarios || [],
-    agentes: window.chatState.agentes || [],
-    departamentos: window.chatState.departamentos || []
-  };
-};
-
-  /* ================= USUÁRIOS CHAT ================= */
-  document.querySelectorAll("[data-chat-usuario]").forEach(u => {
-    chat.usuarios.push({
-      nome: u.dataset.nome || "",
-      email: u.dataset.email || "",
-      permissao: u.dataset.permissao || ""
-    });
-  });
-
-  /* ================= DEPARTAMENTOS ================= */
-  document.querySelectorAll("[data-chat-departamento]").forEach(d => {
-    chat.departamentos.push({
-      nome: d.dataset.nome || "",
-      agentes: JSON.parse(d.dataset.agentes || "[]")
-    });
-  });
-
-  /* ================= AGENTES CHAT ================= */
-  document.querySelectorAll("[data-chat-agente]").forEach(a => {
-    chat.agentes.push({
-      nome: a.dataset.nome || "",
-      departamentos: JSON.parse(a.dataset.departamentos || "[]")
-    });
-  });
-
-  return chat;
-};
-
 /* ================= MOTOR ================= */
 
 function syncTudo() {
