@@ -1,3 +1,84 @@
+/* ======================================================
+   RESUMO – CHAT / OMNICHANNEL (ISOLADO / SEGURO)
+   ====================================================== */
+window.renderResumoChat = function (container, data) {
+  if (!data || !data.chat || !data.chat.tipo) return;
+
+  const {
+    tipo,
+    api,
+    conta,
+    canais = [],
+    usuarios = [],
+    agentes = [],
+    departamentos = []
+  } = data.chat;
+
+  const section = document.createElement("section");
+  section.className = "resumo-bloco";
+
+  section.innerHTML = `
+    <h2>💬 Chat / Omnichannel</h2>
+
+    <div class="resumo-card">
+      <div><strong>Tipo:</strong> ${tipo}</div>
+      ${api ? `<div><strong>API:</strong> ${api}</div>` : ""}
+      ${conta ? `<div><strong>Conta:</strong> ${conta}</div>` : ""}
+
+      ${
+        canais.length
+          ? `<div class="lista">
+              ${canais.map(c => `<span class="chip">${c}</span>`).join("")}
+            </div>`
+          : ""
+      }
+
+      ${
+        usuarios.length
+          ? `<div class="info-linha">
+              <strong>Usuários Chat:</strong>
+              <ul>
+                ${usuarios.map(u => `<li>${u.nome} (${u.email})</li>`).join("")}
+              </ul>
+            </div>`
+          : ""
+      }
+
+      ${
+        agentes.length
+          ? `<div class="info-linha">
+              <strong>Agentes Chat:</strong>
+              <ul>
+                ${agentes.map(a => `<li>${a.nome}</li>`).join("")}
+              </ul>
+            </div>`
+          : ""
+      }
+
+      ${
+        departamentos.length
+          ? `<div class="info-linha">
+              <strong>Departamentos:</strong>
+              ${departamentos.map(d => `
+                <div style="margin-top:6px">
+                  <strong>${d.nome}</strong>
+                  <div class="lista">
+                    ${(d.agentes || []).map(a => `<span class="chip">${a}</span>`).join("")}
+                  </div>
+                </div>
+              `).join("")}
+            </div>`
+          : ""
+      }
+    </div>
+  `;
+
+  container.appendChild(section);
+};
+
+/* ======================================================
+   RESUMO – PRINCIPAL (PABX INTACTO)
+   ====================================================== */
 document.addEventListener("DOMContentLoaded", () => {
   /* ===== TEMA ===== */
   const temaSalvo = localStorage.getItem("tema");
@@ -10,8 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let dados;
   try {
     dados = JSON.parse(raw);
-  } catch (e) {
-    console.error("JSON inválido", e);
+  } catch {
+    console.error("JSON inválido");
     return;
   }
 
@@ -19,10 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!resumo) return;
   resumo.innerHTML = "";
 
-  /* ================= CHAT (ANTES OU DEPOIS DO PABX – SUA ESCOLHA) ================= */
-  renderResumoChat(resumo, dados);
-
-  /* ================= FUNÇÃO: IDENTIFICAR DESTINO ================= */
+  /* ================= FUNÇÃO AUXILIAR ================= */
   function identificarDestino(nome, voz) {
     if (!nome) return "Não definido";
     if (voz.regras_tempo?.some(r => r.nome === nome)) return `⏰ Regra de Tempo — ${nome}`;
@@ -51,13 +129,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!dados.voz) return;
   const voz = dados.voz;
 
-  /* ===== MAPA RAMAL → USUÁRIO ===== */
   const mapaRamalUsuario = {};
   (voz.agentes || []).forEach(a => {
     if (a.ramal && a.nome) mapaRamalUsuario[a.ramal] = a.nome;
   });
 
-  /* ===== USUÁRIOS WEB ===== */
+  /* ===== USUÁRIOS ===== */
   if (voz.usuarios?.length) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
@@ -131,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ===== ENTRADAS / NÚMEROS ===== */
+  /* ===== NÚMEROS ===== */
   if (voz.entradas?.length) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
@@ -169,4 +246,12 @@ document.addEventListener("DOMContentLoaded", () => {
       </section>
     `;
   }
+
+  /* ================= CHAT – SEM MEXER NO PABX ================= */
+  window.renderResumoChat(resumo, dados);
 });
+
+/* ================= VOLTAR ================= */
+window.voltar = function () {
+  window.location.href = "index.html";
+};
