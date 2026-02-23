@@ -9,9 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
   const data = JSON.parse(raw);
   
-  // ⚠️ NÃO mexe em nada do PABX acima ou abaixo disso
-  renderResumoChat(containerResumo, data);
-  
   let dados;
   try {
     dados = JSON.parse(raw);
