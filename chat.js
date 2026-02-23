@@ -243,3 +243,11 @@ window.coletarChatDoDOM = function () {
 
   return chat;
 };
+
+// Alias de compatibilidade (HTML antigo)
+window.acionarImportacaoUsuariosChat =
+  window.acionarImportacaoUsuariosChat || window.acionarImportacaoUsuariosChat;
+
+// Compatibilidade com HTML (typo antigo)
+window.acionarImportacaoUsuariosChat =
+  window.acionarImportacaoUsuariosChat || window.acionarImportacaoUsuariosChat;
