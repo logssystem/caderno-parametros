@@ -220,10 +220,37 @@ window.adicionarDepartamentoChat = function () {
     const select = document.createElement("select");
     select.innerHTML = `<option value="">Selecione um agente</option>`;
 
-    document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
-      const d = a.getData?.();
-      if (d?.nome) select.add(new Option(d.nome, d.nome));
+   // ===== 1. COLETA DEPARTAMENTOS =====
+const mapaAgenteDepartamentos = {};
+
+document
+  .querySelectorAll("#listaDepartamentosChat .campo-descricao")
+  .forEach(depEl => {
+    const dep = depEl.getData?.();
+    if (!dep?.nome) return;
+
+    chat.departamentos.push(dep);
+
+    (dep.agentes || []).forEach(nomeAgente => {
+      if (!mapaAgenteDepartamentos[nomeAgente]) {
+        mapaAgenteDepartamentos[nomeAgente] = [];
+      }
+      mapaAgenteDepartamentos[nomeAgente].push(dep.nome);
     });
+  });
+
+// ===== 2. COLETA AGENTES (COM DEPARTAMENTOS) =====
+document
+  .querySelectorAll("#listaAgentesChat .campo-descricao")
+  .forEach(a => {
+    const d = a.getData?.();
+    if (!d?.nome) return;
+
+    chat.agentes.push({
+      ...d,
+      departamentos: mapaAgenteDepartamentos[d.nome] || []
+    });
+  });
 
     const del = document.createElement("button");
     del.textContent = "✖";
