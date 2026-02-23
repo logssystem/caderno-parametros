@@ -361,31 +361,3 @@ window.coletarChatDoDOM = function () {
       .filter(Boolean)
   };
 };
-
-  // usuários
-  document.querySelectorAll(".usuario-chat").forEach(el => {
-    chat.usuarios.push({
-      nome: el.querySelector(".nome")?.value || "",
-      email: el.querySelector(".email")?.value || ""
-    });
-  });
-
-  // agentes
-  document.querySelectorAll(".agente-chat").forEach(el => {
-    chat.agentes.push({
-      nome: el.dataset.nome,
-      usuario: el.dataset.usuario,
-      departamentos: JSON.parse(el.dataset.departamentos || "[]")
-    });
-  });
-
-  // departamentos
-  document.querySelectorAll(".departamento-chat").forEach(el => {
-    chat.departamentos.push({
-      nome: el.dataset.nome,
-      agentes: JSON.parse(el.dataset.agentes || "[]")
-    });
-  });
-
-  return chat;
-};
