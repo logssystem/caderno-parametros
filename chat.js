@@ -1,4 +1,4 @@
-console.log("CHAT.JS FINAL – ESTÁVEL (STATE ÚNICO + RESUMO OK)");
+console.log("CHAT.JS FINAL – ESTÁVEL (STATE ÚNICO COESO)");
 
 /* =====================================================
    STATE ÚNICO DO CHAT (FONTE DA VERDADE)
@@ -40,9 +40,7 @@ window.adicionarUsuarioChat = function () {
   senha.oninput = () => validarSenha(senha, regras);
 
   const permissao = document.createElement("select");
-  permissao.style.marginTop = "8px";
   permissao.append(new Option("Selecione a permissão (opcional)", ""));
-
   [
     "Administrador do Módulo de Omnichannel",
     "Supervisor(a) Omnichannel",
@@ -61,8 +59,7 @@ window.adicionarUsuarioChat = function () {
   del.textContent = "✖";
   del.onclick = () => {
     wrap.remove();
-    syncUsuariosChat();
-    gerarAgentesChatAPartirUsuarios();
+    syncChatStateFromDOM();
   };
 
   wrap.getData = () => ({
@@ -73,50 +70,13 @@ window.adicionarUsuarioChat = function () {
     agente: chkAgente.checked
   });
 
-  chkAgente.onchange = () => {
-    syncUsuariosChat();
-    gerarAgentesChatAPartirUsuarios();
-  };
+  chkAgente.onchange = syncChatStateFromDOM;
 
   wrap.append(nome, email, senha, regras, permissao, lbl, del);
   lista.appendChild(wrap);
 
-  syncUsuariosChat();
+  syncChatStateFromDOM();
 };
-
-/* =====================================================
-   AGENTES CHAT (AUTOMÁTICOS)
-   ===================================================== */
-function gerarAgentesChatAPartirUsuarios() {
-  const lista = document.getElementById("listaAgentesChat");
-  if (!lista) return;
-
-  lista.innerHTML = "";
-  window.chatState.agentes = [];
-
-  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
-    const data = u.getData?.();
-    if (data?.agente && data.nome) {
-      const wrap = document.createElement("div");
-      wrap.className = "campo-descricao";
-
-      const nome = document.createElement("input");
-      nome.value = data.nome;
-      nome.disabled = true;
-
-      wrap.getData = () => ({
-        nome: data.nome,
-        usuario: data.email,
-        departamentos: []
-      });
-
-      wrap.append(nome);
-      lista.appendChild(wrap);
-
-      window.chatState.agentes.push(wrap.getData());
-    }
-  });
-}
 
 /* =====================================================
    DEPARTAMENTOS CHAT
@@ -140,7 +100,7 @@ window.adicionarDepartamentoChat = function () {
   del.textContent = "🗑";
   del.onclick = () => {
     wrap.remove();
-    syncDepartamentosChat();
+    syncChatStateFromDOM();
   };
 
   topo.append(nome, del);
@@ -151,8 +111,6 @@ window.adicionarDepartamentoChat = function () {
 
   const btnAdd = document.createElement("button");
   btnAdd.textContent = "+ Adicionar agente";
-  btnAdd.style.marginTop = "6px";
-
   btnAdd.onclick = () => {
     const linha = document.createElement("div");
     linha.style.display = "flex";
@@ -161,18 +119,18 @@ window.adicionarDepartamentoChat = function () {
     const select = document.createElement("select");
     select.append(new Option("Selecione um agente", ""));
 
-    window.chatState.agentes.forEach(a => {
-      select.add(new Option(a.nome, a.nome));
-    });
+    window.chatState.agentes.forEach(a =>
+      select.add(new Option(a.nome, a.nome))
+    );
+
+    select.onchange = syncChatStateFromDOM;
 
     const x = document.createElement("button");
     x.textContent = "✖";
     x.onclick = () => {
       linha.remove();
-      syncDepartamentosChat();
+      syncChatStateFromDOM();
     };
-
-    select.onchange = syncDepartamentosChat;
 
     linha.append(select, x);
     listaAgentes.appendChild(linha);
@@ -189,26 +147,50 @@ window.adicionarDepartamentoChat = function () {
   wrap.append(listaAgentes, btnAdd);
   lista.appendChild(wrap);
 
-  syncDepartamentosChat();
+  syncChatStateFromDOM();
 };
 
 /* =====================================================
-   SINCRONIZAÇÃO DO STATE
+   SINCRONIZAÇÃO ÚNICA E DEFINITIVA
    ===================================================== */
-function syncUsuariosChat() {
+function syncChatStateFromDOM() {
   window.chatState.usuarios = [];
+  window.chatState.agentes = [];
+  window.chatState.departamentos = [];
+
+  // usuários
   document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
     const d = u.getData?.();
     if (d?.nome) window.chatState.usuarios.push(d);
   });
-}
 
-function syncDepartamentosChat() {
-  window.chatState.departamentos = [];
-  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
-    const data = d.getData?.();
-    if (data?.nome) window.chatState.departamentos.push(data);
+  // agentes (derivados dos usuários)
+  window.chatState.usuarios.forEach(u => {
+    if (u.agente) {
+      window.chatState.agentes.push({
+        nome: u.nome,
+        usuario: u.email,
+        departamentos: []
+      });
+    }
   });
+
+  // departamentos
+  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
+    const dep = d.getData?.();
+    if (!dep?.nome) return;
+
+    window.chatState.departamentos.push(dep);
+
+    dep.agentes.forEach(nomeAgente => {
+      const ag = window.chatState.agentes.find(a => a.nome === nomeAgente);
+      if (ag && !ag.departamentos.includes(dep.nome)) {
+        ag.departamentos.push(dep.nome);
+      }
+    });
+  });
+
+  console.log("✅ chatState sincronizado:", window.chatState);
 }
 
 /* =====================================================
@@ -237,46 +219,6 @@ function validarSenha(input, regrasEl) {
    COLETA FINAL (USADA PELO app.js)
    ===================================================== */
 window.coletarChatDoDOM = function () {
-  return {
-    tipo: window.chatState.tipo,
-    api: window.chatState.api,
-    conta: window.chatState.conta,
-    canais: window.chatState.canais || [],
-    usuarios: window.chatState.usuarios || [],
-    agentes: window.chatState.agentes || [],
-    departamentos: window.chatState.departamentos || []
-  };
+  syncChatStateFromDOM();
+  return window.chatState;
 };
-
-function syncChatStateFromDOM() {
-  // 🔄 limpa state
-  window.chatState.usuarios = [];
-  window.chatState.agentes = [];
-  window.chatState.departamentos = [];
-
-  // ===== USUÁRIOS CHAT =====
-  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
-    const data = u.getData?.();
-    if (data && data.nome) {
-      window.chatState.usuarios.push(data);
-    }
-  });
-
-  // ===== AGENTES CHAT =====
-  document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
-    const data = a.getData?.();
-    if (data && data.nome) {
-      window.chatState.agentes.push(data);
-    }
-  });
-
-  // ===== DEPARTAMENTOS CHAT =====
-  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
-    const data = d.getData?.();
-    if (data && data.nome) {
-      window.chatState.departamentos.push(data);
-    }
-  });
-
-  console.log("✅ chatState sincronizado:", window.chatState);
-}
