@@ -2,42 +2,38 @@
    RESUMO – CHAT / OMNICHANNEL (ISOLADO / SEGURO)
    ====================================================== */
 window.renderResumoChat = function (container, data) {
-  if (!data || !data.chat || !data.chat.tipo) return;
+  if (!container || !data?.chat) return;
 
   const chat = data.chat;
 
-  // 🔁 Compatibilidade com estrutura real do chat.js
-  const usuarios =
-    chat.usuarios ||
-    chat.usuariosChat ||
-    [];
+  const usuarios = Array.isArray(chat.usuarios) ? chat.usuarios : [];
+  const agentes = Array.isArray(chat.agentes) ? chat.agentes : [];
+  const departamentos = Array.isArray(chat.departamentos) ? chat.departamentos : [];
+  const canais = Array.isArray(chat.canais) ? chat.canais : [];
 
-  const agentes =
-    chat.agentes ||
-    chat.agentesChat ||
-    [];
-
-  const departamentos =
-    chat.departamentos ||
-    chat.departamentosChat ||
-    [];
-
-  const canais = chat.canais || [];
+  if (
+    !chat.tipo &&
+    !usuarios.length &&
+    !agentes.length &&
+    !departamentos.length
+  ) {
+    return;
+  }
 
   const section = document.createElement("section");
   section.className = "resumo-bloco";
 
-  section.innerHTML = `
+  let html = `
     <h2>💬 Chat / Omnichannel</h2>
 
     <div class="resumo-card">
-      <div class="resumo-linha"><strong>Tipo:</strong> ${chat.tipo}</div>
-      ${chat.api ? `<div class="resumo-linha"><strong>API:</strong> ${chat.api}</div>` : ""}
-      ${chat.conta ? `<div class="resumo-linha"><strong>Conta:</strong> ${chat.conta}</div>` : ""}
+      <div><strong>Tipo:</strong> ${chat.tipo || "-"}</div>
+      <div><strong>API:</strong> ${chat.api || "-"}</div>
+      <div><strong>Conta:</strong> ${chat.conta || "-"}</div>
 
       ${
         canais.length
-          ? `<div class="resumo-linha">
+          ? `<div style="margin-top:8px">
               <strong>Canais:</strong>
               <div class="lista">
                 ${canais.map(c => `<span class="chip">${c}</span>`).join("")}
@@ -45,47 +41,65 @@ window.renderResumoChat = function (container, data) {
             </div>`
           : ""
       }
-
-      ${
-        usuarios.length
-          ? `<div class="resumo-linha">
-              <strong>Usuários Chat:</strong>
-              <ul>
-                ${usuarios.map(u => `<li>${u.nome || u.email || u}</li>`).join("")}
-              </ul>
-            </div>`
-          : ""
-      }
-
-      ${
-        agentes.length
-          ? `<div class="resumo-linha">
-              <strong>Agentes Chat:</strong>
-              <ul>
-                ${agentes.map(a => `<li>${a.nome || a}</li>`).join("")}
-              </ul>
-            </div>`
-          : ""
-      }
-
-      ${
-        departamentos.length
-          ? `<div class="resumo-linha">
-              <strong>Departamentos:</strong>
-              ${departamentos.map(d => `
-                <div style="margin-top:6px">
-                  <strong>${d.nome || d}</strong>
-                  <div class="lista">
-                    ${(d.agentes || []).map(a => `<span class="chip">${a}</span>`).join("")}
-                  </div>
-                </div>
-              `).join("")}
-            </div>`
-          : ""
-      }
     </div>
   `;
 
+  if (usuarios.length) {
+    html += `
+      <h3>👤 Usuários do Chat</h3>
+      <div class="resumo-grid">
+        ${usuarios.map(u => `
+          <div class="resumo-card">
+            <div class="titulo">${u.nome || "-"}</div>
+            <div>📧 ${u.email || "-"}</div>
+            <div>🔑 ${u.permissao || "-"}</div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  if (departamentos.length) {
+    html += `
+      <h3>🏷️ Departamentos</h3>
+      <div class="resumo-grid">
+        ${departamentos.map(d => `
+          <div class="resumo-card">
+            <div class="titulo">${d.nome || "-"}</div>
+            ${
+              d.agentes?.length
+                ? `<div class="lista">
+                    ${d.agentes.map(a => `<span class="chip">${a}</span>`).join("")}
+                   </div>`
+                : `<em>Sem agentes vinculados</em>`
+            }
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  if (agentes.length) {
+    html += `
+      <h3>🎧 Agentes do Chat</h3>
+      <div class="resumo-grid">
+        ${agentes.map(a => `
+          <div class="resumo-card">
+            <div class="titulo">${a.nome || "-"}</div>
+            ${
+              a.departamentos?.length
+                ? `<div class="lista">
+                    ${a.departamentos.map(d => `<span class="chip">${d}</span>`).join("")}
+                   </div>`
+                : `<em>Sem departamentos</em>`
+            }
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  section.innerHTML = html;
   container.appendChild(section);
 };
 
@@ -93,11 +107,9 @@ window.renderResumoChat = function (container, data) {
    RESUMO – PRINCIPAL (PABX INTACTO)
    ====================================================== */
 document.addEventListener("DOMContentLoaded", () => {
-  /* ===== TEMA ===== */
   const temaSalvo = localStorage.getItem("tema");
   document.body.classList.toggle("dark", temaSalvo === "dark");
 
-  /* ===== DADOS ===== */
   const raw = localStorage.getItem("CONFIG_CADERNO");
   if (!raw) return;
 
@@ -113,7 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!resumo) return;
   resumo.innerHTML = "";
 
-  /* ================= FUNÇÃO AUXILIAR ================= */
   function identificarDestino(nome, voz) {
     if (!nome) return "Não definido";
     if (voz.regras_tempo?.some(r => r.nome === nome)) return `⏰ Regra de Tempo — ${nome}`;
@@ -124,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return nome;
   }
 
-  /* ================= CLIENTE ================= */
+  /* ===== CLIENTE ===== */
   if (dados.cliente) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
@@ -138,7 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ================= VOZ / PABX ================= */
   if (!dados.voz) return;
   const voz = dados.voz;
 
@@ -260,7 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ================= CHAT – SEM MEXER NO PABX ================= */
+  /* ===== CHAT (FINAL) ===== */
   window.renderResumoChat(resumo, dados);
 });
 
