@@ -244,10 +244,25 @@ window.coletarChatDoDOM = function () {
   return chat;
 };
 
-// Alias de compatibilidade (HTML antigo)
-window.acionarImportacaoUsuariosChat =
-  window.acionarImportacaoUsuariosChat || window.acionarImportacaoUsuariosChat;
+/* =====================================================
+   ALIASES DE COMPATIBILIDADE – IMPORTAÇÃO CSV CHAT
+   (NÃO REMOVER)
+   ===================================================== */
 
-// Compatibilidade com HTML (typo antigo)
+// nome oficial
 window.acionarImportacaoUsuariosChat =
-  window.acionarImportacaoUsuariosChat || window.acionarImportacaoUsuariosChat;
+  window.acionarImportacaoUsuariosChat || function () {
+    console.error("Função principal de importação não encontrada");
+  };
+
+// aliases para HTML antigo / typo
+window.acionarImporttacaoUsuariosChat =
+  window.acionarImportacaoUsuariosChat;
+
+window.acionarImportacaoUsuarioChat =
+  window.acionarImportacaoUsuariosChat;
+
+window.acionarImportacaoUsuarios =
+  window.acionarImportacaoUsuariosChat;
+
+console.log("✅ Aliases de importação CSV Chat registrados");
