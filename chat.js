@@ -210,17 +210,9 @@ window.adicionarDepartamentoChat = function () {
   listaAgentes.style.marginTop = "8px";
 
   const btnAdd = document.createElement("button");
-  btnAdd.textContent = "+ Adicionar agente";
+btnAdd.textContent = "+ Adicionar agente";
 
-  btnAdd.onclick = () => {
-    const linha = document.createElement("div");
-    linha.style.display = "flex";
-    linha.style.gap = "6px";
-
-    const select = document.createElement("select");
-    select.innerHTML = `<option value="">Selecione um agente</option>`;
-
-    btnAdd.onclick = () => {
+btnAdd.onclick = () => {
   const linha = document.createElement("div");
   linha.style.display = "flex";
   linha.style.gap = "6px";
@@ -228,7 +220,7 @@ window.adicionarDepartamentoChat = function () {
   const select = document.createElement("select");
   select.innerHTML = `<option value="">Selecione um agente</option>`;
 
-  // ✅ LISTA DE AGENTES VINDO DO DOM
+  // lista agentes existentes (DOM)
   document
     .querySelectorAll("#listaAgentesChat .campo-descricao")
     .forEach(a => {
@@ -248,7 +240,7 @@ window.adicionarDepartamentoChat = function () {
   linha.append(select, del);
   listaAgentes.appendChild(linha);
 };
-
+   
 // ===== 2. COLETA AGENTES (COM DEPARTAMENTOS) =====
 document
   .querySelectorAll("#listaAgentesChat .campo-descricao")
