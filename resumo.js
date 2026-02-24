@@ -33,23 +33,6 @@ window.renderResumoChat = function (container, data) {
     return;
   }
 
-  /* ======================================================
-     MAPA AGENTE → DEPARTAMENTOS
-     (Departamento é a fonte da verdade)
-     ====================================================== */
-  const mapaAgenteDepartamentos = {};
-
-  departamentos.forEach(dep => {
-    if (!dep.nome || !Array.isArray(dep.agentes)) return;
-
-    dep.agentes.forEach(nomeAgente => {
-      if (!mapaAgenteDepartamentos[nomeAgente]) {
-        mapaAgenteDepartamentos[nomeAgente] = [];
-      }
-      mapaAgenteDepartamentos[nomeAgente].push(dep.nome);
-    });
-  });
-
   const section = document.createElement("section");
   section.className = "resumo-bloco";
 
@@ -112,65 +95,69 @@ window.renderResumoChat = function (container, data) {
     `;
   }
 
-  /* ===== AGENTES DO CHAT ===== */
-   if (agentes.length) {
-     html += `
-       <h3>🎧 Agentes do Chat</h3>
-       <div class="resumo-grid">
-         ${agentes.map(a => {
-           // 🔥 descobre departamentos olhando a lista de departamentos
-           const deps = departamentos
-             .filter(d => Array.isArray(d.agentes) && d.agentes.includes(a.nome))
-             .map(d => d.nome);
-   
-           return `
-             <div class="resumo-card">
-               <div class="titulo">${a.nome || "-"}</div>
-               ${
-                 deps.length
-                   ? `<div class="lista">
-                       ${deps.map(d => `<span class="chip">${d}</span>`).join("")}
-                      </div>`
-                   : `<em>Sem departamentos</em>`
-               }
-             </div>
-           `;
-         }).join("")}
-       </div>
-     `;
-   }
+  /* ===== AGENTES DO CHAT (DERIVADO DOS DEPARTAMENTOS) ===== */
+  if (agentes.length) {
+    html += `
+      <h3>🎧 Agentes do Chat</h3>
+      <div class="resumo-grid">
+        ${agentes.map(a => {
+          const deps = departamentos
+            .filter(d => Array.isArray(d.agentes) && d.agentes.includes(a.nome))
+            .map(d => d.nome);
+
+          return `
+            <div class="resumo-card">
+              <div class="titulo">${a.nome || "-"}</div>
+              ${
+                deps.length
+                  ? `<div class="lista">
+                      ${deps.map(d => `<span class="chip">${d}</span>`).join("")}
+                     </div>`
+                  : `<em>Sem departamentos</em>`
+              }
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+  }
+
+  // 🔒 FINALIZA O BLOCO DO CHAT
+  section.innerHTML = html;
+  container.appendChild(section);
+};
 
 /* ======================================================
    RESUMO – PRINCIPAL (PABX INTACTO)
    ====================================================== */
-   document.addEventListener("DOMContentLoaded", () => {
-     const temaSalvo = localStorage.getItem("tema");
-     document.body.classList.toggle("dark", temaSalvo === "dark");
-   
-     const raw = localStorage.getItem("CONFIG_CADERNO");
-     if (!raw) return;
-   
-     let dados;
-     try {
-       dados = JSON.parse(raw);
-     } catch {
-       console.error("JSON inválido");
-       return;
-     }
-   
-     const resumo = document.getElementById("resumo");
-     if (!resumo) return;
-     resumo.innerHTML = "";
-   
-     function identificarDestino(nome, voz) {
-       if (!nome) return "Não definido";
-       if (voz.regras_tempo?.some(r => r.nome === nome)) return `⏰ Regra de Tempo — ${nome}`;
-       if (voz.filas?.some(f => f.nome === nome)) return `📞 Fila — ${nome}`;
-       if (voz.uras?.some(u => u.nome === nome)) return `🎙️ URA — ${nome}`;
-       if (voz.grupo_ring?.some(g => g.nome === nome)) return `🔔 Grupo de Ring — ${nome}`;
-       if (voz.ramais?.some(r => String(r.ramal) === String(nome))) return `☎️ Ramal — ${nome}`;
-       return nome;
-     }
+document.addEventListener("DOMContentLoaded", () => {
+  const temaSalvo = localStorage.getItem("tema");
+  document.body.classList.toggle("dark", temaSalvo === "dark");
+
+  const raw = localStorage.getItem("CONFIG_CADERNO");
+  if (!raw) return;
+
+  let dados;
+  try {
+    dados = JSON.parse(raw);
+  } catch {
+    console.error("JSON inválido");
+    return;
+  }
+
+  const resumo = document.getElementById("resumo");
+  if (!resumo) return;
+  resumo.innerHTML = "";
+
+  function identificarDestino(nome, voz) {
+    if (!nome) return "Não definido";
+    if (voz.regras_tempo?.some(r => r.nome === nome)) return `⏰ Regra de Tempo — ${nome}`;
+    if (voz.filas?.some(f => f.nome === nome)) return `📞 Fila — ${nome}`;
+    if (voz.uras?.some(u => u.nome === nome)) return `🎙️ URA — ${nome}`;
+    if (voz.grupo_ring?.some(g => g.nome === nome)) return `🔔 Grupo de Ring — ${nome}`;
+    if (voz.ramais?.some(r => String(r.ramal) === String(nome))) return `☎️ Ramal — ${nome}`;
+    return nome;
+  }
 
   /* ===== CLIENTE ===== */
   if (dados.cliente) {
