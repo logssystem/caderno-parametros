@@ -260,42 +260,56 @@ window.coletarChatDoDOM = function () {
     departamentos: []
   };
 
-  document.querySelectorAll("#listaUsuariosChat .campo-descricao")
+  /* ===== COLETAR USUÁRIOS ===== */
+  document
+    .querySelectorAll("#listaUsuariosChat .campo-descricao")
     .forEach(u => {
       const d = u.getData?.();
       if (d?.nome) chat.usuarios.push(d);
     });
 
-  document.querySelectorAll("#listaAgentesChat .campo-descricao")
+  /* ===== COLETAR AGENTES ===== */
+  document
+    .querySelectorAll("#listaAgentesChat .campo-descricao")
     .forEach(a => {
       const d = a.getData?.();
       if (d?.nome) chat.agentes.push(d);
     });
 
   /* =====================================================
-   SINCRONIZAR DEPARTAMENTOS NOS AGENTES
-   (Departamento é a fonte da verdade)
-   ===================================================== */
-   const mapaAgenteDepartamentos = {};
-   
-   // percorre departamentos e monta mapa agente -> departamentos
-   chat.departamentos.forEach(dep => {
-     if (!dep.nome || !Array.isArray(dep.agentes)) return;
-   
-     dep.agentes.forEach(nomeAgente => {
-       if (!mapaAgenteDepartamentos[nomeAgente]) {
-         mapaAgenteDepartamentos[nomeAgente] = [];
-       }
-       mapaAgenteDepartamentos[nomeAgente].push(dep.nome);
-     });
-   });
-   
-   // aplica departamentos nos agentes
-   chat.agentes = chat.agentes.map(ag => ({
-     ...ag,
-     departamentos: mapaAgenteDepartamentos[ag.nome] || []
-   }));
-   
+     ✅ ESTE BLOCO É O QUE ESTAVA FALTANDO
+     COLETAR DEPARTAMENTOS
+     ===================================================== */
+  document
+    .querySelectorAll("#listaDepartamentosChat .campo-descricao")
+    .forEach(d => {
+      const dep = d.getData?.();
+      if (dep?.nome) chat.departamentos.push(dep);
+    });
+
+  /* =====================================================
+     SINCRONIZAR DEPARTAMENTOS NOS AGENTES
+     (Departamento é a fonte da verdade)
+     ===================================================== */
+  const mapaAgenteDepartamentos = {};
+
+  chat.departamentos.forEach(dep => {
+    if (!Array.isArray(dep.agentes)) return;
+
+    dep.agentes.forEach(nomeAgente => {
+      const key = String(nomeAgente).trim();
+      if (!mapaAgenteDepartamentos[key]) {
+        mapaAgenteDepartamentos[key] = [];
+      }
+      mapaAgenteDepartamentos[key].push(dep.nome);
+    });
+  });
+
+  chat.agentes = chat.agentes.map(a => ({
+    ...a,
+    departamentos: mapaAgenteDepartamentos[a.nome] || []
+  }));
+
   return chat;
 };
 
