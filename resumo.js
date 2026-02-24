@@ -6,7 +6,7 @@ window.renderResumoChat = function (container, data) {
 
   const chat = data.chat;
 
-  // ===== NORMALIZAÇÃO SEGURA (AJUSTE CRÍTICO) =====
+  // ===== NORMALIZAÇÃO SEGURA =====
   const usuarios =
     Array.isArray(chat.usuarios) && chat.usuarios.length
       ? chat.usuarios
@@ -33,6 +33,23 @@ window.renderResumoChat = function (container, data) {
     return;
   }
 
+  /* ======================================================
+     MAPA AGENTE → DEPARTAMENTOS
+     (Departamento é a fonte da verdade)
+     ====================================================== */
+  const mapaAgenteDepartamentos = {};
+
+  departamentos.forEach(dep => {
+    if (!dep.nome || !Array.isArray(dep.agentes)) return;
+
+    dep.agentes.forEach(nomeAgente => {
+      if (!mapaAgenteDepartamentos[nomeAgente]) {
+        mapaAgenteDepartamentos[nomeAgente] = [];
+      }
+      mapaAgenteDepartamentos[nomeAgente].push(dep.nome);
+    });
+  });
+
   const section = document.createElement("section");
   section.className = "resumo-bloco";
 
@@ -57,6 +74,7 @@ window.renderResumoChat = function (container, data) {
     </div>
   `;
 
+  /* ===== USUÁRIOS DO CHAT ===== */
   if (usuarios.length) {
     html += `
       <h3>👤 Usuários do Chat</h3>
@@ -65,13 +83,15 @@ window.renderResumoChat = function (container, data) {
           <div class="resumo-card">
             <div class="titulo">${u.nome || "-"}</div>
             <div>📧 ${u.email || "-"}</div>
-            <div>🔑 ${u.permissao || "-"}</div>
+            <div>🔑 ${u.senha || "-"}</div>
+            <div>👮 ${u.permissao || "-"}</div>
           </div>
         `).join("")}
       </div>
     `;
   }
 
+  /* ===== DEPARTAMENTOS ===== */
   if (departamentos.length) {
     html += `
       <h3>🏷️ Departamentos</h3>
@@ -92,22 +112,26 @@ window.renderResumoChat = function (container, data) {
     `;
   }
 
+  /* ===== AGENTES DO CHAT ===== */
   if (agentes.length) {
     html += `
       <h3>🎧 Agentes do Chat</h3>
       <div class="resumo-grid">
-        ${agentes.map(a => `
-          <div class="resumo-card">
-            <div class="titulo">${a.nome || "-"}</div>
-            ${
-              a.departamentos?.length
-                ? `<div class="lista">
-                    ${a.departamentos.map(d => `<span class="chip">${d}</span>`).join("")}
-                   </div>`
-                : `<em>Sem departamentos</em>`
-            }
-          </div>
-        `).join("")}
+        ${agentes.map(a => {
+          const deps = mapaAgenteDepartamentos[a.nome] || [];
+          return `
+            <div class="resumo-card">
+              <div class="titulo">${a.nome || "-"}</div>
+              ${
+                deps.length
+                  ? `<div class="lista">
+                      ${deps.map(d => `<span class="chip">${d}</span>`).join("")}
+                     </div>`
+                  : `<em>Sem departamentos</em>`
+              }
+            </div>
+          `;
+        }).join("")}
       </div>
     `;
   }
@@ -165,12 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!dados.voz) return;
   const voz = dados.voz;
 
-  const mapaRamalUsuario = {};
-  (voz.agentes || []).forEach(a => {
-    if (a.ramal && a.nome) mapaRamalUsuario[a.ramal] = a.nome;
-  });
-
-  /* ===== USUÁRIOS ===== */
+  /* ===== USUÁRIOS WEB ===== */
   if (voz.usuarios?.length) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
@@ -189,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ===== AGENTES ===== */
+  /* ===== AGENTES VOZ ===== */
   if (voz.agentes?.length) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
