@@ -294,28 +294,27 @@ window.coletarChatDoDOM = function () {
      SINCRONIZAR DEPARTAMENTOS NOS AGENTES
      (Departamento é a fonte da verdade)
      ===================================================== */
-  const mapaAgenteDepartamentos = {};
-
-  chat.departamentos.forEach(dep => {
-    if (!Array.isArray(dep.agentes)) return;
-
-    dep.agentes.forEach(nomeAgente => {
-      const key = String(nomeAgente).trim();
-      if (!mapaAgenteDepartamentos[key]) {
-        mapaAgenteDepartamentos[key] = [];
-      }
-      mapaAgenteDepartamentos[key].push(dep.nome);
-    });
-  });
-
-  chat.agentes = chat.agentes.map(a => ({
-    ...a,
-    departamentos: mapaAgenteDepartamentos[a.nome] || []
-  }));
-
-  return chat;
-};
-
+        const mapaAgenteDepartamentos = {};
+      
+      chat.departamentos.forEach(dep => {
+        if (!Array.isArray(dep.agentes)) return;
+      
+        dep.agentes.forEach(nomeAgente => {
+          const key = String(nomeAgente).trim().toLowerCase();
+          if (!mapaAgenteDepartamentos[key]) {
+            mapaAgenteDepartamentos[key] = [];
+          }
+          mapaAgenteDepartamentos[key].push(dep.nome);
+        });
+      });
+      
+      chat.agentes = chat.agentes.map(a => ({
+        ...a,
+        departamentos: mapaAgenteDepartamentos[
+          String(a.nome).trim().toLowerCase()
+        ] || []
+      }));
+         
 /* =====================================================
    COMPATIBILIDADE – IMPORTAÇÃO CSV CHAT
    ===================================================== */
