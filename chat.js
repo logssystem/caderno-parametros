@@ -247,30 +247,6 @@ function validarSenha(input, regrasEl) {
 }
 
 /* =====================================================
-   SINCRONIZAR DEPARTAMENTOS NOS AGENTES
-   (Departamento é a fonte da verdade)
-   ===================================================== */
-const mapaAgenteDepartamentos = {};
-
-// percorre departamentos e monta mapa agente -> departamentos
-chat.departamentos.forEach(dep => {
-  if (!dep.nome || !Array.isArray(dep.agentes)) return;
-
-  dep.agentes.forEach(nomeAgente => {
-    if (!mapaAgenteDepartamentos[nomeAgente]) {
-      mapaAgenteDepartamentos[nomeAgente] = [];
-    }
-    mapaAgenteDepartamentos[nomeAgente].push(dep.nome);
-  });
-});
-
-// aplica departamentos nos agentes
-chat.agentes = chat.agentes.map(ag => ({
-  ...ag,
-  departamentos: mapaAgenteDepartamentos[ag.nome] || []
-}));
-
-/* =====================================================
    COLETA FINAL CHAT
    ===================================================== */
 window.coletarChatDoDOM = function () {
@@ -296,12 +272,30 @@ window.coletarChatDoDOM = function () {
       if (d?.nome) chat.agentes.push(d);
     });
 
-  document.querySelectorAll("#listaDepartamentosChat .campo-descricao")
-    .forEach(dep => {
-      const d = dep.getData?.();
-      if (d?.nome) chat.departamentos.push(d);
-    });
-
+  /* =====================================================
+   SINCRONIZAR DEPARTAMENTOS NOS AGENTES
+   (Departamento é a fonte da verdade)
+   ===================================================== */
+   const mapaAgenteDepartamentos = {};
+   
+   // percorre departamentos e monta mapa agente -> departamentos
+   chat.departamentos.forEach(dep => {
+     if (!dep.nome || !Array.isArray(dep.agentes)) return;
+   
+     dep.agentes.forEach(nomeAgente => {
+       if (!mapaAgenteDepartamentos[nomeAgente]) {
+         mapaAgenteDepartamentos[nomeAgente] = [];
+       }
+       mapaAgenteDepartamentos[nomeAgente].push(dep.nome);
+     });
+   });
+   
+   // aplica departamentos nos agentes
+   chat.agentes = chat.agentes.map(ag => ({
+     ...ag,
+     departamentos: mapaAgenteDepartamentos[ag.nome] || []
+   }));
+   
   return chat;
 };
 
