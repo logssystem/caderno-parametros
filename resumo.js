@@ -101,9 +101,23 @@ window.renderResumoChat = function (container, data) {
       <h3>🎧 Agentes do Chat</h3>
       <div class="resumo-grid">
         ${agentes.map(a => {
-          const deps = departamentos
-            .filter(d => Array.isArray(d.agentes) && d.agentes.includes(a.nome))
-            .map(d => d.nome);
+          const nomeAgente = (a.nome || "").trim().toLowerCase();
+         const emailAgente = (a.usuario || "").trim().toLowerCase();
+         
+         const deps = departamentos
+           .filter(d =>
+             Array.isArray(d.agentes) &&
+               d.agentes.some(x => {
+                 const v =
+                   typeof x === "string"
+                     ? x
+                     : x?.nome || x?.value || "";
+               
+                 const normalizado = String(v).trim().toLowerCase();
+                 return normalizado === nomeAgente || normalizado === emailAgente;
+               })
+           )
+           .map(d => d.nome);
 
           return `
             <div class="resumo-card">
