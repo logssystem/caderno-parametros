@@ -209,39 +209,48 @@ window.adicionarDepartamentoChat = function () {
   const listaAgentes = document.createElement("div");
   listaAgentes.style.marginTop = "8px";
 
-const btnAdd = document.createElement("button");
-btnAdd.textContent = "+ Adicionar agente";
+  const btnAdd = document.createElement("button");
+  btnAdd.textContent = "+ Adicionar agente";
 
-btnAdd.onclick = () => {
-  const linha = document.createElement("div");
-  linha.style.display = "flex";
-  linha.style.gap = "6px";
+  btnAdd.onclick = () => {
+    const linha = document.createElement("div");
+    linha.style.display = "flex";
+    linha.style.gap = "6px";
 
-  const select = document.createElement("select");
-  select.innerHTML = `<option value="">Selecione um agente</option>`;
+    const select = document.createElement("select");
+    select.innerHTML = `<option value="">Selecione um agente</option>`;
 
-  document
-    .querySelectorAll("#listaAgentesChat .campo-descricao")
-    .forEach(a => {
-      const d = a.getData?.();
-      if (!d?.nome) return;
+    document
+      .querySelectorAll("#listaAgentesChat .campo-descricao")
+      .forEach(a => {
+        const d = a.getData?.();
+        if (!d?.nome) return;
 
-      const opt = document.createElement("option");
-      opt.value = d.nome;
-      opt.textContent = d.nome;
-      select.appendChild(opt);
+        const opt = document.createElement("option");
+        opt.value = d.nome;
+        opt.textContent = d.nome;
+        select.appendChild(opt);
+      });
+
+    const del = document.createElement("button");
+    del.textContent = "✖";
+    del.onclick = () => linha.remove();
+
+    linha.append(select, del);
+    listaAgentes.appendChild(linha);
+  };
+
+  wrap.getData = () => {
+    const agentes = [];
+    listaAgentes.querySelectorAll("select").forEach(s => {
+      if (s.value) agentes.push(s.value);
     });
+    return { nome: inputNome.value.trim(), agentes };
+  };
 
-  const del = document.createElement("button");
-  del.textContent = "✖";
-  del.onclick = () => linha.remove();
-
-  linha.append(select, del);
-  listaAgentes.appendChild(linha);
+  wrap.append(listaAgentes, btnAdd);
+  lista.appendChild(wrap);
 };
-
-wrap.append(listaAgentes, btnAdd);
-lista.appendChild(wrap);
    
 // ===== 2. COLETA AGENTES (COM DEPARTAMENTOS) =====
 document
