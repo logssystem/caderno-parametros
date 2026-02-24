@@ -209,7 +209,7 @@ window.adicionarDepartamentoChat = function () {
   const listaAgentes = document.createElement("div");
   listaAgentes.style.marginTop = "8px";
 
-  const btnAdd = document.createElement("button");
+const btnAdd = document.createElement("button");
 btnAdd.textContent = "+ Adicionar agente";
 
 btnAdd.onclick = () => {
@@ -220,7 +220,6 @@ btnAdd.onclick = () => {
   const select = document.createElement("select");
   select.innerHTML = `<option value="">Selecione um agente</option>`;
 
-  // lista agentes existentes (DOM)
   document
     .querySelectorAll("#listaAgentesChat .campo-descricao")
     .forEach(a => {
@@ -240,6 +239,9 @@ btnAdd.onclick = () => {
   linha.append(select, del);
   listaAgentes.appendChild(linha);
 };
+
+wrap.append(listaAgentes, btnAdd);
+lista.appendChild(wrap);
    
 // ===== 2. COLETA AGENTES (COM DEPARTAMENTOS) =====
 document
