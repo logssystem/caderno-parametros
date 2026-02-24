@@ -220,24 +220,34 @@ window.adicionarDepartamentoChat = function () {
     const select = document.createElement("select");
     select.innerHTML = `<option value="">Selecione um agente</option>`;
 
-   // ===== 1. COLETA DEPARTAMENTOS =====
-const mapaAgenteDepartamentos = {};
+    btnAdd.onclick = () => {
+  const linha = document.createElement("div");
+  linha.style.display = "flex";
+  linha.style.gap = "6px";
 
-document
-  .querySelectorAll("#listaDepartamentosChat .campo-descricao")
-  .forEach(depEl => {
-    const dep = depEl.getData?.();
-    if (!dep?.nome) return;
+  const select = document.createElement("select");
+  select.innerHTML = `<option value="">Selecione um agente</option>`;
 
-    chat.departamentos.push(dep);
+  // ✅ LISTA DE AGENTES VINDO DO DOM
+  document
+    .querySelectorAll("#listaAgentesChat .campo-descricao")
+    .forEach(a => {
+      const d = a.getData?.();
+      if (!d?.nome) return;
 
-    (dep.agentes || []).forEach(nomeAgente => {
-      if (!mapaAgenteDepartamentos[nomeAgente]) {
-        mapaAgenteDepartamentos[nomeAgente] = [];
-      }
-      mapaAgenteDepartamentos[nomeAgente].push(dep.nome);
+      const opt = document.createElement("option");
+      opt.value = d.nome;
+      opt.textContent = d.nome;
+      select.appendChild(opt);
     });
-  });
+
+  const del = document.createElement("button");
+  del.textContent = "✖";
+  del.onclick = () => linha.remove();
+
+  linha.append(select, del);
+  listaAgentes.appendChild(linha);
+};
 
 // ===== 2. COLETA AGENTES (COM DEPARTAMENTOS) =====
 document
