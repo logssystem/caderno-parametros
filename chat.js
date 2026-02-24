@@ -184,7 +184,7 @@ function gerarAgentesChatAPartirUsuarios() {
 /* =====================================================
    DEPARTAMENTOS CHAT
    ===================================================== */
-window.adicionarDepartamentoChat = function () {
+/*window.adicionarDepartamentoChat = function () {
   const lista = document.getElementById("listaDepartamentosChat");
   if (!lista) return;
 
