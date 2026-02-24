@@ -151,7 +151,7 @@ function gerarAgentesChatAPartirUsuarios() {
 }
 
 /* =====================================================
-   DEPARTAMENTOS CHAT (AJUSTADO)
+   DEPARTAMENTOS CHAT
    ===================================================== */
 window.adicionarDepartamentoChat = function () {
   const lista = document.getElementById("listaDepartamentosChat");
@@ -214,10 +214,7 @@ window.adicionarDepartamentoChat = function () {
     listaAgentes.querySelectorAll("select").forEach(s => {
       if (s.value) agentes.push(s.value);
     });
-    return {
-      nome: nome.value.trim(),
-      agentes
-    };
+    return { nome: nome.value.trim(), agentes };
   };
 
   wrap.append(listaAgentes, btnAdd);
@@ -225,32 +222,7 @@ window.adicionarDepartamentoChat = function () {
 };
 
 /* =====================================================
-   SENHA – PADRÃO PABX
-   ===================================================== */
-function validarSenha(input, regrasEl) {
-  const v = input.value || "";
-
-  if (!v.length) {
-    regrasEl.innerHTML =
-      `<div class="regra-neutra">Mín. 11 | Maiúscula | Número | Especial</div>`;
-    return false;
-  }
-
-  const ok =
-    v.length >= 11 &&
-    /[A-Z]/.test(v) &&
-    /\d/.test(v) &&
-    /[^A-Za-z0-9]/.test(v);
-
-  regrasEl.innerHTML = ok
-    ? `<div class="regra-ok">Senha válida</div>`
-    : `<div class="regra-erro">Mín. 11 | Maiúscula | Número | Especial</div>`;
-
-  return ok;
-}
-
-/* =====================================================
-   COLETA FINAL CHAT
+   COLETA FINAL CHAT (CORRIGIDA)
    ===================================================== */
 window.coletarChatDoDOM = function () {
   const chat = {
@@ -263,60 +235,42 @@ window.coletarChatDoDOM = function () {
     departamentos: []
   };
 
-  /* ===== COLETAR USUÁRIOS ===== */
-  document
-    .querySelectorAll("#listaUsuariosChat .campo-descricao")
-    .forEach(u => {
-      const d = u.getData?.();
-      if (d?.nome) chat.usuarios.push(d);
-    });
+  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
+    const d = u.getData?.();
+    if (d?.nome) chat.usuarios.push(d);
+  });
 
-  /* ===== COLETAR AGENTES ===== */
-  document
-    .querySelectorAll("#listaAgentesChat .campo-descricao")
-    .forEach(a => {
-      const d = a.getData?.();
-      if (d?.nome) chat.agentes.push(d);
-    });
+  document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
+    const d = a.getData?.();
+    if (d?.nome) chat.agentes.push(d);
+  });
 
-  /* =====================================================
-     ✅ ESTE BLOCO É O QUE ESTAVA FALTANDO
-     COLETAR DEPARTAMENTOS
-     ===================================================== */
-  document
-    .querySelectorAll("#listaDepartamentosChat .campo-descricao")
-    .forEach(d => {
-      const dep = d.getData?.();
-      if (dep?.nome) chat.departamentos.push(dep);
-    });
+  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
+    const dep = d.getData?.();
+    if (dep?.nome) chat.departamentos.push(dep);
+  });
 
-  /* =====================================================
-     SINCRONIZAR DEPARTAMENTOS NOS AGENTES
-     (Departamento é a fonte da verdade)
-     ===================================================== */
-        const mapaAgenteDepartamentos = {};
-      
-      chat.departamentos.forEach(dep => {
-        if (!Array.isArray(dep.agentes)) return;
-      
-        dep.agentes.forEach(nomeAgente => {
-          const key = String(nomeAgente).trim().toLowerCase();
-          if (!mapaAgenteDepartamentos[key]) {
-            mapaAgenteDepartamentos[key] = [];
-          }
-          mapaAgenteDepartamentos[key].push(dep.nome);
-        });
-      });
-      
-      chat.agentes = chat.agentes.map(a => ({
-        ...a,
-        departamentos: mapaAgenteDepartamentos[
-          String(a.nome).trim().toLowerCase()
-        ] || []
-      }));
-         
+  // 🔥 DEPARTAMENTO = FONTE DA VERDADE
+  const mapa = {};
+
+  chat.departamentos.forEach(dep => {
+    dep.agentes.forEach(a => {
+      const key = String(a).trim().toLowerCase();
+      if (!mapa[key]) mapa[key] = [];
+      mapa[key].push(dep.nome);
+    });
+  });
+
+  chat.agentes = chat.agentes.map(a => ({
+    ...a,
+    departamentos: mapa[String(a.nome).trim().toLowerCase()] || []
+  }));
+
+  return chat;
+};
+
 /* =====================================================
-   COMPATIBILIDADE – IMPORTAÇÃO CSV CHAT
+   CSV COMPATIBILIDADE
    ===================================================== */
 window.acionarImportacaoUsuariosChat = function () {
   const input = document.getElementById("importUsuariosChat");
@@ -340,4 +294,4 @@ window.importarUsuariosChat = window.acionarImportacaoUsuariosChat;
 window.importarUsuariosChatCSV = window.acionarImportacaoUsuariosChat;
 window.processarCSVUsuariosChat = processarCSVUsuariosChat;
 
-console.log("✅ Chat.js carregado sem erros");
+console.log("✅ Chat.js carregado e consistente");
