@@ -87,18 +87,10 @@ window.adicionarUsuarioChat = function () {
 
 /* =====================================================
    PROCESSAMENTO CSV – USUÁRIOS CHAT
-   (FUNÇÃO BASE QUE ESTAVA FALTANDO)
    ===================================================== */
 function processarCSVUsuariosChat(texto) {
-  const linhas = texto
-    .replace(/\r/g, "")
-    .split("\n")
-    .filter(l => l.trim());
-
-  if (linhas.length < 2) {
-    console.warn("CSV inválido ou vazio");
-    return;
-  }
+  const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
+  if (linhas.length < 2) return;
 
   const sep = linhas[0].includes(";") ? ";" : ",";
   const headers = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
@@ -106,47 +98,24 @@ function processarCSVUsuariosChat(texto) {
   linhas.forEach(linha => {
     const valores = linha.split(sep);
     const row = {};
-
-    headers.forEach((h, i) => {
-      row[h] = (valores[i] || "").trim();
-    });
-
+    headers.forEach((h, i) => row[h] = (valores[i] || "").trim());
     if (!row.usuario) return;
 
-    // evita duplicar usuário
     const existe = [...document.querySelectorAll("#listaUsuariosChat .campo-nome")]
       .some(i => i.value === row.usuario);
-
     if (existe) return;
 
     const wrap = adicionarUsuarioChat();
-
     wrap.querySelector(".campo-nome").value = row.usuario;
     wrap.querySelector("input[type=email]").value = row.email || "";
     wrap.querySelector(".campo-senha").value = row.senha || "";
-
-    const select = wrap.querySelector("select");
-    if (select && row.permissao) {
-      [...select.options].forEach(opt => {
-        if (opt.value.toLowerCase() === row.permissao.toLowerCase()) {
-          opt.selected = true;
-        }
-      });
-    }
 
     if (row.agente?.toLowerCase() === "sim") {
       wrap.querySelector("input[type=checkbox]").checked = true;
     }
   });
 
-  // garante geração dos agentes
   gerarAgentesChatAPartirUsuarios();
-
-  if (typeof mostrarToast === "function") {
-    mostrarToast("Usuários do chat importados com sucesso!");
-  } else {
-    console.log("Usuários do chat importados com sucesso!");
-  }
 }
 
 /* =====================================================
@@ -159,41 +128,41 @@ function gerarAgentesChatAPartirUsuarios() {
   lista.innerHTML = "";
 
   document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
-    const data = u.getData?.();
-    if (data?.agente && data.nome) {
-      const wrap = document.createElement("div");
-      wrap.className = "campo-descricao";
+    const d = u.getData?.();
+    if (!d?.agente || !d.nome) return;
 
-      const nome = document.createElement("input");
-      nome.value = data.nome;
-      nome.disabled = true;
+    const wrap = document.createElement("div");
+    wrap.className = "campo-descricao";
 
-      wrap.getData = () => ({
-        nome: data.nome,
-        usuario: data.email,
-        senha: data.senha,
-        departamentos: []
-      });
+    const nome = document.createElement("input");
+    nome.value = d.nome;
+    nome.disabled = true;
 
-      wrap.append(nome);
-      lista.appendChild(wrap);
-    }
+    wrap.getData = () => ({
+      nome: d.nome,
+      usuario: d.email,
+      senha: d.senha,
+      departamentos: []
+    });
+
+    wrap.append(nome);
+    lista.appendChild(wrap);
   });
 }
 
 /* =====================================================
-   DEPARTAMENTOS CHAT
+   DEPARTAMENTOS CHAT (AJUSTADO)
    ===================================================== */
-/*window.adicionarDepartamentoChat = function () {
+window.adicionarDepartamentoChat = function () {
   const lista = document.getElementById("listaDepartamentosChat");
   if (!lista) return;
 
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  const linhaTopo = document.createElement("div");
-  linhaTopo.style.display = "flex";
-  linhaTopo.style.gap = "8px";
+  const topo = document.createElement("div");
+  topo.style.display = "flex";
+  topo.style.gap = "8px";
 
   const inputNome = document.createElement("input");
   inputNome.placeholder = "Nome do departamento";
@@ -203,8 +172,8 @@ function gerarAgentesChatAPartirUsuarios() {
   btnRemover.textContent = "🗑";
   btnRemover.onclick = () => wrap.remove();
 
-  linhaTopo.append(inputNome, btnRemover);
-  wrap.appendChild(linhaTopo);
+  topo.append(inputNome, btnRemover);
+  wrap.appendChild(topo);
 
   const listaAgentes = document.createElement("div");
   listaAgentes.style.marginTop = "8px";
@@ -231,39 +200,6 @@ function gerarAgentesChatAPartirUsuarios() {
         opt.textContent = d.nome;
         select.appendChild(opt);
       });
-
-    const del = document.createElement("button");
-    del.textContent = "✖";
-    del.onclick = () => linha.remove();
-
-    linha.append(select, del);
-    listaAgentes.appendChild(linha);
-  };
-
-  wrap.getData = () => {
-    const agentes = [];
-    listaAgentes.querySelectorAll("select").forEach(s => {
-      if (s.value) agentes.push(s.value);
-    });
-    return { nome: inputNome.value.trim(), agentes };
-  };
-
-  wrap.append(listaAgentes, btnAdd);
-  lista.appendChild(wrap);
-};
-   
-// ===== 2. COLETA AGENTES (COM DEPARTAMENTOS) =====
-document
-  .querySelectorAll("#listaAgentesChat .campo-descricao")
-  .forEach(a => {
-    const d = a.getData?.();
-    if (!d?.nome) return;
-
-    chat.agentes.push({
-      ...d,
-      departamentos: mapaAgenteDepartamentos[d.nome] || []
-    });
-  });
 
     const del = document.createElement("button");
     del.textContent = "✖";
@@ -311,7 +247,7 @@ function validarSenha(input, regrasEl) {
 }
 
 /* =====================================================
-   🔥 COLETA FINAL – ÚNICA PARTE AJUSTADA 🔥
+   COLETA FINAL CHAT
    ===================================================== */
 window.coletarChatDoDOM = function () {
   const chat = {
@@ -324,77 +260,50 @@ window.coletarChatDoDOM = function () {
     departamentos: []
   };
 
-  document
-    .querySelectorAll("#listaUsuariosChat .campo-descricao")
+  document.querySelectorAll("#listaUsuariosChat .campo-descricao")
     .forEach(u => {
       const d = u.getData?.();
-      if (d && d.nome) chat.usuarios.push(d);
+      if (d?.nome) chat.usuarios.push(d);
     });
 
-  document
-    .querySelectorAll("#listaAgentesChat .campo-descricao")
+  document.querySelectorAll("#listaAgentesChat .campo-descricao")
     .forEach(a => {
       const d = a.getData?.();
-      if (d && d.nome) chat.agentes.push(d);
+      if (d?.nome) chat.agentes.push(d);
     });
 
-  document
-    .querySelectorAll("#listaDepartamentosChat .campo-descricao")
-    .forEach(d => {
-      const data = d.getData?.();
-      if (data && data.nome) chat.departamentos.push(data);
+  document.querySelectorAll("#listaDepartamentosChat .campo-descricao")
+    .forEach(dep => {
+      const d = dep.getData?.();
+      if (d?.nome) chat.departamentos.push(d);
     });
 
   return chat;
 };
 
 /* =====================================================
-   COMPATIBILIDADE – IMPORTAÇÃO CSV CHAT (LEGADO)
-   NÃO REMOVER – usado pelo HTML antigo
+   COMPATIBILIDADE – IMPORTAÇÃO CSV CHAT
    ===================================================== */
+window.acionarImportacaoUsuariosChat = function () {
+  const input = document.getElementById("importUsuariosChat");
+  if (!input) return;
 
-// função base REAL (já existe no seu código)
-if (typeof window.acionarImportacaoUsuariosChat !== "function") {
-  window.acionarImportacaoUsuariosChat = function () {
-    const input = document.getElementById("importUsuariosChat");
-    if (!input) {
-      console.warn("Input importUsuariosChat não encontrado");
-      return;
-    }
+  input.value = "";
+  input.click();
 
-    input.value = "";
-    input.click();
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
 
-    input.onchange = () => {
-      const file = input.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = e => {
-        if (typeof processarCSVUsuariosChat === "function") {
-          processarCSVUsuariosChat(e.target.result);
-        } else {
-          console.error("processarCSVUsuariosChat não encontrada");
-        }
-      };
-      reader.readAsText(file);
-    };
+    const reader = new FileReader();
+    reader.onload = e => processarCSVUsuariosChat(e.target.result);
+    reader.readAsText(file);
   };
-}
+};
 
-/* ===== ALIASES DE SEGURANÇA (HTML antigo) ===== */
-window.acionarImportacaoUsuariosChatCSV =
-  window.acionarImportacaoUsuariosChat;
-
-window.importarUsuariosChat =
-  window.acionarImportacaoUsuariosChat;
-
-window.importarUsuariosChatCSV =
-  window.acionarImportacaoUsuariosChat;
-
-console.log("✅ Compatibilidade CSV Chat carregada");
-
-// =====================================================
-// EXPOR FUNÇÃO CSV PARA COMPATIBILIDADE GLOBAL
-// =====================================================
+window.acionarImportacaoUsuariosChatCSV = window.acionarImportacaoUsuariosChat;
+window.importarUsuariosChat = window.acionarImportacaoUsuariosChat;
+window.importarUsuariosChatCSV = window.acionarImportacaoUsuariosChat;
 window.processarCSVUsuariosChat = processarCSVUsuariosChat;
+
+console.log("✅ Chat.js carregado sem erros");
