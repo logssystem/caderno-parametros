@@ -164,15 +164,15 @@ window.adicionarDepartamentoChat = function () {
   topo.style.display = "flex";
   topo.style.gap = "8px";
 
-  const inputNome = document.createElement("input");
-  inputNome.placeholder = "Nome do departamento";
-  inputNome.style.flex = "1";
+  const nome = document.createElement("input");
+  nome.placeholder = "Nome do departamento";
+  nome.style.flex = "1";
 
-  const btnRemover = document.createElement("button");
-  btnRemover.textContent = "🗑";
-  btnRemover.onclick = () => wrap.remove();
+  const btnDel = document.createElement("button");
+  btnDel.textContent = "🗑";
+  btnDel.onclick = () => wrap.remove();
 
-  topo.append(inputNome, btnRemover);
+  topo.append(nome, btnDel);
   wrap.appendChild(topo);
 
   const listaAgentes = document.createElement("div");
@@ -214,7 +214,10 @@ window.adicionarDepartamentoChat = function () {
     listaAgentes.querySelectorAll("select").forEach(s => {
       if (s.value) agentes.push(s.value);
     });
-    return { nome: inputNome.value.trim(), agentes };
+    return {
+      nome: nome.value.trim(),
+      agentes
+    };
   };
 
   wrap.append(listaAgentes, btnAdd);
