@@ -123,12 +123,12 @@ window.renderResumoChat = function (container, data) {
             <div class="resumo-card">
               <div class="titulo">${a.nome || "-"}</div>
               ${
-                deps.length
-                  ? `<div class="lista">
-                      ${deps.map(d => `<span class="chip">${d}</span>`).join("")}
-                     </div>`
-                  : `<em>Sem departamentos</em>`
-              }
+                 deps.length
+                   ? `<div class="lista">
+                       ${deps.map(d => `<span class="chip">${d}</span>`).join("")}
+                      </div>`
+                   : ``
+               }
             </div>
           `;
         }).join("")}
