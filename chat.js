@@ -36,8 +36,10 @@ window.adicionarUsuarioChat = function () {
   senha.classList.add("campo-senha");
 
   const regras = document.createElement("div");
-  validarSenha(senha, regras);
-  senha.oninput = () => validarSenha(senha, regras);
+  if (typeof window.validarSenha === "function") {
+  window.validarSenha(senha, regras);
+  senha.oninput = () => window.validarSenha(senha, regras);
+}
 
   const permissao = document.createElement("select");
   permissao.style.marginTop = "8px";
