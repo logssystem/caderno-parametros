@@ -37,9 +37,9 @@ window.adicionarUsuarioChat = function () {
 
   const regras = document.createElement("div");
   if (typeof window.validarSenha === "function") {
-  window.validarSenha(senha, regras);
-  senha.oninput = () => window.validarSenha(senha, regras);
-}
+    window.validarSenha(senha, regras);
+    senha.oninput = () => window.validarSenha(senha, regras);
+  }
 
   const permissao = document.createElement("select");
   permissao.style.marginTop = "8px";
@@ -88,7 +88,7 @@ window.adicionarUsuarioChat = function () {
 };
 
 /* =====================================================
-   PROCESSAMENTO CSV – USUÁRIOS CHAT
+   PROCESSAMENTO CSV – USUÁRIOS CHAT (ROBUSTO)
    ===================================================== */
 function processarCSVUsuariosChat(texto) {
   const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
@@ -97,47 +97,57 @@ function processarCSVUsuariosChat(texto) {
   const sep = linhas[0].includes(";") ? ";" : ",";
   const headers = linhas.shift().split(sep).map(h => h.trim().toLowerCase());
 
-  linhas.forEach(linha => {
-    const valores = linha.split(sep);
-    const row = {};
-    headers.forEach((h, i) => row[h] = (valores[i] || "").trim());
-    if (!row.usuario) return;
+  linhas.forEach((linha, index) => {
+    try {
+      const valores = linha.split(sep);
+      const row = {};
+      headers.forEach((h, i) => row[h] = (valores[i] || "").trim());
 
-    const existe = [...document.querySelectorAll("#listaUsuariosChat .campo-nome")]
-      .some(i => i.value === row.usuario);
-    if (existe) return;
+      const nomeCSV = row.usuario || row.nome;
+      if (!nomeCSV) return;
 
-    const wrap = adicionarUsuarioChat();
-    wrap.querySelector(".campo-nome").value = row.usuario;
-    wrap.querySelector("input[type=email]").value = row.email || "";
-    wrap.querySelector(".campo-senha").value = row.senha || "";
+      const existe = [...document.querySelectorAll("#listaUsuariosChat .campo-nome")]
+        .some(i => i.value === nomeCSV);
+      if (existe) return;
 
-   const agenteVal = (row.agente || "").toLowerCase();
-if (["sim", "yes", "true", "1"].includes(agenteVal)) {
-  wrap.querySelector("input[type=checkbox]").checked = true;
-}
+      const wrap = adicionarUsuarioChat();
+      if (!wrap) return;
 
-// Permissão
-if (row.permissao) {
-  const select = wrap.querySelector("select");
-  [...select.options].forEach(opt => {
-    if (opt.value.toLowerCase() === row.permissao.toLowerCase()) {
-      select.value = opt.value;
+      wrap.querySelector(".campo-nome").value = nomeCSV;
+      wrap.querySelector("input[type=email]").value = row.email || "";
+      wrap.querySelector(".campo-senha").value = row.senha || "";
+
+      const agenteVal = (row.agente || "").toLowerCase();
+      if (["sim", "yes", "true", "1"].includes(agenteVal)) {
+        wrap.querySelector("input[type=checkbox]").checked = true;
+      }
+
+      if (row.permissao) {
+        const select = wrap.querySelector("select");
+        [...select.options].forEach(opt => {
+          if (opt.value.toLowerCase() === row.permissao.toLowerCase()) {
+            select.value = opt.value;
+          }
+        });
+      }
+
+      // Revalida senha (SE existir função)
+      const senhaInput = wrap.querySelector(".campo-senha");
+      const regras = wrap.querySelector("div");
+      if (senhaInput && typeof window.validarSenha === "function") {
+        window.validarSenha(senhaInput, regras);
+      }
+
+    } catch (e) {
+      console.error("Erro ao importar linha CSV:", index + 2, e);
     }
-  });
-}
-
-// Revalida senha visualmente
-const senhaInput = wrap.querySelector(".campo-senha");
-const regras = wrap.querySelector("div");
-if (senhaInput) validarSenha(senhaInput, regras);
   });
 
   gerarAgentesChatAPartirUsuarios();
 }
 
 /* =====================================================
-   AGENTES CHAT (GERADOS DOS USUÁRIOS)
+   AGENTES CHAT
    ===================================================== */
 function gerarAgentesChatAPartirUsuarios() {
   const lista = document.getElementById("listaAgentesChat");
@@ -207,17 +217,15 @@ window.adicionarDepartamentoChat = function () {
     const select = document.createElement("select");
     select.innerHTML = `<option value="">Selecione um agente</option>`;
 
-    document
-      .querySelectorAll("#listaAgentesChat .campo-descricao")
-      .forEach(a => {
-        const d = a.getData?.();
-        if (!d?.nome) return;
+    document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
+      const d = a.getData?.();
+      if (!d?.nome) return;
 
-        const opt = document.createElement("option");
-        opt.value = d.nome;
-        opt.textContent = d.nome;
-        select.appendChild(opt);
-      });
+      const opt = document.createElement("option");
+      opt.value = d.nome;
+      opt.textContent = d.nome;
+      select.appendChild(opt);
+    });
 
     const del = document.createElement("button");
     del.textContent = "✖";
@@ -240,7 +248,7 @@ window.adicionarDepartamentoChat = function () {
 };
 
 /* =====================================================
-   COLETA FINAL CHAT (CORRIGIDA)
+   COLETA FINAL CHAT
    ===================================================== */
 window.coletarChatDoDOM = function () {
   const chat = {
@@ -268,9 +276,7 @@ window.coletarChatDoDOM = function () {
     if (dep?.nome) chat.departamentos.push(dep);
   });
 
-  // 🔥 DEPARTAMENTO = FONTE DA VERDADE
   const mapa = {};
-
   chat.departamentos.forEach(dep => {
     dep.agentes.forEach(a => {
       const key = String(a).trim().toLowerCase();
@@ -307,9 +313,7 @@ window.acionarImportacaoUsuariosChat = function () {
   };
 };
 
-window.acionarImportacaoUsuariosChatCSV = window.acionarImportacaoUsuariosChat;
 window.importarUsuariosChat = window.acionarImportacaoUsuariosChat;
-window.importarUsuariosChatCSV = window.acionarImportacaoUsuariosChat;
 window.processarCSVUsuariosChat = processarCSVUsuariosChat;
 
 console.log("✅ Chat.js carregado e consistente");
