@@ -6,22 +6,9 @@ window.renderResumoChat = function (container, data) {
 
   const chat = data.chat;
 
-  // ===== NORMALIZAÇÃO SEGURA =====
-  const usuarios =
-    Array.isArray(chat.usuarios) && chat.usuarios.length
-      ? chat.usuarios
-      : [];
-
-  const agentes =
-    Array.isArray(chat.agentes) && chat.agentes.length
-      ? chat.agentes
-      : [];
-
-  const departamentos =
-    Array.isArray(chat.departamentos) && chat.departamentos.length
-      ? chat.departamentos
-      : [];
-
+  const usuarios = Array.isArray(chat.usuarios) ? chat.usuarios : [];
+  const agentes = Array.isArray(chat.agentes) ? chat.agentes : [];
+  const departamentos = Array.isArray(chat.departamentos) ? chat.departamentos : [];
   const canais = Array.isArray(chat.canais) ? chat.canais : [];
 
   if (
@@ -29,9 +16,7 @@ window.renderResumoChat = function (container, data) {
     !usuarios.length &&
     !agentes.length &&
     !departamentos.length
-  ) {
-    return;
-  }
+  ) return;
 
   const section = document.createElement("section");
   section.className = "resumo-bloco";
@@ -57,7 +42,7 @@ window.renderResumoChat = function (container, data) {
     </div>
   `;
 
-  /* ===== USUÁRIOS DO CHAT ===== */
+  /* ===== USUÁRIOS CHAT ===== */
   if (usuarios.length) {
     html += `
       <h3>👤 Usuários do Chat</h3>
@@ -74,20 +59,20 @@ window.renderResumoChat = function (container, data) {
     `;
   }
 
-  /* ===== DEPARTAMENTOS ===== */
+  /* ===== DEPARTAMENTOS CHAT ===== */
   if (departamentos.length) {
     html += `
       <h3>🏷️ Departamentos</h3>
       <div class="resumo-grid">
         ${departamentos.map(d => `
           <div class="resumo-card">
-            <div class="titulo">${d.nome || "-"}</div>
+            <div class="titulo">${d.nome}</div>
             ${
               d.agentes?.length
                 ? `<div class="lista">
                     ${d.agentes.map(a => `<span class="chip">${a}</span>`).join("")}
                    </div>`
-                : `<em>Sem agentes vinculados</em>`
+                : ""
             }
           </div>
         `).join("")}
@@ -95,54 +80,33 @@ window.renderResumoChat = function (container, data) {
     `;
   }
 
-  /* ===== AGENTES DO CHAT (DERIVADO DOS DEPARTAMENTOS) ===== */
+  /* ===== AGENTES CHAT ===== */
   if (agentes.length) {
     html += `
       <h3>🎧 Agentes do Chat</h3>
       <div class="resumo-grid">
-        ${agentes.map(a => {
-          const nomeAgente = (a.nome || "").trim().toLowerCase();
-         const emailAgente = (a.usuario || "").trim().toLowerCase();
-         
-         const deps = departamentos
-           .filter(d =>
-             Array.isArray(d.agentes) &&
-               d.agentes.some(x => {
-                 const v =
-                   typeof x === "string"
-                     ? x
-                     : x?.nome || x?.value || "";
-               
-                 const normalizado = String(v).trim().toLowerCase();
-                 return normalizado === nomeAgente || normalizado === emailAgente;
-               })
-           )
-           .map(d => d.nome);
-
-          return `
-            <div class="resumo-card">
-              <div class="titulo">${a.nome || "-"}</div>
-              ${
-                 deps.length
-                   ? `<div class="lista">
-                       ${deps.map(d => `<span class="chip">${d}</span>`).join("")}
-                      </div>`
-                   : ``
-               }
-            </div>
-          `;
-        }).join("")}
+        ${agentes.map(a => `
+          <div class="resumo-card">
+            <div class="titulo">${a.nome}</div>
+            ${
+              a.departamentos?.length
+                ? `<div class="lista">
+                    ${a.departamentos.map(d => `<span class="chip">${d}</span>`).join("")}
+                   </div>`
+                : ""
+            }
+          </div>
+        `).join("")}
       </div>
     `;
   }
 
-  // 🔒 FINALIZA O BLOCO DO CHAT
   section.innerHTML = html;
   container.appendChild(section);
 };
 
 /* ======================================================
-   RESUMO – PRINCIPAL (PABX INTACTO)
+   RESUMO – PRINCIPAL (VOZ / PABX + CHAT)
    ====================================================== */
 document.addEventListener("DOMContentLoaded", () => {
   const temaSalvo = localStorage.getItem("tema");
@@ -163,17 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!resumo) return;
   resumo.innerHTML = "";
 
-  function identificarDestino(nome, voz) {
-    if (!nome) return "Não definido";
-    if (voz.regras_tempo?.some(r => r.nome === nome)) return `⏰ Regra de Tempo — ${nome}`;
-    if (voz.filas?.some(f => f.nome === nome)) return `📞 Fila — ${nome}`;
-    if (voz.uras?.some(u => u.nome === nome)) return `🎙️ URA — ${nome}`;
-    if (voz.grupo_ring?.some(g => g.nome === nome)) return `🔔 Grupo de Ring — ${nome}`;
-    if (voz.ramais?.some(r => String(r.ramal) === String(nome))) return `☎️ Ramal — ${nome}`;
-    return nome;
-  }
-
-  /* ===== CLIENTE ===== */
+  /* ================= CLIENTE ================= */
   if (dados.cliente) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
@@ -187,10 +141,14 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  if (!dados.voz) return;
+  if (!dados.voz) {
+    window.renderResumoChat(resumo, dados);
+    return;
+  }
+
   const voz = dados.voz;
 
-  /* ===== USUÁRIOS WEB ===== */
+  /* ================= USUÁRIOS WEB ================= */
   if (voz.usuarios?.length) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
@@ -209,11 +167,28 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ===== AGENTES VOZ ===== */
+  /* ================= RAMAIS ================= */
+  if (voz.ramais?.length) {
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>☎️ Ramais</h2>
+        <div class="resumo-grid">
+          ${voz.ramais.map(r => `
+            <div class="resumo-card">
+              <div class="titulo">Ramal ${r.ramal}</div>
+              <div>🔐 ${r.senha || "-"}</div>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  /* ================= AGENTES VOZ ================= */
   if (voz.agentes?.length) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
-        <h2>🎧 Agentes</h2>
+        <h2>🎧 Agentes (Voz)</h2>
         <div class="resumo-grid">
           ${voz.agentes.map(a => `
             <div class="resumo-card">
@@ -227,7 +202,80 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ===== CHAT (FINAL) ===== */
+  /* ================= FILAS ================= */
+  if (voz.filas?.length) {
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>📞 Filas</h2>
+        <div class="resumo-grid">
+          ${voz.filas.map(f => `
+            <div class="resumo-card">
+              <div class="titulo">${f.nome}</div>
+              ${
+                f.agentes?.length
+                  ? `<div class="lista">
+                      ${f.agentes.map(a => `<span class="chip">${a}</span>`).join("")}
+                     </div>`
+                  : ""
+              }
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  /* ================= GRUPO DE RING ================= */
+  if (voz.grupo_ring?.length) {
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>🔔 Grupo de Ring</h2>
+        <div class="resumo-grid">
+          ${voz.grupo_ring.map(g => `
+            <div class="resumo-card">
+              <div class="titulo">${g.nome}</div>
+              <div>${g.estrategia || "-"}</div>
+              ${
+                g.ramais?.length
+                  ? `<div class="lista">
+                      ${g.ramais.map(r => `<span class="chip">${r}</span>`).join("")}
+                     </div>`
+                  : ""
+              }
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  /* ================= URA ================= */
+  if (voz.uras?.length) {
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>🎙️ URAs</h2>
+        <div class="resumo-grid">
+          ${voz.uras.map(u => `
+            <div class="resumo-card">
+              <div class="titulo">${u.nome}</div>
+              <div>${u.mensagem}</div>
+              ${
+                u.opcoes?.length
+                  ? `<ul>
+                      ${u.opcoes.map(o =>
+                        `<li>Tecla ${o.tecla} → ${o.destino}</li>`
+                      ).join("")}
+                     </ul>`
+                  : ""
+              }
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  /* ================= CHAT ================= */
   window.renderResumoChat(resumo, dados);
 });
 
