@@ -1,86 +1,49 @@
 /* ======================================================
-   RESUMO – CHAT / OMNICHANNEL (ISOLADO / SEGURO)
+   RESUMO – CHAT (ISOLADO)
    ====================================================== */
 window.renderResumoChat = function (container, data) {
   if (!container || !data?.chat) return;
 
   const chat = data.chat;
+  const usuarios = chat.usuarios || [];
+  const agentes = chat.agentes || [];
+  const departamentos = chat.departamentos || [];
+  const canais = chat.canais || [];
 
-  const usuarios = Array.isArray(chat.usuarios) ? chat.usuarios : [];
-  const agentes = Array.isArray(chat.agentes) ? chat.agentes : [];
-  const departamentos = Array.isArray(chat.departamentos) ? chat.departamentos : [];
-  const canais = Array.isArray(chat.canais) ? chat.canais : [];
-
-  if (
-    !chat.tipo &&
-    !usuarios.length &&
-    !agentes.length &&
-    !departamentos.length
-  ) return;
+  if (!chat.tipo && !usuarios.length && !agentes.length) return;
 
   const section = document.createElement("section");
   section.className = "resumo-bloco";
 
   let html = `
     <h2>💬 Chat / Omnichannel</h2>
-
     <div class="resumo-card">
       <div><strong>Tipo:</strong> ${chat.tipo || "-"}</div>
       <div><strong>API:</strong> ${chat.api || "-"}</div>
       <div><strong>Conta:</strong> ${chat.conta || "-"}</div>
-
       ${
         canais.length
-          ? `<div style="margin-top:8px">
-              <strong>Canais:</strong>
-              <div class="lista">
-                ${canais.map(c => `<span class="chip">${c}</span>`).join("")}
-              </div>
-            </div>`
+          ? `<div class="lista">${canais.map(c => `<span class="chip">${c}</span>`).join("")}</div>`
           : ""
       }
     </div>
   `;
 
-  /* ===== USUÁRIOS CHAT ===== */
   if (usuarios.length) {
     html += `
       <h3>👤 Usuários do Chat</h3>
       <div class="resumo-grid">
         ${usuarios.map(u => `
           <div class="resumo-card">
-            <div class="titulo">${u.nome || "-"}</div>
-            <div>📧 ${u.email || "-"}</div>
-            <div>🔑 ${u.senha || "-"}</div>
-            <div>👮 ${u.permissao || "-"}</div>
+            <div class="titulo">${u.nome}</div>
+            <div>${u.email}</div>
+            <div>${u.permissao}</div>
           </div>
         `).join("")}
       </div>
     `;
   }
 
-  /* ===== DEPARTAMENTOS CHAT ===== */
-  if (departamentos.length) {
-    html += `
-      <h3>🏷️ Departamentos</h3>
-      <div class="resumo-grid">
-        ${departamentos.map(d => `
-          <div class="resumo-card">
-            <div class="titulo">${d.nome}</div>
-            ${
-              d.agentes?.length
-                ? `<div class="lista">
-                    ${d.agentes.map(a => `<span class="chip">${a}</span>`).join("")}
-                   </div>`
-                : ""
-            }
-          </div>
-        `).join("")}
-      </div>
-    `;
-  }
-
-  /* ===== AGENTES CHAT ===== */
   if (agentes.length) {
     html += `
       <h3>🎧 Agentes do Chat</h3>
@@ -90,9 +53,7 @@ window.renderResumoChat = function (container, data) {
             <div class="titulo">${a.nome}</div>
             ${
               a.departamentos?.length
-                ? `<div class="lista">
-                    ${a.departamentos.map(d => `<span class="chip">${d}</span>`).join("")}
-                   </div>`
+                ? `<div class="lista">${a.departamentos.map(d => `<span class="chip">${d}</span>`).join("")}</div>`
                 : ""
             }
           </div>
@@ -106,60 +67,56 @@ window.renderResumoChat = function (container, data) {
 };
 
 /* ======================================================
-   RESUMO – PRINCIPAL (VOZ / PABX + CHAT)
+   RESUMO – PRINCIPAL (VOZ + CHAT)
    ====================================================== */
 document.addEventListener("DOMContentLoaded", () => {
-  const temaSalvo = localStorage.getItem("tema");
-  document.body.classList.toggle("dark", temaSalvo === "dark");
+  const resumo = document.getElementById("resumo");
+  if (!resumo) return;
 
   const raw = localStorage.getItem("CONFIG_CADERNO");
   if (!raw) return;
 
-  let dados;
-  try {
-    dados = JSON.parse(raw);
-  } catch {
-    console.error("JSON inválido");
-    return;
-  }
-
-  const resumo = document.getElementById("resumo");
-  if (!resumo) return;
+  const dados = JSON.parse(raw);
   resumo.innerHTML = "";
+
+  /* ================= FUNÇÃO CHAVE ================= */
+  function identificarDestino(nome) {
+    if (!nome) return "-";
+    if (dados.voz?.regras_tempo?.some(r => r.nome === nome)) return `⏰ Regra de Tempo — ${nome}`;
+    if (dados.voz?.filas?.some(f => f.nome === nome)) return `📞 Fila — ${nome}`;
+    if (dados.voz?.grupo_ring?.some(g => g.nome === nome)) return `🔔 Grupo de Ring — ${nome}`;
+    if (dados.voz?.uras?.some(u => u.nome === nome)) return `🎙️ URA — ${nome}`;
+    if (dados.voz?.ramais?.some(r => String(r.ramal) === String(nome))) return `☎️ Ramal — ${nome}`;
+    return nome;
+  }
 
   /* ================= CLIENTE ================= */
   if (dados.cliente) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
-        <h2>🏢 Dados do Cliente</h2>
+        <h2>🏢 Cliente</h2>
         <div class="resumo-card">
-          <div><strong>Empresa:</strong> ${dados.cliente.empresa}</div>
-          <div><strong>Domínio:</strong> ${dados.cliente.dominio}</div>
-          <div><strong>CNPJ:</strong> ${dados.cliente.cnpj}</div>
+          <div>${dados.cliente.empresa}</div>
+          <div>${dados.cliente.dominio}</div>
+          <div>${dados.cliente.cnpj}</div>
         </div>
       </section>
     `;
-  }
-
-  if (!dados.voz) {
-    window.renderResumoChat(resumo, dados);
-    return;
   }
 
   const voz = dados.voz;
+  if (!voz) return;
 
-  /* ================= USUÁRIOS WEB ================= */
-  if (voz.usuarios?.length) {
+  /* ================= NÚMEROS / ENTRADAS ================= */
+  if (voz.entradas?.length) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
-        <h2>👤 Usuários Web</h2>
+        <h2>📞 Números / Entradas</h2>
         <div class="resumo-grid">
-          ${voz.usuarios.map(u => `
+          ${voz.entradas.map(e => `
             <div class="resumo-card">
-              <div class="titulo">${u.nome}</div>
-              <div>📧 ${u.email}</div>
-              <div>🔐 ${u.senha}</div>
-              <div>${u.permissao} ${u.agente ? `<span class="badge">Agente</span>` : ""}</div>
+              <div class="titulo">${e.numero}</div>
+              <div>${identificarDestino(e.destino)}</div>
             </div>
           `).join("")}
         </div>
@@ -167,34 +124,18 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ================= RAMAIS ================= */
-  if (voz.ramais?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco">
-        <h2>☎️ Ramais</h2>
-        <div class="resumo-grid">
-          ${voz.ramais.map(r => `
-            <div class="resumo-card">
-              <div class="titulo">Ramal ${r.ramal}</div>
-              <div>🔐 ${r.senha || "-"}</div>
-            </div>
-          `).join("")}
-        </div>
-      </section>
-    `;
-  }
-
-  /* ================= AGENTES VOZ ================= */
+  /* ================= AGENTES ================= */
   if (voz.agentes?.length) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
-        <h2>🎧 Agentes (Voz)</h2>
+        <h2>🎧 Agentes</h2>
         <div class="resumo-grid">
           ${voz.agentes.map(a => `
             <div class="resumo-card">
               <div class="titulo">${a.nome}</div>
-              <div>📞 Ramal: ${a.ramal || "Não vinculado"}</div>
+              <div>📞 Ramal: ${a.ramal || "-"}</div>
               ${a.multiskill ? `<span class="badge">Multiskill</span>` : ""}
+              ${a.regra_tempo ? `<div>⏰ ${a.regra_tempo}</div>` : ""}
             </div>
           `).join("")}
         </div>
@@ -202,22 +143,18 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ================= FILAS ================= */
-  if (voz.filas?.length) {
+  /* ================= PAUSAS ================= */
+  if (voz.pausas?.length) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
-        <h2>📞 Filas</h2>
+        <h2>⏸️ Pausas</h2>
         <div class="resumo-grid">
-          ${voz.filas.map(f => `
+          ${voz.pausas.map(p => `
             <div class="resumo-card">
-              <div class="titulo">${f.nome}</div>
-              ${
-                f.agentes?.length
-                  ? `<div class="lista">
-                      ${f.agentes.map(a => `<span class="chip">${a}</span>`).join("")}
-                     </div>`
-                  : ""
-              }
+              <div class="titulo">${p.grupo}</div>
+              <div class="lista">
+                ${p.itens.map(i => `<span class="chip">${i}</span>`).join("")}
+              </div>
             </div>
           `).join("")}
         </div>
@@ -225,23 +162,16 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  /* ================= GRUPO DE RING ================= */
-  if (voz.grupo_ring?.length) {
+  /* ================= REGRAS DE TEMPO ================= */
+  if (voz.regras_tempo?.length) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
-        <h2>🔔 Grupo de Ring</h2>
+        <h2>⏰ Regras de Tempo</h2>
         <div class="resumo-grid">
-          ${voz.grupo_ring.map(g => `
+          ${voz.regras_tempo.map(r => `
             <div class="resumo-card">
-              <div class="titulo">${g.nome}</div>
-              <div>${g.estrategia || "-"}</div>
-              ${
-                g.ramais?.length
-                  ? `<div class="lista">
-                      ${g.ramais.map(r => `<span class="chip">${r}</span>`).join("")}
-                     </div>`
-                  : ""
-              }
+              <div class="titulo">${r.nome}</div>
+              <div>${r.descricao || ""}</div>
             </div>
           `).join("")}
         </div>
@@ -253,21 +183,38 @@ document.addEventListener("DOMContentLoaded", () => {
   if (voz.uras?.length) {
     resumo.innerHTML += `
       <section class="resumo-bloco">
-        <h2>🎙️ URAs</h2>
+        <h2>🎙️ URA</h2>
         <div class="resumo-grid">
           ${voz.uras.map(u => `
             <div class="resumo-card">
               <div class="titulo">${u.nome}</div>
               <div>${u.mensagem}</div>
-              ${
-                u.opcoes?.length
-                  ? `<ul>
-                      ${u.opcoes.map(o =>
-                        `<li>Tecla ${o.tecla} → ${o.destino}</li>`
-                      ).join("")}
-                     </ul>`
-                  : ""
-              }
+              <ul>
+                ${u.opcoes.map(o =>
+                  `<li>Tecla ${o.tecla} → ${identificarDestino(o.destino)}</li>`
+                ).join("")}
+              </ul>
+            </div>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  /* ================= PESQUISA DE SATISFAÇÃO ================= */
+  if (voz.pesquisas?.length) {
+    resumo.innerHTML += `
+      <section class="resumo-bloco">
+        <h2>⭐ Pesquisa de Satisfação</h2>
+        <div class="resumo-grid">
+          ${voz.pesquisas.map(p => `
+            <div class="resumo-card">
+              <div class="titulo">${p.nome}</div>
+              <div>${p.introducao}</div>
+              <div>${p.pergunta}</div>
+              <ul>
+                ${p.respostas.map(r => `<li>${r}</li>`).join("")}
+              </ul>
             </div>
           `).join("")}
         </div>
