@@ -110,9 +110,25 @@ function processarCSVUsuariosChat(texto) {
     wrap.querySelector("input[type=email]").value = row.email || "";
     wrap.querySelector(".campo-senha").value = row.senha || "";
 
-    if (row.agente?.toLowerCase() === "sim") {
-      wrap.querySelector("input[type=checkbox]").checked = true;
+   const agenteVal = (row.agente || "").toLowerCase();
+if (["sim", "yes", "true", "1"].includes(agenteVal)) {
+  wrap.querySelector("input[type=checkbox]").checked = true;
+}
+
+// Permissão
+if (row.permissao) {
+  const select = wrap.querySelector("select");
+  [...select.options].forEach(opt => {
+    if (opt.value.toLowerCase() === row.permissao.toLowerCase()) {
+      select.value = opt.value;
     }
+  });
+}
+
+// Revalida senha visualmente
+const senhaInput = wrap.querySelector(".campo-senha");
+const regras = wrap.querySelector("div");
+if (senhaInput) validarSenha(senhaInput, regras);
   });
 
   gerarAgentesChatAPartirUsuarios();
