@@ -107,6 +107,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const voz = dados.voz || {};
 
+   if (
+     voz.usuarios?.length ||
+     voz.ramais?.length ||
+     voz.agentes?.length ||
+     voz.filas?.length ||
+     voz.uras?.length ||
+     voz.grupo_ring?.length
+   ) {
+     resumo.innerHTML += `
+       <section class="resumo-bloco modulo-titulo">
+         <h1>📞 Voz / Call Center</h1>
+       </section>
+     `;
+   }
+   
   function identificarDestino(nome) {
     if (!nome) return "-";
 
@@ -355,7 +370,21 @@ document.addEventListener("DOMContentLoaded", () => {
        </section>
      `;
    }
-   
+
+   /* ================= SEPARADOR CHAT ================= */
+   if (
+     dados.chat &&
+     (dados.chat.tipo ||
+      dados.chat.usuarios?.length ||
+      dados.chat.agentes?.length)
+   ) {
+     resumo.innerHTML += `
+       <section class="resumo-bloco modulo-titulo">
+         <h1>💬 Chat / Omnichannel</h1>
+       </section>
+     `;
+   }
+      
   /* ================= CHAT ================= */
   window.renderResumoChat(resumo, dados);
 
