@@ -304,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
      `;
    }
 
-  /* ================= PESQUISA ================= */
+   /* ================= PESQUISA ================= */
    if (voz.pesquisas?.length) {
      resumo.innerHTML += `
        <section class="resumo-bloco">
@@ -313,13 +313,6 @@ document.addEventListener("DOMContentLoaded", () => {
            ${voz.pesquisas.map(p => `
              <div class="resumo-card">
                <div class="titulo">${p.nome}</div>
-   
-               <div>
-                 <strong>Status:</strong> 
-                 ${p.ativa ? 
-                   `<span class="badge" style="background:#28a745">Ativa</span>` : 
-                   `<span class="badge" style="background:#dc3545">Inativa</span>`}
-               </div>
    
                ${p.introducao ? `<div><strong>Áudio inicial:</strong> ${p.introducao}</div>` : ""}
    
