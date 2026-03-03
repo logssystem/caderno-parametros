@@ -1471,7 +1471,7 @@ window.explorar = function () {
     const agentesSemRamal = agentes.filter(a => !a.ramal);
     if (agentesSemRamal.length) {
       mostrarToast("Existe agente sem ramal vinculado.", true);
-      throw new Error("Agente sem ramal");
+      return null;
     }
 
     /* ================= FILAS ================= */
@@ -1512,7 +1512,7 @@ window.explorar = function () {
     const pesquisa = coletarPesquisaSatisfacao();
     const pesquisas = pesquisa ? [pesquisa] : [];
 
-    /* ================= JSON FINAL ================= */
+    /* ================= BASE VOZ ================= */
 
     const dados = {
       cliente: {
@@ -1534,9 +1534,21 @@ window.explorar = function () {
       }
     };
 
+    /* ================= CHAT (CORREÇÃO DEFINITIVA) ================= */
+
+    let chat = null;
+
+    if (window.chatState?.tipo === "api" || window.chatState?.tipo === "qr") {
+      if (typeof window.coletarChatDoDOM === "function") {
+        chat = window.coletarChatDoDOM();
+      }
+    }
+
     if (chat && chat.tipo) {
       dados.chat = chat;
     }
+
+    /* ================= FINAL ================= */
 
     document.getElementById("resultado").textContent =
       JSON.stringify(dados, null, 2);
