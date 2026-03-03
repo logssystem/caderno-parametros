@@ -70,6 +70,25 @@ window.renderResumoChat = function (container, data) {
   container.appendChild(section);
 };
 
+if (chat.departamentos?.length) {
+  html += `
+    <h3>🏢 Departamentos</h3>
+    <div class="resumo-grid">
+      ${chat.departamentos.map(dep => `
+        <div class="resumo-card">
+          <div class="titulo">${dep.nome}</div>
+          ${
+            dep.agentes?.length
+              ? `<div class="lista">
+                  ${dep.agentes.map(a => `<span class="chip">${a}</span>`).join("")}
+                 </div>`
+              : `<div class="texto-secundario">Sem agentes</div>`
+          }
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
 
 /* ======================================================
    RESUMO – PRINCIPAL
