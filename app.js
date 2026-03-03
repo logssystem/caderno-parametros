@@ -1564,48 +1564,48 @@ window.explorar = function () {
   }
 };
 
-    /* ================= CHAT (COLETA OFICIAL) ================= */
+/* ================= CHAT (COLETA OFICIAL) ================= */
 
-    const chat = window.coletarChatDoDOM
-      ? window.coletarChatDoDOM()
-      : null;
+const chat = window.coletarChatDoDOM
+  ? window.coletarChatDoDOM()
+  : null;
 
-    /* ================= JSON FINAL ================= */
+/* ================= JSON FINAL ================= */
 
-    const dados = {
-      cliente: {
-        empresa,
-        dominio,
-        cnpj: document.getElementById("cnpjCliente")?.value || ""
-      },
-      voz: {
-        usuarios,
-        ramais,
-        agentes,
-        filas,
-        regras_tempo,
-        uras: coletarURAs(),
-        grupo_ring: coletarGrupoRing(),
-        entradas: coletarEntradas(),
-        pausas: coletarPausas(),
-        pesquisaSatisfacao: coletarPesquisaSatisfacao()
-      }
-    };
-
-    if (chat && chat.tipo) {
-      dados.chat = chat;
-    }
-
-    document.getElementById("resultado").textContent =
-      JSON.stringify(dados, null, 2);
-
-    mostrarToast("JSON gerado com sucesso!");
-
-  } catch (e) {
-    console.error(e);
-    mostrarToast("Erro ao gerar JSON", true);
-    return null;
+const dados = {
+  cliente: {
+    empresa,
+    dominio,
+    cnpj: document.getElementById("cnpjCliente")?.value || ""
+  },
+  voz: {
+    usuarios,
+    ramais,
+    agentes,
+    filas,
+    regras_tempo,
+    uras: coletarURAs(),
+    grupo_ring: coletarGrupoRing(),
+    entradas: coletarEntradas(),
+    pausas: coletarPausas(),
+    pesquisaSatisfacao: coletarPesquisaSatisfacao()
   }
+};
+
+if (chat && chat.tipo) {
+  dados.chat = chat;
+}
+
+document.getElementById("resultado").textContent =
+  JSON.stringify(dados, null, 2);
+
+mostrarToast("JSON gerado com sucesso!");
+
+} catch (e) {
+  console.error(e);
+  mostrarToast("Erro ao gerar JSON", true);
+  return null;
+}
 };
 
   // ================= CHAT – SELECIONAR TIPO =================
