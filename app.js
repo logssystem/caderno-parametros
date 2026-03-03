@@ -1557,7 +1557,7 @@ function mostrarToast(msg, error = false) {
     mostrarToast("JSON gerado com sucesso!");
     return dados;
 
-  } catch (e) {
+   catch (e) {
     console.error(e);
     mostrarToast("Erro ao gerar JSON", true);
     return null;
@@ -1602,7 +1602,7 @@ function mostrarToast(msg, error = false) {
     mostrarToast("JSON gerado com sucesso!");
     return dados;
 
-  } catch (e) {
+    catch (e) {
     console.error(e);
     mostrarToast("Erro ao gerar JSON", true);
     return null;
