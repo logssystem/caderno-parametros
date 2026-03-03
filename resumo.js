@@ -360,3 +360,8 @@ document.addEventListener("DOMContentLoaded", () => {
   window.renderResumoChat(resumo, dados);
 
 });
+
+/* ================= VOLTAR ================= */
+window.voltar = function () {
+  window.location.href = "index.html"; 
+};
