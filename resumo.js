@@ -1,4 +1,4 @@
-/* ======================================================
+//* ======================================================
    RESUMO – CHAT (BLINDADO E ESTÁVEL)
    ====================================================== */
 window.renderResumoChat = function (container, data) {
@@ -28,6 +28,7 @@ window.renderResumoChat = function (container, data) {
     </div>
   `;
 
+  /* ================= USUÁRIOS ================= */
   if (usuarios.length) {
     html += `
       <h3>👤 Usuários do Chat</h3>
@@ -43,21 +44,20 @@ window.renderResumoChat = function (container, data) {
     `;
   }
 
+  /* ================= AGENTES ================= */
   if (agentes.length) {
     html += `
       <h3>🎧 Agentes do Chat</h3>
       <div class="resumo-grid">
         ${agentes.map(a => {
-          const deps = Array.isArray(a.departamentos)
-            ? a.departamentos
-            : (a.departamentos ? [a.departamentos] : []);
+          const deps = Array.isArray(a.departamentos) ? a.departamentos : [];
           return `
             <div class="resumo-card">
               <div class="titulo">${a.nome}</div>
               ${
                 deps.length
                   ? `<div class="lista">${deps.map(d => `<span class="chip">${d}</span>`).join("")}</div>`
-                  : ""
+                  : `<div class="texto-secundario">Sem departamento</div>`
               }
             </div>
           `;
@@ -66,29 +66,30 @@ window.renderResumoChat = function (container, data) {
     `;
   }
 
+  /* ================= DEPARTAMENTOS ================= */
+  if (chat.departamentos?.length) {
+    html += `
+      <h3>🏢 Departamentos</h3>
+      <div class="resumo-grid">
+        ${chat.departamentos.map(dep => `
+          <div class="resumo-card">
+            <div class="titulo">${dep.nome}</div>
+            ${
+              dep.agentes?.length
+                ? `<div class="lista">
+                    ${dep.agentes.map(a => `<span class="chip">${a}</span>`).join("")}
+                   </div>`
+                : `<div class="texto-secundario">Sem agentes</div>`
+            }
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
   section.innerHTML = html;
   container.appendChild(section);
 };
-
-if (chat.departamentos?.length) {
-  html += `
-    <h3>🏢 Departamentos</h3>
-    <div class="resumo-grid">
-      ${chat.departamentos.map(dep => `
-        <div class="resumo-card">
-          <div class="titulo">${dep.nome}</div>
-          ${
-            dep.agentes?.length
-              ? `<div class="lista">
-                  ${dep.agentes.map(a => `<span class="chip">${a}</span>`).join("")}
-                 </div>`
-              : `<div class="texto-secundario">Sem agentes</div>`
-          }
-        </div>
-      `).join("")}
-    </div>
-  `;
-}
 
 /* ======================================================
    RESUMO – PRINCIPAL
