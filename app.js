@@ -1600,7 +1600,6 @@ window.explorar = function () {
       JSON.stringify(dados, null, 2);
 
     mostrarToast("JSON gerado com sucesso!");
-    return dados;
 
   } catch (e) {
     console.error(e);
