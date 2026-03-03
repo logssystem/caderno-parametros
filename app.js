@@ -1600,6 +1600,7 @@ document.getElementById("resultado").textContent =
   JSON.stringify(dados, null, 2);
 
 mostrarToast("JSON gerado com sucesso!");
+return null;
 
 } catch (e) {
   console.error(e);
