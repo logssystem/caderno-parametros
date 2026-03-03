@@ -1150,12 +1150,17 @@ function coletarGrupoRing() {
 
   document.querySelectorAll("#listaGrupoRing .campo-descricao").forEach(g => {
     const nome = g.querySelector(".campo-nome")?.value.trim();
+
+    // 🔥 LÊ DIRETAMENTE DO SELECT (não depende mais do dataset)
+    const selectEstr = g.querySelector("select");
+    const estrategiaSelecionada = selectEstr?.value || "";
+
     const ramais = JSON.parse(g.dataset.ramais || "[]");
 
     if (nome && ramais.length) {
       grupos.push({
         nome,
-        estrategia: g.dataset.estrategia || "",
+        estrategia: estrategiaSelecionada,
         ramais
       });
     }
