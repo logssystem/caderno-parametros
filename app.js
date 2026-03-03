@@ -1405,102 +1405,102 @@ function mostrarToast(msg, error = false) {
 
 /* ================= SALVAR / EXPLORAR ================= */
 
-  window.explorar = function () {
-    try {
-  
-      const empresa = document.getElementById("empresaCliente")?.value.trim();
-      const dominio = document.getElementById("dominioCliente")?.value.trim();
-  
-      if (!empresa || !dominio) {
-        mostrarToast("Preencha o nome da empresa e o domínio do cliente", true);
-        return null;
-      }
-  
-      if (!validarDominioCliente()) {
-        mostrarToast("O domínio deve terminar com .sobreip.com.br", true);
-        return null;
-      }
-  
-      /* ================= USUÁRIOS ================= */
-  
-      const usuarios = [];
-      document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
-        if (!u.getNome()) return;
-  
-        usuarios.push({
-          nome: u.getNome(),
-          email: u.getEmail(),
-          senha: u.getSenha(),
-          permissao: u.getPermissao(),
-          agente: u.isAgente()
-        });
-      });
-  
-      /* ================= RAMAIS ================= */
-  
-      const ramais = [];
-      document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
-        if (!r.getNome()) return;
-  
-        ramais.push({
-          ramal: r.getNome(),
-          senha: r.getSenha()
-        });
-      });
-  
-      /* ================= AGENTES ================= */
-  
-      const agentes = [];
-      document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
-        const nome = a.querySelector(".campo-nome")?.value || "";
-        if (!nome) return;
-  
-        agentes.push({
-          nome,
-          ramal: a.getRamal ? a.getRamal() : "",
-          multiskill: a.isMultiskill ? a.isMultiskill() : false
-        });
-      });
-  
-      const agentesSemRamal = agentes.filter(a => !a.ramal);
-      if (agentesSemRamal.length) {
-        mostrarToast("Existe agente sem ramal vinculado.", true);
-        throw new Error("Agente sem ramal");
-      }
-  
-      /* ================= FILAS ================= */
-  
-      const filas = [];
-      document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
-        const nome = f.querySelector(".campo-nome")?.value.trim();
-        const listaAg = JSON.parse(f.dataset.agentes || "[]");
-  
-        if (nome && listaAg.length) {
-          filas.push({ nome, agentes: listaAg });
-        }
-      });
-  
-      /* ================= REGRAS DE TEMPO ================= */
-  
-      const regras_tempo = [];
-      document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
-        if (r.getData) {
-          const data = r.getData();
-          if (data.nome) regras_tempo.push(data);
-        }
-      });
+window.explorar = function () {
+  try {
 
-    /* ================= OUTROS BLOCOS ================= */
+    const empresa = document.getElementById("empresaCliente")?.value.trim();
+    const dominio = document.getElementById("dominioCliente")?.value.trim();
+
+    if (!empresa || !dominio) {
+      mostrarToast("Preencha o nome da empresa e o domínio do cliente", true);
+      return null;
+    }
+
+    if (!validarDominioCliente()) {
+      mostrarToast("O domínio deve terminar com .sobreip.com.br", true);
+      return null;
+    }
+
+    /* ================= USUÁRIOS ================= */
+
+    const usuarios = [];
+    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+      if (!u.getNome()) return;
+
+      usuarios.push({
+        nome: u.getNome(),
+        email: u.getEmail(),
+        senha: u.getSenha(),
+        permissao: u.getPermissao(),
+        agente: u.isAgente()
+      });
+    });
+
+    /* ================= RAMAIS ================= */
+
+    const ramais = [];
+    document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+      if (!r.getNome()) return;
+
+      ramais.push({
+        ramal: r.getNome(),
+        senha: r.getSenha()
+      });
+    });
+
+    /* ================= AGENTES ================= */
+
+    const agentes = [];
+    document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+      const nome = a.querySelector(".campo-nome")?.value || "";
+      if (!nome) return;
+
+      agentes.push({
+        nome,
+        ramal: a.getRamal ? a.getRamal() : "",
+        multiskill: a.isMultiskill ? a.isMultiskill() : false
+      });
+    });
+
+    const agentesSemRamal = agentes.filter(a => !a.ramal);
+    if (agentesSemRamal.length) {
+      mostrarToast("Existe agente sem ramal vinculado.", true);
+      throw new Error("Agente sem ramal");
+    }
+
+    /* ================= FILAS ================= */
+
+    const filas = [];
+    document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
+      const nome = f.querySelector(".campo-nome")?.value.trim();
+      const listaAg = JSON.parse(f.dataset.agentes || "[]");
+
+      if (nome && listaAg.length) {
+        filas.push({ nome, agentes: listaAg });
+      }
+    });
+
+    /* ================= REGRAS DE TEMPO ================= */
+
+    const regras_tempo = [];
+    document.querySelectorAll("#listaRegrasTempo .campo-descricao").forEach(r => {
+      if (r.getData) {
+        const data = r.getData();
+        if (data.nome) regras_tempo.push(data);
+      }
+    });
+
+    /* ================= OUTROS ================= */
 
     const grupo_ring = coletarGrupoRing() || [];
     const uras = coletarURAs() || [];
     const entradas = coletarEntradas() || [];
 
     const pausa = coletarPausas();
-    const pausas = pausa ? [pausa] : []; // 🔥 agora vira array
+    const pausas = pausa ? [pausa] : [];
 
     const pesquisa = coletarPesquisaSatisfacao();
-    const pesquisas = pesquisa ? [pesquisa] : []; // 🔥 padroniza array
+    const pesquisas = pesquisa ? [pesquisa] : [];
 
     /* ================= CHAT ================= */
 
@@ -1557,7 +1557,7 @@ function mostrarToast(msg, error = false) {
     mostrarToast("JSON gerado com sucesso!");
     return dados;
 
-   catch (e) {
+  } catch (e) {
     console.error(e);
     mostrarToast("Erro ao gerar JSON", true);
     return null;
@@ -1602,7 +1602,7 @@ function mostrarToast(msg, error = false) {
     mostrarToast("JSON gerado com sucesso!");
     return dados;
 
-    catch (e) {
+  } catch (e) {
     console.error(e);
     mostrarToast("Erro ao gerar JSON", true);
     return null;
