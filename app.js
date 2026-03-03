@@ -1512,29 +1512,6 @@ window.explorar = function () {
     const pesquisa = coletarPesquisaSatisfacao();
     const pesquisas = pesquisa ? [pesquisa] : [];
 
-    /* ================= CHAT ================= */
-
-    let chat = window.coletarChatDoDOM
-      ? window.coletarChatDoDOM()
-      : null;
-
-    if (chat && chat.departamentos?.length && chat.agentes?.length) {
-
-      const mapa = {};
-
-      chat.departamentos.forEach(dep => {
-        (dep.agentes || []).forEach(nomeAgente => {
-          if (!mapa[nomeAgente]) mapa[nomeAgente] = [];
-          mapa[nomeAgente].push(dep.nome);
-        });
-      });
-
-      chat.agentes = chat.agentes.map(a => ({
-        ...a,
-        departamentos: mapa[a.nome] || []
-      }));
-    }
-
     /* ================= JSON FINAL ================= */
 
     const dados = {
