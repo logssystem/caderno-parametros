@@ -313,20 +313,36 @@ document.addEventListener("DOMContentLoaded", () => {
            ${voz.pesquisas.map(p => `
              <div class="resumo-card">
                <div class="titulo">${p.nome}</div>
-               <div>${p.introducao || ""}</div>
-               <div><strong>Pergunta:</strong> ${p.pergunta || ""}</div>
-               <ul>
+   
+               <div>
+                 <strong>Status:</strong> 
+                 ${p.ativa ? 
+                   `<span class="badge" style="background:#28a745">Ativa</span>` : 
+                   `<span class="badge" style="background:#dc3545">Inativa</span>`}
+               </div>
+   
+               ${p.introducao ? `<div><strong>Áudio inicial:</strong> ${p.introducao}</div>` : ""}
+   
+               <div style="margin-top:6px;">
+                 <strong>Pergunta:</strong><br>
+                 ${p.pergunta || "-"}
+               </div>
+   
+               <ul style="margin-top:8px;">
                  ${(p.respostas || []).map(r =>
                    `<li>${r.nota} - ${r.descricao}</li>`
                  ).join("")}
                </ul>
+   
+               ${p.encerramento ? `<div style="margin-top:8px;"><strong>Áudio final:</strong> ${p.encerramento}</div>` : ""}
+   
              </div>
            `).join("")}
          </div>
        </section>
      `;
    }
-
+   
   /* ================= CHAT ================= */
   window.renderResumoChat(resumo, dados);
 
