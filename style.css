@@ -52,6 +52,13 @@ body {
   cursor: pointer;
 }
 
+.btn-voltar-intro {
+  position: relative;
+  z-index: 9999;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 /* BOTÃO VOLTAR */
 .btn-voltar-intro {
   background: transparent;
