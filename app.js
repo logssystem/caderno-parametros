@@ -379,15 +379,15 @@ function criarRespostaPesquisa() {
 
 function togglePausas() {
   const bloco = document.getElementById("pausasConteudo");
-  const chatArea = document.getElementById("chat-area");
+  if (!bloco) return;
 
-  // se o chat estiver visível, NÃO abre pausa
-  if (chatArea && chatArea.style.display !== "none") {
+  // verifica se o módulo VOZ está ativo
+  const modo = localStorage.getItem("modo_atendimento");
+
+  if (modo === "chat") {
     mostrarToast("Pausas são exclusivas do Call Center (Voz)", true);
     return;
   }
-
-  if (!bloco) return;
 
   bloco.style.display =
     bloco.style.display === "none" ? "block" : "none";
