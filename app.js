@@ -873,39 +873,6 @@ function gerarAgentesAPartirUsuarios() {
         if (nome && ramal) ramaisSalvos[nome] = ramal;
     });
     
-  function gerarAgentesChatAPartirUsuarios() {
-
-    const lista = document.getElementById("listaAgentesChat");
-    if (!lista) return;
-
-    lista.innerHTML = "";
-
-    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
-
-        if (u.isAgenteOmni && u.isAgenteOmni() && u.getNome()) {
-
-            const wrap = document.createElement("div");
-            wrap.className = "campo-descricao";
-
-            const linha = document.createElement("div");
-            linha.className = "linha-principal";
-
-            const nome = document.createElement("input");
-            nome.className = "campo-nome";
-            nome.value = u.getNome();
-            nome.disabled = true;
-
-            linha.append(nome);
-            wrap.append(linha);
-
-            lista.appendChild(wrap);
-
-        }
-
-    });
-
-}
-    
     listaAgentes.innerHTML = "";
 
     document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
@@ -964,6 +931,39 @@ function gerarAgentesAPartirUsuarios() {
             listaAgentes.append(wrap);
         }
     });
+}
+
+function gerarAgentesChatAPartirUsuarios() {
+
+    const lista = document.getElementById("listaAgentesChat");
+    if (!lista) return;
+
+    lista.innerHTML = "";
+
+    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+
+        if (u.isAgenteOmni && u.isAgenteOmni() && u.getNome()) {
+
+            const wrap = document.createElement("div");
+            wrap.className = "campo-descricao";
+
+            const linha = document.createElement("div");
+            linha.className = "linha-principal";
+
+            const nome = document.createElement("input");
+            nome.className = "campo-nome";
+            nome.value = u.getNome();
+            nome.disabled = true;
+
+            linha.append(nome);
+            wrap.append(linha);
+
+            lista.appendChild(wrap);
+
+        }
+
+    });
+
 }
 
 /* ================= DESTINOS URA ================= */
