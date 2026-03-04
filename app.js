@@ -1895,6 +1895,8 @@ window.initCaderno = function () {
       window.inicializarChatUI();
     }
   }
+
+  setTimeout(syncTudo, 200);
 };
 
 function bloquearLetrasRamalRange() {
