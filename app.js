@@ -577,6 +577,12 @@ function criarCampo(tipo) {
         boxOmni.style.alignItems = "center";
         boxOmni.style.gap = "6px";
         boxOmni.style.marginTop = "6px";
+
+        const modo = localStorage.getItem("modo_atendimento");
+
+        if (modo !== "ambos") {
+            boxOmni.style.display = "none";
+        }
         
         chkAgenteOmni = document.createElement("input");
         chkAgenteOmni.type = "checkbox";
@@ -863,7 +869,35 @@ function gerarAgentesAPartirUsuarios() {
         const ramal = a.getRamal ? a.getRamal() : "";
         if (nome && ramal) ramaisSalvos[nome] = ramal;
     });
+    
+    function gerarAgentesChatAPartirUsuarios() {
 
+    const lista = document.getElementById("listaAgentesChat");
+    if (!lista) return;
+
+    lista.innerHTML = "";
+
+    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+
+        if (u.isAgenteOmni && u.isAgenteOmni() && u.getNome()) {
+
+            const wrap = document.createElement("div");
+            wrap.className = "campo-descricao";
+
+            const nome = document.createElement("input");
+            nome.className = "campo-nome";
+            nome.value = u.getNome();
+            nome.disabled = true;
+
+            wrap.append(nome);
+
+            lista.append(wrap);
+        }
+
+    });
+
+}
+    
     listaAgentes.innerHTML = "";
 
     document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
@@ -1280,6 +1314,7 @@ window.coletarChatDoDOM = function () {
 
 function syncTudo() {
     gerarAgentesAPartirUsuarios();
+    gerarAgentesChatAPartirUsuarios();
     atualizarSelectAgentesFila();
     atualizarSelectRamaisGrupo();
     atualizarTodosDestinosURA();
