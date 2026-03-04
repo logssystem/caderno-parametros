@@ -936,24 +936,18 @@ function gerarAgentesAPartirUsuarios() {
 function gerarAgentesChatAPartirUsuarios() {
 
     const lista = document.getElementById("listaAgentesChat");
-
-    if (!lista) {
-        console.warn("listaAgentesChat ainda não existe");
-        return;
-    }
+    if (!lista) return;
 
     lista.innerHTML = "";
 
-    const usuarios = document.querySelectorAll("#listaUsuariosWeb .campo-descricao");
+    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
 
-    usuarios.forEach(u => {
+        const nome = u.querySelector(".campo-nome")?.value;
 
-        const nomeUsuario = u.getNome?.();
-        const agenteOmni = u.isAgenteOmni?.();
+        // pega o SEGUNDO checkbox (omnichannel)
+        const chkOmni = u.querySelectorAll("input[type=checkbox]")[1];
 
-        console.log("Verificando usuário:", nomeUsuario, "omni:", agenteOmni);
-
-        if (agenteOmni && nomeUsuario) {
+        if (chkOmni && chkOmni.checked && nome) {
 
             const wrap = document.createElement("div");
             wrap.className = "campo-descricao";
@@ -961,17 +955,15 @@ function gerarAgentesChatAPartirUsuarios() {
             const linha = document.createElement("div");
             linha.className = "linha-principal";
 
-            const nome = document.createElement("input");
-            nome.className = "campo-nome";
-            nome.value = nomeUsuario;
-            nome.disabled = true;
+            const inputNome = document.createElement("input");
+            inputNome.className = "campo-nome";
+            inputNome.value = nome;
+            inputNome.disabled = true;
 
-            linha.append(nome);
+            linha.append(inputNome);
             wrap.append(linha);
 
             lista.appendChild(wrap);
-
-            console.log("Agente omnichannel criado:", nomeUsuario);
         }
 
     });
