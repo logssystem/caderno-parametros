@@ -1488,8 +1488,7 @@ window.explorar = function () {
         email: u.getEmail(),
         senha: u.getSenha(),
         permissao: u.getPermissao(),
-        agente_callcenter: u.isAgente(),
-        agente_omnichannel: u.isAgenteOmni()
+        agente: u.isAgente()
       });
 
     /* ================= RAMAIS ================= */
