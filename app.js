@@ -1823,3 +1823,24 @@ window.initCaderno = function () {
     }
   }
 };
+
+function bloquearLetrasRamalRange() {
+
+  const inicio = document.getElementById("ramalInicio");
+  const fim = document.getElementById("ramalFim");
+
+  if (inicio) {
+    inicio.addEventListener("input", () => {
+      inicio.value = inicio.value.replace(/\D/g, "");
+    });
+  }
+
+  if (fim) {
+    fim.addEventListener("input", () => {
+      fim.value = fim.value.replace(/\D/g, "");
+    });
+  }
+
+}
+
+document.addEventListener("DOMContentLoaded", bloquearLetrasRamalRange);
