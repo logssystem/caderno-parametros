@@ -936,7 +936,12 @@ function gerarAgentesAPartirUsuarios() {
 function gerarAgentesChatAPartirUsuarios() {
 
     const lista = document.getElementById("listaAgentesChat");
-    if (!lista) return;
+
+    // se o módulo chat ainda não carregou, tenta novamente
+    if (!lista) {
+        setTimeout(gerarAgentesChatAPartirUsuarios, 200);
+        return;
+    }
 
     lista.innerHTML = "";
 
