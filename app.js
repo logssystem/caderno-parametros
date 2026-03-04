@@ -1479,18 +1479,20 @@ window.explorar = function () {
 
     const usuarios = [];
     document
-      .querySelectorAll(`#${listas.usuario_web} .campo-descricao`)
-      .forEach(u => {
-        if (!u.getNome()) return;
-
-        usuarios.push({
-        nome: u.getNome(),
-        email: u.getEmail(),
-        senha: u.getSenha(),
-        permissao: u.getPermissao(),
-        agente: u.isAgente()
-      });
-
+    .querySelectorAll(`#${listas.usuario_web} .campo-descricao`)
+    .forEach(u => {
+      if (!u.getNome()) return;
+  
+      usuarios.push({
+      nome: u.getNome(),
+      email: u.getEmail(),
+      senha: u.getSenha(),
+      permissao: u.getPermissao(),
+      agente_callcenter: u.isAgente(),
+      agente_omnichannel: u.isAgenteOmni()
+    });
+  
+    });
     /* ================= RAMAIS ================= */
 
     const ramais = [];
