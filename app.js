@@ -523,6 +523,7 @@ function criarCampo(tipo) {
     let permissao = null;
     let regras = null;
     let chkAgente = null;
+    let chkAgenteOmni = null;
 
     /* ===== USUÁRIO WEB ===== */
     if (tipo === "usuario_web") {
@@ -570,6 +571,21 @@ function criarCampo(tipo) {
 
         boxAgente.append(chkAgente, txt);
         wrap.append(boxAgente);
+        
+        const boxOmni = document.createElement("label");
+        boxOmni.style.display = "flex";
+        boxOmni.style.alignItems = "center";
+        boxOmni.style.gap = "6px";
+        boxOmni.style.marginTop = "6px";
+        
+        chkAgenteOmni = document.createElement("input");
+        chkAgenteOmni.type = "checkbox";
+        
+        const txtOmni = document.createElement("span");
+        txtOmni.textContent = "Este usuário é agente omnichannel";
+        
+        boxOmni.append(chkAgenteOmni, txtOmni);
+        wrap.append(boxOmni);
 
         regras = document.createElement("div");
         regras.style.marginTop = "8px";
@@ -806,6 +822,7 @@ if (tipo === "ring") {
     wrap.getSenha = () => senhaInput?.value || "";
     wrap.getPermissao = () => permissao?.value || "";
     wrap.isAgente = () => chkAgente ? chkAgente.checked : false;
+    wrap.isAgenteOmni = () => chkAgenteOmni ? chkAgenteOmni.checked : false;
 
     return wrap;
 }
@@ -1467,12 +1484,12 @@ window.explorar = function () {
         if (!u.getNome()) return;
 
         usuarios.push({
-          nome: u.getNome(),
-          email: u.getEmail(),
-          senha: u.getSenha(),
-          permissao: u.getPermissao(),
-          agente: u.isAgente()
-        });
+        nome: u.getNome(),
+        email: u.getEmail(),
+        senha: u.getSenha(),
+        permissao: u.getPermissao(),
+        agente_callcenter: u.isAgente(),
+        agente_omnichannel: u.isAgenteOmni()
       });
 
     /* ================= RAMAIS ================= */
@@ -1809,6 +1826,13 @@ window.initCaderno = function () {
   };
 
   const modo = localStorage.getItem("modo_atendimento");
+  
+  if (modo === "ambos") {
+  const cardUsuariosChat = document.querySelector("#listaUsuariosChat")?.closest(".card");
+  if (cardUsuariosChat) {
+    cardUsuariosChat.style.display = "none";
+  }
+}
 
   if (!modo) {
     mostrarIntro();
