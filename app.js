@@ -873,7 +873,7 @@ function gerarAgentesAPartirUsuarios() {
         if (nome && ramal) ramaisSalvos[nome] = ramal;
     });
     
-    function gerarAgentesChatAPartirUsuarios() {
+  function gerarAgentesChatAPartirUsuarios() {
 
     const lista = document.getElementById("listaAgentesChat");
     if (!lista) return;
@@ -887,14 +887,19 @@ function gerarAgentesAPartirUsuarios() {
             const wrap = document.createElement("div");
             wrap.className = "campo-descricao";
 
+            const linha = document.createElement("div");
+            linha.className = "linha-principal";
+
             const nome = document.createElement("input");
             nome.className = "campo-nome";
             nome.value = u.getNome();
             nome.disabled = true;
 
-            wrap.append(nome);
+            linha.append(nome);
+            wrap.append(linha);
 
-            lista.append(wrap);
+            lista.appendChild(wrap);
+
         }
 
     });
