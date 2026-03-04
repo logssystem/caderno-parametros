@@ -937,17 +937,23 @@ function gerarAgentesChatAPartirUsuarios() {
 
     const lista = document.getElementById("listaAgentesChat");
 
-    // se o módulo chat ainda não carregou, tenta novamente
     if (!lista) {
-        setTimeout(gerarAgentesChatAPartirUsuarios, 200);
+        console.warn("listaAgentesChat ainda não existe");
         return;
     }
 
     lista.innerHTML = "";
 
-    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+    const usuarios = document.querySelectorAll("#listaUsuariosWeb .campo-descricao");
 
-        if (u.isAgenteOmni && u.isAgenteOmni() && u.getNome()) {
+    usuarios.forEach(u => {
+
+        const nomeUsuario = u.getNome?.();
+        const agenteOmni = u.isAgenteOmni?.();
+
+        console.log("Verificando usuário:", nomeUsuario, "omni:", agenteOmni);
+
+        if (agenteOmni && nomeUsuario) {
 
             const wrap = document.createElement("div");
             wrap.className = "campo-descricao";
@@ -957,7 +963,7 @@ function gerarAgentesChatAPartirUsuarios() {
 
             const nome = document.createElement("input");
             nome.className = "campo-nome";
-            nome.value = u.getNome();
+            nome.value = nomeUsuario;
             nome.disabled = true;
 
             linha.append(nome);
@@ -965,6 +971,7 @@ function gerarAgentesChatAPartirUsuarios() {
 
             lista.appendChild(wrap);
 
+            console.log("Agente omnichannel criado:", nomeUsuario);
         }
 
     });
