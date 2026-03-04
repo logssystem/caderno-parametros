@@ -1829,16 +1829,24 @@ function bloquearLetrasRamalRange() {
   const inicio = document.getElementById("ramalInicio");
   const fim = document.getElementById("ramalFim");
 
+  function validarInput(e) {
+
+    const valorAntes = e.target.value;
+
+    e.target.value = valorAntes.replace(/\D/g, "");
+
+    if (valorAntes !== e.target.value) {
+      mostrarToast("Digite apenas números para o ramal", true);
+    }
+
+  }
+
   if (inicio) {
-    inicio.addEventListener("input", () => {
-      inicio.value = inicio.value.replace(/\D/g, "");
-    });
+    inicio.addEventListener("input", validarInput);
   }
 
   if (fim) {
-    fim.addEventListener("input", () => {
-      fim.value = fim.value.replace(/\D/g, "");
-    });
+    fim.addEventListener("input", validarInput);
   }
 
 }
