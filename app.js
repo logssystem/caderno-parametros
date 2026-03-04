@@ -586,7 +586,10 @@ function criarCampo(tipo) {
         
         chkAgenteOmni = document.createElement("input");
         chkAgenteOmni.type = "checkbox";
-        
+        chkAgenteOmni.addEventListener("change", () => {
+          syncTudo();
+      });
+              
         const txtOmni = document.createElement("span");
         txtOmni.textContent = "Este usuário é agente omnichannel";
         
