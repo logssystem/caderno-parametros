@@ -233,37 +233,65 @@ window.coletarChatDoDOM = function () {
     departamentos: []
   };
 
-  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
-    const d = u.getData?.();
-    if (d?.nome) chat.usuarios.push(d);
+ document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
+
+  const d = u.getData?.();
+  if (!d?.nome) return;
+
+  chat.usuarios.push({
+    nome: d.nome,
+    email: d.email,
+    senha: d.senha,
+    permissao: d.permissao,
+    agente: d.agente
   });
+
+});
 
   document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
-    const d = a.getData?.();
-    if (d?.nome) chat.agentes.push(d);
-  });
 
+     const nome = a.querySelector(".campo-nome")?.value;
+   
+     if (!nome) return;
+   
+     chat.agentes.push({
+       nome: nome,
+       departamentos: []
+     });
+   
+   });
+   
   document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
     const dep = d.getData?.();
     if (dep?.nome) chat.departamentos.push(dep);
   });
 
   const mapa = {};
-  chat.departamentos.forEach(dep => {
-    dep.agentes.forEach(a => {
-      const key = String(a).trim().toLowerCase();
-      if (!mapa[key]) mapa[key] = [];
-      mapa[key].push(dep.nome);
-    });
+
+chat.departamentos.forEach(dep => {
+  dep.agentes.forEach(a => {
+
+    const key = String(a).trim().toLowerCase();
+
+    if (!mapa[key]) {
+      mapa[key] = new Set();
+    }
+
+    mapa[key].add(dep.nome);
+
   });
+});
 
-  chat.agentes = chat.agentes.map(a => ({
+  chat.agentes = chat.agentes.map(a => {
+
+  const key = String(a.nome).trim().toLowerCase();
+
+  return {
     ...a,
-    departamentos: mapa[String(a.nome).trim().toLowerCase()] || []
-  }));
+    departamentos: mapa[key] ? [...mapa[key]] : []
+  };
 
-  return chat;
-};
+});
 
 /* =====================================================
    CSV COMPATIBILIDADE
