@@ -945,7 +945,7 @@ function gerarAgentesChatAPartirUsuarios() {
         const nome = u.querySelector(".campo-nome")?.value;
 
         // pega o SEGUNDO checkbox (omnichannel)
-        const chkOmni = u.querySelectorAll("input[type=checkbox]")[1];
+        const chkOmni = u.querySelector(".checkbox-omni");
 
         if (chkOmni && chkOmni.checked && nome) {
 
