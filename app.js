@@ -942,12 +942,18 @@ function gerarAgentesChatAPartirUsuarios() {
 
     lista.innerHTML = "";
 
-    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+    // pega usuários da VOZ
+    let usuarios = document.querySelectorAll("#listaUsuariosWeb .campo-descricao");
+
+    // se não existir, pega usuários do CHAT
+    if (!usuarios.length) {
+        usuarios = document.querySelectorAll("#listaUsuariosChat .campo-descricao");
+    }
+
+    usuarios.forEach(u => {
 
         const nome = u.querySelector(".campo-nome")?.value;
-
-        // pega o SEGUNDO checkbox (omnichannel)
-        const chkOmni = u.querySelector(".checkbox-omni");
+        const chkOmni = u.querySelector(".checkbox-omni") || u.querySelector("input[type=checkbox]");
 
         if (chkOmni && chkOmni.checked && nome) {
 
@@ -971,7 +977,6 @@ function gerarAgentesChatAPartirUsuarios() {
     });
 
 }
-
 /* ================= DESTINOS URA ================= */
 
 function atualizarSelectAgentesFila() {
