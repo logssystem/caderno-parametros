@@ -186,14 +186,18 @@ window.adicionarDepartamentoChat = function () {
     select.innerHTML = `<option value="">Selecione um agente</option>`;
 
     document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
-      const d = a.getData?.();
-      if (!d?.nome) return;
-
-      const opt = document.createElement("option");
-      opt.value = d.nome;
-      opt.textContent = d.nome;
-      select.appendChild(opt);
-    });
+   
+     const nome = a.querySelector(".campo-nome")?.value;
+   
+     if (!nome) return;
+   
+     const opt = document.createElement("option");
+     opt.value = nome;
+     opt.textContent = nome;
+   
+     select.appendChild(opt);
+   
+   });
 
     const del = document.createElement("button");
     del.textContent = "✖";
