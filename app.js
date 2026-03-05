@@ -1299,12 +1299,13 @@ window.coletarChatDoDOM = function () {
 
   // usuários chat
   document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
-    chat.usuarios.push({
-      nome: u.getNome?.() || "",
-      email: u.getEmail?.() || "",
-      permissao: u.getPermissao?.() || ""
-    });
+  chat.usuarios.push({
+    nome: u.getNome?.() || "",
+    email: u.getEmail?.() || "",
+    senha: u.getSenha?.() || "",
+    permissao: u.getPermissao?.() || ""
   });
+});
 
   // departamentos
   document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
