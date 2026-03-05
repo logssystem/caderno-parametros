@@ -147,38 +147,6 @@ function processarCSVUsuariosChat(texto) {
 }
 
 /* =====================================================
-   AGENTES CHAT
-   ===================================================== */
-function gerarAgentesChatAPartirUsuarios() {
-  const lista = document.getElementById("listaAgentesChat");
-  if (!lista) return;
-
-  lista.innerHTML = "";
-
-  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
-    const d = u.getData?.();
-    if (!d?.agente || !d.nome) return;
-
-    const wrap = document.createElement("div");
-    wrap.className = "campo-descricao";
-
-    const nome = document.createElement("input");
-    nome.value = d.nome;
-    nome.disabled = true;
-
-    wrap.getData = () => ({
-      nome: d.nome,
-      usuario: d.email,
-      senha: d.senha,
-      departamentos: []
-    });
-
-    wrap.append(nome);
-    lista.appendChild(wrap);
-  });
-}
-
-/* =====================================================
    DEPARTAMENTOS CHAT
    ===================================================== */
 window.adicionarDepartamentoChat = function () {
