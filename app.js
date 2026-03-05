@@ -584,11 +584,13 @@ function criarCampo(tipo) {
             boxOmni.style.display = "none";
         }
         
-        chkAgenteOmni = document.createElement("input");
+       chkAgenteOmni = document.createElement("input");
         chkAgenteOmni.type = "checkbox";
+        chkAgenteOmni.classList.add("checkbox-omni");
+        
         chkAgenteOmni.addEventListener("change", () => {
           syncTudo();
-      });
+        });
               
         const txtOmni = document.createElement("span");
         txtOmni.textContent = "Este usuário é agente omnichannel";
