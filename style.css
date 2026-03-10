@@ -1310,3 +1310,25 @@ body.dark .resumo-chip {
   background: #2c2c2c;
   color: #ddd;
 }
+
+.btn-confirmar{
+    background: linear-gradient(135deg,#4f7cff,#335cff);
+    color:white;
+    border:none;
+    padding:12px 22px;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(0,0,0,0.15);
+    transition:all .2s ease;
+}
+
+.btn-confirmar:hover{
+    transform:translateY(-1px);
+    box-shadow:0 6px 14px rgba(0,0,0,0.2);
+}
+
+.btn-confirmar:active{
+    transform:scale(0.97);
+}
