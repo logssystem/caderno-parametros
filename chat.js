@@ -282,7 +282,7 @@ chat.departamentos.forEach(dep => {
   });
 });
 
-  chat.agentes = chat.agentes.map(a => {
+ chat.agentes = chat.agentes.map(a => {
 
   const key = String(a.nome).trim().toLowerCase();
 
@@ -292,6 +292,10 @@ chat.departamentos.forEach(dep => {
   };
 
 });
+
+return chat;
+
+};
 
 /* =====================================================
    CSV COMPATIBILIDADE
