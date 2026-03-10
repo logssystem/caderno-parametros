@@ -1881,15 +1881,20 @@ window.initCaderno = function () {
     departamentos: []
   };
 
-  const modo = localStorage.getItem("modo_atendimento");
-  
-  if (modo === "ambos") {
-  const cardUsuariosChat = document.querySelector("#listaUsuariosChat")?.closest(".card");
-  if (cardUsuariosChat) {
-    cardUsuariosChat.style.display = "none";
-  }
-}
+ const modo = localStorage.getItem("modo_atendimento");
 
+  const usuariosChat = document.getElementById("listaUsuariosChat");
+  
+  if (usuariosChat) {
+  
+    const bloco = usuariosChat.parentElement;
+  
+    if (bloco) {
+      bloco.style.display = modo === "ambos" ? "none" : "block";
+    }
+  
+  }
+  
   if (!modo) {
     mostrarIntro();
     return;
