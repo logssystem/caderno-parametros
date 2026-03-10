@@ -1887,10 +1887,10 @@ window.initCaderno = function () {
   
   if (usuariosChat) {
   
-    const bloco = usuariosChat.parentElement;
+    const cardUsuarios = usuariosChat.closest(".card");
   
-    if (bloco) {
-      bloco.style.display = modo === "ambos" ? "none" : "block";
+    if (cardUsuarios) {
+      cardUsuarios.style.display = modo === "ambos" ? "none" : "block";
     }
   
   }
