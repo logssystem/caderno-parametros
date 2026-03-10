@@ -410,3 +410,52 @@ document.addEventListener("DOMContentLoaded", () => {
 window.voltar = function () {
   window.location.href = "index.html"; 
 };
+
+/* ================= GERAR PDF ================= */
+window.confirmarConfiguracao = function () {
+
+  const { jsPDF } = window.jspdf;
+
+  const doc = new jsPDF();
+
+  const raw = localStorage.getItem("CONFIG_CADERNO");
+  if (!raw) {
+    alert("Nenhuma configuração encontrada.");
+    return;
+  }
+
+  const dados = JSON.parse(raw);
+
+  let y = 10;
+
+  doc.setFontSize(16);
+  doc.text("Resumo da Configuração", 10, y);
+  y += 10;
+
+  doc.setFontSize(10);
+
+  function escreverLinha(label, valor) {
+    doc.text(`${label}: ${valor || "-"}`, 10, y);
+    y += 6;
+  }
+
+  if (dados.cliente) {
+    escreverLinha("Empresa", dados.cliente.empresa);
+    escreverLinha("Domínio", dados.cliente.dominio);
+    escreverLinha("CNPJ", dados.cliente.cnpj);
+    y += 4;
+  }
+
+  if (dados.voz?.usuarios?.length) {
+    doc.text("Usuários Web:", 10, y);
+    y += 6;
+
+    dados.voz.usuarios.forEach(u => {
+      escreverLinha("Nome", u.nome);
+      escreverLinha("Email", u.email);
+      y += 2;
+    });
+  }
+
+  doc.save("configuracao-cliente.pdf");
+};
