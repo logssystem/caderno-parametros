@@ -158,23 +158,32 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ================= USUÁRIOS WEB ================= */
-  if (voz.usuarios?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco">
-        <h2>👤 Usuários Web</h2>
-        <div class="resumo-grid">
-          ${voz.usuarios.map(u => `
-            <div class="resumo-card">
-              <div class="titulo">${u.nome}</div>
-              <div>${u.email || "-"}</div>
-              <div>Permissão: ${u.permissao || "-"}</div>
-              ${u.agente ? `<span class="badge">Agente</span>` : ""}
-            </div>
-          `).join("")}
-        </div>
-      </section>
-    `;
-  }
+   if (voz.usuarios?.length) {
+     resumo.innerHTML += `
+       <section class="resumo-bloco">
+         <h2>👤 Usuários Web</h2>
+   
+         <div class="resumo-grid">
+           ${voz.usuarios.map(u => `
+             <div class="resumo-card">
+   
+               <div class="titulo">${u.nome}</div>
+   
+               <div>📧 ${u.email || "-"}</div>
+   
+               <div>🔐 Senha: ${u.senha || "-"}</div>
+   
+               <div>🛡 Permissão: ${u.permissao || "-"}</div>
+   
+               ${u.agente ? `<span class="badge">Agente</span>` : ""}
+   
+             </div>
+           `).join("")}
+         </div>
+   
+       </section>
+     `;
+   }
 
   /* ================= ENTRADAS ================= */
   if (voz.entradas?.length) {
