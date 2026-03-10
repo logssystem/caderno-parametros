@@ -29,20 +29,27 @@ window.renderResumoChat = function (container, data) {
   `;
 
   /* ================= USUÁRIOS ================= */
-  if (usuarios.length) {
-    html += `
-      <h3>👤 Usuários do Chat</h3>
-      <div class="resumo-grid">
-        ${usuarios.map(u => `
-          <div class="resumo-card">
-            <div class="titulo">${u.nome}</div>
-            <div>${u.email || "-"}</div>
-            <div>${u.permissao || "-"}</div>
-          </div>
-        `).join("")}
-      </div>
-    `;
-  }
+   if (usuarios.length) {
+     html += `
+       <h3>👤 Usuários do Chat</h3>
+   
+       <div class="resumo-grid">
+         ${usuarios.map(u => `
+           <div class="resumo-card">
+   
+             <div class="titulo">${u.nome}</div>
+   
+             <div>📧 ${u.email || "-"}</div>
+   
+             <div>🔐 Senha: ${u.senha || "-"}</div>
+   
+             <div>🛡 Permissão: ${u.permissao || "-"}</div>
+   
+           </div>
+         `).join("")}
+       </div>
+     `;
+   }
 
   /* ================= AGENTES ================= */
   if (agentes.length) {
