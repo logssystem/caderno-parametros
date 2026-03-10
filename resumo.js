@@ -444,8 +444,8 @@ document.addEventListener("DOMContentLoaded", () => {
         /* CLIENTE */
       
         linha("CLIENTE");
-        linha(`Empresa: ${dados.cliente.empresa}`);
-        linha(`Domínio: ${dados.cliente.dominio}`);
+        linha(`Empresa: ${dados.cliente?.empresa || "-"}`);
+         linha(`Domínio: ${dados.cliente?.dominio || "-"}`);
       
         y += 6;
       
