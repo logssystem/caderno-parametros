@@ -416,357 +416,366 @@ window.voltar = function () {
 ================================================= */
 window.confirmarConfiguracao = function () {
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
 
-  const raw = localStorage.getItem("CONFIG_CADERNO");
+const raw = localStorage.getItem("CONFIG_CADERNO");
 
-  if (!raw) {
-    alert("Nenhuma configuração encontrada.");
-    return;
-  }
+if (!raw) {
+  alert("Nenhuma configuração encontrada.");
+  return;
+}
 
-  const dados = JSON.parse(raw);
-  const voz = dados.voz || null;
-  const chat = dados.chat || null;
+const dados = JSON.parse(raw);
+const voz = dados.voz || null;
+const chat = dados.chat || null;
 
-  let y = 25;
+let y = 25;
 
-  function verificarEspaco(altura){
-    if(y + altura > 280){
-      doc.addPage();
-      y = 25;
-    }
-  }
+/* controle de quebra */
 
-  function titulo(txt){
+function verificarEspaco(altura){
 
-    verificarEspaco(20);
+  if(y + altura > 280){
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const textWidth = doc.getTextWidth(txt);
-
-    y += 8;
-
-    doc.setFontSize(16);
-    doc.setFont(undefined,"bold");
-
-    doc.text(txt,(pageWidth - textWidth)/2,y);
-
-    y += 10;
-
-    doc.setFont(undefined,"normal");
-    doc.setFontSize(11);
+    doc.addPage();
+    y = 25;
 
   }
 
-  function linhaCentro(txt){
+}
 
-    verificarEspaco(10);
+/* reserva espaço para blocos */
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const textWidth = doc.getTextWidth(txt);
+function verificarBloco(linhas){
 
-    doc.text(txt,(pageWidth - textWidth)/2,y);
+  const altura = linhas * 7 + 20;
 
-    y += 7;
+  if(y + altura > 280){
 
-  }
-
-  function tabela(a,b,c,d){
-
-    verificarEspaco(10);
-
-    doc.text(String(a || "-"),14,y);
-    doc.text(String(b || "-"),70,y);
-
-    if(c) doc.text(String(c),120,y);
-    if(d) doc.text(String(d),170,y);
-
-    y += 7;
-  }
-
-  function separador(){
-
-    verificarEspaco(10);
-
-    doc.line(12,y,198,y);
-
-    y += 10;
+    doc.addPage();
+    y = 25;
 
   }
 
-  /* ================= CAPA ================= */
+}
 
-  doc.setFontSize(22);
-  doc.setFont(undefined,"bold");
+/* título centralizado */
+
+function titulo(txt){
+
+  verificarEspaco(20);
 
   const pageWidth = doc.internal.pageSize.getWidth();
+  const textWidth = doc.getTextWidth(txt);
 
-  const tituloPrincipal = "Caderno de Parâmetros";
+  y += 8;
 
-  doc.text(
-    tituloPrincipal,
-    (pageWidth - doc.getTextWidth(tituloPrincipal)) / 2,
-    18
-  );
+  doc.setFontSize(16);
+  doc.setFont(undefined,"bold");
 
-  doc.setFontSize(12);
+  doc.text(txt,(pageWidth-textWidth)/2,y);
+
+  y += 10;
+
   doc.setFont(undefined,"normal");
+  doc.setFontSize(11);
 
-  const subtitulo = "Resumo da Configuração do Cliente";
+}
 
-  doc.text(
-    subtitulo,
-    (pageWidth - doc.getTextWidth(subtitulo)) / 2,
-    26
-  );
+/* linha centralizada */
 
-  y = 40;
+function linhaCentro(txt){
 
-  /* ================= CLIENTE ================= */
+  verificarEspaco(10);
 
-  if(dados.cliente){
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const textWidth = doc.getTextWidth(txt);
 
-    titulo("CLIENTE");
+  doc.text(txt,(pageWidth-textWidth)/2,y);
 
-    linhaCentro(`Empresa: ${dados.cliente.empresa || "-"}`);
-    linhaCentro(`Domínio: ${dados.cliente.dominio || "-"}`);
-    linhaCentro(`CNPJ: ${dados.cliente.cnpj || "-"}`);
+  y += 7;
 
-    separador();
-  }
+}
 
-  /* ================= VOZ ================= */
+/* tabela padrão */
 
-  if(voz){
+function tabela(a,b,c,d){
 
-    if(voz.usuarios?.length){
+  verificarEspaco(10);
 
-      titulo("USUÁRIOS WEB");
+  doc.text(String(a||"-"),14,y);
+  doc.text(String(b||"-"),70,y);
 
-      tabela("Nome","Email","Senha","Permissão");
+  if(c) doc.text(String(c),120,y);
+  if(d) doc.text(String(d),170,y);
 
-      voz.usuarios.forEach(u=>{
-        tabela(u.nome,u.email,u.senha,u.permissao);
-      });
+  y += 7;
 
-      separador();
-    }
+}
 
-    if(voz.ramais?.length){
+function separador(){
 
-      titulo("RAMAIS");
+  verificarEspaco(10);
 
-      tabela("Ramal","Senha");
+  doc.line(12,y,198,y);
 
-      voz.ramais.forEach(r=>{
-        tabela(String(r.ramal),r.senha);
-      });
+  y += 10;
 
-      separador();
-    }
+}
 
-    if(voz.entradas?.length){
+/* CAPA */
 
-      titulo("ENTRADAS");
+doc.setFontSize(22);
+doc.setFont(undefined,"bold");
 
-      voz.entradas.forEach(e=>{
-        linhaCentro(`Número: ${e.numero}`);
-      });
+const pageWidth = doc.internal.pageSize.getWidth();
 
-      separador();
-    }
+const tituloPrincipal = "Caderno de Parâmetros";
 
-    if(voz.agentes?.length){
+doc.text(
+  tituloPrincipal,
+  (pageWidth-doc.getTextWidth(tituloPrincipal))/2,
+  18
+);
 
-      titulo("AGENTES");
+doc.setFontSize(12);
+doc.setFont(undefined,"normal");
 
-      tabela("Nome","Ramal");
+const subtitulo = "Resumo da Configuração do Cliente";
 
-      voz.agentes.forEach(a=>{
-        tabela(a.nome,String(a.ramal));
-      });
+doc.text(
+  subtitulo,
+  (pageWidth-doc.getTextWidth(subtitulo))/2,
+  26
+);
 
-      separador();
-    }
+y = 40;
 
-    if(voz.filas?.length){
+/* CLIENTE */
 
-      titulo("FILAS");
+if(dados.cliente){
 
-      tabela("Fila","Agentes");
+  titulo("CLIENTE");
 
-      voz.filas.forEach(f=>{
-        tabela(f.nome,(f.agentes || []).join(", "));
-      });
+  linhaCentro(`Empresa: ${dados.cliente.empresa || "-"}`);
+  linhaCentro(`Domínio: ${dados.cliente.dominio || "-"}`);
+  linhaCentro(`CNPJ: ${dados.cliente.cnpj || "-"}`);
 
-      separador();
-    }
+  separador();
 
-    if(voz.grupo_ring?.length){
+}
 
-      titulo("GRUPO DE RING");
+/* VOZ */
 
-      voz.grupo_ring.forEach(g=>{
-        linhaCentro(`Grupo: ${g.nome}`);
-        linhaCentro(`Estratégia: ${g.estrategia}`);
-        linhaCentro(`Ramais: ${(g.ramais || []).join(", ")}`);
-        y += 4;
-      });
+if(voz){
 
-      separador();
-    }
+  if(voz.usuarios?.length){
 
-    if(voz.uras?.length){
+    titulo("USUÁRIOS WEB");
 
-      titulo("URA");
+    tabela("Nome","Email","Senha","Permissão");
 
-      voz.uras.forEach(u=>{
-
-        linhaCentro(`URA: ${u.nome}`);
-        linhaCentro(`Mensagem: ${u.mensagem}`);
-
-        (u.opcoes || []).forEach(o=>{
-          linhaCentro(`${o.tecla} -> ${o.destino}`);
-        });
-
-        y += 5;
-      });
-
-      separador();
-    }
-
-    if(voz.regras_tempo?.length){
-
-      titulo("REGRAS DE TEMPO");
-
-      voz.regras_tempo.forEach(r=>{
-        linhaCentro(`Regra: ${r.nome}`);
-        linhaCentro(`Dias: ${(r.dias || []).join(", ")}`);
-        linhaCentro(`Horário: ${(r.hora_inicio || r.inicio || "-")} -> ${(r.hora_fim || r.fim || "-")}`);
-        linhaCentro(`Destino: ${r.destino || "-"}`);
-        y += 5;
-      });
-
-      separador();
-    }
-
-    if(voz.pausas?.length){
-
-      titulo("PAUSAS");
-
-      voz.pausas.forEach(p=>{
-
-        linhaCentro(`Grupo: ${p.grupo || p.nome || "-"}`);
-
-        (p.itens || []).forEach(i=>{
-          linhaCentro(`• ${(i.nome || "-")} (${i.tempo || "-"})`);
-        });
-
-        y += 4;
-      });
-
-      separador();
-    }
-
-    if(voz.pesquisas?.length){
-
-      titulo("PESQUISA DE SATISFAÇÃO");
-
-      voz.pesquisas.forEach(p=>{
-
-        linhaCentro(`Nome: ${p.nome}`);
-        linhaCentro(`Introdução: ${p.introducao || "-"}`);
-        linhaCentro(`Pergunta: ${p.pergunta || "-"}`);
-
-        (p.respostas || []).forEach(r=>{
-          linhaCentro(`• ${r.nota || "-"} - ${r.descricao || "-"}`);
-        });
-
-        if(p.encerramento){
-          linhaCentro(`Encerramento: ${p.encerramento}`);
-        }
-
-        y += 5;
-      });
-
-      separador();
-    }
-
-  }
-
-  /* ================= CHAT ================= */
-
-  if(chat){
-
-    titulo("CHAT / OMNICHANNEL");
-
-    linhaCentro(`Tipo: ${chat.tipo || "-"}`);
-    linhaCentro(`API: ${chat.api || "-"}`);
-    linhaCentro(`Conta: ${chat.conta || "-"}`);
-
-    if(chat.canais?.length){
-
-      linhaCentro("Canais:");
-
-      chat.canais.forEach(c=>{
-        linhaCentro(`• ${c}`);
-      });
-
-    }
+    voz.usuarios.forEach(u=>{
+      tabela(u.nome,u.email,u.senha,u.permissao);
+    });
 
     separador();
 
-    if(chat.usuarios?.length){
+  }
 
-      titulo("USUÁRIOS CHAT");
+  if(voz.ramais?.length){
 
-      tabela("Nome","Email","Senha","Permissão");
+    titulo("RAMAIS");
 
-      chat.usuarios.forEach(u=>{
-        tabela(u.nome,u.email,u.senha,u.permissao);
-      });
+    tabela("Ramal","Senha");
 
-      separador();
-    }
+    voz.ramais.forEach(r=>{
+      tabela(String(r.ramal),r.senha);
+    });
 
-    if(chat.agentes?.length){
-
-      titulo("AGENTES CHAT");
-
-      chat.agentes.forEach(a=>{
-
-        linhaCentro(`Agente: ${a.nome}`);
-
-        if(a.departamentos?.length){
-          linhaCentro(`Departamentos: ${a.departamentos.join(", ")}`);
-        }
-
-        y += 3;
-      });
-
-      separador();
-    }
-
-    if(chat.departamentos?.length){
-
-      titulo("DEPARTAMENTOS");
-
-      chat.departamentos.forEach(d=>{
-
-        linhaCentro(`Departamento: ${d.nome}`);
-
-        if(d.agentes?.length){
-          linhaCentro(`Agentes: ${d.agentes.join(", ")}`);
-        }
-
-        y += 3;
-      });
-    }
+    separador();
 
   }
 
-  doc.save("caderno-parametros.pdf");
+  if(voz.entradas?.length){
+
+    verificarBloco(3);
+
+    titulo("ENTRADAS");
+
+    voz.entradas.forEach(e=>{
+      linhaCentro(`Número: ${e.numero}`);
+    });
+
+    separador();
+
+  }
+
+  if(voz.agentes?.length){
+
+    titulo("AGENTES");
+
+    tabela("Nome","Ramal");
+
+    voz.agentes.forEach(a=>{
+      tabela(a.nome,String(a.ramal));
+    });
+
+    separador();
+
+  }
+
+  if(voz.filas?.length){
+
+    titulo("FILAS");
+
+    tabela("Fila","Agentes");
+
+    voz.filas.forEach(f=>{
+      tabela(f.nome,(f.agentes||[]).join(", "));
+    });
+
+    separador();
+
+  }
+
+  if(voz.grupo_ring?.length){
+
+    verificarBloco(5);
+
+    titulo("GRUPO DE RING");
+
+    voz.grupo_ring.forEach(g=>{
+      linhaCentro(`Grupo: ${g.nome}`);
+      linhaCentro(`Estratégia: ${g.estrategia}`);
+      linhaCentro(`Ramais: ${(g.ramais||[]).join(", ")}`);
+      y += 4;
+    });
+
+    separador();
+
+  }
+
+  if(voz.uras?.length){
+
+    let linhasURA = 4;
+
+    voz.uras.forEach(u=>{
+      linhasURA += (u.opcoes||[]).length + 2;
+    });
+
+    verificarBloco(linhasURA);
+
+    titulo("URA");
+
+    voz.uras.forEach(u=>{
+
+      linhaCentro(`URA: ${u.nome}`);
+      linhaCentro(`Mensagem: ${u.mensagem}`);
+
+      (u.opcoes||[]).forEach(o=>{
+        linhaCentro(`${o.tecla} -> ${o.destino}`);
+      });
+
+      y += 5;
+
+    });
+
+    separador();
+
+  }
+
+  if(voz.pausas?.length){
+
+    let linhas = 4;
+
+    voz.pausas.forEach(p=>{
+      linhas += (p.itens||[]).length;
+    });
+
+    verificarBloco(linhas);
+
+    titulo("PAUSAS");
+
+    voz.pausas.forEach(p=>{
+
+      linhaCentro(`Grupo: ${p.grupo||p.nome||"-"}`);
+
+      (p.itens||[]).forEach(i=>{
+        linhaCentro(`• ${i.nome||"-"} (${i.tempo||"-"})`);
+      });
+
+      y += 4;
+
+    });
+
+    separador();
+
+  }
+
+  if(voz.pesquisas?.length){
+
+    let linhas = 6;
+
+    voz.pesquisas.forEach(p=>{
+      linhas += (p.respostas||[]).length;
+    });
+
+    verificarBloco(linhas);
+
+    titulo("PESQUISA DE SATISFAÇÃO");
+
+    voz.pesquisas.forEach(p=>{
+
+      linhaCentro(`Nome: ${p.nome}`);
+      linhaCentro(`Introdução: ${p.introducao||"-"}`);
+      linhaCentro(`Pergunta: ${p.pergunta||"-"}`);
+
+      (p.respostas||[]).forEach(r=>{
+        linhaCentro(`• ${r.nota||"-"} - ${r.descricao||"-"}`);
+      });
+
+      if(p.encerramento){
+        linhaCentro(`Encerramento: ${p.encerramento}`);
+      }
+
+      y += 5;
+
+    });
+
+    separador();
+
+  }
+
+}
+
+/* CHAT */
+
+if(chat){
+
+  verificarBloco(6);
+
+  titulo("CHAT / OMNICHANNEL");
+
+  linhaCentro(`Tipo: ${chat.tipo||"-"}`);
+  linhaCentro(`API: ${chat.api||"-"}`);
+  linhaCentro(`Conta: ${chat.conta||"-"}`);
+
+  if(chat.canais?.length){
+
+    linhaCentro("Canais:");
+
+    chat.canais.forEach(c=>{
+      linhaCentro(`• ${c}`);
+    });
+
+  }
+
+  separador();
+
+}
+
+doc.save("caderno-parametros.pdf");
 
 };
