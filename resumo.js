@@ -439,6 +439,15 @@ window.confirmarConfiguracao = function () {
     }
   }
 
+  /* protege blocos grandes */
+  function verificarBloco(linhas){
+    const altura = linhas * 7 + 15;
+    if(y + altura > 280){
+      doc.addPage();
+      y = 25;
+    }
+  }
+
   function titulo(txt){
     verificarEspaco(20);
     y += 8;
@@ -552,21 +561,36 @@ window.confirmarConfiguracao = function () {
       separador();
     }
 
+    /* URA protegida */
+
     if(voz.uras?.length){
+
+      let linhasURA = 3;
+      voz.uras.forEach(u=>{
+        linhasURA += (u.opcoes || []).length + 2;
+      });
+
+      verificarBloco(linhasURA);
+
       titulo("URA");
+
       voz.uras.forEach(u=>{
         linha(`URA: ${u.nome}`);
         linha(`Mensagem: ${u.mensagem}`);
+
         (u.opcoes || []).forEach(o=>{
           linha(o.tecla + " -> " + o.destino);
         });
+
         y += 5;
       });
+
       separador();
     }
 
     if(voz.regras_tempo?.length){
       titulo("REGRAS DE TEMPO");
+
       voz.regras_tempo.forEach(r=>{
         linha(`Regra: ${r.nome}`);
         linha(`Dias: ${(r.dias || []).join(", ")}`);
@@ -574,35 +598,68 @@ window.confirmarConfiguracao = function () {
         linha(`Destino: ${r.destino || "-"}`);
         y += 5;
       });
+
       separador();
     }
 
+    /* PAUSAS protegida */
+
     if(voz.pausas?.length){
+
+      let linhasPausa = 2;
+
+      voz.pausas.forEach(p=>{
+        linhasPausa += (p.itens || []).length + 1;
+      });
+
+      verificarBloco(linhasPausa);
+
       titulo("PAUSAS");
+
       voz.pausas.forEach(p=>{
         linha(`Grupo: ${p.grupo || p.nome || "-"}`);
+
         (p.itens || []).forEach(i=>{
           linha(`• ${(i.nome || "-")} (${i.tempo || "-"})`);
         });
+
         y += 4;
       });
+
       separador();
     }
 
+    /* PESQUISA protegida */
+
     if(voz.pesquisas?.length){
-      titulo("PESQUISA DE SATISFAÇÃO");
+
+      let linhasPesquisa = 4;
+
       voz.pesquisas.forEach(p=>{
+        linhasPesquisa += (p.respostas || []).length + 2;
+      });
+
+      verificarBloco(linhasPesquisa);
+
+      titulo("PESQUISA DE SATISFAÇÃO");
+
+      voz.pesquisas.forEach(p=>{
+
         linha(`Nome: ${p.nome}`);
         linha(`Introdução: ${p.introducao || "-"}`);
         linha(`Pergunta: ${p.pergunta || "-"}`);
+
         (p.respostas || []).forEach(r=>{
           linha(`• ${r.nota || "-"} - ${r.descricao || "-"}`);
         });
+
         if(p.encerramento){
           linha(`Encerramento: ${p.encerramento}`);
         }
+
         y += 5;
       });
+
       separador();
     }
 
@@ -630,31 +687,44 @@ window.confirmarConfiguracao = function () {
     if(chat.usuarios?.length){
       titulo("USUÁRIOS CHAT");
       tabela("Nome","Email","Senha","Permissão");
+
       chat.usuarios.forEach(u=>{
         tabela(u.nome,u.email,u.senha,u.permissao);
       });
+
       separador();
     }
 
     if(chat.agentes?.length){
+
+      verificarBloco(chat.agentes.length * 2);
+
       titulo("AGENTES CHAT");
+
       chat.agentes.forEach(a=>{
+
         linha(`Agente: ${a.nome}`);
+
         if(a.departamentos?.length){
           linha(`Departamentos: ${a.departamentos.join(", ")}`);
         }
+
         y += 3;
       });
+
       separador();
     }
 
     if(chat.departamentos?.length){
       titulo("DEPARTAMENTOS");
+
       chat.departamentos.forEach(d=>{
         linha(`Departamento: ${d.nome}`);
+
         if(d.agentes?.length){
           linha(`Agentes: ${d.agentes.join(", ")}`);
         }
+
         y += 3;
       });
     }
