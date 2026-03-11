@@ -412,274 +412,339 @@ window.voltar = function () {
 };
 
 /* =================================================
-   GERAR PDF – CADERNO DE PARÂMETROS
+   GERAR PDF – CADERNO DE PARÂMETROS (VERSÃO ESTÁVEL)
 ================================================= */
 
-window.confirmarConfiguracao = function () {
+window.confirmarConfiguracao = function(){
 
-  const doc = new window.jspdf.jsPDF();
+const doc = new jspdf.jsPDF();
+const raw = localStorage.getItem("CONFIG_CADERNO");
 
-  const raw = localStorage.getItem("CONFIG_CADERNO");
+if(!raw){
+alert("Nenhuma configuração encontrada.");
+return;
+}
 
-  if (!raw) {
-    alert("Nenhuma configuração encontrada.");
-    return;
-  }
+const dados = JSON.parse(raw);
+const voz = dados.voz || {};
+const chat = dados.chat || {};
 
-  const dados = JSON.parse(raw);
+let y = 30;
 
-  let y = 30;
+/* ===== FUNÇÕES ===== */
 
-  /* ================= TÍTULO ================= */
+function titulo(txt){
 
-  doc.setFontSize(22);
-  doc.text("Caderno de Parâmetros",105,20,{align:"center"});
+doc.setFontSize(16);
+doc.setFont(undefined,"bold");
+doc.text(txt,105,y,{align:"center"});
 
-  doc.setFontSize(12);
-  doc.text("Resumo da Configuração do Cliente",105,28,{align:"center"});
+y+=8;
 
-  /* ================= CLIENTE ================= */
+doc.setFont(undefined,"normal");
+doc.setFontSize(11);
 
-  if(dados.cliente){
+}
 
-    doc.setFontSize(16);
-    doc.text("CLIENTE",105,y,{align:"center"});
-    y+=10;
+function linhaCentral(txt){
 
-    doc.setFontSize(11);
+doc.text(txt,105,y,{align:"center"});
+y+=6;
 
-    doc.text(`Empresa: ${dados.cliente.empresa || "-"}`,105,y,{align:"center"});
-    y+=6;
+}
 
-    doc.text(`Domínio: ${dados.cliente.dominio || "-"}`,105,y,{align:"center"});
-    y+=6;
+function separador(){
 
-    doc.text(`CNPJ: ${dados.cliente.cnpj || "-"}`,105,y,{align:"center"});
+doc.line(12,y,198,y);
+y+=10;
 
-    y+=12;
-  }
+}
 
-  /* ================= USUÁRIOS WEB ================= */
+function verificarPagina(){
 
-  if(dados.voz?.usuarios?.length){
+if(y>270){
+doc.addPage();
+y=25;
+}
 
-    doc.text("USUÁRIOS WEB",105,y,{align:"center"});
-    y+=6;
+}
 
-    doc.autoTable({
+/* ================= CAPA ================= */
 
-      startY:y,
+doc.setFontSize(22);
+doc.setFont(undefined,"bold");
+doc.text("Caderno de Parâmetros",105,18,{align:"center"});
 
-      head:[["Nome","Email","Senha","Permissão"]],
+doc.setFontSize(12);
+doc.setFont(undefined,"normal");
+doc.text("Resumo da Configuração do Cliente",105,26,{align:"center"});
 
-      body:dados.voz.usuarios.map(u=>[
-        u.nome,
-        u.email,
-        u.senha,
-        u.permissao
-      ]),
+y=40;
 
-      theme:"grid",
+/* ================= CLIENTE ================= */
 
-      styles:{
-        fontSize:10,
-        halign:"center"
-      },
+if(dados.cliente){
 
-      headStyles:{
-        fillColor:[230,230,230],
-        fontStyle:"bold"
-      },
+titulo("CLIENTE");
 
-      columnStyles:{
-        0:{cellWidth:35},
-        1:{cellWidth:60},
-        2:{cellWidth:40},
-        3:{cellWidth:50}
-      }
+linhaCentral("Empresa: "+(dados.cliente.empresa||"-"));
+linhaCentral("Domínio: "+(dados.cliente.dominio||"-"));
+linhaCentral("CNPJ: "+(dados.cliente.cnpj||"-"));
 
-    });
+separador();
 
-    y = doc.lastAutoTable.finalY + 10;
+}
 
-  }
+/* ================= USUÁRIOS WEB ================= */
 
-  /* ================= RAMAIS ================= */
+if(voz.usuarios?.length){
 
-  if(dados.voz?.ramais?.length){
+titulo("USUÁRIOS WEB");
 
-    doc.text("RAMAIS",105,y,{align:"center"});
-    y+=6;
+doc.autoTable({
 
-    doc.autoTable({
+startY:y,
 
-      startY:y,
+head:[["Nome","Email","Senha","Permissão"]],
 
-      head:[["Ramal","Senha"]],
+body:voz.usuarios.map(u=>[
+u.nome||"-",
+u.email||"-",
+u.senha||"-",
+u.permissao||"-"
+]),
 
-      body:dados.voz.ramais.map(r=>[
-        r.ramal,
-        r.senha
-      ]),
+styles:{
+halign:"center",
+fontSize:10
+},
 
-      theme:"grid",
-      styles:{halign:"center"}
+headStyles:{
+fillColor:[230,230,230],
+fontStyle:"bold"
+},
 
-    });
+columnStyles:{
+0:{cellWidth:35},
+1:{cellWidth:60},
+2:{cellWidth:35},
+3:{cellWidth:60}
+}
 
-    y = doc.lastAutoTable.finalY + 10;
+});
 
-  }
+y = doc.lastAutoTable.finalY + 10;
 
-  /* ================= ENTRADAS ================= */
+}
 
-  if(dados.voz?.entradas?.length){
+/* ================= RAMAIS ================= */
 
-    doc.text("ENTRADAS",105,y,{align:"center"});
-    y+=8;
+if(voz.ramais?.length){
 
-    dados.voz.entradas.forEach(e=>{
-      doc.text(`Número: ${e.numero}`,105,y,{align:"center"});
-      y+=6;
-    });
+titulo("RAMAIS");
 
-    y+=6;
+doc.autoTable({
 
-  }
+startY:y,
 
-  /* ================= AGENTES ================= */
+head:[["Ramal","Senha"]],
 
-  if(dados.voz?.agentes?.length){
+body:voz.ramais.map(r=>[
+r.ramal||"-",
+r.senha||"-"
+]),
 
-    doc.text("AGENTES",105,y,{align:"center"});
-    y+=6;
+styles:{halign:"center"}
 
-    doc.autoTable({
+});
 
-      startY:y,
+y = doc.lastAutoTable.finalY + 10;
 
-      head:[["Nome","Ramal"]],
+}
 
-      body:dados.voz.agentes.map(a=>[
-        a.nome,
-        a.ramal
-      ]),
+/* ================= ENTRADAS ================= */
 
-      theme:"grid",
-      styles:{halign:"center"}
+if(voz.entradas?.length){
 
-    });
+titulo("ENTRADAS");
 
-    y = doc.lastAutoTable.finalY + 10;
+voz.entradas.forEach(e=>{
+linhaCentral("Número: "+e.numero);
+});
 
-  }
+separador();
 
-  /* ================= FILAS ================= */
+}
 
-  if(dados.voz?.filas?.length){
+/* ================= AGENTES ================= */
 
-    doc.text("FILAS",105,y,{align:"center"});
-    y+=6;
+if(voz.agentes?.length){
 
-    doc.autoTable({
+titulo("AGENTES");
 
-      startY:y,
+doc.autoTable({
 
-      head:[["Fila","Agentes"]],
+startY:y,
 
-      body:dados.voz.filas.map(f=>[
-        f.nome,
-        (f.agentes || []).join(", ")
-      ]),
+head:[["Nome","Ramal"]],
 
-      theme:"grid",
-      styles:{halign:"center"}
+body:voz.agentes.map(a=>[
+a.nome||"-",
+a.ramal||"-"
+]),
 
-    });
+styles:{halign:"center"}
 
-    y = doc.lastAutoTable.finalY + 10;
+});
 
-  }
+y = doc.lastAutoTable.finalY + 10;
 
-  /* ================= GRUPO RING ================= */
+}
 
-  if(dados.voz?.grupo_ring?.length){
+/* ================= FILAS ================= */
 
-    doc.text("GRUPO DE RING",105,y,{align:"center"});
-    y+=8;
+if(voz.filas?.length){
 
-    dados.voz.grupo_ring.forEach(g=>{
+titulo("FILAS");
 
-      doc.text(`Grupo: ${g.nome}`,105,y,{align:"center"});
-      y+=6;
+doc.autoTable({
 
-      doc.text(`Estratégia: ${g.estrategia}`,105,y,{align:"center"});
-      y+=6;
+startY:y,
 
-      doc.text(`Ramais: ${(g.ramais || []).join(", ")}`,105,y,{align:"center"});
+head:[["Fila","Agentes"]],
 
-      y+=10;
+body:voz.filas.map(f=>[
+f.nome||"-",
+(f.agentes||[]).join(", ")
+]),
 
-    });
+styles:{halign:"center"}
 
-  }
+});
 
-  /* ================= URA ================= */
+y = doc.lastAutoTable.finalY + 10;
 
-  if(dados.voz?.uras?.length){
+}
 
-    doc.text("URA",105,y,{align:"center"});
-    y+=8;
+/* ================= GRUPO DE RING ================= */
 
-    dados.voz.uras.forEach(u=>{
+if(voz.grupo_ring?.length){
 
-      doc.text(`URA: ${u.nome}`,105,y,{align:"center"});
-      y+=6;
+titulo("GRUPO DE RING");
 
-      doc.text(`Mensagem: ${u.mensagem}`,105,y,{align:"center"});
-      y+=6;
+voz.grupo_ring.forEach(g=>{
 
-      (u.opcoes || []).forEach(o=>{
-        doc.text(`${o.tecla} -> ${o.destino}`,105,y,{align:"center"});
-        y+=6;
-      });
+linhaCentral("Grupo: "+g.nome);
+linhaCentral("Estratégia: "+g.estrategia);
+linhaCentral("Ramais: "+(g.ramais||[]).join(", "));
 
-      y+=6;
+y+=4;
 
-    });
+});
 
-  }
+separador();
 
-  /* ================= CHAT ================= */
+}
 
-  if(dados.chat){
+/* ================= URA ================= */
 
-    doc.text("CHAT / OMNICHANNEL",105,y,{align:"center"});
-    y+=8;
+if(voz.uras?.length){
 
-    doc.text(`Tipo: ${dados.chat.tipo}`,105,y,{align:"center"});
-    y+=6;
+titulo("URA");
 
-    doc.text(`API: ${dados.chat.api}`,105,y,{align:"center"});
-    y+=6;
+voz.uras.forEach(u=>{
 
-    doc.text(`Conta: ${dados.chat.conta}`,105,y,{align:"center"});
-    y+=6;
+linhaCentral("URA: "+u.nome);
+linhaCentral("Mensagem: "+u.mensagem);
 
-    if(dados.chat.canais){
+(u.opcoes||[]).forEach(o=>{
+linhaCentral(o.tecla+" -> "+o.destino);
+});
 
-      doc.text("Canais:",105,y,{align:"center"});
-      y+=6;
+y+=5;
 
-      dados.chat.canais.forEach(c=>{
-        doc.text(`• ${c}`,105,y,{align:"center"});
-        y+=6;
-      });
+});
 
-    }
+separador();
 
-  }
+}
 
-  doc.save("caderno-parametros.pdf");
+/* ================= PAUSAS ================= */
+
+if(voz.pausas?.length){
+
+titulo("PAUSAS");
+
+voz.pausas.forEach(p=>{
+
+linhaCentral("Grupo: "+(p.grupo||p.nome));
+
+(p.itens||[]).forEach(i=>{
+linhaCentral("• "+i.nome+" ("+i.tempo+")");
+});
+
+y+=4;
+
+});
+
+separador();
+
+}
+
+/* ================= PESQUISA ================= */
+
+if(voz.pesquisas?.length){
+
+titulo("PESQUISA DE SATISFAÇÃO");
+
+voz.pesquisas.forEach(p=>{
+
+linhaCentral("Nome: "+p.nome);
+linhaCentral("Introdução: "+p.introducao);
+linhaCentral("Pergunta: "+p.pergunta);
+
+(p.respostas||[]).forEach(r=>{
+linhaCentral("• "+r.nota+" - "+r.descricao);
+});
+
+if(p.encerramento){
+linhaCentral("Encerramento: "+p.encerramento);
+}
+
+y+=5;
+
+});
+
+separador();
+
+}
+
+/* ================= CHAT ================= */
+
+if(chat){
+
+titulo("CHAT / OMNICHANNEL");
+
+linhaCentral("Tipo: "+(chat.tipo||"-"));
+linhaCentral("API: "+(chat.api||"-"));
+linhaCentral("Conta: "+(chat.conta||"-"));
+
+if(chat.canais?.length){
+
+linhaCentral("Canais:");
+
+chat.canais.forEach(c=>{
+linhaCentral("• "+c);
+});
+
+}
+
+separador();
+
+}
+
+/* ================= FINAL ================= */
+
+doc.save("caderno-parametros.pdf");
 
 };
