@@ -432,55 +432,87 @@ window.confirmarConfiguracao = function () {
 
   let y = 25;
 
+  /* ================= FUNÇÕES ================= */
+
   function titulo(txt){
-    doc.setFontSize(15);
+
+    y += 6;
+
+    doc.setFontSize(16);
     doc.setFont(undefined,"bold");
-    doc.text(txt,10,y);
-    y += 8;
-    doc.setFont(undefined,"normal");
+    doc.text(txt,12,y);
+
+    y += 10;
+
     doc.setFontSize(11);
+    doc.setFont(undefined,"normal");
+
   }
 
   function linha(txt){
-    doc.text(txt,10,y);
-    y += 6;
+
+    doc.text(txt,14,y);
+    y += 7;
+
   }
 
   function tabela(a,b,c,d){
-    doc.text(a || "-",10,y);
-    doc.text(b || "-",60,y);
-    if(c) doc.text(c,110,y);
-    if(d) doc.text(d,160,y);
-    y += 6;
+
+    doc.text(a || "-",14,y);
+    doc.text(b || "-",70,y);
+
+    if(c)
+      doc.text(c,120,y);
+
+    if(d)
+      doc.text(d,170,y);
+
+    y += 7;
+
+  }
+
+  function separador(){
+
+    doc.line(12,y,198,y);
+    y += 8;
+
   }
 
   function novaPagina(){
+
     if(y > 270){
+
       doc.addPage();
-      y = 20;
+      y = 25;
+
     }
+
   }
 
   /* ================= CAPA ================= */
 
-  doc.setFontSize(20);
+  doc.setFontSize(22);
   doc.setFont(undefined,"bold");
-  doc.text("CADERNO DE PARÂMETROS",10,15);
+  doc.text("Caderno de Parâmetros",12,18);
 
   doc.setFontSize(12);
   doc.setFont(undefined,"normal");
-  doc.text("Resumo da Configuração",10,22);
+  doc.text("Resumo da Configuração do Cliente",12,26);
 
-  y = 35;
+  y = 40;
 
   /* ================= CLIENTE ================= */
 
   if(dados.cliente){
+
     titulo("CLIENTE");
 
     linha(`Empresa: ${dados.cliente.empresa || "-"}`);
     linha(`Domínio: ${dados.cliente.dominio || "-"}`);
     linha(`CNPJ: ${dados.cliente.cnpj || "-"}`);
+
+    separador();
+
   }
 
   /* ================= VOZ ================= */
@@ -498,6 +530,8 @@ window.confirmarConfiguracao = function () {
         novaPagina();
       });
 
+      separador();
+
     }
 
     if(voz.ramais?.length){
@@ -511,6 +545,8 @@ window.confirmarConfiguracao = function () {
         novaPagina();
       });
 
+      separador();
+
     }
 
     if(voz.entradas?.length){
@@ -520,6 +556,8 @@ window.confirmarConfiguracao = function () {
       voz.entradas.forEach(e=>{
         linha(`Número: ${e.numero}`);
       });
+
+      separador();
 
     }
 
@@ -534,6 +572,8 @@ window.confirmarConfiguracao = function () {
         novaPagina();
       });
 
+      separador();
+
     }
 
     if(voz.filas?.length){
@@ -547,6 +587,8 @@ window.confirmarConfiguracao = function () {
         novaPagina();
       });
 
+      separador();
+
     }
 
     if(voz.grupo_ring?.length){
@@ -558,8 +600,9 @@ window.confirmarConfiguracao = function () {
         linha(`Estratégia: ${g.estrategia}`);
         linha(`Ramais: ${(g.ramais || []).join(", ")}`);
         y += 4;
-        novaPagina();
       });
+
+      separador();
 
     }
 
@@ -583,6 +626,8 @@ window.confirmarConfiguracao = function () {
 
       });
 
+      separador();
+
     }
 
     if(voz.regras_tempo?.length){
@@ -595,6 +640,8 @@ window.confirmarConfiguracao = function () {
         linha(`Horário: ${r.hora_inicio} às ${r.hora_fim}`);
         y += 4;
       });
+
+      separador();
 
     }
 
@@ -609,8 +656,10 @@ window.confirmarConfiguracao = function () {
           linha(`• ${i.nome} (${i.tempo})`);
         });
 
-        y += 3;
+        y += 4;
       });
+
+      separador();
 
     }
 
@@ -628,6 +677,8 @@ window.confirmarConfiguracao = function () {
 
         y += 4;
       });
+
+      separador();
 
     }
 
@@ -653,6 +704,8 @@ window.confirmarConfiguracao = function () {
 
     }
 
+    separador();
+
     if(chat.usuarios?.length){
 
       titulo("USUÁRIOS CHAT");
@@ -662,6 +715,8 @@ window.confirmarConfiguracao = function () {
       chat.usuarios.forEach(u=>{
         tabela(u.nome,u.email,u.senha,u.permissao);
       });
+
+      separador();
 
     }
 
@@ -675,8 +730,10 @@ window.confirmarConfiguracao = function () {
         if(a.departamentos?.length)
           linha(`Departamentos: ${a.departamentos.join(", ")}`);
 
-        y += 2;
+        y += 3;
       });
+
+      separador();
 
     }
 
@@ -690,12 +747,14 @@ window.confirmarConfiguracao = function () {
         if(d.agentes?.length)
           linha(`Agentes: ${d.agentes.join(", ")}`);
 
-        y += 2;
+        y += 3;
       });
 
     }
 
   }
+
+  /* ================= SALVAR PDF ================= */
 
   doc.save("caderno-parametros.pdf");
 
