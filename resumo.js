@@ -439,7 +439,6 @@ window.confirmarConfiguracao = function () {
     }
   }
 
-  /* protege blocos grandes */
   function verificarBloco(linhas){
     const altura = linhas * 7 + 15;
     if(y + altura > 280){
@@ -449,14 +448,25 @@ window.confirmarConfiguracao = function () {
   }
 
   function titulo(txt){
+
     verificarEspaco(20);
+
     y += 8;
+
     doc.setFontSize(16);
     doc.setFont(undefined,"bold");
-    doc.text(txt,12,y);
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const textWidth = doc.getTextWidth(txt);
+    const x = (pageWidth - textWidth) / 2;
+
+    doc.text(txt, x, y);
+
     y += 10;
+
     doc.setFont(undefined,"normal");
     doc.setFontSize(11);
+
   }
 
   function linha(txt){
@@ -465,12 +475,29 @@ window.confirmarConfiguracao = function () {
     y += 7;
   }
 
+  function linhaCentro(txt){
+
+    verificarEspaco(10);
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const textWidth = doc.getTextWidth(txt);
+    const x = (pageWidth - textWidth) / 2;
+
+    doc.text(String(txt), x, y);
+
+    y += 7;
+
+  }
+
   function tabela(a,b,c,d){
     verificarEspaco(10);
+
     doc.text(String(a || "-"),14,y);
     doc.text(String(b || "-"),70,y);
+
     if(c) doc.text(String(c),120,y);
     if(d) doc.text(String(d),170,y);
+
     y += 7;
   }
 
@@ -480,25 +507,37 @@ window.confirmarConfiguracao = function () {
     y += 10;
   }
 
-  /* CAPA */
+  /* ================= CAPA ================= */
 
   doc.setFontSize(22);
   doc.setFont(undefined,"bold");
-  doc.text("Caderno de Parâmetros",12,18);
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const tituloPrincipal = "Caderno de Parâmetros";
+  const tituloWidth = doc.getTextWidth(tituloPrincipal);
+
+  doc.text(tituloPrincipal,(pageWidth - tituloWidth)/2,18);
 
   doc.setFontSize(12);
   doc.setFont(undefined,"normal");
-  doc.text("Resumo da Configuração do Cliente",12,26);
+
+  const subtitulo = "Resumo da Configuração do Cliente";
+  const subtWidth = doc.getTextWidth(subtitulo);
+
+  doc.text(subtitulo,(pageWidth - subtWidth)/2,26);
 
   y = 40;
 
-  /* CLIENTE */
+  /* ================= CLIENTE ================= */
 
   if(dados.cliente){
+
     titulo("CLIENTE");
-    linha(`Empresa: ${dados.cliente.empresa || "-"}`);
-    linha(`Domínio: ${dados.cliente.dominio || "-"}`);
-    linha(`CNPJ: ${dados.cliente.cnpj || "-"}`);
+
+    linhaCentro(`Empresa: ${dados.cliente.empresa || "-"}`);
+    linhaCentro(`Domínio: ${dados.cliente.dominio || "-"}`);
+    linhaCentro(`CNPJ: ${dados.cliente.cnpj || "-"}`);
+
     separador();
   }
 
@@ -509,59 +548,69 @@ window.confirmarConfiguracao = function () {
     if(voz.usuarios?.length){
       titulo("USUÁRIOS WEB");
       tabela("Nome","Email","Senha","Permissão");
+
       voz.usuarios.forEach(u=>{
         tabela(u.nome,u.email,u.senha,u.permissao);
       });
+
       separador();
     }
 
     if(voz.ramais?.length){
       titulo("RAMAIS");
       tabela("Ramal","Senha");
+
       voz.ramais.forEach(r=>{
         tabela(String(r.ramal),r.senha);
       });
+
       separador();
     }
 
     if(voz.entradas?.length){
       titulo("ENTRADAS");
+
       voz.entradas.forEach(e=>{
         linha(`Número: ${e.numero}`);
       });
+
       separador();
     }
 
     if(voz.agentes?.length){
       titulo("AGENTES");
       tabela("Nome","Ramal");
+
       voz.agentes.forEach(a=>{
         tabela(a.nome,String(a.ramal));
       });
+
       separador();
     }
 
     if(voz.filas?.length){
       titulo("FILAS");
       tabela("Fila","Agentes");
+
       voz.filas.forEach(f=>{
         tabela(f.nome,(f.agentes || []).join(", "));
       });
+
       separador();
     }
 
     if(voz.grupo_ring?.length){
       titulo("GRUPO DE RING");
+
       voz.grupo_ring.forEach(g=>{
         linha(`Grupo: ${g.nome}`);
         linha(`Estratégia: ${g.estrategia}`);
         linha(`Ramais: ${(g.ramais || []).join(", ")}`);
         y += 4;
       });
+
       separador();
     }
-
-    /* URA protegida */
 
     if(voz.uras?.length){
 
@@ -602,8 +651,6 @@ window.confirmarConfiguracao = function () {
       separador();
     }
 
-    /* PAUSAS protegida */
-
     if(voz.pausas?.length){
 
       let linhasPausa = 2;
@@ -628,8 +675,6 @@ window.confirmarConfiguracao = function () {
 
       separador();
     }
-
-    /* PESQUISA protegida */
 
     if(voz.pesquisas?.length){
 
@@ -677,6 +722,7 @@ window.confirmarConfiguracao = function () {
 
     if(chat.canais?.length){
       linha("Canais:");
+
       chat.canais.forEach(c=>{
         linha(`• ${c}`);
       });
@@ -686,6 +732,7 @@ window.confirmarConfiguracao = function () {
 
     if(chat.usuarios?.length){
       titulo("USUÁRIOS CHAT");
+
       tabela("Nome","Email","Senha","Permissão");
 
       chat.usuarios.forEach(u=>{
@@ -702,7 +749,6 @@ window.confirmarConfiguracao = function () {
       titulo("AGENTES CHAT");
 
       chat.agentes.forEach(a=>{
-
         linha(`Agente: ${a.nome}`);
 
         if(a.departamentos?.length){
