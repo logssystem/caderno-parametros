@@ -520,106 +520,192 @@ window.confirmarConfiguracao = function () {
 
   /* ================= VOZ ================= */
 
-  if(voz){
+if(voz){
 
-    if(voz.usuarios?.length){
+  /* USUÁRIOS WEB */
 
-      titulo("USUÁRIOS WEB");
+  if(voz.usuarios?.length){
 
-      tabela("Nome","Email","Senha","Permissão");
+    titulo("USUÁRIOS WEB");
 
-      voz.usuarios.forEach(u=>{
-        tabela(u.nome,u.email,u.senha,u.permissao);
-      });
+    tabela("Nome","Email","Senha","Permissão");
 
-      separador();
-    }
+    voz.usuarios.forEach(u=>{
+      tabela(u.nome,u.email,u.senha,u.permissao);
+    });
 
-    if(voz.ramais?.length){
-
-      titulo("RAMAIS");
-
-      tabela("Ramal","Senha");
-
-      voz.ramais.forEach(r=>{
-        tabela(String(r.ramal),r.senha);
-      });
-
-      separador();
-    }
-
-    if(voz.entradas?.length){
-
-      titulo("ENTRADAS");
-
-      voz.entradas.forEach(e=>{
-        linha(`Número: ${e.numero}`);
-      });
-
-      separador();
-    }
-
-    if(voz.agentes?.length){
-
-      titulo("AGENTES");
-
-      tabela("Nome","Ramal");
-
-      voz.agentes.forEach(a=>{
-        tabela(a.nome,String(a.ramal));
-      });
-
-      separador();
-    }
-
-    if(voz.filas?.length){
-
-      titulo("FILAS");
-
-      tabela("Fila","Agentes");
-
-      voz.filas.forEach(f=>{
-        tabela(f.nome,(f.agentes || []).join(", "));
-      });
-
-      separador();
-    }
-
-    if(voz.grupo_ring?.length){
-
-      titulo("GRUPO DE RING");
-
-      voz.grupo_ring.forEach(g=>{
-        linha(`Grupo: ${g.nome}`);
-        linha(`Estratégia: ${g.estrategia}`);
-        linha(`Ramais: ${(g.ramais || []).join(", ")}`);
-      });
-
-      separador();
-    }
-
-    if(voz.uras?.length){
-
-      titulo("URA");
-
-      voz.uras.forEach(u=>{
-
-        verificarEspaco(25);
-
-        linha(`URA: ${u.nome}`);
-        linha(`Mensagem: ${u.mensagem}`);
-
-        (u.opcoes || []).forEach(o=>{
-          linha(`${o.tecla} → ${o.destino}`);
-        });
-
-        y += 5;
-      });
-
-      separador();
-    }
-
+    separador();
   }
+
+  /* RAMAIS */
+
+  if(voz.ramais?.length){
+
+    titulo("RAMAIS");
+
+    tabela("Ramal","Senha");
+
+    voz.ramais.forEach(r=>{
+      tabela(String(r.ramal),r.senha);
+    });
+
+    separador();
+  }
+
+  /* ENTRADAS */
+
+  if(voz.entradas?.length){
+
+    titulo("ENTRADAS");
+
+    voz.entradas.forEach(e=>{
+      linha(`Número: ${e.numero}`);
+    });
+
+    separador();
+  }
+
+  /* AGENTES */
+
+  if(voz.agentes?.length){
+
+    titulo("AGENTES");
+
+    tabela("Nome","Ramal");
+
+    voz.agentes.forEach(a=>{
+      tabela(a.nome,String(a.ramal));
+    });
+
+    separador();
+  }
+
+  /* FILAS */
+
+  if(voz.filas?.length){
+
+    titulo("FILAS");
+
+    tabela("Fila","Agentes");
+
+    voz.filas.forEach(f=>{
+      tabela(f.nome,(f.agentes || []).join(", "));
+    });
+
+    separador();
+  }
+
+  /* GRUPO DE RING */
+
+  if(voz.grupo_ring?.length){
+
+    titulo("GRUPO DE RING");
+
+    voz.grupo_ring.forEach(g=>{
+
+      verificarEspaco(20);
+
+      linha(`Grupo: ${g.nome}`);
+      linha(`Estratégia: ${g.estrategia}`);
+      linha(`Ramais: ${(g.ramais || []).join(", ")}`);
+
+      y += 4;
+    });
+
+    separador();
+  }
+
+  /* URA */
+
+  if(voz.uras?.length){
+
+    titulo("URA");
+
+    voz.uras.forEach(u=>{
+
+      verificarEspaco(25);
+
+      linha(`URA: ${u.nome}`);
+      linha(`Mensagem: ${u.mensagem}`);
+
+      (u.opcoes || []).forEach(o=>{
+        linha(`${o.tecla} → ${o.destino}`);
+      });
+
+      y += 5;
+    });
+
+    separador();
+  }
+
+  /* REGRAS DE TEMPO */
+
+  if(voz.regras_tempo?.length){
+
+    titulo("REGRAS DE TEMPO");
+
+    voz.regras_tempo.forEach(r=>{
+
+      verificarEspaco(25);
+
+      linha(`Regra: ${r.nome}`);
+      linha(`Dias: ${(r.dias || []).join(", ")}`);
+      linha(`Horário: ${r.inicio} → ${r.fim}`);
+      linha(`Destino: ${r.destino}`);
+
+      y += 5;
+    });
+
+    separador();
+  }
+
+  /* PAUSAS */
+
+  if(voz.pausas?.length){
+
+    titulo("PAUSAS");
+
+    voz.pausas.forEach(p=>{
+
+      verificarEspaco(20);
+
+      linha(`Grupo: ${p.nome}`);
+
+      (p.itens || []).forEach(i=>{
+        linha(`• ${i}`);
+      });
+
+      y += 4;
+    });
+
+    separador();
+  }
+
+  /* PESQUISA DE SATISFAÇÃO */
+
+  if(voz.pesquisas?.length){
+
+    titulo("PESQUISA DE SATISFAÇÃO");
+
+    voz.pesquisas.forEach(p=>{
+
+      verificarEspaco(25);
+
+      linha(`Nome: ${p.nome}`);
+      linha(`Introdução: ${p.introducao}`);
+      linha(`Pergunta: ${p.pergunta}`);
+
+      (p.respostas || []).forEach(r=>{
+        linha(`• ${r}`);
+      });
+
+      y += 5;
+    });
+
+    separador();
+  }
+
+}
 
   /* ================= CHAT ================= */
 
