@@ -661,51 +661,53 @@ if(voz){
 
   /* PAUSAS */
 
-  if(voz.pausas?.length){
+   if(voz.pausas?.length){
+   
+     titulo("PAUSAS");
+   
+     voz.pausas.forEach(p=>{
+   
+       verificarEspaco(20);
+   
+       linha(`Grupo: ${p.grupo || p.nome || "-"}`);
+   
+       (p.itens || []).forEach(i=>{
+         linha(`• ${i.nome || i} (${i.tempo || "-"})`);
+       });
+   
+       y += 4;
+     });
+   
+     separador();
+   }
 
-    titulo("PAUSAS");
+ /* PESQUISA DE SATISFAÇÃO */
 
-    voz.pausas.forEach(p=>{
-
-      verificarEspaco(20);
-
-      linha(`Grupo: ${p.nome}`);
-
-      (p.itens || []).forEach(i=>{
-        linha(`• ${i}`);
-      });
-
-      y += 4;
-    });
-
-    separador();
-  }
-
-  /* PESQUISA DE SATISFAÇÃO */
-
-  if(voz.pesquisas?.length){
-
-    titulo("PESQUISA DE SATISFAÇÃO");
-
-    voz.pesquisas.forEach(p=>{
-
-      verificarEspaco(25);
-
-      linha(`Nome: ${p.nome}`);
-      linha(`Introdução: ${p.introducao}`);
-      linha(`Pergunta: ${p.pergunta}`);
-
-      (p.respostas || []).forEach(r=>{
-        linha(`• ${r}`);
-      });
-
-      y += 5;
-    });
-
-    separador();
-  }
-
-}
+   if(voz.pesquisas?.length){
+   
+     titulo("PESQUISA DE SATISFAÇÃO");
+   
+     voz.pesquisas.forEach(p=>{
+   
+       verificarEspaco(25);
+   
+       linha(`Nome: ${p.nome}`);
+       linha(`Introdução: ${p.introducao || "-"}`);
+       linha(`Pergunta: ${p.pergunta || "-"}`);
+   
+       (p.respostas || []).forEach(r=>{
+         linha(`• ${r.nota || "-"} - ${r.descricao || r}`);
+       });
+   
+       if(p.encerramento){
+         linha(`Encerramento: ${p.encerramento}`);
+       }
+   
+       y += 5;
+     });
+   
+     separador();
+   }
 
   /* ================= CHAT ================= */
 
