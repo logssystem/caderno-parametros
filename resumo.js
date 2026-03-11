@@ -432,27 +432,44 @@ window.confirmarConfiguracao = function () {
 
   let y = 25;
 
+  /* CONTROLE DE QUEBRA */
+  function verificarEspaco(altura){
+
+    if(y + altura > 280){
+      doc.addPage();
+      y = 25;
+    }
+
+  }
+
   function titulo(txt){
+
+    verificarEspaco(20);
+
     y += 8;
     doc.setFontSize(16);
     doc.setFont(undefined,"bold");
     doc.text(txt,12,y);
+
     y += 10;
+
     doc.setFont(undefined,"normal");
     doc.setFontSize(11);
+
   }
 
   function linha(txt){
+
+    verificarEspaco(10);
+
     doc.text(txt,14,y);
     y += 7;
 
-    if(y > 280){
-      doc.addPage();
-      y = 25;
-    }
   }
 
   function tabela(a,b,c,d){
+
+    verificarEspaco(10);
 
     doc.text(a || "-",14,y);
     doc.text(b || "-",70,y);
@@ -465,16 +482,15 @@ window.confirmarConfiguracao = function () {
 
     y += 7;
 
-    if(y > 280){
-      doc.addPage();
-      y = 25;
-    }
-
   }
 
   function separador(){
+
+    verificarEspaco(10);
+
     doc.line(12,y,198,y);
     y += 10;
+
   }
 
   /* ================= CAPA ================= */
@@ -587,6 +603,9 @@ window.confirmarConfiguracao = function () {
       titulo("URA");
 
       voz.uras.forEach(u=>{
+
+        verificarEspaco(25);
+
         linha(`URA: ${u.nome}`);
         linha(`Mensagem: ${u.mensagem}`);
 
@@ -605,6 +624,8 @@ window.confirmarConfiguracao = function () {
   /* ================= CHAT ================= */
 
   if(chat){
+
+    verificarEspaco(40);
 
     titulo("CHAT / OMNICHANNEL");
 
@@ -651,6 +672,9 @@ window.confirmarConfiguracao = function () {
       titulo("AGENTES CHAT");
 
       chat.agentes.forEach(a=>{
+
+        verificarEspaco(15);
+
         linha(`Agente: ${a.nome}`);
 
         if(a.departamentos?.length){
@@ -670,6 +694,9 @@ window.confirmarConfiguracao = function () {
       titulo("DEPARTAMENTOS");
 
       chat.departamentos.forEach(d=>{
+
+        verificarEspaco(15);
+
         linha(`Departamento: ${d.nome}`);
 
         if(d.agentes?.length){
