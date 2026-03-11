@@ -425,89 +425,118 @@ window.confirmarConfiguracao = function () {
 
   const dados = JSON.parse(raw);
   const voz = dados.voz || {};
+  const chat = dados.chat || {};
 
-  let y = 10;
+  let y = 20;
 
   function titulo(txt){
-    doc.setFontSize(14);
-    doc.text(txt,10,y);
+    doc.setFontSize(16);
+    doc.setFont(undefined,"bold");
+    doc.text(txt, 10, y);
     y += 8;
-    doc.setFontSize(10);
+    doc.setFont(undefined,"normal");
+    doc.setFontSize(11);
+  }
+
+  function subtitulo(txt){
+    y += 4;
+    doc.setFont(undefined,"bold");
+    doc.text(txt, 10, y);
+    y += 6;
+    doc.setFont(undefined,"normal");
   }
 
   function linha(txt){
-    doc.text(txt,10,y);
+    doc.text(txt, 12, y);
     y += 6;
   }
 
   function novaPagina(){
     if(y > 270){
       doc.addPage();
-      y = 10;
+      y = 20;
     }
   }
 
-  /* CLIENTE */
-  titulo("Resumo da Configuração");
+  /* =================================================
+     TÍTULO
+  ================================================= */
+
+  doc.setFontSize(20);
+  doc.setFont(undefined,"bold");
+  doc.text("Caderno de Parâmetros", 10, 15);
+
+  doc.setFontSize(12);
+  doc.setFont(undefined,"normal");
+  doc.text("Resumo da Configuração do Cliente", 10, 22);
+
+  y = 30;
+
+  /* =================================================
+     CLIENTE
+  ================================================= */
 
   if(dados.cliente){
+    titulo("Cliente");
+
     linha(`Empresa: ${dados.cliente.empresa}`);
     linha(`Domínio: ${dados.cliente.dominio}`);
     linha(`CNPJ: ${dados.cliente.cnpj}`);
-    y+=4;
+
+    y += 4;
   }
 
-  /* USUARIOS */
+  /* =================================================
+     USUÁRIOS
+  ================================================= */
+
   if(voz.usuarios?.length){
     titulo("Usuários Web");
+
     voz.usuarios.forEach(u=>{
       linha(`Nome: ${u.nome}`);
       linha(`Email: ${u.email}`);
+      linha(`Permissão: ${u.permissao}`);
+      y += 2;
       novaPagina();
     });
   }
 
-  /* RAMAIS */
+  /* =================================================
+     RAMAIS
+  ================================================= */
+
   if(voz.ramais?.length){
     titulo("Ramais");
+
     voz.ramais.forEach(r=>{
       linha(`Ramal: ${r.ramal}`);
       novaPagina();
     });
   }
 
-  /* AGENTES */
-  if(voz.agentes?.length){
-    titulo("Agentes");
-    voz.agentes.forEach(a=>{
-      linha(`${a.nome} - Ramal ${a.ramal}`);
-      novaPagina();
-    });
-  }
+  /* =================================================
+     FILAS
+  ================================================= */
 
-  /* FILAS */
   if(voz.filas?.length){
     titulo("Filas");
+
     voz.filas.forEach(f=>{
       linha(`Fila: ${f.nome}`);
-      linha(`Agentes: ${(f.agentes||[]).join(", ")}`);
+      linha(`Agentes: ${(f.agentes || []).join(", ")}`);
+      y += 3;
       novaPagina();
     });
   }
 
-  /* GRUPO RING */
-  if(voz.grupo_ring?.length){
-    titulo("Grupo de Ring");
-    voz.grupo_ring.forEach(g=>{
-      linha(`Grupo: ${g.nome}`);
-      linha(`Ramais: ${(g.ramais||[]).join(", ")}`);
-      novaPagina();
-    });
-  }
+  /* =================================================
+     URA
+  ================================================= */
 
-  /* URA */
   if(voz.uras?.length){
     titulo("URA");
+
     voz.uras.forEach(u=>{
       linha(`URA: ${u.nome}`);
       linha(`Mensagem: ${u.mensagem}`);
@@ -516,19 +545,31 @@ window.confirmarConfiguracao = function () {
         linha(`Tecla ${o.tecla} → ${o.destino}`);
       });
 
+      y += 3;
       novaPagina();
     });
   }
 
-  /* CHAT */
-  if(dados.chat){
+  /* =================================================
+     CHAT
+  ================================================= */
+
+  if(chat.tipo){
     titulo("Chat / Omnichannel");
 
-    linha(`Tipo: ${dados.chat.tipo || "-"}`);
-    linha(`API: ${dados.chat.api || "-"}`);
-    linha(`Conta: ${dados.chat.conta || "-"}`);
+    linha(`Tipo: ${chat.tipo}`);
+    linha(`API: ${chat.api}`);
+    linha(`Conta: ${chat.conta}`);
 
-    novaPagina();
+    if(chat.canais?.length){
+      subtitulo("Canais Ativos");
+
+      chat.canais.forEach(c=>{
+        linha(`• ${c}`);
+      });
+    }
+
+    y += 4;
   }
 
   doc.save("configuracao-cliente.pdf");
