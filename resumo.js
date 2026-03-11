@@ -411,13 +411,16 @@ window.voltar = function () {
   window.location.href = "index.html"; 
 };
 
-/* ================= GERAR PDF ================= */
+/* =================================================
+   GERAR PDF – CADERNO DE PARÂMETROS
+================================================= */
 window.confirmarConfiguracao = function () {
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
   const raw = localStorage.getItem("CONFIG_CADERNO");
+
   if (!raw) {
     alert("Nenhuma configuração encontrada.");
     return;
@@ -434,6 +437,7 @@ window.confirmarConfiguracao = function () {
     doc.setFont(undefined,"bold");
     doc.text(txt, 10, y);
     y += 8;
+
     doc.setFont(undefined,"normal");
     doc.setFontSize(11);
   }
@@ -458,9 +462,9 @@ window.confirmarConfiguracao = function () {
     }
   }
 
-  /* =================================================
-     TÍTULO
-  ================================================= */
+  /* ================================================
+     CAPA
+  ================================================ */
 
   doc.setFontSize(20);
   doc.setFont(undefined,"bold");
@@ -470,107 +474,190 @@ window.confirmarConfiguracao = function () {
   doc.setFont(undefined,"normal");
   doc.text("Resumo da Configuração do Cliente", 10, 22);
 
-  y = 30;
+  y = 35;
 
-  /* =================================================
+  /* ================================================
      CLIENTE
-  ================================================= */
+  ================================================ */
 
   if(dados.cliente){
     titulo("Cliente");
 
-    linha(`Empresa: ${dados.cliente.empresa}`);
-    linha(`Domínio: ${dados.cliente.dominio}`);
-    linha(`CNPJ: ${dados.cliente.cnpj}`);
+    linha(`Empresa: ${dados.cliente.empresa || "-"}`);
+    linha(`Domínio: ${dados.cliente.dominio || "-"}`);
+    linha(`CNPJ: ${dados.cliente.cnpj || "-"}`);
 
     y += 4;
   }
 
-  /* =================================================
-     USUÁRIOS
-  ================================================= */
+  /* ================================================
+     USUÁRIOS WEB
+  ================================================ */
 
   if(voz.usuarios?.length){
+
     titulo("Usuários Web");
 
-    voz.usuarios.forEach(u=>{
+    voz.usuarios.forEach(u => {
+
       linha(`Nome: ${u.nome}`);
       linha(`Email: ${u.email}`);
-      linha(`Permissão: ${u.permissao}`);
+      linha(`Senha: ${u.senha || "-"}`);
+      linha(`Permissão: ${u.permissao || "-"}`);
+
       y += 2;
       novaPagina();
+
     });
+
   }
 
-  /* =================================================
+  /* ================================================
      RAMAIS
-  ================================================= */
+  ================================================ */
 
   if(voz.ramais?.length){
+
     titulo("Ramais");
 
-    voz.ramais.forEach(r=>{
+    voz.ramais.forEach(r => {
+
       linha(`Ramal: ${r.ramal}`);
+      linha(`Senha: ${r.senha || "-"}`);
+
+      y += 2;
       novaPagina();
+
     });
+
   }
 
-  /* =================================================
+  /* ================================================
+     AGENTES
+  ================================================ */
+
+  if(voz.agentes?.length){
+
+    titulo("Agentes");
+
+    voz.agentes.forEach(a => {
+
+      linha(`Nome: ${a.nome}`);
+      linha(`Ramal: ${a.ramal || "-"}`);
+
+      if(a.multiskill)
+        linha(`Multiskill: Sim`);
+
+      if(a.regra_tempo)
+        linha(`Regra de Tempo: ${a.regra_tempo}`);
+
+      y += 2;
+      novaPagina();
+
+    });
+
+  }
+
+  /* ================================================
      FILAS
-  ================================================= */
+  ================================================ */
 
   if(voz.filas?.length){
+
     titulo("Filas");
 
-    voz.filas.forEach(f=>{
+    voz.filas.forEach(f => {
+
       linha(`Fila: ${f.nome}`);
       linha(`Agentes: ${(f.agentes || []).join(", ")}`);
+
       y += 3;
       novaPagina();
+
     });
+
   }
 
-  /* =================================================
+  /* ================================================
+     GRUPO DE RING
+  ================================================ */
+
+  if(voz.grupo_ring?.length){
+
+    titulo("Grupo de Ring");
+
+    voz.grupo_ring.forEach(g => {
+
+      linha(`Grupo: ${g.nome}`);
+      linha(`Estratégia: ${g.estrategia || "-"}`);
+      linha(`Ramais: ${(g.ramais || []).join(", ")}`);
+
+      y += 3;
+      novaPagina();
+
+    });
+
+  }
+
+  /* ================================================
      URA
-  ================================================= */
+  ================================================ */
 
   if(voz.uras?.length){
+
     titulo("URA");
 
-    voz.uras.forEach(u=>{
+    voz.uras.forEach(u => {
+
       linha(`URA: ${u.nome}`);
       linha(`Mensagem: ${u.mensagem}`);
 
-      (u.opcoes || []).forEach(o=>{
+      (u.opcoes || []).forEach(o => {
+
         linha(`Tecla ${o.tecla} → ${o.destino}`);
+
       });
 
       y += 3;
       novaPagina();
+
     });
+
   }
 
-  /* =================================================
-     CHAT
-  ================================================= */
+  /* ================================================
+     CHAT / OMNICHANNEL
+  ================================================ */
 
   if(chat.tipo){
+
     titulo("Chat / Omnichannel");
 
-    linha(`Tipo: ${chat.tipo}`);
-    linha(`API: ${chat.api}`);
-    linha(`Conta: ${chat.conta}`);
+    linha(`Tipo: ${chat.tipo || "-"}`);
+    linha(`API: ${chat.api || "-"}`);
+    linha(`Conta: ${chat.conta || "-"}`);
+
+    /* CANAIS */
 
     if(chat.canais?.length){
+
       subtitulo("Canais Ativos");
 
-      chat.canais.forEach(c=>{
+      chat.canais.forEach(c => {
+
         linha(`• ${c}`);
+
       });
+
     }
 
     y += 4;
   }
 
+  /* ================================================
+     SALVAR PDF
+  ================================================ */
+
   doc.save("configuracao-cliente.pdf");
+
 };
