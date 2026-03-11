@@ -415,7 +415,6 @@ window.voltar = function () {
 window.confirmarConfiguracao = function () {
 
   const { jsPDF } = window.jspdf;
-
   const doc = new jsPDF();
 
   const raw = localStorage.getItem("CONFIG_CADERNO");
@@ -425,36 +424,111 @@ window.confirmarConfiguracao = function () {
   }
 
   const dados = JSON.parse(raw);
+  const voz = dados.voz || {};
 
   let y = 10;
 
-  doc.setFontSize(16);
-  doc.text("Resumo da Configuração", 10, y);
-  y += 10;
+  function titulo(txt){
+    doc.setFontSize(14);
+    doc.text(txt,10,y);
+    y += 8;
+    doc.setFontSize(10);
+  }
 
-  doc.setFontSize(10);
-
-  function escreverLinha(label, valor) {
-    doc.text(`${label}: ${valor || "-"}`, 10, y);
+  function linha(txt){
+    doc.text(txt,10,y);
     y += 6;
   }
 
-  if (dados.cliente) {
-    escreverLinha("Empresa", dados.cliente.empresa);
-    escreverLinha("Domínio", dados.cliente.dominio);
-    escreverLinha("CNPJ", dados.cliente.cnpj);
-    y += 4;
+  function novaPagina(){
+    if(y > 270){
+      doc.addPage();
+      y = 10;
+    }
   }
 
-  if (dados.voz?.usuarios?.length) {
-    doc.text("Usuários Web:", 10, y);
-    y += 6;
+  /* CLIENTE */
+  titulo("Resumo da Configuração");
 
-    dados.voz.usuarios.forEach(u => {
-      escreverLinha("Nome", u.nome);
-      escreverLinha("Email", u.email);
-      y += 2;
+  if(dados.cliente){
+    linha(`Empresa: ${dados.cliente.empresa}`);
+    linha(`Domínio: ${dados.cliente.dominio}`);
+    linha(`CNPJ: ${dados.cliente.cnpj}`);
+    y+=4;
+  }
+
+  /* USUARIOS */
+  if(voz.usuarios?.length){
+    titulo("Usuários Web");
+    voz.usuarios.forEach(u=>{
+      linha(`Nome: ${u.nome}`);
+      linha(`Email: ${u.email}`);
+      novaPagina();
     });
+  }
+
+  /* RAMAIS */
+  if(voz.ramais?.length){
+    titulo("Ramais");
+    voz.ramais.forEach(r=>{
+      linha(`Ramal: ${r.ramal}`);
+      novaPagina();
+    });
+  }
+
+  /* AGENTES */
+  if(voz.agentes?.length){
+    titulo("Agentes");
+    voz.agentes.forEach(a=>{
+      linha(`${a.nome} - Ramal ${a.ramal}`);
+      novaPagina();
+    });
+  }
+
+  /* FILAS */
+  if(voz.filas?.length){
+    titulo("Filas");
+    voz.filas.forEach(f=>{
+      linha(`Fila: ${f.nome}`);
+      linha(`Agentes: ${(f.agentes||[]).join(", ")}`);
+      novaPagina();
+    });
+  }
+
+  /* GRUPO RING */
+  if(voz.grupo_ring?.length){
+    titulo("Grupo de Ring");
+    voz.grupo_ring.forEach(g=>{
+      linha(`Grupo: ${g.nome}`);
+      linha(`Ramais: ${(g.ramais||[]).join(", ")}`);
+      novaPagina();
+    });
+  }
+
+  /* URA */
+  if(voz.uras?.length){
+    titulo("URA");
+    voz.uras.forEach(u=>{
+      linha(`URA: ${u.nome}`);
+      linha(`Mensagem: ${u.mensagem}`);
+
+      (u.opcoes || []).forEach(o=>{
+        linha(`Tecla ${o.tecla} → ${o.destino}`);
+      });
+
+      novaPagina();
+    });
+  }
+
+  /* CHAT */
+  if(dados.chat){
+    titulo("Chat / Omnichannel");
+
+    linha(`Tipo: ${dados.chat.tipo || "-"}`);
+    linha(`API: ${dados.chat.api || "-"}`);
+    linha(`Conta: ${dados.chat.conta || "-"}`);
+
+    novaPagina();
   }
 
   doc.save("configuracao-cliente.pdf");
