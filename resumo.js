@@ -439,29 +439,19 @@ window.confirmarConfiguracao = function () {
     }
   }
 
-  function verificarBloco(linhas){
-    const altura = linhas * 7 + 15;
-    if(y + altura > 280){
-      doc.addPage();
-      y = 25;
-    }
-  }
-
   function titulo(txt){
 
     verificarEspaco(20);
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const textWidth = doc.getTextWidth(txt);
 
     y += 8;
 
     doc.setFontSize(16);
     doc.setFont(undefined,"bold");
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const textWidth = doc.getTextWidth(txt);
-
-    const x = (pageWidth - textWidth) / 2;
-
-    doc.text(txt, x, y);
+    doc.text(txt,(pageWidth - textWidth)/2,y);
 
     y += 10;
 
@@ -470,32 +460,14 @@ window.confirmarConfiguracao = function () {
 
   }
 
-  function linha(txt){
-    verificarEspaco(10);
-    doc.text(String(txt),14,y);
-    y += 7;
-  }
-
-  /* decide automaticamente se centraliza */
-  function linhaAuto(txt){
+  function linhaCentro(txt){
 
     verificarEspaco(10);
 
     const pageWidth = doc.internal.pageSize.getWidth();
     const textWidth = doc.getTextWidth(txt);
 
-    const limiteCentro = 90;
-
-    if(textWidth < limiteCentro){
-
-      const x = (pageWidth - textWidth) / 2;
-      doc.text(txt,x,y);
-
-    } else {
-
-      doc.text(txt,14,y);
-
-    }
+    doc.text(txt,(pageWidth - textWidth)/2,y);
 
     y += 7;
 
@@ -521,6 +493,7 @@ window.confirmarConfiguracao = function () {
     doc.line(12,y,198,y);
 
     y += 10;
+
   }
 
   /* ================= CAPA ================= */
@@ -529,6 +502,7 @@ window.confirmarConfiguracao = function () {
   doc.setFont(undefined,"bold");
 
   const pageWidth = doc.internal.pageSize.getWidth();
+
   const tituloPrincipal = "Caderno de Parâmetros";
 
   doc.text(
@@ -556,9 +530,9 @@ window.confirmarConfiguracao = function () {
 
     titulo("CLIENTE");
 
-    linhaAuto(`Empresa: ${dados.cliente.empresa || "-"}`);
-    linhaAuto(`Domínio: ${dados.cliente.dominio || "-"}`);
-    linhaAuto(`CNPJ: ${dados.cliente.cnpj || "-"}`);
+    linhaCentro(`Empresa: ${dados.cliente.empresa || "-"}`);
+    linhaCentro(`Domínio: ${dados.cliente.dominio || "-"}`);
+    linhaCentro(`CNPJ: ${dados.cliente.cnpj || "-"}`);
 
     separador();
   }
@@ -598,7 +572,7 @@ window.confirmarConfiguracao = function () {
       titulo("ENTRADAS");
 
       voz.entradas.forEach(e=>{
-        linhaAuto(`Número: ${e.numero}`);
+        linhaCentro(`Número: ${e.numero}`);
       });
 
       separador();
@@ -635,9 +609,9 @@ window.confirmarConfiguracao = function () {
       titulo("GRUPO DE RING");
 
       voz.grupo_ring.forEach(g=>{
-        linhaAuto(`Grupo: ${g.nome}`);
-        linhaAuto(`Estratégia: ${g.estrategia}`);
-        linhaAuto(`Ramais: ${(g.ramais || []).join(", ")}`);
+        linhaCentro(`Grupo: ${g.nome}`);
+        linhaCentro(`Estratégia: ${g.estrategia}`);
+        linhaCentro(`Ramais: ${(g.ramais || []).join(", ")}`);
         y += 4;
       });
 
@@ -646,23 +620,15 @@ window.confirmarConfiguracao = function () {
 
     if(voz.uras?.length){
 
-      let linhasURA = 3;
-
-      voz.uras.forEach(u=>{
-        linhasURA += (u.opcoes || []).length + 2;
-      });
-
-      verificarBloco(linhasURA);
-
       titulo("URA");
 
       voz.uras.forEach(u=>{
 
-        linhaAuto(`URA: ${u.nome}`);
-        linhaAuto(`Mensagem: ${u.mensagem}`);
+        linhaCentro(`URA: ${u.nome}`);
+        linhaCentro(`Mensagem: ${u.mensagem}`);
 
         (u.opcoes || []).forEach(o=>{
-          linhaAuto(o.tecla + " -> " + o.destino);
+          linhaCentro(`${o.tecla} -> ${o.destino}`);
         });
 
         y += 5;
@@ -676,10 +642,10 @@ window.confirmarConfiguracao = function () {
       titulo("REGRAS DE TEMPO");
 
       voz.regras_tempo.forEach(r=>{
-        linhaAuto(`Regra: ${r.nome}`);
-        linhaAuto(`Dias: ${(r.dias || []).join(", ")}`);
-        linhaAuto(`Horário: ${(r.hora_inicio || r.inicio || "-")} -> ${(r.hora_fim || r.fim || "-")}`);
-        linhaAuto(`Destino: ${r.destino || "-"}`);
+        linhaCentro(`Regra: ${r.nome}`);
+        linhaCentro(`Dias: ${(r.dias || []).join(", ")}`);
+        linhaCentro(`Horário: ${(r.hora_inicio || r.inicio || "-")} -> ${(r.hora_fim || r.fim || "-")}`);
+        linhaCentro(`Destino: ${r.destino || "-"}`);
         y += 5;
       });
 
@@ -688,22 +654,14 @@ window.confirmarConfiguracao = function () {
 
     if(voz.pausas?.length){
 
-      let linhasPausa = 2;
-
-      voz.pausas.forEach(p=>{
-        linhasPausa += (p.itens || []).length + 1;
-      });
-
-      verificarBloco(linhasPausa);
-
       titulo("PAUSAS");
 
       voz.pausas.forEach(p=>{
 
-        linhaAuto(`Grupo: ${p.grupo || p.nome || "-"}`);
+        linhaCentro(`Grupo: ${p.grupo || p.nome || "-"}`);
 
         (p.itens || []).forEach(i=>{
-          linhaAuto(`• ${(i.nome || "-")} (${i.tempo || "-"})`);
+          linhaCentro(`• ${(i.nome || "-")} (${i.tempo || "-"})`);
         });
 
         y += 4;
@@ -714,28 +672,20 @@ window.confirmarConfiguracao = function () {
 
     if(voz.pesquisas?.length){
 
-      let linhasPesquisa = 4;
-
-      voz.pesquisas.forEach(p=>{
-        linhasPesquisa += (p.respostas || []).length + 2;
-      });
-
-      verificarBloco(linhasPesquisa);
-
       titulo("PESQUISA DE SATISFAÇÃO");
 
       voz.pesquisas.forEach(p=>{
 
-        linhaAuto(`Nome: ${p.nome}`);
-        linhaAuto(`Introdução: ${p.introducao || "-"}`);
-        linhaAuto(`Pergunta: ${p.pergunta || "-"}`);
+        linhaCentro(`Nome: ${p.nome}`);
+        linhaCentro(`Introdução: ${p.introducao || "-"}`);
+        linhaCentro(`Pergunta: ${p.pergunta || "-"}`);
 
         (p.respostas || []).forEach(r=>{
-          linhaAuto(`• ${r.nota || "-"} - ${r.descricao || "-"}`);
+          linhaCentro(`• ${r.nota || "-"} - ${r.descricao || "-"}`);
         });
 
         if(p.encerramento){
-          linhaAuto(`Encerramento: ${p.encerramento}`);
+          linhaCentro(`Encerramento: ${p.encerramento}`);
         }
 
         y += 5;
@@ -752,16 +702,16 @@ window.confirmarConfiguracao = function () {
 
     titulo("CHAT / OMNICHANNEL");
 
-    linhaAuto(`Tipo: ${chat.tipo || "-"}`);
-    linhaAuto(`API: ${chat.api || "-"}`);
-    linhaAuto(`Conta: ${chat.conta || "-"}`);
+    linhaCentro(`Tipo: ${chat.tipo || "-"}`);
+    linhaCentro(`API: ${chat.api || "-"}`);
+    linhaCentro(`Conta: ${chat.conta || "-"}`);
 
     if(chat.canais?.length){
 
-      linhaAuto("Canais:");
+      linhaCentro("Canais:");
 
       chat.canais.forEach(c=>{
-        linhaAuto(`• ${c}`);
+        linhaCentro(`• ${c}`);
       });
 
     }
@@ -783,16 +733,14 @@ window.confirmarConfiguracao = function () {
 
     if(chat.agentes?.length){
 
-      verificarBloco(chat.agentes.length * 2);
-
       titulo("AGENTES CHAT");
 
       chat.agentes.forEach(a=>{
 
-        linhaAuto(`Agente: ${a.nome}`);
+        linhaCentro(`Agente: ${a.nome}`);
 
         if(a.departamentos?.length){
-          linhaAuto(`Departamentos: ${a.departamentos.join(", ")}`);
+          linhaCentro(`Departamentos: ${a.departamentos.join(", ")}`);
         }
 
         y += 3;
@@ -807,10 +755,10 @@ window.confirmarConfiguracao = function () {
 
       chat.departamentos.forEach(d=>{
 
-        linhaAuto(`Departamento: ${d.nome}`);
+        linhaCentro(`Departamento: ${d.nome}`);
 
         if(d.agentes?.length){
-          linhaAuto(`Agentes: ${d.agentes.join(", ")}`);
+          linhaCentro(`Agentes: ${d.agentes.join(", ")}`);
         }
 
         y += 3;
