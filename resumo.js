@@ -416,330 +416,344 @@ window.voltar = function () {
 ================================================= */
 window.confirmarConfiguracao = function () {
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  const raw = localStorage.getItem("CONFIG_CADERNO");
-  if (!raw) {
-    alert("Nenhuma configuração encontrada.");
-    return;
-  }
-
-  const dados = JSON.parse(raw);
-  const voz = dados.voz || {};
-  const chat = dados.chat || {};
-
-  let y = 25;
-  const pageWidth = doc.internal.pageSize.getWidth();
-
-  /* ---------------- Utilidades ---------------- */
-
-  function verificarEspaco(altura){
-    if (y + altura > 280) {
-      doc.addPage();
-      y = 25;
-    }
-  }
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
 
-  function verificarBloco(linhas){
-    const altura = linhas * 7 + 20;
-    if (y + altura > 280) {
-      doc.addPage();
-      y = 25;
-    }
-  }
+const raw = localStorage.getItem("CONFIG_CADERNO");
 
-  function titulo(txt){
-    verificarEspaco(20);
-    y += 8;
-    doc.setFontSize(16);
-    doc.setFont(undefined,"bold");
-    const w = doc.getTextWidth(txt);
-    doc.text(txt,(pageWidth - w)/2,y);
-    y += 10;
-    doc.setFont(undefined,"normal");
-    doc.setFontSize(11);
-  }
+if (!raw) {
+  alert("Nenhuma configuração encontrada.");
+  return;
+}
 
-  function linhaCentro(txt){
-    verificarEspaco(10);
-    const w = doc.getTextWidth(txt);
-    doc.text(txt,(pageWidth - w)/2,y);
-    y += 7;
-  }
+const dados = JSON.parse(raw);
 
-  /* tabela centralizada (2 a 4 colunas) */
-  function tabela(a,b,c,d){
+let y = 30;
 
-    verificarEspaco(10);
+/* ================= TÍTULO ================= */
 
-    const center = pageWidth/2;
+doc.setFontSize(22);
+doc.text("Caderno de Parâmetros",105,20,{align:"center"});
 
-    const col1 = center - 60;
-    const col2 = center - 10;
-    const col3 = center + 40;
-    const col4 = center + 90;
+doc.setFontSize(12);
+doc.text("Resumo da Configuração do Cliente",105,28,{align:"center"});
 
-    doc.text(String(a || "-"), col1, y);
-    doc.text(String(b || "-"), col2, y);
+/* ================= CLIENTE ================= */
 
-    if(c) doc.text(String(c), col3, y);
-    if(d) doc.text(String(d), col4, y);
+if(dados.cliente){
 
-    y += 7;
-  }
+doc.setFontSize(16);
+doc.text("CLIENTE",105,y,{align:"center"});
 
-  function separador(){
-    verificarEspaco(10);
-    doc.line(12,y,198,y);
-    y += 10;
-  }
+y+=10;
 
-  /* ---------------- CAPA ---------------- */
+doc.setFontSize(11);
 
-  doc.setFontSize(22);
-  doc.setFont(undefined,"bold");
+doc.text(`Empresa: ${dados.cliente.empresa || "-"}`,105,y,{align:"center"});
+y+=6;
 
-  const tituloPrincipal = "Caderno de Parâmetros";
-  doc.text(
-    tituloPrincipal,
-    (pageWidth - doc.getTextWidth(tituloPrincipal)) / 2,
-    18
-  );
+doc.text(`Domínio: ${dados.cliente.dominio || "-"}`,105,y,{align:"center"});
+y+=6;
 
-  doc.setFontSize(12);
-  doc.setFont(undefined,"normal");
+doc.text(`CNPJ: ${dados.cliente.cnpj || "-"}`,105,y,{align:"center"});
 
-  const subtitulo = "Resumo da Configuração do Cliente";
-  doc.text(
-    subtitulo,
-    (pageWidth - doc.getTextWidth(subtitulo)) / 2,
-    26
-  );
+y+=12;
 
-  y = 40;
+}
 
-  /* ---------------- CLIENTE ---------------- */
+/* ================= USUÁRIOS WEB ================= */
 
-  if(dados.cliente){
+if(dados.voz?.usuarios?.length){
 
-    titulo("CLIENTE");
+doc.text("USUÁRIOS WEB",105,y,{align:"center"});
 
-    linhaCentro(`Empresa: ${dados.cliente.empresa || "-"}`);
-    linhaCentro(`Domínio: ${dados.cliente.dominio || "-"}`);
-    linhaCentro(`CNPJ: ${dados.cliente.cnpj || "-"}`);
+y+=6;
 
-    separador();
-  }
+doc.autoTable({
 
-  /* ---------------- USUÁRIOS WEB ---------------- */
+startY:y,
 
-  if(voz.usuarios?.length){
+head:[["Nome","Email","Senha","Permissão"]],
 
-    titulo("USUÁRIOS WEB");
+body:dados.voz.usuarios.map(u=>[
+u.nome,
+u.email,
+u.senha,
+u.permissao
+]),
 
-    tabela("Nome","Email","Senha","Permissão");
+theme:"grid",
 
-    voz.usuarios.forEach(u=>{
-      tabela(u.nome,u.email,u.senha,u.permissao);
-    });
+styles:{
+fontSize:10,
+halign:"center",
+valign:"middle"
+},
 
-    separador();
-  }
+headStyles:{
+fillColor:[230,230,230],
+textColor:20,
+fontStyle:"bold"
+},
 
-  /* ---------------- RAMAIS ---------------- */
+columnStyles:{
+0:{cellWidth:35},
+1:{cellWidth:60},
+2:{cellWidth:40},
+3:{cellWidth:50}
+}
 
-  if(voz.ramais?.length){
+});
 
-    titulo("RAMAIS");
+y = doc.lastAutoTable.finalY + 10;
 
-    tabela("Ramal","Senha");
+}
 
-    voz.ramais.forEach(r=>{
-      tabela(String(r.ramal),r.senha);
-    });
+/* ================= RAMAIS ================= */
 
-    separador();
-  }
+if(dados.voz?.ramais?.length){
 
-  /* ---------------- ENTRADAS ---------------- */
+doc.text("RAMAIS",105,y,{align:"center"});
 
-  if(voz.entradas?.length){
+y+=6;
 
-    verificarBloco(3);
+doc.autoTable({
 
-    titulo("ENTRADAS");
+startY:y,
 
-    voz.entradas.forEach(e=>{
-      linhaCentro(`Número: ${e.numero}`);
-    });
+head:[["Ramal","Senha"]],
 
-    separador();
-  }
+body:dados.voz.ramais.map(r=>[
+r.ramal,
+r.senha
+]),
 
-  /* ---------------- AGENTES ---------------- */
+theme:"grid",
 
-  if(voz.agentes?.length){
+styles:{halign:"center"}
 
-    titulo("AGENTES");
+});
 
-    tabela("Nome","Ramal");
+y = doc.lastAutoTable.finalY + 10;
 
-    voz.agentes.forEach(a=>{
-      tabela(a.nome,String(a.ramal));
-    });
+}
 
-    separador();
-  }
+/* ================= ENTRADAS ================= */
 
-  /* ---------------- FILAS ---------------- */
+if(dados.voz?.entradas?.length){
 
-  if(voz.filas?.length){
+doc.text("ENTRADAS",105,y,{align:"center"});
 
-    titulo("FILAS");
+y+=8;
 
-    tabela("Fila","Agentes");
+dados.voz.entradas.forEach(e=>{
+doc.text(`Número: ${e.numero}`,105,y,{align:"center"});
+y+=6;
+});
 
-    voz.filas.forEach(f=>{
-      tabela(f.nome,(f.agentes || []).join(", "));
-    });
+y+=6;
 
-    separador();
-  }
+}
 
-  /* ---------------- GRUPO DE RING ---------------- */
+/* ================= AGENTES ================= */
 
-  if(voz.grupo_ring?.length){
+if(dados.voz?.agentes?.length){
 
-    verificarBloco(6);
+doc.text("AGENTES",105,y,{align:"center"});
 
-    titulo("GRUPO DE RING");
+y+=6;
 
-    voz.grupo_ring.forEach(g=>{
-      linhaCentro(`Grupo: ${g.nome}`);
-      linhaCentro(`Estratégia: ${g.estrategia}`);
-      linhaCentro(`Ramais: ${(g.ramais || []).join(", ")}`);
-      y += 4;
-    });
+doc.autoTable({
 
-    separador();
-  }
+startY:y,
 
-  /* ---------------- URA ---------------- */
+head:[["Nome","Ramal"]],
 
-  if(voz.uras?.length){
+body:dados.voz.agentes.map(a=>[
+a.nome,
+a.ramal
+]),
 
-    let linhas = 4;
-    voz.uras.forEach(u=>{
-      linhas += (u.opcoes || []).length + 2;
-    });
+theme:"grid",
 
-    verificarBloco(linhas);
+styles:{halign:"center"}
 
-    titulo("URA");
+});
 
-    voz.uras.forEach(u=>{
+y = doc.lastAutoTable.finalY + 10;
 
-      linhaCentro(`URA: ${u.nome}`);
-      linhaCentro(`Mensagem: ${u.mensagem}`);
+}
 
-      (u.opcoes || []).forEach(o=>{
-        linhaCentro(`${o.tecla} -> ${o.destino}`);
-      });
+/* ================= FILAS ================= */
 
-      y += 5;
-    });
+if(dados.voz?.filas?.length){
 
-    separador();
-  }
+doc.text("FILAS",105,y,{align:"center"});
 
-  /* ---------------- PAUSAS ---------------- */
+y+=6;
 
-  if(voz.pausas?.length){
+doc.autoTable({
 
-    let linhas = 4;
-    voz.pausas.forEach(p=>{
-      linhas += (p.itens || []).length;
-    });
+startY:y,
 
-    verificarBloco(linhas);
+head:[["Fila","Agentes"]],
 
-    titulo("PAUSAS");
+body:dados.voz.filas.map(f=>[
+f.nome,
+(f.agentes || []).join(", ")
+]),
 
-    voz.pausas.forEach(p=>{
+theme:"grid",
 
-      linhaCentro(`Grupo: ${p.grupo || p.nome || "-"}`);
+styles:{halign:"center"}
 
-      (p.itens || []).forEach(i=>{
-        linhaCentro(`• ${i.nome || "-"} (${i.tempo || "-"})`);
-      });
+});
 
-      y += 4;
-    });
+y = doc.lastAutoTable.finalY + 10;
 
-    separador();
-  }
+}
 
-  /* ---------------- PESQUISA ---------------- */
+/* ================= GRUPO RING ================= */
 
-  if(voz.pesquisas?.length){
+if(dados.voz?.grupo_ring?.length){
 
-    let linhas = 6;
-    voz.pesquisas.forEach(p=>{
-      linhas += (p.respostas || []).length;
-    });
+doc.text("GRUPO DE RING",105,y,{align:"center"});
 
-    verificarBloco(linhas);
+y+=8;
 
-    titulo("PESQUISA DE SATISFAÇÃO");
+dados.voz.grupo_ring.forEach(g=>{
 
-    voz.pesquisas.forEach(p=>{
+doc.text(`Grupo: ${g.nome}`,105,y,{align:"center"});
+y+=6;
 
-      linhaCentro(`Nome: ${p.nome}`);
-      linhaCentro(`Introdução: ${p.introducao || "-"}`);
-      linhaCentro(`Pergunta: ${p.pergunta || "-"}`);
+doc.text(`Estratégia: ${g.estrategia}`,105,y,{align:"center"});
+y+=6;
 
-      (p.respostas || []).forEach(r=>{
-        linhaCentro(`• ${r.nota || "-"} - ${r.descricao || "-"}`);
-      });
+doc.text(`Ramais: ${(g.ramais || []).join(", ")}`,105,y,{align:"center"});
 
-      if(p.encerramento){
-        linhaCentro(`Encerramento: ${p.encerramento}`);
-      }
+y+=10;
 
-      y += 5;
-    });
+});
 
-    separador();
-  }
+}
 
-  /* ---------------- CHAT ---------------- */
+/* ================= URA ================= */
 
-  if(chat?.tipo){
+if(dados.voz?.uras?.length){
 
-    let linhas = 6;
-    if(chat.canais) linhas += chat.canais.length;
+doc.text("URA",105,y,{align:"center"});
 
-    verificarBloco(linhas);
+y+=8;
 
-    titulo("CHAT / OMNICHANNEL");
+dados.voz.uras.forEach(u=>{
 
-    linhaCentro(`Tipo: ${chat.tipo || "-"}`);
-    linhaCentro(`API: ${chat.api || "-"}`);
-    linhaCentro(`Conta: ${chat.conta || "-"}`);
+doc.text(`URA: ${u.nome}`,105,y,{align:"center"});
+y+=6;
 
-    if(chat.canais?.length){
+doc.text(`Mensagem: ${u.mensagem}`,105,y,{align:"center"});
+y+=6;
 
-      linhaCentro("Canais:");
+(u.opcoes || []).forEach(o=>{
+doc.text(`${o.tecla} -> ${o.destino}`,105,y,{align:"center"});
+y+=6;
+});
 
-      chat.canais.forEach(c=>{
-        linhaCentro(`• ${c}`);
-      });
-    }
+y+=6;
 
-    separador();
-  }
+});
 
-  doc.save("caderno-parametros.pdf");
+}
+
+/* ================= PAUSAS ================= */
+
+if(dados.voz?.pausas?.length){
+
+doc.text("PAUSAS",105,y,{align:"center"});
+
+y+=8;
+
+dados.voz.pausas.forEach(p=>{
+
+doc.text(`Grupo: ${p.grupo}`,105,y,{align:"center"});
+y+=6;
+
+(p.itens || []).forEach(i=>{
+doc.text(`• ${i.nome} (${i.tempo})`,105,y,{align:"center"});
+y+=6;
+});
+
+y+=6;
+
+});
+
+}
+
+/* ================= PESQUISA ================= */
+
+if(dados.voz?.pesquisas?.length){
+
+doc.text("PESQUISA DE SATISFAÇÃO",105,y,{align:"center"});
+
+y+=8;
+
+dados.voz.pesquisas.forEach(p=>{
+
+doc.text(`Nome: ${p.nome}`,105,y,{align:"center"});
+y+=6;
+
+doc.text(`Introdução: ${p.introducao}`,105,y,{align:"center"});
+y+=6;
+
+doc.text(`Pergunta: ${p.pergunta}`,105,y,{align:"center"});
+y+=6;
+
+(p.respostas || []).forEach(r=>{
+doc.text(`• ${r.nota} - ${r.descricao}`,105,y,{align:"center"});
+y+=6;
+});
+
+if(p.encerramento){
+doc.text(`Encerramento: ${p.encerramento}`,105,y,{align:"center"});
+y+=6;
+}
+
+y+=6;
+
+});
+
+}
+
+/* ================= CHAT ================= */
+
+if(dados.chat){
+
+doc.text("CHAT / OMNICHANNEL",105,y,{align:"center"});
+
+y+=8;
+
+doc.text(`Tipo: ${dados.chat.tipo}`,105,y,{align:"center"});
+y+=6;
+
+doc.text(`API: ${dados.chat.api}`,105,y,{align:"center"});
+y+=6;
+
+doc.text(`Conta: ${dados.chat.conta}`,105,y,{align:"center"});
+y+=6;
+
+if(dados.chat.canais){
+
+doc.text("Canais:",105,y,{align:"center"});
+y+=6;
+
+dados.chat.canais.forEach(c=>{
+doc.text(`• ${c}`,105,y,{align:"center"});
+y+=6;
+});
+
+}
+
+}
+
+doc.save("caderno-parametros.pdf");
 
 };
