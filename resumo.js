@@ -412,348 +412,274 @@ window.voltar = function () {
 };
 
 /* =================================================
-   GERAR PDF – CADERNO DE PARÂMETROS (CENTRALIZADO)
+   GERAR PDF – CADERNO DE PARÂMETROS
 ================================================= */
+
 window.confirmarConfiguracao = function () {
 
-const { jsPDF } = window.jspdf;
-const doc = new jsPDF();
+  const doc = new window.jspdf.jsPDF();
 
-const raw = localStorage.getItem("CONFIG_CADERNO");
+  const raw = localStorage.getItem("CONFIG_CADERNO");
 
-if (!raw) {
-  alert("Nenhuma configuração encontrada.");
-  return;
-}
+  if (!raw) {
+    alert("Nenhuma configuração encontrada.");
+    return;
+  }
 
-const dados = JSON.parse(raw);
+  const dados = JSON.parse(raw);
 
-let y = 30;
+  let y = 30;
 
-/* ================= TÍTULO ================= */
+  /* ================= TÍTULO ================= */
 
-doc.setFontSize(22);
-doc.text("Caderno de Parâmetros",105,20,{align:"center"});
+  doc.setFontSize(22);
+  doc.text("Caderno de Parâmetros",105,20,{align:"center"});
 
-doc.setFontSize(12);
-doc.text("Resumo da Configuração do Cliente",105,28,{align:"center"});
+  doc.setFontSize(12);
+  doc.text("Resumo da Configuração do Cliente",105,28,{align:"center"});
 
-/* ================= CLIENTE ================= */
+  /* ================= CLIENTE ================= */
 
-if(dados.cliente){
+  if(dados.cliente){
 
-doc.setFontSize(16);
-doc.text("CLIENTE",105,y,{align:"center"});
+    doc.setFontSize(16);
+    doc.text("CLIENTE",105,y,{align:"center"});
+    y+=10;
 
-y+=10;
+    doc.setFontSize(11);
 
-doc.setFontSize(11);
+    doc.text(`Empresa: ${dados.cliente.empresa || "-"}`,105,y,{align:"center"});
+    y+=6;
 
-doc.text(`Empresa: ${dados.cliente.empresa || "-"}`,105,y,{align:"center"});
-y+=6;
+    doc.text(`Domínio: ${dados.cliente.dominio || "-"}`,105,y,{align:"center"});
+    y+=6;
 
-doc.text(`Domínio: ${dados.cliente.dominio || "-"}`,105,y,{align:"center"});
-y+=6;
+    doc.text(`CNPJ: ${dados.cliente.cnpj || "-"}`,105,y,{align:"center"});
 
-doc.text(`CNPJ: ${dados.cliente.cnpj || "-"}`,105,y,{align:"center"});
+    y+=12;
+  }
 
-y+=12;
+  /* ================= USUÁRIOS WEB ================= */
 
-}
+  if(dados.voz?.usuarios?.length){
 
-/* ================= USUÁRIOS WEB ================= */
+    doc.text("USUÁRIOS WEB",105,y,{align:"center"});
+    y+=6;
 
-if(dados.voz?.usuarios?.length){
+    doc.autoTable({
 
-doc.text("USUÁRIOS WEB",105,y,{align:"center"});
+      startY:y,
 
-y+=6;
+      head:[["Nome","Email","Senha","Permissão"]],
 
-doc.autoTable({
+      body:dados.voz.usuarios.map(u=>[
+        u.nome,
+        u.email,
+        u.senha,
+        u.permissao
+      ]),
 
-startY:y,
+      theme:"grid",
 
-head:[["Nome","Email","Senha","Permissão"]],
+      styles:{
+        fontSize:10,
+        halign:"center"
+      },
 
-body:dados.voz.usuarios.map(u=>[
-u.nome,
-u.email,
-u.senha,
-u.permissao
-]),
+      headStyles:{
+        fillColor:[230,230,230],
+        fontStyle:"bold"
+      },
 
-theme:"grid",
+      columnStyles:{
+        0:{cellWidth:35},
+        1:{cellWidth:60},
+        2:{cellWidth:40},
+        3:{cellWidth:50}
+      }
 
-styles:{
-fontSize:10,
-halign:"center",
-valign:"middle"
-},
+    });
 
-headStyles:{
-fillColor:[230,230,230],
-textColor:20,
-fontStyle:"bold"
-},
+    y = doc.lastAutoTable.finalY + 10;
 
-columnStyles:{
-0:{cellWidth:35},
-1:{cellWidth:60},
-2:{cellWidth:40},
-3:{cellWidth:50}
-}
+  }
 
-});
+  /* ================= RAMAIS ================= */
 
-y = doc.lastAutoTable.finalY + 10;
+  if(dados.voz?.ramais?.length){
 
-}
+    doc.text("RAMAIS",105,y,{align:"center"});
+    y+=6;
 
-/* ================= RAMAIS ================= */
+    doc.autoTable({
 
-if(dados.voz?.ramais?.length){
+      startY:y,
 
-doc.text("RAMAIS",105,y,{align:"center"});
+      head:[["Ramal","Senha"]],
 
-y+=6;
+      body:dados.voz.ramais.map(r=>[
+        r.ramal,
+        r.senha
+      ]),
 
-doc.autoTable({
+      theme:"grid",
+      styles:{halign:"center"}
 
-startY:y,
+    });
 
-head:[["Ramal","Senha"]],
+    y = doc.lastAutoTable.finalY + 10;
 
-body:dados.voz.ramais.map(r=>[
-r.ramal,
-r.senha
-]),
+  }
 
-theme:"grid",
+  /* ================= ENTRADAS ================= */
 
-styles:{halign:"center"}
+  if(dados.voz?.entradas?.length){
 
-});
+    doc.text("ENTRADAS",105,y,{align:"center"});
+    y+=8;
 
-y = doc.lastAutoTable.finalY + 10;
+    dados.voz.entradas.forEach(e=>{
+      doc.text(`Número: ${e.numero}`,105,y,{align:"center"});
+      y+=6;
+    });
 
-}
+    y+=6;
 
-/* ================= ENTRADAS ================= */
+  }
 
-if(dados.voz?.entradas?.length){
+  /* ================= AGENTES ================= */
 
-doc.text("ENTRADAS",105,y,{align:"center"});
+  if(dados.voz?.agentes?.length){
 
-y+=8;
+    doc.text("AGENTES",105,y,{align:"center"});
+    y+=6;
 
-dados.voz.entradas.forEach(e=>{
-doc.text(`Número: ${e.numero}`,105,y,{align:"center"});
-y+=6;
-});
+    doc.autoTable({
 
-y+=6;
+      startY:y,
 
-}
+      head:[["Nome","Ramal"]],
 
-/* ================= AGENTES ================= */
+      body:dados.voz.agentes.map(a=>[
+        a.nome,
+        a.ramal
+      ]),
 
-if(dados.voz?.agentes?.length){
+      theme:"grid",
+      styles:{halign:"center"}
 
-doc.text("AGENTES",105,y,{align:"center"});
+    });
 
-y+=6;
+    y = doc.lastAutoTable.finalY + 10;
 
-doc.autoTable({
+  }
 
-startY:y,
+  /* ================= FILAS ================= */
 
-head:[["Nome","Ramal"]],
+  if(dados.voz?.filas?.length){
 
-body:dados.voz.agentes.map(a=>[
-a.nome,
-a.ramal
-]),
+    doc.text("FILAS",105,y,{align:"center"});
+    y+=6;
 
-theme:"grid",
+    doc.autoTable({
 
-styles:{halign:"center"}
+      startY:y,
 
-});
+      head:[["Fila","Agentes"]],
 
-y = doc.lastAutoTable.finalY + 10;
+      body:dados.voz.filas.map(f=>[
+        f.nome,
+        (f.agentes || []).join(", ")
+      ]),
 
-}
+      theme:"grid",
+      styles:{halign:"center"}
 
-/* ================= FILAS ================= */
+    });
 
-if(dados.voz?.filas?.length){
+    y = doc.lastAutoTable.finalY + 10;
 
-doc.text("FILAS",105,y,{align:"center"});
+  }
 
-y+=6;
+  /* ================= GRUPO RING ================= */
 
-doc.autoTable({
+  if(dados.voz?.grupo_ring?.length){
 
-startY:y,
+    doc.text("GRUPO DE RING",105,y,{align:"center"});
+    y+=8;
 
-head:[["Fila","Agentes"]],
+    dados.voz.grupo_ring.forEach(g=>{
 
-body:dados.voz.filas.map(f=>[
-f.nome,
-(f.agentes || []).join(", ")
-]),
+      doc.text(`Grupo: ${g.nome}`,105,y,{align:"center"});
+      y+=6;
 
-theme:"grid",
+      doc.text(`Estratégia: ${g.estrategia}`,105,y,{align:"center"});
+      y+=6;
 
-styles:{halign:"center"}
+      doc.text(`Ramais: ${(g.ramais || []).join(", ")}`,105,y,{align:"center"});
 
-});
+      y+=10;
 
-y = doc.lastAutoTable.finalY + 10;
+    });
 
-}
+  }
 
-/* ================= GRUPO RING ================= */
+  /* ================= URA ================= */
 
-if(dados.voz?.grupo_ring?.length){
+  if(dados.voz?.uras?.length){
 
-doc.text("GRUPO DE RING",105,y,{align:"center"});
+    doc.text("URA",105,y,{align:"center"});
+    y+=8;
 
-y+=8;
+    dados.voz.uras.forEach(u=>{
 
-dados.voz.grupo_ring.forEach(g=>{
+      doc.text(`URA: ${u.nome}`,105,y,{align:"center"});
+      y+=6;
 
-doc.text(`Grupo: ${g.nome}`,105,y,{align:"center"});
-y+=6;
+      doc.text(`Mensagem: ${u.mensagem}`,105,y,{align:"center"});
+      y+=6;
 
-doc.text(`Estratégia: ${g.estrategia}`,105,y,{align:"center"});
-y+=6;
+      (u.opcoes || []).forEach(o=>{
+        doc.text(`${o.tecla} -> ${o.destino}`,105,y,{align:"center"});
+        y+=6;
+      });
 
-doc.text(`Ramais: ${(g.ramais || []).join(", ")}`,105,y,{align:"center"});
+      y+=6;
 
-y+=10;
+    });
 
-});
+  }
 
-}
+  /* ================= CHAT ================= */
 
-/* ================= URA ================= */
+  if(dados.chat){
 
-if(dados.voz?.uras?.length){
+    doc.text("CHAT / OMNICHANNEL",105,y,{align:"center"});
+    y+=8;
 
-doc.text("URA",105,y,{align:"center"});
+    doc.text(`Tipo: ${dados.chat.tipo}`,105,y,{align:"center"});
+    y+=6;
 
-y+=8;
+    doc.text(`API: ${dados.chat.api}`,105,y,{align:"center"});
+    y+=6;
 
-dados.voz.uras.forEach(u=>{
+    doc.text(`Conta: ${dados.chat.conta}`,105,y,{align:"center"});
+    y+=6;
 
-doc.text(`URA: ${u.nome}`,105,y,{align:"center"});
-y+=6;
+    if(dados.chat.canais){
 
-doc.text(`Mensagem: ${u.mensagem}`,105,y,{align:"center"});
-y+=6;
+      doc.text("Canais:",105,y,{align:"center"});
+      y+=6;
 
-(u.opcoes || []).forEach(o=>{
-doc.text(`${o.tecla} -> ${o.destino}`,105,y,{align:"center"});
-y+=6;
-});
+      dados.chat.canais.forEach(c=>{
+        doc.text(`• ${c}`,105,y,{align:"center"});
+        y+=6;
+      });
 
-y+=6;
+    }
 
-});
+  }
 
-}
-
-/* ================= PAUSAS ================= */
-
-if(dados.voz?.pausas?.length){
-
-doc.text("PAUSAS",105,y,{align:"center"});
-
-y+=8;
-
-dados.voz.pausas.forEach(p=>{
-
-doc.text(`Grupo: ${p.grupo}`,105,y,{align:"center"});
-y+=6;
-
-(p.itens || []).forEach(i=>{
-doc.text(`• ${i.nome} (${i.tempo})`,105,y,{align:"center"});
-y+=6;
-});
-
-y+=6;
-
-});
-
-}
-
-/* ================= PESQUISA ================= */
-
-if(dados.voz?.pesquisas?.length){
-
-doc.text("PESQUISA DE SATISFAÇÃO",105,y,{align:"center"});
-
-y+=8;
-
-dados.voz.pesquisas.forEach(p=>{
-
-doc.text(`Nome: ${p.nome}`,105,y,{align:"center"});
-y+=6;
-
-doc.text(`Introdução: ${p.introducao}`,105,y,{align:"center"});
-y+=6;
-
-doc.text(`Pergunta: ${p.pergunta}`,105,y,{align:"center"});
-y+=6;
-
-(p.respostas || []).forEach(r=>{
-doc.text(`• ${r.nota} - ${r.descricao}`,105,y,{align:"center"});
-y+=6;
-});
-
-if(p.encerramento){
-doc.text(`Encerramento: ${p.encerramento}`,105,y,{align:"center"});
-y+=6;
-}
-
-y+=6;
-
-});
-
-}
-
-/* ================= CHAT ================= */
-
-if(dados.chat){
-
-doc.text("CHAT / OMNICHANNEL",105,y,{align:"center"});
-
-y+=8;
-
-doc.text(`Tipo: ${dados.chat.tipo}`,105,y,{align:"center"});
-y+=6;
-
-doc.text(`API: ${dados.chat.api}`,105,y,{align:"center"});
-y+=6;
-
-doc.text(`Conta: ${dados.chat.conta}`,105,y,{align:"center"});
-y+=6;
-
-if(dados.chat.canais){
-
-doc.text("Canais:",105,y,{align:"center"});
-y+=6;
-
-dados.chat.canais.forEach(c=>{
-doc.text(`• ${c}`,105,y,{align:"center"});
-y+=6;
-});
-
-}
-
-}
-
-doc.save("caderno-parametros.pdf");
+  doc.save("caderno-parametros.pdf");
 
 };
