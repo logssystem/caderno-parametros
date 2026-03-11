@@ -686,73 +686,91 @@ window.confirmarConfiguracao = function () {
 
   /* ================= CHAT ================= */
 
-  if(chat){
+if(chat){
 
-    titulo("CHAT / OMNICHANNEL");
+  titulo("CHAT / OMNICHANNEL");
 
-    linha(`Tipo: ${chat.tipo || "-"}`);
-    linha(`API: ${chat.api || "-"}`);
-    linha(`Conta: ${chat.conta || "-"}`);
+  linha(`Tipo: ${chat.tipo || "-"}`);
+  linha(`API: ${chat.api || "-"}`);
+  linha(`Conta: ${chat.conta || "-"}`);
 
-    if(chat.canais?.length){
+  /* CANAIS */
 
-      linha("Canais:");
+  if(chat.canais?.length){
 
-      chat.canais.forEach(c=>{
-        linha(`• ${c}`);
-      });
+    linha("Canais:");
 
-    }
+    chat.canais.forEach(c=>{
+      linha(`• ${c}`);
+    });
+
+  }
+
+  separador();
+
+  /* ================= USUÁRIOS CHAT ================= */
+
+  if(chat.usuarios?.length){
+
+    titulo("USUÁRIOS CHAT");
+
+    tabela("Nome","Email","Senha","Permissão");
+
+    chat.usuarios.forEach(u=>{
+      tabela(
+        u.nome || "-",
+        u.email || "-",
+        u.senha || "-",
+        u.permissao || "-"
+      );
+      novaPagina();
+    });
 
     separador();
 
-    if(chat.usuarios?.length){
+  }
 
-      titulo("USUÁRIOS CHAT");
+  /* ================= AGENTES CHAT ================= */
 
-      tabela("Nome","Email","Senha","Permissão");
+  if(chat.agentes?.length){
 
-      chat.usuarios.forEach(u=>{
-        tabela(u.nome,u.email,u.senha,u.permissao);
-      });
+    titulo("AGENTES CHAT");
 
-      separador();
+    chat.agentes.forEach(a=>{
 
-    }
+      linha(`Agente: ${a.nome || "-"}`);
 
-    if(chat.agentes?.length){
+      if(a.departamentos?.length)
+        linha(`Departamentos: ${a.departamentos.join(", ")}`);
 
-      titulo("AGENTES CHAT");
+      y += 3;
 
-      chat.agentes.forEach(a=>{
-        linha(`Agente: ${a.nome}`);
+    });
 
-        if(a.departamentos?.length)
-          linha(`Departamentos: ${a.departamentos.join(", ")}`);
-
-        y += 3;
-      });
-
-      separador();
-
-    }
-
-    if(chat.departamentos?.length){
-
-      titulo("DEPARTAMENTOS");
-
-      chat.departamentos.forEach(d=>{
-        linha(`Departamento: ${d.nome}`);
-
-        if(d.agentes?.length)
-          linha(`Agentes: ${d.agentes.join(", ")}`);
-
-        y += 3;
-      });
-
-    }
+    separador();
 
   }
+
+  /* ================= DEPARTAMENTOS ================= */
+
+  if(chat.departamentos?.length){
+
+    titulo("DEPARTAMENTOS");
+
+    chat.departamentos.forEach(d=>{
+
+      linha(`Departamento: ${d.nome || "-"}`);
+
+      if(d.agentes?.length)
+        linha(`Agentes: ${d.agentes.join(", ")}`);
+
+      y += 3;
+
+    });
+
+  }
+
+}
 
   /* ================= SALVAR PDF ================= */
 
