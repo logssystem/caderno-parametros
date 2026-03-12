@@ -1884,21 +1884,23 @@ window.initCaderno = function () {
  const modo = localStorage.getItem("modo_atendimento");
 
   const usuariosChat = document.getElementById("listaUsuariosChat");
-  
-  if (usuariosChat) {
-  
-    const cardUsuarios = usuariosChat.closest(".card");
-  
-    if (cardUsuarios) {
-      cardUsuarios.style.display = modo === "ambos" ? "none" : "block";
+
+if (usuariosChat) {
+
+  const cardUsuarios = usuariosChat.closest(".card");
+
+  if (cardUsuarios) {
+
+    // só mostra usuários omnichannel quando for SOMENTE chat
+    if (modo === "chat") {
+      cardUsuarios.style.display = "block";
+    } else {
+      cardUsuarios.style.display = "none";
     }
-  
+
   }
-  
-  if (!modo) {
-    mostrarIntro();
-    return;
-  }
+
+}
 
   mostrarApp(modo);
 
