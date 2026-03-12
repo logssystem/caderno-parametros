@@ -435,28 +435,39 @@ let y = 30;
 
 function titulo(txt){
 
-doc.setFontSize(16);
+verificarPagina();
+
+doc.setFillColor(30,120,210);
+doc.rect(12,y-6,186,10,"F");
+
+doc.setTextColor(255);
+doc.setFontSize(12);
 doc.setFont(undefined,"bold");
+
 doc.text(txt,105,y,{align:"center"});
 
-y+=8;
-
+doc.setTextColor(0);
 doc.setFont(undefined,"normal");
-doc.setFontSize(11);
+
+y+=12;
 
 }
 
 function linhaCentral(txt){
 
+verificarPagina();
+
 doc.text(txt,105,y,{align:"center"});
-y+=6;
+y+=7;
 
 }
 
 function separador(){
 
+y+=3;
+doc.setDrawColor(200);
 doc.line(12,y,198,y);
-y+=10;
+y+=12;
 
 }
 
@@ -520,15 +531,14 @@ fontSize:10
 },
 
 headStyles:{
-fillColor:[230,230,230],
+fillColor:[30,120,210],
+textColor:[255,255,255],
 fontStyle:"bold"
 },
-
-columnStyles:{
-0:{cellWidth:35},
-1:{cellWidth:60},
-2:{cellWidth:35},
-3:{cellWidth:60}
+styles:{
+halign:"center",
+fontSize:10,
+cellPadding:4
 }
 
 });
