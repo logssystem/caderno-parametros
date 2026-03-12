@@ -480,6 +480,14 @@ y=25;
 
 }
 
+function garantirEspaco(altura){
+
+if(y + altura > 270){
+doc.addPage();
+y = 25;
+}
+
+}
 /* ================= CAPA ================= */
 
 doc.setFontSize(22);
@@ -524,11 +532,6 @@ u.email||"-",
 u.senha||"-",
 u.permissao||"-"
 ]),
-
-styles:{
-halign:"center",
-fontSize:10
-},
 
 headStyles:{
 fillColor:[30,120,210],
@@ -576,6 +579,7 @@ y = doc.lastAutoTable.finalY + 10;
 
 if(voz.entradas?.length){
 
+garantirEspaco(25);
 titulo("ENTRADAS");
 
 voz.entradas.forEach(e=>{
@@ -640,6 +644,7 @@ y = doc.lastAutoTable.finalY + 10;
 
 if(voz.grupo_ring?.length){
 
+garantirEspaco(40);
 titulo("GRUPO DE RING");
 
 voz.grupo_ring.forEach(g=>{
@@ -660,6 +665,7 @@ separador();
 
 if(voz.uras?.length){
 
+garantirEspaco(60);
 titulo("URA");
 
 voz.uras.forEach(u=>{
@@ -683,6 +689,7 @@ separador();
 
 if(voz.pausas?.length){
 
+garantirEspaco(40);
 titulo("PAUSAS");
 
 voz.pausas.forEach(p=>{
@@ -705,6 +712,7 @@ separador();
 
 if(voz.pesquisas?.length){
 
+garantirEspaco(60);
 titulo("PESQUISA DE SATISFAÇÃO");
 
 voz.pesquisas.forEach(p=>{
@@ -733,6 +741,7 @@ separador();
 
 if(chat){
 
+garantirEspaco(40);
 titulo("CHAT / OMNICHANNEL");
 
 linhaCentral("Tipo: "+(chat.tipo||"-"));
