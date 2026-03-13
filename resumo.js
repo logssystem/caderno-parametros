@@ -21,14 +21,21 @@ window.renderResumoChat = function (container, data) {
 
   if (chat.tipo === "qr") {
 
-    html += `
-      <div class="resumo-card">
-        <div><strong>Tipo:</strong> Integração via QR Code</div>
-        <div>Conexão realizada por leitura de QR Code.</div>
-      </div>
-    `;
+  html += `
+    <div class="resumo-card">
 
-  } else if (chat.tipo === "api") {
+      <div><strong>Tipo:</strong> Integração via QR Code</div>
+
+      <div><strong>Número do QR Code:</strong> ${chat.conta || "-"}</div>
+
+      <div class="texto-secundario">
+        Conexão realizada por leitura de QR Code.
+      </div>
+
+    </div>
+  `;
+
+} else if (chat.tipo === "api") {
 
     html += `
       <div class="resumo-card">
