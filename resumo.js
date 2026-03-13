@@ -4,16 +4,31 @@
 
 window.renderResumoChat = function (container, data) {
 
-  if (!container || !data?.chat) return;
+  if (!container) return;
+
+  // 🔒 NÃO MOSTRA CHAT SE NÃO EXISTIR
+  if (!data.chat) return;
+
+  // 🔒 NÃO MOSTRA CHAT SE TIPO NÃO EXISTIR
+  if (!data.chat.tipo) return;
 
   const chat = data.chat;
-  const usuarios = chat.usuarios || [];
-  const agentes = chat.agentes || [];
 
   let html = "";
 
   const section = document.createElement("section");
   section.className = "resumo-bloco";
+
+  html += `
+    <h2>💬 Chat / Omnichannel</h2>
+    <p><strong>Tipo:</strong> ${chat.tipo || "-"}</p>
+    <p><strong>API:</strong> ${chat.api || "-"}</p>
+    <p><strong>Conta:</strong> ${chat.conta || "-"}</p>
+  `;
+
+  section.innerHTML = html;
+  container.appendChild(section);
+};
 
   /* ================= TIPO ================= */
 
