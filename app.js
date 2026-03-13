@@ -1665,19 +1665,12 @@ if (window.chatState?.tipo === "api" || window.chatState?.tipo === "qr") {
     ? window.coletarChatDoDOM()
     : {};
 
-  // pega o número do input QR direto
-  const numeroQr = document.getElementById("numeroQr");
-
-  if (numeroQr && numeroQr.value) {
-    chat.conta = numeroQr.value;
+  // GARANTE QUE O NÚMERO DO QR VAI
+  if (window.chatState?.conta) {
+    chat.conta = window.chatState.conta;
   }
 
 }
-
-if (chat && chat.tipo) {
-  dados.chat = chat;
-}
-
     /* ================= FINAL ================= */
 
     document.getElementById("resultado").textContent =
