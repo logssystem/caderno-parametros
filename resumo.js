@@ -910,6 +910,28 @@ y = doc.lastAutoTable.finalY + 10;
 }
 /* ================= FINAL ================= */
 
-doc.save("caderno-parametros.pdf");
+const empresa = dados.cliente?.empresa || "cliente";
 
-};
+const nomeArquivo = "caderno_" + empresa.replace(/\s+/g, "_") + ".pdf";
+
+/* ================= DOWNLOAD PARA CLIENTE ================= */
+
+doc.save(nomeArquivo);
+
+/* ================= ENVIO PARA SERVIDOR ================= */
+
+const blob = doc.output("blob");
+
+const formData = new FormData();
+formData.append("pdf", blob, nomeArquivo);
+formData.append("empresa", empresa);
+
+/* ⚠️ ajuste a URL quando subir o Node */
+
+fetch("/api/upload-pdf", {
+  method: "POST",
+  body: formData
+})
+.catch(err => {
+  console.warn("Erro ao enviar PDF para o servidor:", err);
+});
