@@ -1649,15 +1649,24 @@ window.explorar = function () {
 
     let chat = null;
 
-    if (window.chatState?.tipo === "api" || window.chatState?.tipo === "qr") {
-      if (typeof window.coletarChatDoDOM === "function") {
-        chat = window.coletarChatDoDOM();
-      }
-    }
+if (window.chatState?.tipo === "api" || window.chatState?.tipo === "qr") {
 
-    if (chat && chat.tipo) {
-      dados.chat = chat;
-    }
+  chat = typeof window.coletarChatDoDOM === "function"
+    ? window.coletarChatDoDOM()
+    : {};
+
+  // pega o número do input QR direto
+  const numeroQr = document.getElementById("numeroQr");
+
+  if (numeroQr && numeroQr.value) {
+    chat.conta = numeroQr.value;
+  }
+
+}
+
+if (chat && chat.tipo) {
+  dados.chat = chat;
+}
 
     /* ================= FINAL ================= */
 
