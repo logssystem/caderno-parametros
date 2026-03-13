@@ -1655,31 +1655,35 @@ window.explorar = function () {
       }
     };
 
-   /* ================= CHAT (CORREÇÃO DEFINITIVA) ================= */
+   /* ================= CHAT ================= */
 
-    let chat = null;
-    
-    if (window.chatState?.tipo === "api" || window.chatState?.tipo === "qr") {
-    
-      chat = typeof window.coletarChatDoDOM === "function"
-        ? window.coletarChatDoDOM()
-        : {};
-    
-      if (window.chatState?.conta) {
-        chat.conta = window.chatState.conta;
-      }
-    
-    }
-        if (chat) {
-      dados.chat = chat;
-    }
-    /* ================= FINAL ================= */
+let chat = null;
 
-    document.getElementById("resultado").textContent =
-      JSON.stringify(dados, null, 2);
+if (window.chatState?.tipo === "api" || window.chatState?.tipo === "qr") {
 
-    mostrarToast("JSON gerado com sucesso!");
-    return dados;
+  chat = typeof window.coletarChatDoDOM === "function"
+    ? window.coletarChatDoDOM()
+    : {};
+
+  if (window.chatState?.conta) {
+    chat.conta = window.chatState.conta;
+  }
+
+}
+
+/* ================= INJETAR CHAT NO JSON ================= */
+
+if (chat) {
+  dados.chat = chat;
+}
+
+/* ================= FINAL ================= */
+
+document.getElementById("resultado").textContent =
+  JSON.stringify(dados, null, 2);
+
+mostrarToast("JSON gerado com sucesso!");
+return dados;
 
   } catch (e) {
     console.error(e);
