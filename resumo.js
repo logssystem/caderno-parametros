@@ -6,61 +6,47 @@ window.renderResumoChat = function (container, data) {
 
   if (!container) return;
 
-  // 🔒 NÃO MOSTRA CHAT SE NÃO EXISTIR
-  if (!data.chat) return;
-
-  // 🔒 NÃO MOSTRA CHAT SE TIPO NÃO EXISTIR
-  if (!data.chat.tipo) return;
+  // 🔒 não mostra chat se não existir
+  if (!data.chat || !data.chat.tipo) return;
 
   const chat = data.chat;
+  const usuarios = chat.usuarios || [];
+  const agentes = chat.agentes || [];
 
   let html = "";
 
   const section = document.createElement("section");
   section.className = "resumo-bloco";
 
-  html += `
-    <h2>💬 Chat / Omnichannel</h2>
-    <p><strong>Tipo:</strong> ${chat.tipo || "-"}</p>
-    <p><strong>API:</strong> ${chat.api || "-"}</p>
-    <p><strong>Conta:</strong> ${chat.conta || "-"}</p>
-  `;
-
-  section.innerHTML = html;
-  container.appendChild(section);
-};
-
   /* ================= TIPO ================= */
 
   html += `<h2>💬 Chat / Omnichannel</h2>`;
 
-if (chat.tipo === "qr") {
-
-html += `
-<div class="resumo-card">
-
-<div><strong>Tipo:</strong> Integração via QR Code</div>
-
-<div class="campo">
-<strong>Número do QR Code:</strong>
-${chat.conta ? chat.conta : "-"}
-</div>
-
-<div class="texto-secundario">
-Conexão realizada por leitura de QR Code.
-</div>
-
-</div>
-`;
-
-} else if (chat.tipo === "api") {
+  if (chat.tipo === "qr") {
 
     html += `
-      <div class="resumo-card">
-        <div><strong>Tipo:</strong> Integração via API Oficial</div>
-        <div><strong>API:</strong> ${chat.api || "-"}</div>
-        <div><strong>Conta:</strong> ${chat.conta || "-"}</div>
+    <div class="resumo-card">
+      <div><strong>Tipo:</strong> Integração via QR Code</div>
+
+      <div class="campo">
+        <strong>Número do QR Code:</strong>
+        ${chat.conta || "-"}
       </div>
+
+      <div class="texto-secundario">
+        Conexão realizada por leitura de QR Code.
+      </div>
+    </div>
+    `;
+
+  } else if (chat.tipo === "api") {
+
+    html += `
+    <div class="resumo-card">
+      <div><strong>Tipo:</strong> Integração via API Oficial</div>
+      <div><strong>API:</strong> ${chat.api || "-"}</div>
+      <div><strong>Conta:</strong> ${chat.conta || "-"}</div>
+    </div>
     `;
 
   }
@@ -70,12 +56,12 @@ Conexão realizada por leitura de QR Code.
   if (chat.canais?.length) {
 
     html += `
-      <div class="resumo-card">
-        <div class="titulo">Canais</div>
-        <div class="lista">
-          ${chat.canais.map(c => `<span class="chip">${c}</span>`).join("")}
-        </div>
+    <div class="resumo-card">
+      <div class="titulo">Canais</div>
+      <div class="lista">
+        ${chat.canais.map(c => `<span class="chip">${c}</span>`).join("")}
       </div>
+    </div>
     `;
 
   }
@@ -85,25 +71,18 @@ Conexão realizada por leitura de QR Code.
   if (usuarios.length) {
 
     html += `
-      <h3>👤 Usuários do Chat</h3>
+    <h3>👤 Usuários do Chat</h3>
 
-      <div class="resumo-grid">
-
-        ${usuarios.map(u => `
-          <div class="resumo-card">
-
-            <div class="titulo">${u.nome}</div>
-
-            <div>📧 ${u.email || "-"}</div>
-
-            <div>🔐 Senha: ${u.senha || "-"}</div>
-
-            <div>🛡 Permissão: ${u.permissao || "-"}</div>
-
-          </div>
-        `).join("")}
-
-      </div>
+    <div class="resumo-grid">
+      ${usuarios.map(u => `
+        <div class="resumo-card">
+          <div class="titulo">${u.nome}</div>
+          <div>📧 ${u.email || "-"}</div>
+          <div>🔐 Senha: ${u.senha || "-"}</div>
+          <div>🛡 Permissão: ${u.permissao || "-"}</div>
+        </div>
+      `).join("")}
+    </div>
     `;
 
   }
@@ -113,31 +92,28 @@ Conexão realizada por leitura de QR Code.
   if (agentes.length) {
 
     html += `
-      <h3>🎧 Agentes do Chat</h3>
+    <h3>🎧 Agentes do Chat</h3>
 
-      <div class="resumo-grid">
+    <div class="resumo-grid">
+      ${agentes.map(a => {
 
-        ${agentes.map(a => {
+        const deps = Array.isArray(a.departamentos) ? a.departamentos : [];
 
-          const deps = Array.isArray(a.departamentos) ? a.departamentos : [];
+        return `
+        <div class="resumo-card">
+          <div class="titulo">${a.nome}</div>
 
-          return `
-            <div class="resumo-card">
+          ${
+            deps.length
+            ? `<div class="lista">${deps.map(d => `<span class="chip">${d}</span>`).join("")}</div>`
+            : `<div class="texto-secundario">Sem departamento</div>`
+          }
 
-              <div class="titulo">${a.nome}</div>
+        </div>
+        `;
 
-              ${
-                deps.length
-                  ? `<div class="lista">${deps.map(d => `<span class="chip">${d}</span>`).join("")}</div>`
-                  : `<div class="texto-secundario">Sem departamento</div>`
-              }
-
-            </div>
-          `;
-
-        }).join("")}
-
-      </div>
+      }).join("")}
+    </div>
     `;
 
   }
@@ -147,27 +123,23 @@ Conexão realizada por leitura de QR Code.
   if (chat.departamentos?.length) {
 
     html += `
-      <h3>🏢 Departamentos</h3>
+    <h3>🏢 Departamentos</h3>
 
-      <div class="resumo-grid">
+    <div class="resumo-grid">
+      ${chat.departamentos.map(dep => `
+        <div class="resumo-card">
 
-        ${chat.departamentos.map(dep => `
-          <div class="resumo-card">
+          <div class="titulo">${dep.nome}</div>
 
-            <div class="titulo">${dep.nome}</div>
+          ${
+            dep.agentes?.length
+            ? `<div class="lista">${dep.agentes.map(a => `<span class="chip">${a}</span>`).join("")}</div>`
+            : `<div class="texto-secundario">Sem agentes</div>`
+          }
 
-            ${
-              dep.agentes?.length
-                ? `<div class="lista">
-                    ${dep.agentes.map(a => `<span class="chip">${a}</span>`).join("")}
-                  </div>`
-                : `<div class="texto-secundario">Sem agentes</div>`
-            }
-
-          </div>
-        `).join("")}
-
-      </div>
+        </div>
+      `).join("")}
+    </div>
     `;
 
   }
