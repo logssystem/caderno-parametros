@@ -1287,17 +1287,10 @@ function coletarEntradas() {
 
 window.coletarChatDoDOM = function () {
 
-  const numeroQr = document.getElementById("numeroQr");
-
   const chat = {
     tipo: window.chatState?.tipo || null,
     api: window.chatState?.api || null,
-
-    conta:
-      window.chatState?.tipo === "qr"
-        ? (numeroQr?.value || null)
-        : (window.chatState?.conta || null),
-
+    conta: window.chatState?.conta || null,
     canais: window.chatState?.canais || [],
     usuarios: [],
     agentes: [],
