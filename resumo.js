@@ -821,6 +821,91 @@ linhaCentral("• " + c);
 
 separador();
 
+   /* ================= USUÁRIOS CHAT ================= */
+
+if (chat.usuarios?.length) {
+
+titulo("USUÁRIOS DO CHAT");
+
+doc.autoTable({
+
+startY:y,
+
+head:[["Nome","Email","Senha","Permissão"]],
+
+body:chat.usuarios.map(u=>[
+u.nome || "-",
+u.email || "-",
+u.senha || "-",
+u.permissao || "-"
+]),
+
+headStyles:{
+fillColor:[30,120,210],
+textColor:[255,255,255],
+fontStyle:"bold"
+},
+
+styles:{
+halign:"center",
+fontSize:10,
+cellPadding:4
+}
+
+});
+
+y = doc.lastAutoTable.finalY + 10;
+
+}
+
+/* ================= AGENTES CHAT ================= */
+
+if (chat.agentes?.length) {
+
+titulo("AGENTES DO CHAT");
+
+doc.autoTable({
+
+startY:y,
+
+head:[["Agente","Departamentos"]],
+
+body:chat.agentes.map(a=>[
+a.nome || "-",
+(a.departamentos || []).join(", ")
+]),
+
+styles:{halign:"center"}
+
+});
+
+y = doc.lastAutoTable.finalY + 10;
+
+}
+
+/* ================= DEPARTAMENTOS ================= */
+
+if (chat.departamentos?.length) {
+
+titulo("DEPARTAMENTOS");
+
+doc.autoTable({
+
+startY:y,
+
+head:[["Departamento","Agentes"]],
+
+body:chat.departamentos.map(d=>[
+d.nome || "-",
+(d.agentes || []).join(", ")
+]),
+
+styles:{halign:"center"}
+
+});
+
+y = doc.lastAutoTable.finalY + 10;
+
 }
 /* ================= FINAL ================= */
 
