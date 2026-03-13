@@ -1287,10 +1287,17 @@ function coletarEntradas() {
 
 window.coletarChatDoDOM = function () {
 
+  const numeroQr = document.getElementById("numeroQr");
+
   const chat = {
     tipo: window.chatState?.tipo || null,
     api: window.chatState?.api || null,
-    conta: window.chatState?.conta || null,
+
+    conta:
+      window.chatState?.tipo === "qr"
+        ? (numeroQr?.value || null)
+        : (window.chatState?.conta || null),
+
     canais: window.chatState?.canais || [],
     usuarios: [],
     agentes: [],
@@ -1299,13 +1306,13 @@ window.coletarChatDoDOM = function () {
 
   // usuários chat
   document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
-  chat.usuarios.push({
-    nome: u.getNome?.() || "",
-    email: u.getEmail?.() || "",
-    senha: u.getSenha?.() || "",
-    permissao: u.getPermissao?.() || ""
+    chat.usuarios.push({
+      nome: u.getNome?.() || "",
+      email: u.getEmail?.() || "",
+      senha: u.getSenha?.() || "",
+      permissao: u.getPermissao?.() || ""
+    });
   });
-});
 
   // departamentos
   document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
@@ -1318,7 +1325,7 @@ window.coletarChatDoDOM = function () {
     });
   });
 
-  // agentes chat
+  // agentes
   document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
     chat.agentes.push({
       nome: a.querySelector(".campo-nome")?.value || "",
