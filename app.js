@@ -1933,7 +1933,6 @@ window.adicionarRespostaPesquisa = adicionarRespostaPesquisa;
 // ================= INIT GLOBAL BLINDADO =================
 window.initCaderno = function () {
 
-  // 🔒 estado base do chat (NUNCA undefined)
   window.chatState = window.chatState || {
     tipo: null,
     api: null,
@@ -1944,25 +1943,18 @@ window.initCaderno = function () {
     departamentos: []
   };
 
- const modo = localStorage.getItem("modo_atendimento");
+  const modo = localStorage.getItem("modo_atendimento");
 
-  const usuariosChat = document.getElementById("listaUsuariosChat");
+  const cardUsuariosOmni = document.getElementById("cardUsuariosOmni");
 
-  if (usuariosChat) {
-  
-    const cardUsuarios = usuariosChat.closest(".card");
-  
-    if (cardUsuarios) {
-  
-      // só aparece quando for CHAT ou VOZ+CHAT
-      if (modo === "chat" || modo === "ambos") {
-        cardUsuarios.style.display = "block";
-      } else {
-        cardUsuarios.style.display = "none";
-      }
-  
+  if (cardUsuariosOmni) {
+
+    if (modo === "chat") {
+      cardUsuariosOmni.style.display = "block";
+    } else {
+      cardUsuariosOmni.style.display = "none";
     }
-  
+
   }
 
   mostrarApp(modo);
