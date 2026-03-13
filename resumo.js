@@ -1,32 +1,44 @@
 /* ======================================================
-   RESUMO – CHAT (BLINDADO E ESTÁVEL)
+   RESUMO – CHAT
 ====================================================== */
+
 window.renderResumoChat = function (container, data) {
   if (!container || !data?.chat) return;
 
   const chat = data.chat;
-  const usuarios = chat.usuarios || [];
-  const agentes = chat.agentes || [];
-  const canais = chat.canais || [];
 
-  if (!chat.tipo && !usuarios.length && !agentes.length) return;
+  const box = document.createElement("div");
+  box.className = "resumo-card";
 
-  const section = document.createElement("section");
-  section.className = "resumo-bloco";
+  let html = `<h3>Chat / Omnichannel</h3>`;
 
-  let html = `
-    <h2>💬 Chat / Omnichannel</h2>
-    <div class="resumo-card">
-      <div><strong>Tipo:</strong> ${chat.tipo || "-"}</div>
-      <div><strong>API:</strong> ${chat.api || "-"}</div>
-      <div><strong>Conta:</strong> ${chat.conta || "-"}</div>
-      ${
-        canais.length
-          ? `<div class="lista">${canais.map(c => `<span class="chip">${c}</span>`).join("")}</div>`
-          : ""
-      }
-    </div>
-  `;
+  // QR CODE
+  if (chat.tipo === "qr") {
+    html += `
+      <p><strong>Tipo:</strong> Integração via QR Code</p>
+      <p><strong>Conexão:</strong> Realizada por leitura de QR Code para autenticação do canal.</p>
+    `;
+  }
+
+  // API
+  else if (chat.tipo === "api") {
+    html += `
+      <p><strong>Tipo:</strong> Integração via API Oficial</p>
+      <p><strong>API:</strong> ${chat.api || "-"}</p>
+      <p><strong>Conta:</strong> ${chat.conta || "-"}</p>
+    `;
+  }
+
+  // canais
+  if (chat.canais && chat.canais.length) {
+    html += `
+      <p><strong>Canais:</strong> ${chat.canais.join(", ")}</p>
+    `;
+  }
+
+  box.innerHTML = html;
+  container.appendChild(box);
+};
 
   /* ================= USUÁRIOS ================= */
    if (usuarios.length) {
