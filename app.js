@@ -1527,7 +1527,9 @@ function mostrarToast(msg, error = false) {
 
 window.explorar = function () {
   try {
-
+    
+    window.chatState = window.chatState || {};
+    
     const empresa = document.getElementById("empresaCliente")?.value.trim();
     const dominio = document.getElementById("dominioCliente")?.value.trim();
 
