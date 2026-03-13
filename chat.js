@@ -7,6 +7,7 @@ window.chatState = window.chatState || {
   tipo: "",
   api: "",
   conta: "",
+  qrnumero: "",
   canais: [],
   usuarios: [],
   agentes: [],
