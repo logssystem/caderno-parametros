@@ -790,7 +790,7 @@ separador();
 
 /* ================= CHAT ================= */
 
-if(chat){
+if(chat && chat.tipo){
 
 garantirEspaco(40);
 titulo("CHAT / OMNICHANNEL");
