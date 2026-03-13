@@ -907,6 +907,7 @@ styles:{halign:"center"}
 y = doc.lastAutoTable.finalY + 10;
 
 }
+}
 /* ================= FINAL ================= */
 
 doc.save("caderno-parametros.pdf");
