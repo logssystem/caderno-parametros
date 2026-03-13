@@ -26,7 +26,10 @@ window.renderResumoChat = function (container, data) {
 
       <div><strong>Tipo:</strong> Integração via QR Code</div>
 
-      <div><strong>Número do QR Code:</strong> ${chat.conta || "-"}</div>
+      <div class="campo">
+  <strong>Número do QR Code:</strong>
+  ${chat?.conta || "-"}
+</div>
 
       <div class="texto-secundario">
         Conexão realizada por leitura de QR Code.
