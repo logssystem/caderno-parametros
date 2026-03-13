@@ -1659,6 +1659,13 @@ window.explorar = function () {
 
    /* ================= CHAT ================= */
 
+const numeroQr = document.getElementById("numeroQr");
+
+if (numeroQr && numeroQr.value.trim()) {
+  window.chatState = window.chatState || {};
+  window.chatState.conta = numeroQr.value.trim();
+}    
+
 let chat = null;
 
 if (window.chatState?.tipo === "api" || window.chatState?.tipo === "qr") {
