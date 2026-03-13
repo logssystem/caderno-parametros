@@ -1688,7 +1688,9 @@ if (numeroQr && numeroQr.value.trim()) {
 
 /* ================= INJETAR CHAT NO JSON ================= */
 
-if (chat) {
+const modo = localStorage.getItem("modo_atendimento");
+
+if ((modo === "chat" || modo === "ambos") && chat) {
   dados.chat = chat;
 }
 
