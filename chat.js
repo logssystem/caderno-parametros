@@ -224,77 +224,105 @@ window.adicionarDepartamentoChat = function () {
    COLETA FINAL CHAT
    ===================================================== */
 window.coletarChatDoDOM = function () {
+
+  const numeroQr = document.getElementById("numeroQr");
+
+  let contaFinal = null;
+
+  if (numeroQr && numeroQr.value.trim()) {
+    contaFinal = numeroQr.value.trim();
+  } else if (window.chatState?.conta) {
+    contaFinal = window.chatState.conta;
+  }
+
   const chat = {
     tipo: window.chatState?.tipo || null,
     api: window.chatState?.api || null,
-    conta: window.chatState?.conta || null,
+    conta: contaFinal,
     canais: window.chatState?.canais || [],
     usuarios: [],
     agentes: [],
     departamentos: []
   };
 
- document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
+  /* ================= USUÁRIOS ================= */
 
-  const d = u.getData?.();
-  if (!d?.nome) return;
+  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
 
-  chat.usuarios.push({
-    nome: d.nome,
-    email: d.email,
-    senha: d.senha,
-    permissao: d.permissao,
-    agente: d.agente
+    const d = u.getData?.();
+    if (!d?.nome) return;
+
+    chat.usuarios.push({
+      nome: d.nome,
+      email: d.email,
+      senha: d.senha,
+      permissao: d.permissao,
+      agente: d.agente
+    });
+
   });
 
-});
+  /* ================= AGENTES ================= */
 
   document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
 
-     const nome = a.querySelector(".campo-nome")?.value;
-   
-     if (!nome) return;
-   
-     chat.agentes.push({
-       nome: nome,
-       departamentos: []
-     });
-   
-   });
-   
-  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
-    const dep = d.getData?.();
-    if (dep?.nome) chat.departamentos.push(dep);
+    const nome = a.querySelector(".campo-nome")?.value;
+
+    if (!nome) return;
+
+    chat.agentes.push({
+      nome: nome,
+      departamentos: []
+    });
+
   });
+
+  /* ================= DEPARTAMENTOS ================= */
+
+  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
+
+    const dep = d.getData?.();
+
+    if (dep?.nome) {
+      chat.departamentos.push(dep);
+    }
+
+  });
+
+  /* ================= MAPA AGENTE → DEPARTAMENTO ================= */
 
   const mapa = {};
 
-chat.departamentos.forEach(dep => {
-  dep.agentes.forEach(a => {
+  chat.departamentos.forEach(dep => {
 
-    const key = String(a).trim().toLowerCase();
+    dep.agentes.forEach(a => {
 
-    if (!mapa[key]) {
-      mapa[key] = new Set();
-    }
+      const key = String(a).trim().toLowerCase();
 
-    mapa[key].add(dep.nome);
+      if (!mapa[key]) {
+        mapa[key] = new Set();
+      }
+
+      mapa[key].add(dep.nome);
+
+    });
 
   });
-});
 
- chat.agentes = chat.agentes.map(a => {
+  chat.agentes = chat.agentes.map(a => {
 
-  const key = String(a.nome).trim().toLowerCase();
+    const key = String(a.nome).trim().toLowerCase();
 
-  return {
-    ...a,
-    departamentos: mapa[key] ? [...mapa[key]] : []
-  };
+    return {
+      ...a,
+      departamentos: mapa[key] ? [...mapa[key]] : []
+    };
 
-});
+  });
 
-return chat;
+  console.log("CHAT FINAL:", chat);
+
+  return chat;
 
 };
 
