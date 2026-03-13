@@ -1948,22 +1948,22 @@ window.initCaderno = function () {
 
   const usuariosChat = document.getElementById("listaUsuariosChat");
 
-if (usuariosChat) {
-
-  const cardUsuarios = usuariosChat.closest(".card");
-
-  if (cardUsuarios) {
-
-    // só mostra usuários omnichannel quando for SOMENTE chat
-    if (modo === "chat") {
-      cardUsuarios.style.display = "block";
-    } else {
-      cardUsuarios.style.display = "none";
+  if (usuariosChat) {
+  
+    const cardUsuarios = usuariosChat.closest(".card");
+  
+    if (cardUsuarios) {
+  
+      // só aparece quando for CHAT ou VOZ+CHAT
+      if (modo === "chat" || modo === "ambos") {
+        cardUsuarios.style.display = "block";
+      } else {
+        cardUsuarios.style.display = "none";
+      }
+  
     }
-
+  
   }
-
-}
 
   mostrarApp(modo);
 
