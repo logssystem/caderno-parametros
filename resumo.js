@@ -790,21 +790,31 @@ separador();
 
 /* ================= CHAT ================= */
 
-if(chat && chat.tipo){
+if (chat && chat.tipo) {
 
 garantirEspaco(40);
 titulo("CHAT / OMNICHANNEL");
 
-linhaCentral("Tipo: "+(chat.tipo||"-"));
-linhaCentral("API: "+(chat.api||"-"));
-linhaCentral("Conta: "+(chat.conta||"-"));
+if (chat.tipo === "qr") {
 
-if(chat.canais?.length){
+linhaCentral("Tipo: Integração via QR Code");
+linhaCentral("Número do QR Code: " + (chat.conta || "-"));
+linhaCentral("Conexão realizada por leitura de QR Code.");
+
+} else if (chat.tipo === "api") {
+
+linhaCentral("Tipo: Integração via API Oficial");
+linhaCentral("API: " + (chat.api || "-"));
+linhaCentral("Conta: " + (chat.conta || "-"));
+
+}
+
+if (chat.canais?.length) {
 
 linhaCentral("Canais:");
 
 chat.canais.forEach(c=>{
-linhaCentral("• "+c);
+linhaCentral("• " + c);
 });
 
 }
@@ -812,7 +822,6 @@ linhaCentral("• "+c);
 separador();
 
 }
-
 /* ================= FINAL ================= */
 
 doc.save("caderno-parametros.pdf");
