@@ -1659,7 +1659,7 @@ window.explorar = function () {
 
    /* ================= CHAT ================= */
 
-const numeroQr = document.querySelector("#chat-qr input");
+const numeroQr = document.querySelector("#numeroWhatsapp");
 
 if (numeroQr && numeroQr.value.trim()) {
   window.chatState = window.chatState || {};
@@ -1674,7 +1674,7 @@ if (window.chatState?.tipo === "api" || window.chatState?.tipo === "qr") {
     ? window.coletarChatDoDOM()
     : {};
     
-    const numeroQr = document.querySelector("#chat-qr input");
+    const numeroQr = document.querySelector("#numeroWhatsapp");
 
 if (numeroQr && numeroQr.value.trim()) {
   chat.conta = numeroQr.value.trim();
