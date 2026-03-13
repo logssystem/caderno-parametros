@@ -1655,22 +1655,24 @@ window.explorar = function () {
       }
     };
 
-    /* ================= CHAT (CORREÇÃO DEFINITIVA) ================= */
+   /* ================= CHAT (CORREÇÃO DEFINITIVA) ================= */
 
     let chat = null;
-
-if (window.chatState?.tipo === "api" || window.chatState?.tipo === "qr") {
-
-  chat = typeof window.coletarChatDoDOM === "function"
-    ? window.coletarChatDoDOM()
-    : {};
-
-  // GARANTE QUE O NÚMERO DO QR VAI
-  if (window.chatState?.conta) {
-    chat.conta = window.chatState.conta;
-  }
-
-}
+    
+    if (window.chatState?.tipo === "api" || window.chatState?.tipo === "qr") {
+    
+      chat = typeof window.coletarChatDoDOM === "function"
+        ? window.coletarChatDoDOM()
+        : {};
+    
+      if (window.chatState?.conta) {
+        chat.conta = window.chatState.conta;
+      }
+    
+    }
+        if (chat) {
+      dados.chat = chat;
+    }
     /* ================= FINAL ================= */
 
     document.getElementById("resultado").textContent =
