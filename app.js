@@ -1687,6 +1687,13 @@ window.selecionarTipoChat = function (el, tipo) {
   // marca o selecionado
   if (el) el.classList.add("active");
 
+  // captura número do QR se existir
+  const numeroQr = document.getElementById("numeroQr");
+
+  if (numeroQr && numeroQr.value) {
+    window.chatState.conta = numeroQr.value;
+  }
+
   // controla visibilidade
   const apiBox = document.getElementById("api-oficial");
   const qrBox = document.getElementById("chat-qr");
@@ -1701,6 +1708,26 @@ window.selecionarTipoChat = function (el, tipo) {
 
   console.log("Tipo de chat selecionado:", tipo);
 };
+
+
+// ================= CAPTURAR NÚMERO DO QR =================
+document.addEventListener("DOMContentLoaded", () => {
+
+  const numeroQr = document.getElementById("numeroQr");
+
+  if (!numeroQr) return;
+
+  numeroQr.addEventListener("input", function () {
+
+    window.chatState = window.chatState || {};
+
+    window.chatState.conta = this.value;
+
+    console.log("Número QR atualizado:", window.chatState.conta);
+
+  });
+
+});
 
 // ================= CHAT – SELECIONAR API =================
 window.selecionarApi = function (el, api) {
