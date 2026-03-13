@@ -1659,7 +1659,7 @@ window.explorar = function () {
 
    /* ================= CHAT ================= */
 
-const numeroQr = document.getElementById("numeroQr");
+const numeroQr = document.querySelector("#chat-qr input");
 
 if (numeroQr && numeroQr.value.trim()) {
   window.chatState = window.chatState || {};
@@ -1673,7 +1673,13 @@ if (window.chatState?.tipo === "api" || window.chatState?.tipo === "qr") {
   chat = typeof window.coletarChatDoDOM === "function"
     ? window.coletarChatDoDOM()
     : {};
+    
+    const numeroQr = document.querySelector("#chat-qr input");
 
+if (numeroQr && numeroQr.value.trim()) {
+  chat.conta = numeroQr.value.trim();
+}
+    
   if (window.chatState?.conta) {
     chat.conta = window.chatState.conta;
   }
