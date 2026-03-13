@@ -1286,13 +1286,21 @@ function coletarEntradas() {
 /* ================= CHAT – COLETA FINAL ================= */
 
 window.coletarChatDoDOM = function () {
-  const numeroQr = document.getElementById("numeroQr");
+ const numeroQr = document.getElementById("numeroQr");
 
+  let contaFinal = null;
+  
+  if (numeroQr && numeroQr.value.trim()) {
+    contaFinal = numeroQr.value.trim();
+  } else if (window.chatState?.conta) {
+    contaFinal = window.chatState.conta;
+  }
+  
   const chat = {
     tipo: window.chatState?.tipo || null,
     api: window.chatState?.api || null,
-    conta: (numeroQr && numeroQr.value?.trim()) || window.chatState?.conta || null,
-    canais: window.chatState?.canais || [],
+    conta: contaFinal,
+      canais: window.chatState?.canais || [],
     usuarios: [],
     agentes: [],
     departamentos: []
@@ -1328,6 +1336,8 @@ window.coletarChatDoDOM = function () {
     });
   });
 
+  console.log("CHAT FINAL:", chat);
+  
   return chat;
 };
 
