@@ -1894,12 +1894,12 @@ window.adicionarPausa = adicionarPausa;
 window.togglePesquisaSatisfacao = togglePesquisaSatisfacao;
 window.adicionarRespostaPesquisa = adicionarRespostaPesquisa;
 
-/* ================= MODO ESCURO (PADRÃO DARK) ================= */
+/* ================= TEMA (DARK PADRÃO + INTRO FIXA) ================= */
 
 (function initTema() {
   const btn = document.getElementById("toggleTheme");
 
-  // 🔥 DEFINE DARK COMO PADRÃO
+  // 🔥 define dark como padrão (só para o sistema)
   if (!localStorage.getItem("tema")) {
     localStorage.setItem("tema", "dark");
   }
@@ -1907,18 +1907,24 @@ window.adicionarRespostaPesquisa = adicionarRespostaPesquisa;
   function aplicarTema() {
     const tema = localStorage.getItem("tema") || "dark";
 
+    // aplica no body
     document.body.classList.remove("dark", "light");
     document.body.classList.add(tema);
+
+    // 👉 NÃO mexe na intro
+    const intro = document.getElementById("intro-screen");
+    if (intro && intro.style.display !== "none") {
+      intro.classList.remove("light");
+      intro.classList.add("dark");
+    }
 
     if (btn) {
       btn.textContent = tema === "dark" ? "☀️" : "🌙";
     }
   }
 
-  // aplica ao carregar
   aplicarTema();
 
-  // toggle
   if (btn) {
     btn.addEventListener("click", () => {
       const atual = localStorage.getItem("tema") || "dark";
