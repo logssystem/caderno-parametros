@@ -9,16 +9,39 @@
 <body>
 
 <!-- ================= INTRO ================= -->
-<div id="intro-screen">
-  <div class="intro-box">
-    <h1 id="intro-text"></h1>
-    <div class="intro-actions">
-      <button onclick="selecionarModo('voz')">📞 Atendimento por Voz</button>
-      <button onclick="selecionarModo('chat')">💬 Atendimento por Chat</button>
-      <button onclick="selecionarModo('ambos')">📞 + 💬 Voz + Chat</button>
+  <div id="intro-screen">
+  
+    <!-- FUNDO ANIMADO -->
+    <div class="background"></div>
+  
+    <div class="intro-box nova-intro">
+  
+      <h1 class="titulo-intro">
+        Bem-vindo ao Caderno de Parâmetros
+      </h1>
+  
+      <p class="subtitulo-intro">
+        Configure e documente seu ambiente de atendimento de forma simples e profissional.
+      </p>
+  
+      <div class="intro-actions">
+  
+        <button class="botao-intro" onclick="selecionarModo('voz')">
+          📞 Atendimento por Voz
+        </button>
+  
+        <button class="botao-intro" onclick="selecionarModo('chat')">
+          💬 Atendimento por Chat
+        </button>
+  
+        <button class="botao-intro destaque" onclick="selecionarModo('ambos')">
+          📞 + 💬 Voz + Chat
+        </button>
+  
+      </div>
+  
     </div>
   </div>
-</div>
 
 <!-- ================= HEADER ================= -->
 <header class="app-header">
