@@ -1495,3 +1495,12 @@ body.light .botao-intro {
 .botao-intro.destaque:hover {
   box-shadow: 0 0 20px rgba(0,255,200,0.6);
 }
+
+.cursor {
+  animation: piscar 1s infinite;
+}
+
+@keyframes piscar {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}
