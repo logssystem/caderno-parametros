@@ -1352,35 +1352,48 @@ body.dark .resumo-chip {
   cursor:pointer;
 }
 
-/* ===== FUNDO ANIMADO INTRO ===== */
+/* ================= INTRO MODERNA ================= */
+
 #intro-screen {
   position: relative;
   height: 100vh;
   overflow: hidden;
-
-  background: linear-gradient(270deg, #020617, #0f172a, #020617);
-  background-size: 600% 600%;
-  animation: gradientMove 15s ease infinite;
 
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* ===== FUNDO ESCURO ===== */
+body.dark #intro-screen,
+#intro-screen {
+  background: linear-gradient(270deg, #020617, #0f172a, #020617);
+  background-size: 600% 600%;
+  animation: gradientMove 15s ease infinite;
+}
+
+/* ===== FUNDO CLARO ===== */
+body.light #intro-screen {
+  background: linear-gradient(270deg, #e2e8f0, #cbd5f5, #e2e8f0);
+}
+
+/* ANIMAÇÃO FUNDO */
 @keyframes gradientMove {
   0% { background-position: 0% 50%;}
   50% { background-position: 100% 50%;}
   100% { background-position: 0% 50%;}
 }
 
-/* PARTÍCULAS */
+/* ===== PARTÍCULAS ===== */
 .background::before {
   content: "";
   position: absolute;
   width: 200%;
   height: 200%;
+
   background: radial-gradient(circle, rgba(0,255,150,0.08) 1px, transparent 1px);
   background-size: 40px 40px;
+
   animation: moveParticles 30s linear infinite;
 }
 
@@ -1389,7 +1402,7 @@ body.dark .resumo-chip {
   to { transform: translate(-200px, -200px); }
 }
 
-/* CARD NOVO */
+/* ===== CARD ===== */
 .nova-intro {
   width: 500px;
   padding: 40px;
@@ -1403,8 +1416,18 @@ body.dark .resumo-chip {
   text-align: center;
 
   animation: aparecer 0.6s ease;
+
+  color: #fff;
 }
 
+/* CORREÇÃO PARA TEMA CLARO */
+body.light .nova-intro {
+  background: rgba(255,255,255,0.8);
+  color: #000;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* ANIMAÇÃO ENTRADA */
 @keyframes aparecer {
   from {
     opacity: 0;
@@ -1416,9 +1439,16 @@ body.dark .resumo-chip {
   }
 }
 
+/* LOGO */
+.logo-intro {
+  height: 45px;
+  margin-bottom: 15px;
+}
+
+/* TEXTOS */
 .titulo-intro {
   font-size: 22px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .subtitulo-intro {
@@ -1437,20 +1467,31 @@ body.dark .resumo-chip {
   border: none;
 
   background: rgba(255,255,255,0.08);
-  color: white;
+  color: inherit;
 
   cursor: pointer;
   transition: all 0.25s ease;
 }
 
+/* TEMA CLARO BOTÃO */
+body.light .botao-intro {
+  background: rgba(0,0,0,0.05);
+}
+
+/* HOVER */
 .botao-intro:hover {
   transform: translateY(-2px) scale(1.02);
   background: rgba(0,255,150,0.15);
   box-shadow: 0 0 15px rgba(0,255,150,0.3);
 }
 
+/* BOTÃO PRINCIPAL */
 .botao-intro.destaque {
   background: linear-gradient(90deg, #00ffa3, #00cfff);
   color: #000;
   font-weight: bold;
+}
+
+.botao-intro.destaque:hover {
+  box-shadow: 0 0 20px rgba(0,255,200,0.6);
 }
