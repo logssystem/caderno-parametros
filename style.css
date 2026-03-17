@@ -1697,3 +1697,15 @@ body.light .chat-card {
     transform: translateY(0);
   }
 }
+
+/* INTRO SEMPRE DARK (IGNORA TEMA GLOBAL) */
+#intro-screen {
+  background: linear-gradient(270deg, #020617, #0f172a, #020617) !important;
+  color: #fff !important;
+}
+
+/* garante que card da intro não fique branco */
+#intro-screen .nova-intro {
+  background: rgba(255,255,255,0.06) !important;
+  color: #fff !important;
+}
