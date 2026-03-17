@@ -1504,3 +1504,27 @@ body.light .botao-intro {
   0%, 50%, 100% { opacity: 1; }
   25%, 75% { opacity: 0; }
 }
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  pointer-events: none; /* 🔥 ESSENCIAL */
+  z-index: 0;
+}
+
+.orb1 {
+  background: #00ffa3;
+  opacity: 0.25;
+}
+
+.orb2 {
+  background: #00cfff;
+  opacity: 0.25;
+}
+
+.nova-intro {
+  position: relative;
+  z-index: 2;
+}
