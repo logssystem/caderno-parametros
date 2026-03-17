@@ -1894,29 +1894,40 @@ window.adicionarPausa = adicionarPausa;
 window.togglePesquisaSatisfacao = togglePesquisaSatisfacao;
 window.adicionarRespostaPesquisa = adicionarRespostaPesquisa;
 
-/* ================= MODO ESCURO ================= */
+/* ================= MODO ESCURO (PADRÃO DARK) ================= */
 
 (function initTema() {
   const btn = document.getElementById("toggleTheme");
-  if (!btn) return;
 
-  // aplica tema salvo
-  const temaSalvo = localStorage.getItem("tema");
-  if (temaSalvo === "dark") {
-    document.body.classList.add("dark");
-    btn.textContent = "☀️";
-  } else {
-    btn.textContent = "🌙";
+  // 🔥 DEFINE DARK COMO PADRÃO
+  if (!localStorage.getItem("tema")) {
+    localStorage.setItem("tema", "dark");
   }
 
-  // toggle no clique
-  btn.addEventListener("click", () => {
-    document.body.classList.toggle("dark");
+  function aplicarTema() {
+    const tema = localStorage.getItem("tema") || "dark";
 
-    const isDark = document.body.classList.contains("dark");
-    localStorage.setItem("tema", isDark ? "dark" : "light");
-    btn.textContent = isDark ? "☀️" : "🌙";
-  });
+    document.body.classList.remove("dark", "light");
+    document.body.classList.add(tema);
+
+    if (btn) {
+      btn.textContent = tema === "dark" ? "☀️" : "🌙";
+    }
+  }
+
+  // aplica ao carregar
+  aplicarTema();
+
+  // toggle
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const atual = localStorage.getItem("tema") || "dark";
+      const novo = atual === "dark" ? "light" : "dark";
+
+      localStorage.setItem("tema", novo);
+      aplicarTema();
+    });
+  }
 })();
 
 // ================= INIT GLOBAL BLINDADO =================
