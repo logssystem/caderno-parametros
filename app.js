@@ -1837,29 +1837,18 @@ window.informarAgenteChat = function () {
 };
 
 // ================= SALVAR CONFIGURAÇÃO =================
-window.salvarConfiguracao = function () {
-  if (typeof explorar !== "function") {
-    mostrarToast("Função explorar não encontrada", true);
-    return;
-  }
+function salvarConfiguracao(){
 
   const dados = explorar();
-
-console.log("DADOS GERADOS:", dados);
-
-if (!dados || !dados.voz) {
-  mostrarToast("Nenhum dado de voz encontrado. Verifique os campos.", true);
-  return;
-}
 
   localStorage.setItem(
     "CONFIG_CADERNO",
     JSON.stringify(dados)
   );
 
-  console.log("CONFIG_CADERNO salvo:", dados);
-  window.location.href = "resumo.html";
-};
+  window.location.href = "resumo.php";
+
+}
 
 // ================= VISIBILIDADE DO MÓDULO CHAT ================= 
 function atualizarModuloChat() {
@@ -1996,3 +1985,27 @@ function bloquearLetrasRamalRange() {
 }
 
 document.addEventListener("DOMContentLoaded", bloquearLetrasRamalRange);
+
+document.addEventListener("contextmenu", function(e){
+  e.preventDefault();
+});
+
+document.addEventListener("keydown", function(e){
+
+  if(e.key === "F12"){
+    e.preventDefault();
+  }
+
+  if(e.ctrlKey && e.shiftKey && e.key === "I"){
+    e.preventDefault();
+  }
+
+  if(e.ctrlKey && e.shiftKey && e.key === "J"){
+    e.preventDefault();
+  }
+
+  if(e.ctrlKey && e.key === "U"){
+    e.preventDefault();
+  }
+
+});
