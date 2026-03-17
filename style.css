@@ -1709,3 +1709,17 @@ body.light .chat-card {
   background: rgba(255,255,255,0.06) !important;
   color: #fff !important;
 }
+
+/* BOTÃO DESTAQUE (VOZ + CHAT) */
+.botao-intro.destaque {
+  background: linear-gradient(90deg, #00ffa3, #00cfff);
+  color: #000;
+  font-weight: 800;
+  border: none;
+}
+
+/* HOVER MAIS FORTE */
+.botao-intro.destaque:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 20px rgba(0,255,200,0.6);
+}
