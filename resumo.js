@@ -459,14 +459,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* ================= VOLTAR ================= */
 window.voltar = function () {
-  window.location.href = "index.html"; 
+  window.location.href = "index.php"; 
 };
 
 /* =================================================
    GERAR PDF – CADERNO DE PARÂMETROS (VERSÃO ESTÁVEL)
 ================================================= */
 
-window.confirmarConfiguracao = function(){
+window.confirmarConfiguracao = async function(){
 
 const doc = new jspdf.jsPDF();
 const raw = localStorage.getItem("CONFIG_CADERNO");
@@ -910,28 +910,35 @@ y = doc.lastAutoTable.finalY + 10;
 }
 /* ================= FINAL ================= */
 
-const empresa = dados.cliente?.empresa || "cliente";
+doc.save("caderno-parametros.pdf");
 
-const nomeArquivo = "caderno_" + empresa.replace(/\s+/g, "_") + ".pdf";
+/* ================= ENVIAR PARA API ================= */
 
-/* ================= DOWNLOAD PARA CLIENTE ================= */
+try {
 
-doc.save(nomeArquivo);
+  const res = await fetch("/app/caderno/api/salvar.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dados)
+  });
 
-/* ================= ENVIO PARA SERVIDOR ================= */
+  const texto = await res.text();
 
-const blob = doc.output("blob");
+  if (!res.ok) {
+    throw new Error(`Erro ${res.status}: ${texto}`);
+  }
 
-const formData = new FormData();
-formData.append("pdf", blob, nomeArquivo);
-formData.append("empresa", empresa);
+  let r;
+  try {
+    r = JSON.parse(texto);
+  } catch {
+    throw new Error(`Resposta não é JSON válido: ${texto}`);
+  }
 
-/* ⚠️ ajuste a URL quando subir o Node */
+  console.log("API:", r);
 
-fetch("/api/upload-pdf", {
-  method: "POST",
-  body: formData
-})
-.catch(err => {
-  console.warn("Erro ao enviar PDF para o servidor:", err);
-});
+} catch (e) {
+
+  console.error("Erro ao enviar para API", e);
+
+}
