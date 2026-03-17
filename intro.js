@@ -10,7 +10,7 @@ let digitando = false;
 /* ================= INTRO ================= */
 
 function iniciarIntro() {
-  const el = document.getElementById("intro-text");
+  const el = document.getElementById("typing-text");
   if (!el || digitando) return;
 
   el.innerHTML = "";
