@@ -1528,3 +1528,172 @@ body.light .botao-intro {
   position: relative;
   z-index: 2;
 }
+
+body.dark {
+  background: linear-gradient(270deg, #020617, #0f172a, #020617);
+  background-size: 600% 600%;
+  animation: gradientMove 20s ease infinite;
+}
+
+body.light {
+  background: #f1f5f9;
+}
+
+/* ================= UPGRADE VISUAL GLOBAL ================= */
+
+/* FUNDO COM VIDA (SEM EXAGERO) */
+body.dark::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, rgba(0,255,150,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ================= CARDS PREMIUM ================= */
+
+.card {
+  position: relative;
+  z-index: 1;
+
+  border-radius: 16px;
+  padding: 22px;
+
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(8px);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  transition: all 0.25s ease;
+}
+
+/* LIGHT MODE */
+body.light .card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+
+/* HOVER SUAVE */
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+}
+
+/* ================= INPUTS MODERNOS ================= */
+
+input, textarea, select {
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  transition: all 0.2s ease;
+}
+
+/* LIGHT */
+body.light input,
+body.light textarea,
+body.light select {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+}
+
+/* FOCUS */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #00ffa3;
+  box-shadow: 0 0 0 2px rgba(0,255,163,0.2);
+}
+
+/* ================= BOTÕES MELHORADOS ================= */
+
+.btn-add,
+.btn-import {
+  background: rgba(255,255,255,0.05);
+  border: 1px dashed rgba(255,255,255,0.2);
+  transition: all 0.2s ease;
+}
+
+/* LIGHT */
+body.light .btn-add,
+body.light .btn-import {
+  background: #f8fafc;
+}
+
+/* HOVER */
+.btn-add:hover,
+.btn-import:hover {
+  background: rgba(0,255,150,0.15);
+  border-color: #00ffa3;
+  transform: translateY(-1px);
+}
+
+/* BOTÃO SALVAR MAIS PREMIUM */
+.btn-explorar {
+  background: linear-gradient(90deg, #00ffa3, #00cfff);
+  color: #000;
+  box-shadow: 0 6px 20px rgba(0,255,150,0.3);
+}
+
+.btn-explorar:hover {
+  transform: scale(1.03);
+}
+
+/* ================= HEADER MAIS LIMPO ================= */
+
+.app-header {
+  background: transparent;
+}
+
+/* ================= CAMPOS MAIS ORGANIZADOS ================= */
+
+.campo-descricao {
+  padding-bottom: 18px;
+}
+
+/* ================= CHAT CARDS MAIS MODERNOS ================= */
+
+.chat-card {
+  backdrop-filter: blur(6px);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* LIGHT */
+body.light .chat-card {
+  background: #ffffff;
+}
+
+/* ================= BOTÃO DÚVIDAS UPGRADE ================= */
+
+.btn-duvidas {
+  background: linear-gradient(90deg, #00ffa3, #00cfff);
+  color: #000;
+  font-weight: 700;
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0,255,150,0.3);
+  transition: all 0.25s ease;
+}
+
+.btn-duvidas:hover {
+  transform: scale(1.05);
+}
+
+/* ================= MICRO ANIMAÇÃO ================= */
+
+.card {
+  animation: fadeInUp 0.4s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
