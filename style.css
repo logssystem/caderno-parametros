@@ -1935,3 +1935,24 @@ body.dark::after {
   pointer-events: none;
   z-index: 0;
 }
+
+.linha-agente {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-top: 8px;
+}
+
+/* checkbox normal (sem esticar) */
+.linha-agente input[type="checkbox"] {
+  width: auto;
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+/* texto ao lado */
+.linha-agente span {
+  font-size: 13px;
+  opacity: 0.8;
+}
