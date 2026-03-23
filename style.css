@@ -1547,6 +1547,157 @@ body.light {
   background: #f1f5f9;
 }
 
+/* ======================================================
+   🔥 MELHORIA VISUAL – APP (SEM QUEBRAR NADA)
+====================================================== */
+
+/* ===== CONTAINER CENTRAL ===== */
+.main-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  transition: all 0.2s ease;
+  opacity: 0.9;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  opacity: 1;
+}
+
+/* ===== TITULOS ===== */
+.card h2 {
+  font-size: 19px;
+  font-weight: 600;
+  color: #f1f5f9;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+
+/* ===== CAMPOS ===== */
+.bloco-campo {
+  margin-bottom: 16px;
+}
+
+label {
+  font-size: 13px;
+  color: #94a3b8;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* ===== INPUTS ===== */
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  transition: all 0.2s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #64748b;
+}
+
+/* ===== FOCO ===== */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34,197,94,0.2);
+  transform: scale(1.01);
+}
+
+/* ===== BOTÕES BASE ===== */
+button {
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+/* ===== BOTÃO PRINCIPAL (+, ações importantes) ===== */
+.btn-add {
+  background: linear-gradient(135deg, #22c55e, #06b6d4);
+  border: none;
+  color: white;
+}
+
+/* ===== BOTÕES SECUNDÁRIOS ===== */
+.btn-import {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #cbd5f5;
+}
+
+/* ===== ORGANIZAÇÃO DE BOTÕES ===== */
+.acoes-card {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+/* ===== RANGE RAMAIS ===== */
+.acoes-card input {
+  max-width: 180px;
+}
+
+/* ===== CAMPO DESCRIÇÃO ===== */
+.campo-descricao {
+  margin-top: 10px;
+}
+
+/* ===== INPUT HOVER (leve vida) ===== */
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: rgba(255,255,255,0.2);
+}
+
+/* ===== BOTÃO DE DÚVIDAS ===== */
+.btn-duvidas {
+  position: fixed;
+  right: 30px;
+  top: 120px;
+  z-index: 10;
+  background: linear-gradient(135deg, #22c55e, #06b6d4);
+  border: none;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 30px;
+}
+
+.btn-duvidas:hover {
+  transform: scale(1.05);
+}
+
+/* ===== SUAVIDADE GERAL ===== */
+* {
+  transition: background 0.2s, border 0.2s, transform 0.2s;
+}
+
 /* ================= UPGRADE VISUAL GLOBAL ================= */
 
 /* FUNDO COM VIDA (SEM EXAGERO) */
