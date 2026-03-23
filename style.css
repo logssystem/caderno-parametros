@@ -1622,14 +1622,10 @@ label {
 }
 
 /* ===== INPUTS ===== */
-input, select, textarea {
+input:not([type="checkbox"]),
+select,
+textarea {
   width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.04);
-  color: #fff;
-  transition: all 0.2s ease;
 }
 
 input::placeholder,
