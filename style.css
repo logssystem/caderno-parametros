@@ -201,6 +201,22 @@ select.campo-permissao {
   pointer-events: auto;
   transform: translateX(-50%) translateY(0);
 }
+
+.toast.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ERRO (vermelho) */
+.toast.error {
+  background: #ef4444;
+}
+
+/* SUCESSO (verde) */
+.toast:not(.error) {
+  background: #22c55e;
+  color: #052e16;
+}
 /* ================= INTRO ================= */
 #intro-screen {
   position: fixed;
