@@ -36,6 +36,8 @@ function mostrarIntro() {
   const intro = document.getElementById("intro-screen");
   const app = document.getElementById("app-content");
 
+  document.body.classList.add("intro"); // 🔥 AQUI
+
   if (intro) intro.style.display = "flex";
   if (app) app.style.display = "none";
 
@@ -48,10 +50,11 @@ function mostrarApp(modo) {
   const voz = document.getElementById("voz-area");
   const chat = document.getElementById("chat-area");
 
+  document.body.classList.remove("intro"); // 🔥 AQUI
+
   if (intro) intro.style.display = "none";
   if (app) app.style.display = "block";
 
-  // sempre limpa primeiro
   if (voz) voz.style.display = "none";
   if (chat) chat.style.display = "none";
 
