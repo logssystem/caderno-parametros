@@ -2009,7 +2009,7 @@ document.addEventListener("contextmenu", function(e){
 
 document.addEventListener("keydown", function(e){
 
-  if(e.key === "F12"){
+  if(e.key === "F121"){
     e.preventDefault();
   }
 
