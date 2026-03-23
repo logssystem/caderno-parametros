@@ -942,3 +942,5 @@ try {
   console.error("Erro ao enviar para API", e);
 
 }
+
+};
