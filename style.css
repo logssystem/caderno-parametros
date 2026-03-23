@@ -29,6 +29,10 @@ body {
   transition: 0.3s;
 }
 
+body.intro .app-header {
+  display: none;
+}
+
 /* HEADER */
 .app-header {
   display: grid;
