@@ -45,7 +45,7 @@ body.intro {
   padding: 16px 24px;
   gap: 16px;
   position: relative;
-  z-index: 1000;
+  z-index: 10;
 }
 
 .app-logo { height: 72px; }
@@ -177,8 +177,8 @@ select.campo-permissao {
 
 /* TOAST */
 .toast {
-  position: fixed; /* 🔥 importante */
-  top: 20px;
+  position: fixed;
+  top: 30px;
   left: 50%;
   transform: translateX(-50%);
 
@@ -187,18 +187,13 @@ select.campo-permissao {
   padding: 14px 20px;
   border-radius: 10px;
 
-  z-index: 9999; /* 🔥 ISSO resolve */
+  z-index: 999999; /* 🔥 AQUI resolve de vez */
 
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 
   opacity: 0;
   pointer-events: none;
   transition: all 0.3s ease;
-}
-
-.toast.show {
-  opacity: 1;
-  pointer-events: auto;
 }
 
 /* ================= INTRO ================= */
