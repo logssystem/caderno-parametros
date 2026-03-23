@@ -459,7 +459,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* ================= VOLTAR ================= */
 window.voltar = function () {
-  window.location.href = "resumo.html"; 
+  window.location.href = "index.html"; 
 };
 
 /* =================================================
