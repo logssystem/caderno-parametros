@@ -1956,9 +1956,9 @@ body.dark::after {
 /* ===== AJUSTE EMAIL + SENHA (USUÁRIO WEB) ===== */
 
 .campo-descricao input[placeholder*="E-mail"] {
-  width: 65%;
+  width: 45%;
 }
 
 .campo-descricao input.campo-senha {
-  width: 30% !important;
+  width: 45% !important;
 }
