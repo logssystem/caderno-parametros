@@ -95,6 +95,30 @@ window.resetarIntro = () => {
   iniciarIntro();
 };
 
+window.resetarIntro = () => {
+  // limpa modo
+  localStorage.removeItem("modo_atendimento");
+
+  // limpa estado de chat
+  delete window.chatState;
+
+  // 🔥 ESSA LINHA FALTAVA
+  document.body.classList.add("intro");
+
+  // esconde áreas
+  const voz = document.getElementById("voz-area");
+  const chat = document.getElementById("chat-area");
+  const app = document.getElementById("app-content");
+  const intro = document.getElementById("intro-screen");
+
+  if (voz) voz.style.display = "none";
+  if (chat) chat.style.display = "none";
+  if (app) app.style.display = "none";
+  if (intro) intro.style.display = "flex";
+
+  iniciarIntro();
+};
+
 /* ================= INIT ================= */
 
 document.addEventListener("DOMContentLoaded", () => {
