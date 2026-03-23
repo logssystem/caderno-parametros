@@ -567,7 +567,7 @@ function criarCampo(tipo) {
             });
         
         const txt = document.createElement("span");
-        txt.textContent = "Este usuário é agente de call center";
+        txt.textContent = "Este usuário é um agente";
 
         boxAgente.append(chkAgente, txt);
         wrap.append(boxAgente);
