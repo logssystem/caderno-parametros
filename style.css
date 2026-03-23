@@ -33,6 +33,10 @@ body.intro .app-header {
   display: none;
 }
 
+body.intro {
+  overflow: hidden;
+}
+
 /* HEADER */
 .app-header {
   display: grid;
