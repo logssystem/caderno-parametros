@@ -1516,7 +1516,14 @@ function mostrarToast(msg, error = false) {
     }
 
     m.textContent = msg;
-    t.className = "toast show" + (error ? " error" : "");
+
+    t.classList.add("show");
+
+    if (error) {
+        t.classList.add("error");
+    } else {
+        t.classList.remove("error");
+    }
 
     setTimeout(() => {
         t.classList.remove("show");
