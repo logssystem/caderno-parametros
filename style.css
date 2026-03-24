@@ -2050,3 +2050,21 @@ body.light .resumo-sub,
 body.light .chat-agente-sub {
   color: #4b5563 !important;
 }
+
+/* ===== MELHORIA DE IMAGENS NO DARK ===== */
+
+body.dark .chat-card img {
+  filter: brightness(1.2) contrast(1.2);
+}
+
+body.dark .chat-card img[alt*="QR"],
+
+body.dark img[alt*="Meta"],
+body.dark img[src*="meta"] {
+  filter: brightness(1.8) contrast(1.4);
+}
+
+body.dark .chat-card.active img {
+  filter: brightness(1.3) contrast(1.3);
+  drop-shadow: 0 0 10px rgba(56,189,248,0.4);
+}
