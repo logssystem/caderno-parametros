@@ -942,8 +942,10 @@ function gerarAgentesChatAPartirUsuarios() {
 
     usuarios.forEach(u => {
 
-        const nome = u.getNome?.();
-        const isOmni = u.isAgenteOmni ? u.isAgenteOmni() : false;
+        const nome = u.querySelector(".campo-nome")?.value;
+
+        const chk = u.querySelector(".checkbox-omni");
+        const isOmni = chk && chk.checked;
 
         if (isOmni && nome) {
             nomesAtivos.push(nome);
@@ -951,16 +953,6 @@ function gerarAgentesChatAPartirUsuarios() {
 
     });
 
-    // 🔥 pega os atuais no DOM
-    const atuais = [...lista.querySelectorAll(".campo-nome")]
-        .map(i => i.value);
-
-    // 🔥 evita re-render desnecessário
-    if (JSON.stringify(nomesAtivos) === JSON.stringify(atuais)) {
-        return;
-    }
-
-    // 🔥 só agora limpa
     lista.innerHTML = "";
 
     nomesAtivos.forEach(nome => {
