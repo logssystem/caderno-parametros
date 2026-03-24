@@ -2152,3 +2152,17 @@ document.addEventListener("keydown", function(e){
   }
 
 });
+
+document.addEventListener("input", e => {
+    if (e.target.closest(".campo-descricao")) syncTudo();
+});
+
+document.addEventListener("change", e => {
+    if (e.target.closest(".campo-descricao")) syncTudo();
+});
+
+document.addEventListener("change", (e) => {
+  if (e.target.classList.contains("checkbox-omni")) {
+    gerarAgentesChatAPartirUsuarios();
+  }
+});
