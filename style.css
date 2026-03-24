@@ -2103,3 +2103,8 @@ body.dark .logo-wrapper.meta img {
 body.dark .logo-wrapper.meta img {
   filter: brightness(3) contrast(2) saturate(1.2) !important;
 }
+
+.campo-obrigatorio-erro {
+  border: 2px solid #ef4444 !important;
+  background: rgba(239, 68, 68, 0.08);
+}
