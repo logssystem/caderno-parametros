@@ -936,43 +936,54 @@ function gerarAgentesChatAPartirUsuarios() {
   const lista = document.getElementById("listaAgentesChat");
   if (!lista) return;
 
-  const usuarios = document.querySelectorAll("#listaUsuariosWeb .campo-descricao");
+  lista.innerHTML = "";
+
+  let usuarios = document.querySelectorAll("#listaUsuariosWeb .campo-descricao");
+
+  if (!usuarios.length) {
+    usuarios = document.querySelectorAll("#listaUsuariosChat .campo-descricao");
+  }
 
   const agentes = [];
 
   usuarios.forEach(u => {
 
-    const nome = u.getNome?.();
-    const isOmni = u.isAgenteOmni?.();
+    const nome = u.querySelector(".campo-nome")?.value;
 
-    if (isOmni && nome) {
+    const chkOmni = u.querySelector(".checkbox-omni");
+
+    if (chkOmni && chkOmni.checked && nome) {
+
       agentes.push({
         nome,
         departamentos: []
       });
+
+      // render
+      const wrap = document.createElement("div");
+      wrap.className = "campo-descricao";
+
+      const linha = document.createElement("div");
+      linha.className = "linha-principal";
+
+      const input = document.createElement("input");
+      input.className = "campo-nome";
+      input.value = nome;
+      input.disabled = true;
+
+      linha.append(input);
+      wrap.append(linha);
+
+      lista.appendChild(wrap);
     }
 
   });
 
-  // 🔥 AGORA SIM: salva no estado
+  // 🔥 salva no estado (AGORA SIM consistente)
   window.chatState = window.chatState || {};
   window.chatState.agentes = agentes;
 
-  // 🔥 render visual (opcional)
-  lista.innerHTML = "";
-
-  agentes.forEach(a => {
-    const div = document.createElement("div");
-    div.className = "campo-descricao";
-
-    div.innerHTML = `
-      <div class="linha-principal">
-        <input class="campo-nome" value="${a.nome}" disabled />
-      </div>
-    `;
-
-    lista.appendChild(div);
-  });
+  console.log("🔥 agentes chat:", agentes);
 }
 
 /* ================= DESTINOS URA ================= */
