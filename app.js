@@ -1846,7 +1846,7 @@ function salvarConfiguracao(){
     JSON.stringify(dados)
   );
 
-  window.location.href = "resumo.html";
+  window.location.href = "resumo.js";
 
 }
 
