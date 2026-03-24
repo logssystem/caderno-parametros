@@ -249,20 +249,37 @@
           </div>
         </div>
 
-        <div id="api-oficial" class="chat-section" style="display:none">
-          <h3>Fornecedor</h3>
-          <div class="chat-grid">
-            <div class="chat-card" data-api="meta" onclick="selecionarApi(this,'meta')">
-              <img src="./assets/Meta.png"><h4>Meta</h4>
+       <div id="api-oficial" class="chat-section" style="display:none">
+        <h3>Fornecedor</h3>
+      
+        <div class="chat-grid">
+      
+          <!-- META -->
+          <div class="chat-card" data-api="meta" onclick="selecionarApi(this,'meta')">
+            <div class="logo-wrapper meta">
+              <img src="./assets/Meta.png" alt="Meta">
             </div>
-            <div class="chat-card" data-api="360" onclick="selecionarApi(this,'360')">
-              <img src="./assets/360.png"><h4>360 Dialog</h4>
-            </div>
-            <div class="chat-card" data-api="gupshup" onclick="selecionarApi(this,'gupshup')">
-              <img src="./assets/gupshup.png"><h4>Gupshup</h4>
-            </div>
+            <h4>Meta</h4>
           </div>
+      
+          <!-- 360 -->
+          <div class="chat-card" data-api="360" onclick="selecionarApi(this,'360')">
+            <div class="logo-wrapper">
+              <img src="./assets/360.png" alt="360 Dialog">
+            </div>
+            <h4>360 Dialog</h4>
+          </div>
+      
+          <!-- GUPSHUP -->
+          <div class="chat-card" data-api="gupshup" onclick="selecionarApi(this,'gupshup')">
+            <div class="logo-wrapper">
+              <img src="./assets/gupshup.png" alt="Gupshup">
+            </div>
+            <h4>Gupshup</h4>
+          </div>
+      
         </div>
+      </div>
 
         <div id="bloco-conta-api" class="chat-section" style="display:none">
           <h3>Conta</h3>
