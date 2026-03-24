@@ -1577,18 +1577,21 @@ window.explorar = function () {
     
     window.chatState = window.chatState || {};
     
-   const empresaInput = document.getElementById("empresaCliente");
+  const empresaInput = document.getElementById("empresaCliente");
   const dominioInput = document.getElementById("dominioCliente");
   
-  if (!empresa) {
-    destacarCampoErro(empresaInput, "Informe o nome da empresa");
-    return null;
-  }
+  const empresa = empresaInput?.value.trim();
+  const dominio = dominioInput?.value.trim();
   
+  if (!empresa) {
+  destacarCampoErro(empresaInput, "Informe o nome da empresa");
+  return null;
+}
+
   if (!dominio) {
-    destacarCampoErro(dominioInput, "Informe o domínio do cliente");
-    return null;
-  }
+  destacarCampoErro(dominioInput, "Informe o domínio do cliente");
+  return null;
+}
     
     /* ================= USUÁRIOS ================= */
 
