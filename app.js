@@ -1281,64 +1281,6 @@ function coletarEntradas() {
   return entradas;
 }
 
-/* ================= CHAT – COLETA FINAL ================= */
-
-window.coletarChatDoDOM = function () {
- const numeroQr = document.getElementById("numeroQr");
-
-  let contaFinal = null;
-  
-  if (numeroQr && numeroQr.value.trim()) {
-    contaFinal = numeroQr.value.trim();
-  } else if (window.chatState?.conta) {
-    contaFinal = window.chatState.conta;
-  }
-  
-  const chat = {
-    tipo: window.chatState?.tipo || null,
-    api: window.chatState?.api || null,
-    conta: contaFinal,
-      canais: window.chatState?.canais || [],
-    usuarios: [],
-    agentes: [],
-    departamentos: []
-  };
-
-  // usuários chat
-  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
-    chat.usuarios.push({
-      nome: u.getNome?.() || "",
-      email: u.getEmail?.() || "",
-      senha: u.getSenha?.() || "",
-      permissao: u.getPermissao?.() || ""
-    });
-  });
-
-  // departamentos
-  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
-    const nome = d.querySelector(".campo-nome")?.value || "";
-    if (!nome) return;
-
-    chat.departamentos.push({
-      nome,
-      agentes: JSON.parse(d.dataset.agentes || "[]")
-    });
-  });
-
-  // agentes
-  document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
-    chat.agentes.push({
-      nome: a.querySelector(".campo-nome")?.value || "",
-      usuario: a.dataset.usuario || "",
-      departamentos: JSON.parse(a.dataset.departamentos || "[]")
-    });
-  });
-
-  console.log("CHAT FINAL:", chat);
-  
-  return chat;
-};
-
 /* ================= MOTOR ================= */
 
 function syncTudo() {
