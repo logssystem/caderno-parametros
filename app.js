@@ -936,36 +936,50 @@ function gerarAgentesChatAPartirUsuarios() {
     const lista = document.getElementById("listaAgentesChat");
     if (!lista) return;
 
-    lista.innerHTML = "";
-
     const usuarios = document.querySelectorAll("#listaUsuariosWeb .campo-descricao");
+
+    const nomesAtivos = [];
 
     usuarios.forEach(u => {
 
         const nome = u.getNome?.();
-
-        // 🔥 usa getter (igual você fez no agente de voz)
         const isOmni = u.isAgenteOmni ? u.isAgenteOmni() : false;
 
         if (isOmni && nome) {
-
-            const wrap = document.createElement("div");
-            wrap.className = "campo-descricao";
-
-            const linha = document.createElement("div");
-            linha.className = "linha-principal";
-
-            const inputNome = document.createElement("input");
-            inputNome.className = "campo-nome";
-            inputNome.value = nome;
-            inputNome.disabled = true;
-
-            linha.append(inputNome);
-            wrap.append(linha);
-
-            lista.appendChild(wrap);
+            nomesAtivos.push(nome);
         }
 
+    });
+
+    // 🔥 pega os atuais no DOM
+    const atuais = [...lista.querySelectorAll(".campo-nome")]
+        .map(i => i.value);
+
+    // 🔥 evita re-render desnecessário
+    if (JSON.stringify(nomesAtivos) === JSON.stringify(atuais)) {
+        return;
+    }
+
+    // 🔥 só agora limpa
+    lista.innerHTML = "";
+
+    nomesAtivos.forEach(nome => {
+
+        const wrap = document.createElement("div");
+        wrap.className = "campo-descricao";
+
+        const linha = document.createElement("div");
+        linha.className = "linha-principal";
+
+        const input = document.createElement("input");
+        input.className = "campo-nome";
+        input.value = nome;
+        input.disabled = true;
+
+        linha.append(input);
+        wrap.append(linha);
+
+        lista.appendChild(wrap);
     });
 
 }
@@ -1343,7 +1357,7 @@ function syncTudo() {
     atualizarTodosDestinosURA();
 }
 
-document.addEventListener("input", e => {
+document.addEventListener("change", e => {
     if (e.target.closest(".campo-descricao")) syncTudo();
 });
 
