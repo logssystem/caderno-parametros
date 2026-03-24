@@ -1848,9 +1848,9 @@ function salvarConfiguracao(){
 
   const dados = explorar();
 
-  // 🔒 NÃO salva se deu erro
+  // 🔥 ESSA LINHA FALTAVA
   if (!dados) {
-    console.warn("Explorar retornou null — não salvando");
+    mostrarToast("Corrija os erros antes de continuar", true);
     return;
   }
 
