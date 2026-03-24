@@ -916,7 +916,7 @@ doc.save("caderno-parametros.pdf");
 
 try {
 
-  const res = await fetch("/app/caderno/api/salvar.php", {
+  const res = await fetch("/app/caderno/api/salvar.html", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(dados)
