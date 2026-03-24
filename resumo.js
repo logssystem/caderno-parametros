@@ -160,7 +160,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const raw = localStorage.getItem("CONFIG_CADERNO");
   if (!raw) return;
 
-  const dados = JSON.parse(raw);
+  let dados = {};
+
+   try {
+     dados = JSON.parse(raw) || {};
+   } catch (e) {
+     console.warn("Erro ao ler JSON:", e);
+     dados = {};
+   }
   resumo.innerHTML = "";
 
   const voz = dados.voz || {};
