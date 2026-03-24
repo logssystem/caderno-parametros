@@ -479,9 +479,14 @@ window.confirmarConfiguracao = async function(){
 const doc = new jspdf.jsPDF();
 const raw = localStorage.getItem("CONFIG_CADERNO");
 
-if(!raw){
-alert("Nenhuma configuração encontrada.");
-return;
+if (!raw || raw === "null") {
+  document.getElementById("resumo").innerHTML = `
+    <div class="resumo-card">
+      ⚠️ Nenhuma configuração válida encontrada.<br><br>
+      Volte e preencha os dados corretamente.
+    </div>
+  `;
+  return;
 }
 
 const dados = JSON.parse(raw);
