@@ -3,14 +3,23 @@
 /* ===== CLARO ===== */
 :root {
   --bg: #f5f7fa;
-  --text: #1f2933;
+
+  --text: #1f2933;          /* 🔥 MAIS ESCURO */
+  --text-soft: #4b5563;     /* texto secundário */
+
   --header-bg: #ffffff;
   --card-bg: #ffffff;
+
   --border: #d1d5db;
   --field-border: #cbd5e1;
-  --accent: #c6ff00;
-}
 
+  --input-bg: #ffffff;
+  --input-text: #111827;    /* 🔥 texto dentro do input */
+
+  --placeholder: #9ca3af;
+
+  --accent: #6366f1;
+}
 /* ===== ESCURO ===== */
 body.dark {
   --bg: #0b1220;
