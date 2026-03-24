@@ -580,9 +580,19 @@ function criarCampo(tipo) {
 
         const modo = localStorage.getItem("modo_atendimento");
 
-        if (modo !== "ambos") {
-            boxOmni.style.display = "none";
+        if (modo === "chat" || modo === "ambos") {
+
+        if (!window.chatState?.tipo) {
+      
+          const cards = document.querySelectorAll(".tipo-chat .chat-card");
+      
+          cards.forEach(c => c.classList.add("campo-obrigatorio-erro"));
+      
+          mostrarToast("Selecione o tipo de integração do Chat", true);
+      
+          return null;
         }
+      }
         
        chkAgenteOmni = document.createElement("input");
         chkAgenteOmni.type = "checkbox";
@@ -1320,6 +1330,15 @@ window.coletarChatDoDOM = function () {
   document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
     const nome = d.querySelector(".campo-nome")?.value || "";
     if (!nome) return;
+
+    if (!departamentos.length) {
+
+  const bloco = document.getElementById("listaDepartamentosChat");
+
+  destacarCampoErro(bloco, "Adicione pelo menos um departamento");
+
+  return null;
+}
 
     chat.departamentos.push({
       nome,
