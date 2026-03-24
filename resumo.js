@@ -957,3 +957,26 @@ try {
 }
 
 };
+
+(function initTema() {
+  const btn = document.getElementById("toggleTheme");
+  if (!btn) return;
+
+  const temaSalvo = localStorage.getItem("tema");
+
+  if (temaSalvo === "light") {
+    document.body.classList.add("light");
+    btn.textContent = "🌙";
+  } else {
+    btn.textContent = "☀️";
+  }
+
+  btn.addEventListener("click", () => {
+    document.body.classList.toggle("light");
+
+    const isLight = document.body.classList.contains("light");
+
+    localStorage.setItem("tema", isLight ? "light" : "dark");
+    btn.textContent = isLight ? "🌙" : "☀️";
+  });
+})();
