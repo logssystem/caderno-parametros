@@ -1535,20 +1535,6 @@ function processarCSV(tipo, texto) {
 function mostrarToast(msg, error = false) {
     const t = document.getElementById("toastGlobal");
     const m = document.getElementById("toastMessage");
-    function destacarCampoErro(el, mensagem) {
-
-    if (!el) return;
-  
-    el.classList.add("campo-obrigatorio-erro");
-  
-    el.focus();
-  
-    el.scrollIntoView({ behavior: "smooth", block: "center" });
-  
-    if (mensagem) {
-      mostrarToast(mensagem, true);
-    }
-  }
 
     if (!t || !m) {
         console.warn("Toast não encontrado:", msg);
@@ -1570,6 +1556,20 @@ function mostrarToast(msg, error = false) {
     }, 3000);
 }
 
+function destacarCampoErro(el, mensagem) {
+
+  if (!el) return;
+
+  el.classList.add("campo-obrigatorio-erro");
+
+  el.focus();
+
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+  if (mensagem) {
+    mostrarToast(mensagem, true);
+  }
+}
 /* ================= SALVAR / EXPLORAR ================= */
 
 window.explorar = function () {
