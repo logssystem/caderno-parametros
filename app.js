@@ -933,48 +933,48 @@ function gerarAgentesAPartirUsuarios() {
 
 function gerarAgentesChatAPartirUsuarios() {
 
-    const lista = document.getElementById("listaAgentesChat");
-    if (!lista) return;
+  const lista = document.getElementById("listaAgentesChat");
+  if (!lista) return;
 
-    const usuarios = document.querySelectorAll("#listaUsuariosWeb .campo-descricao");
+  const usuarios = document.querySelectorAll("#listaUsuariosWeb .campo-descricao");
 
-    const nomesAtivos = [];
+  const agentes = [];
 
-    usuarios.forEach(u => {
+  usuarios.forEach(u => {
 
-        const nome = u.querySelector(".campo-nome")?.value;
+    const nome = u.getNome?.();
+    const isOmni = u.isAgenteOmni?.();
 
-        const chk = u.querySelector(".checkbox-omni"); // ✅ CORRETO
+    if (isOmni && nome) {
+      agentes.push({
+        nome,
+        departamentos: []
+      });
+    }
 
-        const isOmni = chk && chk.checked;
+  });
 
-        if (isOmni && nome) {
-            nomesAtivos.push(nome);
-        }
+  // 🔥 AGORA SIM: salva no estado
+  window.chatState = window.chatState || {};
+  window.chatState.agentes = agentes;
 
-    });
+  // 🔥 render visual (opcional)
+  lista.innerHTML = "";
 
-    lista.innerHTML = "";
+  agentes.forEach(a => {
+    const div = document.createElement("div");
+    div.className = "campo-descricao";
 
-    nomesAtivos.forEach(nome => {
+    div.innerHTML = `
+      <div class="linha-principal">
+        <input class="campo-nome" value="${a.nome}" disabled />
+      </div>
+    `;
 
-        const wrap = document.createElement("div");
-        wrap.className = "campo-descricao";
-
-        const linha = document.createElement("div");
-        linha.className = "linha-principal";
-
-        const input = document.createElement("input");
-        input.className = "campo-nome";
-        input.value = nome;
-        input.disabled = true;
-
-        linha.append(input);
-        wrap.append(linha);
-
-        lista.appendChild(wrap);
-    });
+    lista.appendChild(div);
+  });
 }
+
 /* ================= DESTINOS URA ================= */
 
 function atualizarSelectAgentesFila() {
