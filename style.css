@@ -1971,3 +1971,82 @@ body.dark::after {
 .campo-descricao input.campo-senha {
   width: 45% !important;
 }
+
+/* ======================================================
+   🔥 FIX DEFINITIVO MODO CLARO (SEM QUEBRAR DARK)
+====================================================== */
+
+/* ===== GARANTE TEXTO ESCURO NO LIGHT ===== */
+body.light,
+:root:not(.dark) {
+  color: #1f2933;
+}
+
+/* ===== CARDS ===== */
+body.light .card {
+  background: #ffffff !important;
+  color: #1f2933 !important;
+}
+
+/* títulos */
+body.light .card h2,
+body.light .card h3,
+body.light h1,
+body.light h2,
+body.light h3,
+body.light h4 {
+  color: #111827 !important;
+}
+
+/* labels */
+body.light label {
+  color: #374151 !important;
+  opacity: 1 !important;
+}
+
+/* ===== INPUTS ===== */
+body.light input,
+body.light textarea,
+body.light select {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+/* placeholder */
+body.light input::placeholder,
+body.light textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+/* ===== BOTÕES ===== */
+body.light .btn-add,
+body.light .btn-import {
+  background: #f8fafc !important;
+  color: #111827 !important;
+  border: 1px dashed #cbd5e1 !important;
+}
+
+/* ===== CHAT CARDS ===== */
+body.light .chat-card {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  color: #111827 !important;
+}
+
+/* ===== BLOCOS INTERNOS (resumo/chat/etc) ===== */
+body.light .chat-info div,
+body.light .chat-grid div,
+body.light .chat-box,
+body.light .chat-agente,
+body.light .chat-departamento {
+  background: #f9fafb !important;
+  color: #111827 !important;
+}
+
+/* ===== TEXTO SECUNDÁRIO ===== */
+body.light .info-linha,
+body.light .resumo-sub,
+body.light .chat-agente-sub {
+  color: #4b5563 !important;
+}
