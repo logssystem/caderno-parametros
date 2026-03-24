@@ -1354,6 +1354,13 @@ function syncTudo() {
 document.addEventListener("input", e => {
     if (e.target.closest(".campo-descricao")) syncTudo();
 });
+
+document.addEventListener("input", (e) => {
+  if (e.target.classList.contains("campo-obrigatorio-erro")) {
+    e.target.classList.remove("campo-obrigatorio-erro");
+  }
+});
+
 document.addEventListener("change", e => {
     if (e.target.closest(".campo-descricao")) syncTudo();
 });
@@ -1509,6 +1516,20 @@ function processarCSV(tipo, texto) {
 function mostrarToast(msg, error = false) {
     const t = document.getElementById("toastGlobal");
     const m = document.getElementById("toastMessage");
+    function destacarCampoErro(el, mensagem) {
+
+    if (!el) return;
+  
+    el.classList.add("campo-obrigatorio-erro");
+  
+    el.focus();
+  
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+  
+    if (mensagem) {
+      mostrarToast(mensagem, true);
+    }
+  }
 
     if (!t || !m) {
         console.warn("Toast não encontrado:", msg);
@@ -1537,28 +1558,18 @@ window.explorar = function () {
     
     window.chatState = window.chatState || {};
     
-    const empresa = document.getElementById("empresaCliente")?.value.trim();
-    const dominio = document.getElementById("dominioCliente")?.value.trim();
-
-    if (!empresa || !dominio) {
-      mostrarToast("Preencha o nome da empresa e o domínio do cliente", true);
-      return null;
-    }
-
-    if (!validarDominioCliente()) {
-      mostrarToast("O domínio deve terminar com .sobreip.com.br", true);
-      return null;
-    }
-    
-    if (!empresa) {
-    mostrarToast("Informe o nome da empresa", true);
+   const empresaInput = document.getElementById("empresaCliente");
+  const dominioInput = document.getElementById("dominioCliente");
+  
+  if (!empresa) {
+    destacarCampoErro(empresaInput, "Informe o nome da empresa");
     return null;
-    }
-    
-    if (!dominio) {
-      mostrarToast("Informe o domínio do cliente", true);
-      return null;
-    }
+  }
+  
+  if (!dominio) {
+    destacarCampoErro(dominioInput, "Informe o domínio do cliente");
+    return null;
+  }
     
     /* ================= USUÁRIOS ================= */
 
@@ -1610,9 +1621,21 @@ window.explorar = function () {
 
     const agentesSemRamal = agentes.filter(a => !a.ramal);
     if (agentesSemRamal.length) {
-      mostrarToast("Existe agente sem ramal vinculado.", true);
-      return null;
+  
+    const lista = document.getElementById("listaAgentes");
+  
+    if (lista) {
+      lista.querySelectorAll(".campo-descricao").forEach(a => {
+        const select = a.querySelector("select");
+  
+        if (select && !select.value) {
+          destacarCampoErro(select, "Agente sem ramal vinculado");
+        }
+      });
     }
+  
+    return null;
+  }
 
     /* ================= FILAS ================= */
 
