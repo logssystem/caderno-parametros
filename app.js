@@ -582,7 +582,7 @@ function criarCampo(tipo) {
         
       chkAgenteOmni = document.createElement("input");
       chkAgenteOmni.type = "checkbox";
-      chkAgenteOmni.classList.add("checkbox-omni");
+      chkAgenteOmni.classList.add("checkbox-omni"); // 👈 ESSENCIAL
       
       chkAgenteOmni.addEventListener("change", () => {
         syncTudo();
@@ -944,7 +944,8 @@ function gerarAgentesChatAPartirUsuarios() {
 
         const nome = u.querySelector(".campo-nome")?.value;
 
-        const chk = u.querySelector(".checkbox-omni");
+        const chk = u.querySelector(".checkbox-omni"); // ✅ CORRETO
+
         const isOmni = chk && chk.checked;
 
         if (isOmni && nome) {
@@ -973,7 +974,6 @@ function gerarAgentesChatAPartirUsuarios() {
 
         lista.appendChild(wrap);
     });
-
 }
 /* ================= DESTINOS URA ================= */
 
