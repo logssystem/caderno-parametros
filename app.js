@@ -24,8 +24,8 @@ const listas = {
 
 const PERMISSOES = [
   "Administrador do Módulo de PABX",
-  "Agente de Call Center",
-  "Supervisor(a) de Call Center",
+  "Agente",
+  "Supervisor",
   "CRM",
   "CRM Owner",
   "Administrador do Módulo de Omnichannel",
@@ -82,8 +82,8 @@ const PERMISSOES = [
         texto: "Permissões disponíveis e suas funções:",
         itens: [
           "Administrador do Módulo de PABX: acesso total às configurações de voz (ramais, URA, filas, agentes e regras de tempo).",
-          "Agente de Call Center: utilizado para usuários que realizam atendimento telefônico.",
-          "Supervisor(a) de Call Center: pode acompanhar agentes e filas do call center.",
+          "Agente: utilizado para usuários que realizam atendimento telefônico.",
+          "Supervisor: pode acompanhar Agentes de call center e Ramais administrativos",
           "CRM: acesso ao módulo de CRM, sem permissões administrativas.",
           "CRM Owner: acesso total ao módulo de CRM.",
           "Administrador do Módulo de Omnichannel: acesso total às configurações de chat e canais digitais.",
@@ -567,7 +567,7 @@ function criarCampo(tipo) {
             });
         
         const txt = document.createElement("span");
-        txt.textContent = "Este usuário é um agente";
+        txt.textContent = "Este usuário é agente de call center";
 
         boxAgente.append(chkAgente, txt);
         wrap.append(boxAgente);
@@ -579,20 +579,24 @@ function criarCampo(tipo) {
         boxOmni.style.marginTop = "6px";
 
         const modo = localStorage.getItem("modo_atendimento");
+
+        if (modo !== "ambos") {
+            boxOmni.style.display = "none";
+        }
         
-      chkAgenteOmni = document.createElement("input");
-      chkAgenteOmni.type = "checkbox";
-      chkAgenteOmni.classList.add("checkbox-omni"); // 👈 ESSENCIAL
-      
-      chkAgenteOmni.addEventListener("change", () => {
-        syncTudo();
-      });
-      
-      const txtOmni = document.createElement("span");
-      txtOmni.textContent = "Este usuário é agente omnichannel";
-      
-      boxOmni.append(chkAgenteOmni, txtOmni);
-      wrap.append(boxOmni);
+       chkAgenteOmni = document.createElement("input");
+        chkAgenteOmni.type = "checkbox";
+        chkAgenteOmni.classList.add("checkbox-omni");
+        
+        chkAgenteOmni.addEventListener("change", () => {
+          syncTudo();
+        });
+              
+        const txtOmni = document.createElement("span");
+        txtOmni.textContent = "Este usuário é agente omnichannel";
+        
+        boxOmni.append(chkAgenteOmni, txtOmni);
+        wrap.append(boxOmni);
 
         regras = document.createElement("div");
         regras.style.marginTop = "8px";
@@ -938,33 +942,41 @@ function gerarAgentesChatAPartirUsuarios() {
 
     lista.innerHTML = "";
 
-    // 👉 pega direto do container correto
-    const usuarios = document.getElementById("listaUsuariosWeb")
-        ?.querySelectorAll(".campo-descricao") || [];
+    // pega usuários da VOZ
+    let usuarios = document.querySelectorAll("#listaUsuariosWeb .campo-descricao");
+
+    // se não existir, pega usuários do CHAT
+    if (!usuarios.length) {
+        usuarios = document.querySelectorAll("#listaUsuariosChat .campo-descricao");
+    }
 
     usuarios.forEach(u => {
 
         const nome = u.querySelector(".campo-nome")?.value;
-        const chkOmni = u.querySelector(".checkbox-omni");
+        const chkOmni = u.querySelector(".checkbox-omni") || u.querySelector("input[type=checkbox]");
 
         if (chkOmni && chkOmni.checked && nome) {
 
             const wrap = document.createElement("div");
             wrap.className = "campo-descricao";
 
+            const linha = document.createElement("div");
+            linha.className = "linha-principal";
+
             const inputNome = document.createElement("input");
             inputNome.className = "campo-nome";
             inputNome.value = nome;
             inputNome.disabled = true;
 
-            wrap.appendChild(inputNome);
+            linha.append(inputNome);
+            wrap.append(linha);
+
             lista.appendChild(wrap);
         }
 
     });
 
 }
-
 /* ================= DESTINOS URA ================= */
 
 function atualizarSelectAgentesFila() {
@@ -1271,6 +1283,64 @@ function coletarEntradas() {
   return entradas;
 }
 
+/* ================= CHAT – COLETA FINAL ================= */
+
+window.coletarChatDoDOM = function () {
+ const numeroQr = document.getElementById("numeroQr");
+
+  let contaFinal = null;
+  
+  if (numeroQr && numeroQr.value.trim()) {
+    contaFinal = numeroQr.value.trim();
+  } else if (window.chatState?.conta) {
+    contaFinal = window.chatState.conta;
+  }
+  
+  const chat = {
+    tipo: window.chatState?.tipo || null,
+    api: window.chatState?.api || null,
+    conta: contaFinal,
+      canais: window.chatState?.canais || [],
+    usuarios: [],
+    agentes: [],
+    departamentos: []
+  };
+
+  // usuários chat
+  document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
+    chat.usuarios.push({
+      nome: u.getNome?.() || "",
+      email: u.getEmail?.() || "",
+      senha: u.getSenha?.() || "",
+      permissao: u.getPermissao?.() || ""
+    });
+  });
+
+  // departamentos
+  document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
+    const nome = d.querySelector(".campo-nome")?.value || "";
+    if (!nome) return;
+
+    chat.departamentos.push({
+      nome,
+      agentes: JSON.parse(d.dataset.agentes || "[]")
+    });
+  });
+
+  // agentes
+  document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
+    chat.agentes.push({
+      nome: a.querySelector(".campo-nome")?.value || "",
+      usuario: a.dataset.usuario || "",
+      departamentos: JSON.parse(a.dataset.departamentos || "[]")
+    });
+  });
+
+  console.log("CHAT FINAL:", chat);
+  
+  return chat;
+};
+
 /* ================= MOTOR ================= */
 
 function syncTudo() {
@@ -1281,16 +1351,9 @@ function syncTudo() {
     atualizarTodosDestinosURA();
 }
 
-document.addEventListener("change", e => {
+document.addEventListener("input", e => {
     if (e.target.closest(".campo-descricao")) syncTudo();
 });
-
-document.addEventListener("input", (e) => {
-  if (e.target.classList.contains("campo-obrigatorio-erro")) {
-    e.target.classList.remove("campo-obrigatorio-erro");
-  }
-});
-
 document.addEventListener("change", e => {
     if (e.target.closest(".campo-descricao")) syncTudo();
 });
@@ -1453,34 +1516,13 @@ function mostrarToast(msg, error = false) {
     }
 
     m.textContent = msg;
-
-    t.classList.add("show");
-
-    if (error) {
-        t.classList.add("error");
-    } else {
-        t.classList.remove("error");
-    }
+    t.className = "toast show" + (error ? " error" : "");
 
     setTimeout(() => {
         t.classList.remove("show");
     }, 3000);
 }
 
-function destacarCampoErro(el, mensagem) {
-
-  if (!el) return;
-
-  el.classList.add("campo-obrigatorio-erro");
-
-  el.focus();
-
-  el.scrollIntoView({ behavior: "smooth", block: "center" });
-
-  if (mensagem) {
-    mostrarToast(mensagem, true);
-  }
-}
 /* ================= SALVAR / EXPLORAR ================= */
 
 window.explorar = function () {
@@ -1488,112 +1530,19 @@ window.explorar = function () {
     
     window.chatState = window.chatState || {};
     
-  const empresaInput = document.getElementById("empresaCliente");
-  const dominioInput = document.getElementById("dominioCliente");
-  
-  const empresa = empresaInput?.value.trim();
-  const dominio = dominioInput?.value.trim();
-  
-  if (!empresa) {
-  destacarCampoErro(empresaInput, "Informe o nome da empresa");
-  return null;
-}
+    const empresa = document.getElementById("empresaCliente")?.value.trim();
+    const dominio = document.getElementById("dominioCliente")?.value.trim();
 
-  if (!dominio) {
-  destacarCampoErro(dominioInput, "Informe o domínio do cliente");
-  return null;
-}
+    if (!empresa || !dominio) {
+      mostrarToast("Preencha o nome da empresa e o domínio do cliente", true);
+      return null;
+    }
 
-  /* ================= VALIDAÇÕES GERAIS ================= */
-  
-  // USUÁRIOS WEB
-  const usuariosInvalidos = [];
-  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
-    const nome = u.getNome?.();
-    const email = u.getEmail?.();
-    const senha = u.getSenha?.();
-    const permissao = u.getPermissao?.();
-  
-    if (!nome || !email || !senha || !permissao) {
-      usuariosInvalidos.push(u);
+    if (!validarDominioCliente()) {
+      mostrarToast("O domínio deve terminar com .sobreip.com.br", true);
+      return null;
     }
-  });
-  
-  if (usuariosInvalidos.length) {
-    destacarCampoErro(
-      usuariosInvalidos[0].querySelector(".campo-nome"),
-      "Preencha todos os campos dos usuários web"
-    );
-    return null;
-  }
-  
-  // RAMAIS
-  const ramaisInvalidos = [];
-  document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
-    const ramal = r.getNome?.();
-    const senha = r.getSenha?.();
-  
-    if (!ramal || !senha) {
-      ramaisInvalidos.push(r);
-    }
-  });
-  
-  if (ramaisInvalidos.length) {
-    destacarCampoErro(
-      ramaisInvalidos[0].querySelector(".campo-nome"),
-      "Preencha todos os ramais"
-    );
-    return null;
-  }
-  
-  // URA
-  const urasInvalidas = [];
-  document.querySelectorAll("#listaURAs .campo-descricao").forEach(ura => {
-    const nome = ura.querySelector(".campo-nome")?.value;
-    const msg = ura.querySelector("textarea")?.value;
-  
-    let opcaoInvalida = false;
-  
-    ura.querySelectorAll(".opcao-ura").forEach(o => {
-      const tecla = o.querySelector("input")?.value;
-      const destino = o.querySelector("select")?.value;
-  
-      if (!tecla || !destino) {
-        opcaoInvalida = true;
-      }
-    });
-  
-    if (!nome || !msg || opcaoInvalida) {
-      urasInvalidas.push(ura);
-    }
-  });
-  
-  if (urasInvalidas.length) {
-    destacarCampoErro(
-      urasInvalidas[0].querySelector(".campo-nome"),
-      "URA incompleta (nome, mensagem ou opções)"
-    );
-    return null;
-  }
-  
-  // FILAS
-  const filasInvalidas = [];
-  document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
-    const nome = f.querySelector(".campo-nome")?.value;
-    const agentes = JSON.parse(f.dataset.agentes || "[]");
-  
-    if (!nome || !agentes.length) {
-      filasInvalidas.push(f);
-    }
-  });
-  
-  if (filasInvalidas.length) {
-    destacarCampoErro(
-      filasInvalidas[0].querySelector(".campo-nome"),
-      "Fila precisa de nome e agentes"
-    );
-    return null;
-  }
+
     /* ================= USUÁRIOS ================= */
 
     const usuarios = [];
@@ -1644,21 +1593,9 @@ window.explorar = function () {
 
     const agentesSemRamal = agentes.filter(a => !a.ramal);
     if (agentesSemRamal.length) {
-  
-    const lista = document.getElementById("listaAgentes");
-  
-    if (lista) {
-      lista.querySelectorAll(".campo-descricao").forEach(a => {
-        const select = a.querySelector("select");
-  
-        if (select && !select.value) {
-          destacarCampoErro(select, "Agente sem ramal vinculado");
-        }
-      });
+      mostrarToast("Existe agente sem ramal vinculado.", true);
+      return null;
     }
-  
-    return null;
-  }
 
     /* ================= FILAS ================= */
 
@@ -1731,68 +1668,30 @@ if (numeroQr && numeroQr.value.trim()) {
 
 let chat = null;
 
-const modo = localStorage.getItem("modo_atendimento");
+if (window.chatState?.tipo === "api" || window.chatState?.tipo === "qr") {
 
-if (modo === "chat" || modo === "ambos") {
-
-  // 🔴 TIPO OBRIGATÓRIO
-  if (!window.chatState?.tipo) {
-    const bloco = document.querySelector(".tipo-chat");
-    destacarCampoErro(bloco, "Selecione o tipo de integração do Chat");
-    return null;
-  }
-
-  // 🔴 API OBRIGATÓRIA
-  if (window.chatState.tipo === "api" && !window.chatState?.api) {
-    const bloco = document.getElementById("api-oficial");
-    destacarCampoErro(bloco, "Selecione a API oficial");
-    return null;
-  }
-
-  // 🔴 CONTA / NÚMERO OBRIGATÓRIO
-  const numeroQr = document.getElementById("numeroQr");
-  const conta = numeroQr?.value || window.chatState?.conta;
-
-  if (!conta) {
-    destacarCampoErro(numeroQr, "Informe o número / conta do WhatsApp");
-    return null;
-  }
-
-  // 🔴 COLETA CHAT
   chat = typeof window.coletarChatDoDOM === "function"
     ? window.coletarChatDoDOM()
-    : null;
+    : {};
+    
+    const numeroQr = document.getElementById("numeroQr");
 
-  if (!chat) {
-    mostrarToast("Erro ao coletar dados do chat", true);
-    return null;
+if (numeroQr && numeroQr.value.trim()) {
+  chat.conta = numeroQr.value.trim();
+}
+    
+  if (window.chatState?.conta) {
+    chat.conta = window.chatState.conta;
   }
 
-  // 🔴 DEPARTAMENTO OBRIGATÓRIO
-  if (!chat.departamentos || !chat.departamentos.length) {
-    const bloco = document.getElementById("listaDepartamentosChat");
-    destacarCampoErro(bloco, "Adicione pelo menos um departamento");
-    return null;
-  }
+}
 
-  // 🔴 DEPARTAMENTO SEM AGENTE
-  const depSemAgente = chat.departamentos.find(d => !d.agentes || !d.agentes.length);
+/* ================= INJETAR CHAT NO JSON ================= */
 
-  if (depSemAgente) {
-    const bloco = document.getElementById("listaDepartamentosChat");
-    destacarCampoErro(bloco, "Departamento sem agentes vinculados");
-    return null;
-  }
+const modo = localStorage.getItem("modo_atendimento");
 
-  // 🔴 AGENTE SEM DEPARTAMENTO
-  const agenteSemDep = chat.agentes.find(a => !a.departamentos || !a.departamentos.length);
-
-  if (agenteSemDep) {
-    const bloco = document.getElementById("listaAgentesChat");
-    destacarCampoErro(bloco, "Agente sem departamento vinculado");
-    return null;
-  }
-
+if ((modo === "chat" || modo === "ambos") && chat) {
+  dados.chat = chat;
 }
 
 /* ================= FINAL ================= */
@@ -1942,26 +1841,13 @@ function salvarConfiguracao(){
 
   const dados = explorar();
 
-  // 🔥 BLOQUEIO TOTAL
-  if (!dados) {
-    console.warn("Configuração inválida - não será salva");
-    mostrarToast("Preencha os campos obrigatórios antes de continuar", true);
-    return;
-  }
-
-  // 🔒 proteção extra (evita salvar null mesmo que algo passe)
-  if (dados === null || typeof dados !== "object") {
-    console.warn("Dados inválidos detectados:", dados);
-    mostrarToast("Erro interno ao gerar configuração", true);
-    return;
-  }
-
   localStorage.setItem(
     "CONFIG_CADERNO",
     JSON.stringify(dados)
   );
 
-  window.location.href = "resumo.html";
+  window.location.href = "resumo.php";
+
 }
 
 // ================= VISIBILIDADE DO MÓDULO CHAT ================= 
@@ -2008,46 +1894,29 @@ window.adicionarPausa = adicionarPausa;
 window.togglePesquisaSatisfacao = togglePesquisaSatisfacao;
 window.adicionarRespostaPesquisa = adicionarRespostaPesquisa;
 
-/* ================= TEMA (DARK PADRÃO + INTRO FIXA) ================= */
+/* ================= MODO ESCURO ================= */
 
 (function initTema() {
   const btn = document.getElementById("toggleTheme");
+  if (!btn) return;
 
-  // 🔥 define dark como padrão (só para o sistema)
-  if (!localStorage.getItem("tema")) {
-    localStorage.setItem("tema", "dark");
+  // aplica tema salvo
+  const temaSalvo = localStorage.getItem("tema");
+  if (temaSalvo === "dark") {
+    document.body.classList.add("dark");
+    btn.textContent = "☀️";
+  } else {
+    btn.textContent = "🌙";
   }
 
-  function aplicarTema() {
-    const tema = localStorage.getItem("tema") || "dark";
+  // toggle no clique
+  btn.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
 
-    // aplica no body
-    document.body.classList.remove("dark", "light");
-    document.body.classList.add(tema);
-
-    // 👉 NÃO mexe na intro
-    const intro = document.getElementById("intro-screen");
-    if (intro && intro.style.display !== "none") {
-      intro.classList.remove("light");
-      intro.classList.add("dark");
-    }
-
-    if (btn) {
-      btn.textContent = tema === "dark" ? "☀️" : "🌙";
-    }
-  }
-
-  aplicarTema();
-
-  if (btn) {
-    btn.addEventListener("click", () => {
-      const atual = localStorage.getItem("tema") || "dark";
-      const novo = atual === "dark" ? "light" : "dark";
-
-      localStorage.setItem("tema", novo);
-      aplicarTema();
-    });
-  }
+    const isDark = document.body.classList.contains("dark");
+    localStorage.setItem("tema", isDark ? "dark" : "light");
+    btn.textContent = isDark ? "☀️" : "🌙";
+  });
 })();
 
 // ================= INIT GLOBAL BLINDADO =================
@@ -2065,17 +1934,26 @@ window.initCaderno = function () {
 
   const modo = localStorage.getItem("modo_atendimento");
 
-  // 👉 controla visibilidade geral
+  const cardUsuariosOmni = document.getElementById("cardUsuariosOmni");
+
+  if (cardUsuariosOmni) {
+
+    if (modo === "chat") {
+      cardUsuariosOmni.style.display = "block";
+    } else {
+      cardUsuariosOmni.style.display = "none";
+    }
+
+  }
+
   mostrarApp(modo);
 
-  // 👉 inicializa chat se necessário
   if (modo === "chat" || modo === "ambos") {
     if (typeof window.inicializarChatUI === "function") {
       window.inicializarChatUI();
     }
   }
 
-  // 👉 sincroniza tudo depois do DOM montar
   setTimeout(syncTudo, 200);
 };
 
@@ -2114,7 +1992,7 @@ document.addEventListener("contextmenu", function(e){
 
 document.addEventListener("keydown", function(e){
 
-  if(e.key === "F121"){
+  if(e.key === "F12"){
     e.preventDefault();
   }
 
@@ -2130,18 +2008,4 @@ document.addEventListener("keydown", function(e){
     e.preventDefault();
   }
 
-});
-
-document.addEventListener("input", e => {
-    if (e.target.closest(".campo-descricao")) syncTudo();
-});
-
-document.addEventListener("change", e => {
-    if (e.target.closest(".campo-descricao")) syncTudo();
-});
-
-document.addEventListener("change", (e) => {
-  if (e.target.classList.contains("checkbox-omni")) {
-    gerarAgentesChatAPartirUsuarios();
-  }
 });
