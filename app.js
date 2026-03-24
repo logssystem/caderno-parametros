@@ -580,19 +580,19 @@ function criarCampo(tipo) {
 
         const modo = localStorage.getItem("modo_atendimento");
         
-       chkAgenteOmni = document.createElement("input");
-        chkAgenteOmni.type = "checkbox";
-        chkAgenteOmni.classList.add("checkbox-omni");
-        
-        chkAgenteOmni.addEventListener("change", () => {
-          syncTudo();
-        });
-              
-        const txtOmni = document.createElement("span");
-        txtOmni.textContent = "Este usuário é agente omnichannel";
-        
-        boxOmni.append(chkAgenteOmni, txtOmni);
-        wrap.append(boxOmni);
+      chkAgenteOmni = document.createElement("input");
+      chkAgenteOmni.type = "checkbox";
+      chkAgenteOmni.classList.add("checkbox-omni");
+      
+      chkAgenteOmni.addEventListener("change", () => {
+        syncTudo();
+      });
+      
+      const txtOmni = document.createElement("span");
+      txtOmni.textContent = "Este usuário é agente omnichannel";
+      
+      boxOmni.append(chkAgenteOmni, txtOmni);
+      wrap.append(boxOmni);
 
         regras = document.createElement("div");
         regras.style.marginTop = "8px";
