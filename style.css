@@ -2071,7 +2071,9 @@ body.dark img[alt*="QR"] {
 /* logos escuras (Meta, etc) */
 body.dark img[src*="meta"],
 body.dark img[alt*="Meta"] {
-  filter: brightness(1.8) contrast(1.4);
+  background: rgba(255,255,255,0.08);
+  padding: 10px;
+  border-radius: 10px;
 }
 
 /* ativo (efeito premium) */
