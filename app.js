@@ -933,57 +933,36 @@ function gerarAgentesAPartirUsuarios() {
 
 function gerarAgentesChatAPartirUsuarios() {
 
-  const lista = document.getElementById("listaAgentesChat");
-  if (!lista) return;
+    const lista = document.getElementById("listaAgentesChat");
+    if (!lista) return;
 
-  lista.innerHTML = "";
+    lista.innerHTML = "";
 
-  let usuarios = document.querySelectorAll("#listaUsuariosWeb .campo-descricao");
+    // 👉 pega direto do container correto
+    const usuarios = document.getElementById("listaUsuariosWeb")
+        ?.querySelectorAll(".campo-descricao") || [];
 
-  if (!usuarios.length) {
-    usuarios = document.querySelectorAll("#listaUsuariosChat .campo-descricao");
-  }
+    usuarios.forEach(u => {
 
-  const agentes = [];
+        const nome = u.querySelector(".campo-nome")?.value;
+        const chkOmni = u.querySelector(".checkbox-omni");
 
-  usuarios.forEach(u => {
+        if (chkOmni && chkOmni.checked && nome) {
 
-    const nome = u.querySelector(".campo-nome")?.value;
+            const wrap = document.createElement("div");
+            wrap.className = "campo-descricao";
 
-    const chkOmni = u.querySelector(".checkbox-omni");
+            const inputNome = document.createElement("input");
+            inputNome.className = "campo-nome";
+            inputNome.value = nome;
+            inputNome.disabled = true;
 
-    if (chkOmni && chkOmni.checked && nome) {
+            wrap.appendChild(inputNome);
+            lista.appendChild(wrap);
+        }
 
-      agentes.push({
-        nome,
-        departamentos: []
-      });
+    });
 
-      // render
-      const wrap = document.createElement("div");
-      wrap.className = "campo-descricao";
-
-      const linha = document.createElement("div");
-      linha.className = "linha-principal";
-
-      const input = document.createElement("input");
-      input.className = "campo-nome";
-      input.value = nome;
-      input.disabled = true;
-
-      linha.append(input);
-      wrap.append(linha);
-
-      lista.appendChild(wrap);
-    }
-
-  });
-
-  // 🔥 salva no estado (AGORA SIM consistente)
-  window.chatState = window.chatState || {};
-  window.chatState.agentes = agentes;
-
-  console.log("🔥 agentes chat:", agentes);
 }
 
 /* ================= DESTINOS URA ================= */
