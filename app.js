@@ -963,7 +963,7 @@ function gerarAgentesChatAPartirUsuarios() {
     usuarios.forEach(u => {
 
         const nome = u.querySelector(".campo-nome")?.value;
-        const chkOmni = u.querySelector(".checkbox-omni") || u.querySelector("input[type=checkbox]");
+        const chkOmni = u.querySelector(".checkbox-omni");
 
         if (chkOmni && chkOmni.checked && nome) {
 
@@ -1330,15 +1330,6 @@ window.coletarChatDoDOM = function () {
   document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
     const nome = d.querySelector(".campo-nome")?.value || "";
     if (!nome) return;
-
-    if (!departamentos.length) {
-
-  const bloco = document.getElementById("listaDepartamentosChat");
-
-  destacarCampoErro(bloco, "Adicione pelo menos um departamento");
-
-  return null;
-}
 
     chat.departamentos.push({
       nome,
@@ -1884,14 +1875,6 @@ if (modo === "chat" || modo === "ambos") {
 
 }
 
-/* ================= INJETAR CHAT NO JSON ================= */
-
-const modo = localStorage.getItem("modo_atendimento");
-
-if ((modo === "chat" || modo === "ambos") && chat) {
-  dados.chat = chat;
-}
-
 /* ================= FINAL ================= */
 
 document.getElementById("resultado").textContent =
@@ -2162,26 +2145,17 @@ window.initCaderno = function () {
 
   const modo = localStorage.getItem("modo_atendimento");
 
-  const cardUsuariosOmni = document.getElementById("cardUsuariosOmni");
-
-  if (cardUsuariosOmni) {
-
-    if (modo === "chat") {
-      cardUsuariosOmni.style.display = "block";
-    } else {
-      cardUsuariosOmni.style.display = "none";
-    }
-
-  }
-
+  // 👉 controla visibilidade geral
   mostrarApp(modo);
 
+  // 👉 inicializa chat se necessário
   if (modo === "chat" || modo === "ambos") {
     if (typeof window.inicializarChatUI === "function") {
       window.inicializarChatUI();
     }
   }
 
+  // 👉 sincroniza tudo depois do DOM montar
   setTimeout(syncTudo, 200);
 };
 
