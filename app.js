@@ -1549,7 +1549,17 @@ window.explorar = function () {
       mostrarToast("O domínio deve terminar com .sobreip.com.br", true);
       return null;
     }
-
+    
+    if (!empresa) {
+    mostrarToast("Informe o nome da empresa", true);
+    return null;
+    }
+    
+    if (!dominio) {
+      mostrarToast("Informe o domínio do cliente", true);
+      return null;
+    }
+    
     /* ================= USUÁRIOS ================= */
 
     const usuarios = [];
