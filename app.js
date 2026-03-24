@@ -938,20 +938,16 @@ function gerarAgentesChatAPartirUsuarios() {
 
     lista.innerHTML = "";
 
-    // pega usuários da VOZ
-    let usuarios = document.querySelectorAll("#listaUsuariosWeb .campo-descricao");
-
-    // se não existir, pega usuários do CHAT
-    if (!usuarios.length) {
-        usuarios = document.querySelectorAll("#listaUsuariosChat .campo-descricao");
-    }
+    const usuarios = document.querySelectorAll("#listaUsuariosWeb .campo-descricao");
 
     usuarios.forEach(u => {
 
-        const nome = u.querySelector(".campo-nome")?.value;
-        const chkOmni = u.querySelector(".checkbox-omni");
+        const nome = u.getNome?.();
 
-        if (chkOmni && chkOmni.checked && nome) {
+        // 🔥 usa getter (igual você fez no agente de voz)
+        const isOmni = u.isAgenteOmni ? u.isAgenteOmni() : false;
+
+        if (isOmni && nome) {
 
             const wrap = document.createElement("div");
             wrap.className = "campo-descricao";
