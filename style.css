@@ -2130,14 +2130,22 @@ body {
 
 /* ===== CARDS ===== */
 .card {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(12px);
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05); /* 🔥 vidro */
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border-radius: 14px;
   padding: 20px;
   margin: 20px auto;
   max-width: 900px;
+
   border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+
+  box-shadow: 
+    0 10px 30px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+
+  color: #e5e7eb;
 }
 
 /* ===== TITULOS ===== */
@@ -2183,4 +2191,15 @@ body.light .card {
 body.light .chip {
   background: #e0e7ff;
   color: #4338ca;
+}
+
+.app-header {
+  background: rgba(2,6,23,0.7);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.chip {
+  background: rgba(99,102,241,0.15);
+  border: 1px solid rgba(99,102,241,0.3);
+  color: #a5b4fc;
 }
