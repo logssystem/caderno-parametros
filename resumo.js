@@ -162,12 +162,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let dados = {};
 
-   try {
-     dados = JSON.parse(raw) || {};
-   } catch (e) {
-     console.warn("Erro ao ler JSON:", e);
-     dados = {};
-   }
+  try {
+    dados = JSON.parse(raw) || {};
+  } catch (e) {
+    console.warn("Erro ao ler JSON:", e);
+    dados = {};
+  }
+
   resumo.innerHTML = "";
 
   const voz = dados.voz || {};
