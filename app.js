@@ -579,20 +579,6 @@ function criarCampo(tipo) {
         boxOmni.style.marginTop = "6px";
 
         const modo = localStorage.getItem("modo_atendimento");
-
-        if (modo === "chat" || modo === "ambos") {
-
-        if (!window.chatState?.tipo) {
-      
-          const cards = document.querySelectorAll(".tipo-chat .chat-card");
-      
-          cards.forEach(c => c.classList.add("campo-obrigatorio-erro"));
-      
-          mostrarToast("Selecione o tipo de integração do Chat", true);
-      
-          return null;
-        }
-      }
         
        chkAgenteOmni = document.createElement("input");
         chkAgenteOmni.type = "checkbox";
