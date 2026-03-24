@@ -2108,3 +2108,79 @@ body.dark .logo-wrapper.meta img {
   border: 2px solid #ef4444 !important;
   background: rgba(239, 68, 68, 0.08);
 }
+
+/* ===== BASE ===== */
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color: #e2e8f0;
+}
+
+/* ===== HEADER ===== */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 30px;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 900px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* ===== TITULOS ===== */
+h2 {
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+/* ===== CHIPS (canais) ===== */
+.chip {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(99,102,241,0.2);
+  color: #c7d2fe;
+  margin-right: 6px;
+  font-size: 12px;
+}
+
+/* ===== BOTÃO THEME ===== */
+.theme-toggle {
+  background: linear-gradient(135deg, #6366f1, #22c55e);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: white;
+  font-weight: 600;
+}
+
+/* ===== LIGHT MODE ===== */
+body.light {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+body.light .card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+body.light .chip {
+  background: #e0e7ff;
+  color: #4338ca;
+}
