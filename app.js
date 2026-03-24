@@ -1848,6 +1848,12 @@ function salvarConfiguracao(){
 
   const dados = explorar();
 
+  // 🔒 NÃO salva se deu erro
+  if (!dados) {
+    console.warn("Explorar retornou null — não salvando");
+    return;
+  }
+
   localStorage.setItem(
     "CONFIG_CADERNO",
     JSON.stringify(dados)
