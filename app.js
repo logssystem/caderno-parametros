@@ -1592,7 +1592,97 @@ window.explorar = function () {
   destacarCampoErro(dominioInput, "Informe o domínio do cliente");
   return null;
 }
-    
+
+  /* ================= VALIDAÇÕES GERAIS ================= */
+  
+  // USUÁRIOS WEB
+  const usuariosInvalidos = [];
+  document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+    const nome = u.getNome?.();
+    const email = u.getEmail?.();
+    const senha = u.getSenha?.();
+    const permissao = u.getPermissao?.();
+  
+    if (!nome || !email || !senha || !permissao) {
+      usuariosInvalidos.push(u);
+    }
+  });
+  
+  if (usuariosInvalidos.length) {
+    destacarCampoErro(
+      usuariosInvalidos[0].querySelector(".campo-nome"),
+      "Preencha todos os campos dos usuários web"
+    );
+    return null;
+  }
+  
+  // RAMAIS
+  const ramaisInvalidos = [];
+  document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+    const ramal = r.getNome?.();
+    const senha = r.getSenha?.();
+  
+    if (!ramal || !senha) {
+      ramaisInvalidos.push(r);
+    }
+  });
+  
+  if (ramaisInvalidos.length) {
+    destacarCampoErro(
+      ramaisInvalidos[0].querySelector(".campo-nome"),
+      "Preencha todos os ramais"
+    );
+    return null;
+  }
+  
+  // URA
+  const urasInvalidas = [];
+  document.querySelectorAll("#listaURAs .campo-descricao").forEach(ura => {
+    const nome = ura.querySelector(".campo-nome")?.value;
+    const msg = ura.querySelector("textarea")?.value;
+  
+    let opcaoInvalida = false;
+  
+    ura.querySelectorAll(".opcao-ura").forEach(o => {
+      const tecla = o.querySelector("input")?.value;
+      const destino = o.querySelector("select")?.value;
+  
+      if (!tecla || !destino) {
+        opcaoInvalida = true;
+      }
+    });
+  
+    if (!nome || !msg || opcaoInvalida) {
+      urasInvalidas.push(ura);
+    }
+  });
+  
+  if (urasInvalidas.length) {
+    destacarCampoErro(
+      urasInvalidas[0].querySelector(".campo-nome"),
+      "URA incompleta (nome, mensagem ou opções)"
+    );
+    return null;
+  }
+  
+  // FILAS
+  const filasInvalidas = [];
+  document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
+    const nome = f.querySelector(".campo-nome")?.value;
+    const agentes = JSON.parse(f.dataset.agentes || "[]");
+  
+    if (!nome || !agentes.length) {
+      filasInvalidas.push(f);
+    }
+  });
+  
+  if (filasInvalidas.length) {
+    destacarCampoErro(
+      filasInvalidas[0].querySelector(".campo-nome"),
+      "Fila precisa de nome e agentes"
+    );
+    return null;
+  }
     /* ================= USUÁRIOS ================= */
 
     const usuarios = [];
@@ -1730,20 +1820,66 @@ if (numeroQr && numeroQr.value.trim()) {
 
 let chat = null;
 
-if (window.chatState?.tipo === "api" || window.chatState?.tipo === "qr") {
+const modo = localStorage.getItem("modo_atendimento");
 
+if (modo === "chat" || modo === "ambos") {
+
+  // 🔴 TIPO OBRIGATÓRIO
+  if (!window.chatState?.tipo) {
+    const bloco = document.querySelector(".tipo-chat");
+    destacarCampoErro(bloco, "Selecione o tipo de integração do Chat");
+    return null;
+  }
+
+  // 🔴 API OBRIGATÓRIA
+  if (window.chatState.tipo === "api" && !window.chatState?.api) {
+    const bloco = document.getElementById("api-oficial");
+    destacarCampoErro(bloco, "Selecione a API oficial");
+    return null;
+  }
+
+  // 🔴 CONTA / NÚMERO OBRIGATÓRIO
+  const numeroQr = document.getElementById("numeroQr");
+  const conta = numeroQr?.value || window.chatState?.conta;
+
+  if (!conta) {
+    destacarCampoErro(numeroQr, "Informe o número / conta do WhatsApp");
+    return null;
+  }
+
+  // 🔴 COLETA CHAT
   chat = typeof window.coletarChatDoDOM === "function"
     ? window.coletarChatDoDOM()
-    : {};
-    
-    const numeroQr = document.getElementById("numeroQr");
+    : null;
 
-if (numeroQr && numeroQr.value.trim()) {
-  chat.conta = numeroQr.value.trim();
-}
-    
-  if (window.chatState?.conta) {
-    chat.conta = window.chatState.conta;
+  if (!chat) {
+    mostrarToast("Erro ao coletar dados do chat", true);
+    return null;
+  }
+
+  // 🔴 DEPARTAMENTO OBRIGATÓRIO
+  if (!chat.departamentos || !chat.departamentos.length) {
+    const bloco = document.getElementById("listaDepartamentosChat");
+    destacarCampoErro(bloco, "Adicione pelo menos um departamento");
+    return null;
+  }
+
+  // 🔴 DEPARTAMENTO SEM AGENTE
+  const depSemAgente = chat.departamentos.find(d => !d.agentes || !d.agentes.length);
+
+  if (depSemAgente) {
+    const bloco = document.getElementById("listaDepartamentosChat");
+    destacarCampoErro(bloco, "Departamento sem agentes vinculados");
+    return null;
+  }
+
+  // 🔴 AGENTE SEM DEPARTAMENTO
+  const agenteSemDep = chat.agentes.find(a => !a.departamentos || !a.departamentos.length);
+
+  if (agenteSemDep) {
+    const bloco = document.getElementById("listaAgentesChat");
+    destacarCampoErro(bloco, "Agente sem departamento vinculado");
+    return null;
   }
 
 }
