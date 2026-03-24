@@ -1848,9 +1848,17 @@ function salvarConfiguracao(){
 
   const dados = explorar();
 
-  // 🔥 ESSA LINHA FALTAVA
+  // 🔥 BLOQUEIO TOTAL
   if (!dados) {
-    mostrarToast("Corrija os erros antes de continuar", true);
+    console.warn("Configuração inválida - não será salva");
+    mostrarToast("Preencha os campos obrigatórios antes de continuar", true);
+    return;
+  }
+
+  // 🔒 proteção extra (evita salvar null mesmo que algo passe)
+  if (dados === null || typeof dados !== "object") {
+    console.warn("Dados inválidos detectados:", dados);
+    mostrarToast("Erro interno ao gerar configuração", true);
     return;
   }
 
@@ -1860,7 +1868,6 @@ function salvarConfiguracao(){
   );
 
   window.location.href = "resumo.html";
-
 }
 
 // ================= VISIBILIDADE DO MÓDULO CHAT ================= 
