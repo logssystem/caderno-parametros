@@ -1,21 +1,34 @@
+/* ======================================================
+   RESET + BASE
+====================================================== */
 * { box-sizing: border-box; }
 
 :root {
+  /* DARK DEFAULT */
   --bg: #0b1220;
-  --text: #ffffff;
+  --text: #e5e7eb;
+  --text-soft: #94a3b8;
+
+  --header-bg: rgba(2,6,23,0.7);
+  --card-bg: rgba(15, 23, 42, 0.75);
+
+  --border: #1e293b;
+  --field-border: #334155;
+
+  --input-bg: rgba(255,255,255,0.05);
+  --input-text: #e5e7eb;
+
+  --accent: #22c55e;
+
+  --chip-bg: rgba(99,102,241,0.15);
+  --chip-text: #a5b4fc;
 }
 
+/* LIGHT MODE */
 body.light {
-  --bg: #f5f7fa;
+  --bg: #f1f5f9;
   --text: #1f2933;
-}
-
-/* ===== CLARO ===== */
-:root {
-  --bg: #f5f7fa;
-
-  --text: #1f2933;          /* 🔥 MAIS ESCURO */
-  --text-soft: #4b5563;     /* texto secundário */
+  --text-soft: #4b5563;
 
   --header-bg: #ffffff;
   --card-bg: #ffffff;
@@ -24,20 +37,261 @@ body.light {
   --field-border: #cbd5e1;
 
   --input-bg: #ffffff;
-  --input-text: #111827;    /* 🔥 texto dentro do input */
+  --input-text: #111827;
 
-  --placeholder: #9ca3af;
-
-  --accent: #6366f1;
+  --chip-bg: #e0e7ff;
+  --chip-text: #4338ca;
 }
-/* ===== ESCURO ===== */
-body.dark {
-  --bg: #0b1220;
-  --text: #e6edf3;
-  --header-bg: #0f172a;
-  --card-bg: #111c33;
-  --border: #24304a;
-  --field-border: #334155;
+
+/* ======================================================
+   BODY
+====================================================== */
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: all 0.25s ease;
+}
+
+/* ======================================================
+   HEADER
+====================================================== */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 24px;
+
+  background: var(--header-bg);
+  backdrop-filter: blur(10px);
+
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.app-logo {
+  height: 48px;
+}
+
+.app-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-weight: 800;
+}
+
+.header-right {
+  display: flex;
+  gap: 10px;
+}
+
+/* ======================================================
+   CONTAINER
+====================================================== */
+.form-container {
+  max-width: 900px;
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ======================================================
+   CARDS
+====================================================== */
+.card,
+.resumo-card {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 18px;
+
+  border: 1px solid var(--border);
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.card h2 {
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+/* ======================================================
+   TEXTOS
+====================================================== */
+h1, h2, h3, h4 {
+  color: var(--text);
+}
+
+label {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+/* ======================================================
+   INPUTS
+====================================================== */
+input, textarea, select {
+  background: var(--input-bg);
+  color: var(--input-text);
+
+  border: 1px solid var(--field-border);
+  border-radius: 10px;
+
+  padding: 10px 12px;
+  font-weight: 500;
+
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-soft);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(34,197,94,0.2);
+}
+
+/* ======================================================
+   BOTÕES
+====================================================== */
+button {
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 600;
+}
+
+.btn-add,
+.btn-import {
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text);
+}
+
+.btn-add:hover,
+.btn-import:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-explorar,
+.btn-salvar {
+  background: linear-gradient(90deg, #00ffa3, #00cfff);
+  color: #000;
+  font-weight: 700;
+  border: none;
+}
+
+.btn-voltar-intro {
+  background: transparent;
+  border: 1px dashed var(--border);
+  color: var(--text);
+}
+
+/* ======================================================
+   GRID / RESUMO
+====================================================== */
+.resumo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.resumo-bloco {
+  margin-bottom: 24px;
+}
+
+/* ======================================================
+   CHIPS
+====================================================== */
+.chip {
+  background: var(--chip-bg);
+  color: var(--chip-text);
+
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+/* ======================================================
+   CHAT CARDS
+====================================================== */
+.chat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chat-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.chat-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(34,197,94,0.3);
+}
+
+/* ======================================================
+   TOAST
+====================================================== */
+.toast {
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+
+  background: #ef4444;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 10px;
+
+  z-index: 9999;
+
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ======================================================
+   BOTÃO DÚVIDAS
+====================================================== */
+.btn-duvidas {
+  position: fixed;
+  right: 30px;
+  top: 140px;
+
+  background: linear-gradient(90deg, #00ffa3, #00cfff);
+  color: #000;
+
+  padding: 12px 18px;
+  border-radius: 20px;
+
+  font-weight: 700;
+  cursor: pointer;
 }
 
 body {
@@ -1470,25 +1724,6 @@ body.light #intro-screen {
   color: #fff;
 }
 
-/* CORREÇÃO PARA TEMA CLARO */
-body.light .nova-intro {
-  background: rgba(255,255,255,0.8);
-  color: #000;
-  border: 1px solid rgba(0,0,0,0.1);
-}
-
-/* ANIMAÇÃO ENTRADA */
-@keyframes aparecer {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* LOGO */
 .logo-intro {
   height: 45px;
@@ -1980,38 +2215,6 @@ body.dark::after {
 
 .campo-descricao input.campo-senha {
   width: 45% !important;
-}
-
-/* ======================================================
-   🔥 FIX DEFINITIVO MODO CLARO (SEM QUEBRAR DARK)
-====================================================== */
-
-/* ===== GARANTE TEXTO ESCURO NO LIGHT ===== */
-body.light,
-:root:not(.dark) {
-  color: #1f2933;
-}
-
-/* ===== CARDS ===== */
-body.light .card {
-  background: #ffffff !important;
-  color: #1f2933 !important;
-}
-
-/* títulos */
-body.light .card h2,
-body.light .card h3,
-body.light h1,
-body.light h2,
-body.light h3,
-body.light h4 {
-  color: #111827 !important;
-}
-
-/* labels */
-body.light label {
-  color: #374151 !important;
-  opacity: 1 !important;
 }
 
 /* ===== INPUTS ===== */
