@@ -1897,67 +1897,31 @@ window.adicionarRespostaPesquisa = adicionarRespostaPesquisa;
 /* ================= MODO ESCURO ================= */
 
 (function initTema() {
+
   const btn = document.querySelector(".theme-toggle");
 
-// aplicar tema salvo ao carregar
-const temaSalvo = localStorage.getItem("tema");
+  // aplicar tema salvo
+  const temaSalvo = localStorage.getItem("tema");
 
-if (temaSalvo) {
-  document.body.classList.add(temaSalvo);
-} else {
-  document.body.classList.add("dark"); // padrão
-}
-
-// clique do botão
-btn.addEventListener("click", () => {
-  if (document.body.classList.contains("light")) {
-    document.body.classList.remove("light");
-    document.body.classList.add("dark");
-    localStorage.setItem("tema", "dark");
+  if (temaSalvo) {
+    document.body.classList.add(temaSalvo);
   } else {
-    document.body.classList.remove("dark");
-    document.body.classList.add("light");
-    localStorage.setItem("tema", "light");
-  }
-});
-
-// ================= INIT GLOBAL BLINDADO =================
-window.initCaderno = function () {
-
-  window.chatState = window.chatState || {
-    tipo: null,
-    api: null,
-    conta: null,
-    canais: [],
-    usuarios: [],
-    agentes: [],
-    departamentos: []
-  };
-
-  const modo = localStorage.getItem("modo_atendimento");
-
-  const cardUsuariosOmni = document.getElementById("cardUsuariosOmni");
-
-  if (cardUsuariosOmni) {
-
-    if (modo === "chat") {
-      cardUsuariosOmni.style.display = "block";
-    } else {
-      cardUsuariosOmni.style.display = "none";
-    }
-
+    document.body.classList.add("dark");
   }
 
-  mostrarApp(modo);
-
-  if (modo === "chat" || modo === "ambos") {
-    if (typeof window.inicializarChatUI === "function") {
-      window.inicializarChatUI();
-    }
+  if (btn) {
+    btn.addEventListener("click", () => {
+      if (document.body.classList.contains("light")) {
+        document.body.classList.replace("light", "dark");
+        localStorage.setItem("tema", "dark");
+      } else {
+        document.body.classList.replace("dark", "light");
+        localStorage.setItem("tema", "light");
+      }
+    });
   }
 
-  setTimeout(syncTudo, 200);
-};
+})();
 
 function bloquearLetrasRamalRange() {
 
@@ -2010,4 +1974,48 @@ document.addEventListener("keydown", function(e){
     e.preventDefault();
   }
 
+});
+
+// ================= INIT GLOBAL BLINDADO =================
+window.initCaderno = function () {
+
+  window.chatState = window.chatState || {
+    tipo: null,
+    api: null,
+    conta: null,
+    canais: [],
+    usuarios: [],
+    agentes: [],
+    departamentos: []
+  };
+
+  const modo = localStorage.getItem("modo_atendimento");
+
+  const cardUsuariosOmni = document.getElementById("cardUsuariosOmni");
+
+  if (cardUsuariosOmni) {
+
+    if (modo === "chat") {
+      cardUsuariosOmni.style.display = "block";
+    } else {
+      cardUsuariosOmni.style.display = "none";
+    }
+
+  }
+
+  mostrarApp(modo);
+
+  if (modo === "chat" || modo === "ambos") {
+    if (typeof window.inicializarChatUI === "function") {
+      window.inicializarChatUI();
+    }
+  }
+
+  setTimeout(syncTudo, 200);
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (typeof window.initCaderno === "function") {
+    window.initCaderno();
+  }
 });
