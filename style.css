@@ -1,5 +1,15 @@
 * { box-sizing: border-box; }
 
+:root {
+  --bg: #0b1220;
+  --text: #ffffff;
+}
+
+body.light {
+  --bg: #f5f7fa;
+  --text: #1f2933;
+}
+
 /* ===== CLARO ===== */
 :root {
   --bg: #f5f7fa;
@@ -2202,4 +2212,22 @@ body.light .chip {
   background: rgba(99,102,241,0.15);
   border: 1px solid rgba(99,102,241,0.3);
   color: #a5b4fc;
+}
+
+.resumo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.header-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.header-right {
+  display: flex;
+  gap: 10px;
 }
