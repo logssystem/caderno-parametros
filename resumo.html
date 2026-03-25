@@ -11,17 +11,24 @@
 <body>
 
   <!-- ================= HEADER ================= -->
-  <header class="app-header resumo-header">
-    <img src="./assets/image.png" class="app-logo" alt="Logo ERA" />
-
-    <h1 class="app-title">Resumo da Configuração</h1>
-    
-    <button id="toggleTheme" class="theme-toggle">🌙</button>
-    <button type="button" class="btn-voltar-intro" onclick="voltar()">
-      ← Voltar ao início
-    </button>
+    <header class="app-header resumo-header">
+  
+    <div class="header-left">
+      <img src="./assets/image.png" class="app-logo" />
+    </div>
+  
+    <div class="header-center">
+      <h1 class="app-title">Resumo da Configuração</h1>
+    </div>
+  
+    <div class="header-right">
+      <button id="toggleTheme" class="theme-toggle">🌙</button>
+      <button class="btn-voltar-intro" onclick="voltar()">
+        ← Voltar ao início
+      </button>
+    </div>
+  
   </header>
-
 
   <!-- ================= CONTEÚDO ================= -->
   <main id="resumo" class="form-container"></main>
