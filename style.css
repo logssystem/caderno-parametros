@@ -14,7 +14,7 @@
 /* 🌞 LIGHT */
 body.light {
   --bg: #f5f7fa;
-  --text: #1f2933;
+  --text: #111827; /* 🔥 mais forte */
   --card-bg: #ffffff;
   --border: #d1d5db;
 }
@@ -114,31 +114,20 @@ label {
 /* ======================================================
    INPUTS
 ====================================================== */
-input, textarea, select {
-  background: var(--input-bg);
-  color: var(--input-text);
+input, select, textarea {
+  background: #fff;
+  border: 1px solid #d1d5db;
+  color: #111827;
 
-  border: 1px solid var(--field-border);
   border-radius: 10px;
-
-  padding: 10px 12px;
-  font-weight: 500;
+  padding: 10px;
 
   transition: all 0.2s ease;
-  width: 100%;
 }
 
-input::placeholder,
-textarea::placeholder {
-  color: var(--text-soft);
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(34,197,94,0.2);
+input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
 }
 
 /* ======================================================
@@ -339,10 +328,13 @@ body.intro {
 /* CARD */
 .card {
   background: var(--card-bg);
-  border-radius: 14px;
-  padding: 24px;
-  margin-bottom: 28px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.2);
+  border-radius: 16px;
+  padding: 20px;
+
+  box-shadow: 
+    0 10px 30px rgba(0,0,0,0.05);
+
+  border: 1px solid var(--border);
 }
 
 .card h2 { margin-bottom: 16px; }
@@ -2359,25 +2351,30 @@ h2 {
   position: fixed;
   top: 20px;
   right: 20px;
+  z-index: 999;
 
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
 
-  border-radius: 12px;
-  border: none;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
 
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(10px);
+
   color: #fff;
-
   font-size: 18px;
   cursor: pointer;
 
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   transition: all 0.2s ease;
 }
 
 .theme-toggle:hover {
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 /* ===== LIGHT MODE ===== */
