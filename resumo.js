@@ -158,7 +158,16 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!resumo) return;
 
   const raw = localStorage.getItem("CONFIG_CADERNO");
-  if (!raw) return;
+   
+   if (!raw || raw === "null") {
+     resumo.innerHTML = `
+       <div class="resumo-card">
+         ⚠️ Nenhum dado encontrado.<br><br>
+         Volte e preencha a configuração antes de acessar o resumo.
+       </div>
+     `;
+     return;
+   }
 
   let dados = {};
 
