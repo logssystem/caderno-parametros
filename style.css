@@ -1518,3 +1518,16 @@ body.light .botao-intro {
 .cursor {
   animation: piscar 1s infinite;
 }
+
+.intro-card {
+  background: #ffffff;
+  color: #0f172a;
+
+  border-radius: 20px;
+  padding: 32px;
+
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.08);
+
+  border: 1px solid #e2e8f0;
+}
