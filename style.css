@@ -1519,54 +1519,58 @@ body.light .botao-intro {
   animation: piscar 1s infinite;
 }
 
-.intro-card {
-  background: #ffffff;
-  color: #0f172a;
+/* ================= INTRO LIGHT FIX FINAL ================= */
 
-  border-radius: 20px;
-  padding: 32px;
-
-  box-shadow:
-    0 20px 40px rgba(0,0,0,0.08);
-
-  border: 1px solid #e2e8f0;
-}
-
-.intro-card button {
-  width: 100%;
-  padding: 14px;
-
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-
-  background: #f8fafc;
-  color: #0f172a;
-
-  transition: all 0.2s ease;
-}
-
-/* hover padrão */
-.intro-card button:hover {
-  background: #e2e8f0;
-}
-
-/* BOTÃO PRINCIPAL (Voz + Chat) */
-.intro-card button.primary {
-  background: linear-gradient(135deg, #10b981, #06b6d4);
-  color: #fff;
-  border: none;
-
-  box-shadow: 0 10px 25px rgba(6,182,212,0.3);
-}
-
-.intro-card button.primary:hover {
-  transform: translateY(-2px);
-}
-
-body.light .intro-wrapper {
+body.light #intro-screen {
   background: radial-gradient(
     circle at center,
     #f1f5f9 0%,
     #e2e8f0 100%
-  );
+  ) !important;
+}
+
+/* CARD PRINCIPAL */
+body.light .nova-intro {
+  background: #ffffff !important;
+  color: #0f172a !important;
+
+  border-radius: 20px;
+  padding: 40px;
+
+  box-shadow: 0 30px 80px rgba(0,0,0,0.12);
+  border: 1px solid #e2e8f0;
+}
+
+/* TEXTOS */
+body.light .titulo-intro {
+  color: #0f172a !important;
+}
+
+body.light .subtitulo-intro {
+  color: #475569 !important;
+}
+
+/* BOTÕES BASE */
+body.light .botao-intro {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+body.light .botao-intro:hover {
+  background: #e2e8f0 !important;
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* BOTÃO PRINCIPAL (VOZ + CHAT) */
+body.light .botao-intro.destaque {
+  background: linear-gradient(135deg, #10b981, #06b6d4) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 15px 40px rgba(6,182,212,0.3);
+}
+
+body.light .botao-intro.destaque:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 20px 50px rgba(6,182,212,0.45);
 }
