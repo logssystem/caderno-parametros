@@ -1897,34 +1897,29 @@ window.adicionarRespostaPesquisa = adicionarRespostaPesquisa;
 /* ================= MODO ESCURO ================= */
 
 (function initTema() {
-  const btn = document.getElementById("toggleTheme");
-  if (!btn) return;
+  const btn = document.querySelector(".theme-toggle");
 
-  // aplica tema salvo
-  const temaSalvo = localStorage.getItem("tema");
-  if (temaSalvo === "dark") {
-    document.body.classList.add("dark");
-    btn.textContent = "☀️";
-  } else {
-    btn.textContent = "🌙";
-  }
+// aplicar tema salvo ao carregar
+const temaSalvo = localStorage.getItem("tema");
 
-  // toggle no clique
-  btn.addEventListener("click", () => {
+if (temaSalvo) {
+  document.body.classList.add(temaSalvo);
+} else {
+  document.body.classList.add("dark"); // padrão
+}
+
+// clique do botão
+btn.addEventListener("click", () => {
   if (document.body.classList.contains("light")) {
     document.body.classList.remove("light");
     document.body.classList.add("dark");
+    localStorage.setItem("tema", "dark");
   } else {
     document.body.classList.remove("dark");
     document.body.classList.add("light");
+    localStorage.setItem("tema", "light");
   }
 });
-
-    const isDark = document.body.classList.contains("dark");
-    localStorage.setItem("tema", isDark ? "dark" : "light");
-    btn.textContent = isDark ? "☀️" : "🌙";
-  });
-})();
 
 // ================= INIT GLOBAL BLINDADO =================
 window.initCaderno = function () {
