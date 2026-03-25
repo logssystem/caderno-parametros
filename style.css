@@ -1531,3 +1531,42 @@ body.light .botao-intro {
 
   border: 1px solid #e2e8f0;
 }
+
+.intro-card button {
+  width: 100%;
+  padding: 14px;
+
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+
+  background: #f8fafc;
+  color: #0f172a;
+
+  transition: all 0.2s ease;
+}
+
+/* hover padrão */
+.intro-card button:hover {
+  background: #e2e8f0;
+}
+
+/* BOTÃO PRINCIPAL (Voz + Chat) */
+.intro-card button.primary {
+  background: linear-gradient(135deg, #10b981, #06b6d4);
+  color: #fff;
+  border: none;
+
+  box-shadow: 0 10px 25px rgba(6,182,212,0.3);
+}
+
+.intro-card button.primary:hover {
+  transform: translateY(-2px);
+}
+
+body.light .intro-wrapper {
+  background: radial-gradient(
+    circle at center,
+    #f1f5f9 0%,
+    #e2e8f0 100%
+  );
+}
