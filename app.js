@@ -1900,24 +1900,29 @@ window.adicionarRespostaPesquisa = adicionarRespostaPesquisa;
 
   const btn = document.querySelector(".theme-toggle");
 
-  // aplicar tema salvo
   const temaSalvo = localStorage.getItem("tema");
 
-  if (temaSalvo) {
-    document.body.classList.add(temaSalvo);
+  if (temaSalvo === "light") {
+    document.body.classList.add("light");
+    if (btn) btn.textContent = "☀️";
   } else {
     document.body.classList.add("dark");
+    if (btn) btn.textContent = "🌙";
   }
 
   if (btn) {
     btn.addEventListener("click", () => {
+
       if (document.body.classList.contains("light")) {
         document.body.classList.replace("light", "dark");
         localStorage.setItem("tema", "dark");
+        btn.textContent = "🌙";
       } else {
         document.body.classList.replace("dark", "light");
         localStorage.setItem("tema", "light");
+        btn.textContent = "☀️";
       }
+
     });
   }
 
