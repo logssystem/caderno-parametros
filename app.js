@@ -1,6 +1,3 @@
-document.addEventListener("DOMContentLoaded", () => {
-  window.initCaderno();
-});
 console.log("APP.JS FINAL – CONSOLIDADO DEFINITIVO (URA + REGRA DE TEMPO + FILA + GRUPO RING + AGENTES)");
 window.addEventListener("error", (e) => {
   console.warn("Erro externo ignorado:", e.message);
@@ -1203,7 +1200,7 @@ function bloquearLetrasRamalRange() {
 document.addEventListener("DOMContentLoaded", bloquearLetrasRamalRange);
 document.addEventListener("contextmenu", e => e.preventDefault());
 document.addEventListener("keydown", e => {
-  if (e.key === "F112") e.preventDefault();
+  if (e.key === "F12") e.preventDefault();
   if (e.ctrlKey && e.shiftKey && e.key === "I") e.preventDefault();
   if (e.ctrlKey && e.shiftKey && e.key === "J") e.preventDefault();
   if (e.ctrlKey && e.key === "U") e.preventDefault();
@@ -1214,7 +1211,8 @@ window.initCaderno = function () {
   const modo = localStorage.getItem("modo_atendimento");
   const cardUsuariosOmni = document.getElementById("cardUsuariosOmni");
   if (cardUsuariosOmni) cardUsuariosOmni.style.display = modo === "chat" ? "block" : "none";
-  mostrarApp(modo);
+  if (typeof mostrarApp === "function") mostrarApp(modo);
+  else if (typeof window.mostrarApp === "function") window.mostrarApp(modo);
   if (modo === "chat" || modo === "ambos") {
     if (typeof window.inicializarChatUI === "function") window.inicializarChatUI();
   }
