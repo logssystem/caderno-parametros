@@ -5,110 +5,69 @@
   <title>Caderno de Parâmetros</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
-
 <body>
-  
+
 <!-- ================= HEADER ================= -->
 <header class="app-header" id="headerApp">
-
   <img src="./assets/image.png" class="app-logo" />
-
   <h1 class="app-title">Caderno de Parâmetros</h1>
-
   <button id="toggleTheme" class="theme-toggle">🌙</button>
-
   <button class="btn-voltar-intro" onclick="resetarIntro()">⬅ Voltar ao início</button>
-
 </header>
 
 <!-- ================= INTRO ================= -->
-  <div id="intro-screen">
-
-  <!-- FUNDO -->
+<div id="intro-screen">
   <div class="background"></div>
-
-  <!-- 🔥 ORBS (AQUI) -->
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
-
-  <!-- CARD -->
   <div class="intro-box nova-intro">
-
     <img src="./assets/image.png" class="logo-intro">
-
     <h1 class="titulo-intro">
       <span id="typing-text"></span><span class="cursor">|</span>
     </h1>
-
     <p class="subtitulo-intro">
       Configure e documente seu ambiente de atendimento de forma simples e profissional.
     </p>
-
     <div class="intro-actions">
-
       <button class="botao-intro" onclick="selecionarModo('voz')">
         📞 Atendimento por Voz
       </button>
-
       <button class="botao-intro" onclick="selecionarModo('chat')">
         💬 Atendimento por Chat
       </button>
-
-     <button class="botao-intro destaque">
-      📞 + 💬 Voz + Chat
-    </button>
-
+      <button class="botao-intro destaque" onclick="selecionarModo('ambos')">
+        📞 + 💬 Voz + Chat
+      </button>
     </div>
-
   </div>
 </div>
 
 <!-- ================= CONTEÚDO ================= -->
 <main id="app-content" class="form-container" style="display:none">
 
-  <button class="btn-duvidas" onclick="toggleDuvidas()">Dúvidas no preenchimento?</button>
-
-  <div id="painelDuvidas" class="painel-duvidas" hidden>
-    <select id="selectDuvida">
-      <option value="">Selecione o assunto</option>
-      <option value="cliente">Dados do Cliente</option>
-      <option value="usuarios">Usuários Web</option>
-      <option value="ramais">Ramais</option>
-      <option value="agentes">Agentes</option>
-      <option value="ura">URA</option>
-      <option value="chat">Chat / Omnichannel</option>
-    </select>
-    <div id="conteudoDuvida"></div>
-  </div>
-
   <!-- ================= DADOS DO CLIENTE ================= -->
   <section class="card">
     <h2>Dados do Cliente</h2>
     <div class="campo-descricao campo-cliente">
-
       <div class="bloco-campo">
         <label>Nome da empresa / cliente</label>
         <input id="empresaCliente" placeholder="Ex: ERA Telecom, Clínica São José">
       </div>
-
       <div class="bloco-campo">
         <label>Domínio do cliente</label>
         <input id="dominioCliente" placeholder="Ex: suporteera.sobreip.com.br">
         <div id="regraDominio"></div>
       </div>
-
       <div class="bloco-campo">
         <label>CNPJ</label>
         <input id="cnpjCliente" placeholder="Ex: 12.345.678/0001-99">
         <div id="regraCNPJ"></div>
       </div>
-
     </div>
   </section>
 
   <!-- ================= VOZ / PBX ================= -->
   <section id="voz-area" style="display:none">
-
     <section class="card">
       <h2>Usuários Web</h2>
       <div class="acoes-card">
@@ -119,7 +78,6 @@
       </div>
       <div id="listaUsuariosWeb"></div>
     </section>
-
     <section class="card">
       <h2>Ramais</h2>
       <div class="acoes-card">
@@ -135,47 +93,39 @@
       </div>
       <div id="listaRings"></div>
     </section>
-
     <section class="card">
       <h2>Agentes</h2>
       <div id="listaAgentes"></div>
       <button class="btn-add" onclick="adicionarCampo('agente')">🔄 Atualizar agentes</button>
     </section>
-
     <section class="card">
       <h2>Números de Entrada</h2>
       <div id="listaEntradas"></div>
       <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
     </section>
-
     <section class="card">
       <h2>Grupo de Ring</h2>
       <div id="listaGrupoRing"></div>
       <button class="btn-add" onclick="adicionarCampo('grupo_ring')">+</button>
     </section>
-
     <section class="card">
       <h2>Filas</h2>
       <div id="listaFilas"></div>
       <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
     </section>
-
     <section class="card">
       <h2>Regras de Tempo</h2>
       <button class="btn-add" onclick="adicionarRegraTempo()">+ Nova regra</button>
       <div id="listaRegrasTempo"></div>
     </section>
-
     <section class="card">
       <h2>URAs</h2>
       <div id="listaURAs"></div>
       <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
     </section>
-
     <section class="card">
       <h2>Pesquisa de Satisfação</h2>
       <button class="btn-add" onclick="togglePesquisaSatisfacao()">+</button>
-
       <div id="pesquisaSatisfacaoConteudo" style="display:none">
         <div class="campo-descricao">
           <input id="pesquisaNome" placeholder="Ex: Pesquisa de Atendimento Telefônico">
@@ -188,7 +138,6 @@
         </div>
       </div>
     </section>
-
     <section class="card">
       <h2>Pausas do Call Center</h2>
       <button class="btn-add" onclick="togglePausas()">+</button>
@@ -200,15 +149,11 @@
         </div>
       </div>
     </section>
-
   </section>
 
   <!-- ================= CHAT ================= -->
   <section id="chat-area" style="display:none">
-
     <section id="modulochat">
-
-      <!-- USUÁRIOS -->
       <section class="card" id="cardUsuariosOmni">
         <h2>Usuários Omnichannel</h2>
         <div class="acoes-card">
@@ -219,24 +164,17 @@
         </div>
         <div id="listaUsuariosChat"></div>
       </section>
-
-      <!-- AGENTES -->
       <section class="card">
         <h2>Agentes Omnichannel</h2>
         <div id="listaAgentesChat"></div>
       </section>
-
-      <!-- DEPARTAMENTOS -->
       <section class="card">
         <h2>Departamentos (Chat)</h2>
         <div id="listaDepartamentosChat"></div>
         <button class="btn-add" onclick="adicionarDepartamentoChat()">+ Adicionar departamento</button>
       </section>
-
-      <!-- CONFIGURAÇÃO -->
       <section class="card">
         <h2>Configuração de Chat</h2>
-
         <div class="chat-section">
           <h3>Tipo de Integração</h3>
           <div class="chat-grid">
@@ -248,39 +186,23 @@
             </div>
           </div>
         </div>
-
-       <div id="api-oficial" class="chat-section" style="display:none">
-        <h3>Fornecedor</h3>
-      
-        <div class="chat-grid">
-      
-          <!-- META -->
-          <div class="chat-card" data-api="meta" onclick="selecionarApi(this,'meta')">
-            <div class="logo-wrapper meta">
-              <img src="./assets/Meta.png" alt="Meta">
+        <div id="api-oficial" class="chat-section" style="display:none">
+          <h3>Fornecedor</h3>
+          <div class="chat-grid">
+            <div class="chat-card" data-api="meta" onclick="selecionarApi(this,'meta')">
+              <div class="logo-wrapper meta"><img src="./assets/Meta.png" alt="Meta"></div>
+              <h4>Meta</h4>
             </div>
-            <h4>Meta</h4>
-          </div>
-      
-          <!-- 360 -->
-          <div class="chat-card" data-api="360" onclick="selecionarApi(this,'360')">
-            <div class="logo-wrapper">
-              <img src="./assets/360.png" alt="360 Dialog">
+            <div class="chat-card" data-api="360" onclick="selecionarApi(this,'360')">
+              <div class="logo-wrapper"><img src="./assets/360.png" alt="360 Dialog"></div>
+              <h4>360 Dialog</h4>
             </div>
-            <h4>360 Dialog</h4>
-          </div>
-      
-          <!-- GUPSHUP -->
-          <div class="chat-card" data-api="gupshup" onclick="selecionarApi(this,'gupshup')">
-            <div class="logo-wrapper">
-              <img src="./assets/gupshup.png" alt="Gupshup">
+            <div class="chat-card" data-api="gupshup" onclick="selecionarApi(this,'gupshup')">
+              <div class="logo-wrapper"><img src="./assets/gupshup.png" alt="Gupshup"></div>
+              <h4>Gupshup</h4>
             </div>
-            <h4>Gupshup</h4>
           </div>
-      
         </div>
-      </div>
-
         <div id="bloco-conta-api" class="chat-section" style="display:none">
           <h3>Conta</h3>
           <div class="chat-grid">
@@ -288,36 +210,21 @@
             <div class="chat-card" data-conta="era" onclick="selecionarConta(this,'era')">ERA</div>
           </div>
         </div>
-
         <div id="chat-canais" class="chat-section" style="display:none">
           <h3>Canais Integrados</h3>
           <div class="chat-grid">
-            <div class="chat-card" data-canal="whatsapp" onclick="toggleCanal(this)">
-              <img src="./assets/whats.png"><h4>WhatsApp</h4>
-            </div>
-            <div class="chat-card" data-canal="instagram" onclick="toggleCanal(this)">
-              <img src="./assets/instagram.png"><h4>Instagram</h4>
-            </div>
-            <div class="chat-card" data-canal="messenger" onclick="toggleCanal(this)">
-              <img src="./assets/messenger.png"><h4>Messenger</h4>
-            </div>
-            <div class="chat-card" data-canal="telegram" onclick="toggleCanal(this)">
-              <img src="./assets/telegram.png"><h4>Telegram</h4>
-            </div>
-            <div class="chat-card" data-canal="email" onclick="toggleCanal(this)">
-              <img src="./assets/email.png"><h4>E-mail</h4>
-            </div>
-            <div class="chat-card" data-canal="google_chat" onclick="toggleCanal(this)">
-              <img src="./assets/google.png"><h4>Google Chat</h4>
-            </div>
+            <div class="chat-card" data-canal="whatsapp"    onclick="toggleCanal(this)"><img src="./assets/whats.png"><h4>WhatsApp</h4></div>
+            <div class="chat-card" data-canal="instagram"   onclick="toggleCanal(this)"><img src="./assets/instagram.png"><h4>Instagram</h4></div>
+            <div class="chat-card" data-canal="messenger"   onclick="toggleCanal(this)"><img src="./assets/messenger.png"><h4>Messenger</h4></div>
+            <div class="chat-card" data-canal="telegram"    onclick="toggleCanal(this)"><img src="./assets/telegram.png"><h4>Telegram</h4></div>
+            <div class="chat-card" data-canal="email"       onclick="toggleCanal(this)"><img src="./assets/email.png"><h4>E-mail</h4></div>
+            <div class="chat-card" data-canal="google_chat" onclick="toggleCanal(this)"><img src="./assets/google.png"><h4>Google Chat</h4></div>
           </div>
         </div>
-
         <div id="chat-qr" class="chat-section" style="display:none">
           <h3>Número WhatsApp</h3>
           <input id="numeroQr" placeholder="Ex: 5511999999999">
         </div>
-
       </section>
     </section>
   </section>
@@ -328,9 +235,34 @@
     <button class="btn-explorar" onclick="salvarConfiguracao()">Salvar</button>
     <pre id="resultado"></pre>
   </section>
-
 </main>
 
+<!-- ================= BOTÃO DÚVIDAS (FLUTUANTE) ================= -->
+<button class="btn-duvidas" onclick="abrirModalDuvidas()">
+  ❓ Dúvidas
+  <span class="badge-ajuda">?</span>
+</button>
+
+<!-- ================= MODAL DÚVIDAS ================= -->
+<div id="modalDuvidasOverlay" class="modal-duvidas-overlay" onclick="fecharModalDuvidasOverlay(event)">
+  <div class="modal-duvidas">
+    <div class="modal-duvidas-header">
+      <h3>❓ Dúvidas no preenchimento</h3>
+      <button class="modal-duvidas-fechar" onclick="fecharModalDuvidas()">✕</button>
+    </div>
+    <div class="modal-duvidas-categorias" id="categoriasDuvida">
+      <!-- gerado pelo JS -->
+    </div>
+    <div class="modal-duvidas-corpo" id="conteudoDuvida">
+      <div class="duvida-placeholder">
+        <span>🗂️</span>
+        Selecione uma categoria acima para ver as dúvidas
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TOAST ================= -->
 <div id="toastGlobal" class="toast">
   <span id="toastMessage"></span>
 </div>
@@ -338,6 +270,5 @@
 <script src="./app.js"></script>
 <script src="./intro.js"></script>
 <script src="./chat.js"></script>
-
 </body>
 </html>
