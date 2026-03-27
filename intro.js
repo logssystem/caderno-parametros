@@ -1,107 +1,71 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <title>Resumo da Configuração</title>
+const introMensagem =
+  "Bem-vindo ao Caderno de Parâmetros da ERA.\n\n" +
+  "Este assistente foi criado para ajudar você a organizar\n" +
+  "e documentar as configurações do seu ambiente de atendimento.\n\n" +
+  "Selecione o tipo de serviço para continuar.";
+let pos = 0;
+let digitando = false;
 
-  <link rel="stylesheet" href="./style.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-</head>
+/* ================= INTRO ================= */
+function iniciarIntro() {
+  const el = document.getElementById("typing-text");
+  if (!el || digitando) return;
+  el.innerHTML = "";
+  pos = 0;
+  digitando = true;
+  (function digitar() {
+    if (pos >= introMensagem.length) { digitando = false; return; }
+    el.innerHTML += introMensagem[pos] === "\n" ? "<br>" : introMensagem[pos];
+    pos++;
+    setTimeout(digitar, 30);
+  })();
+}
+function mostrarIntro() {
+  const intro = document.getElementById("intro-screen");
+  const app   = document.getElementById("app-content");
+  document.body.classList.add("intro");
+  if (intro) intro.style.display = "flex";
+  if (app)   app.style.display   = "none";
+  iniciarIntro();
+}
+function mostrarApp(modo) {
+  const intro = document.getElementById("intro-screen");
+  const app   = document.getElementById("app-content");
+  const voz   = document.getElementById("voz-area");
+  const chat  = document.getElementById("chat-area");
+  document.body.classList.remove("intro");
+  if (intro) intro.style.display = "none";
+  if (app)   app.style.display   = "block";
+  if (voz)   voz.style.display   = "none";
+  if (chat)  chat.style.display  = "none";
+  if (modo === "voz"  || modo === "ambos") if (voz)  voz.style.display  = "block";
+  if (modo === "chat" || modo === "ambos") if (chat) chat.style.display = "block";
+}
 
-<body>
+/* ================= AÇÕES ================= */
+window.mostrarApp = mostrarApp;
+window.selecionarModo = modo => {
+  localStorage.setItem("modo_atendimento", modo);
+  mostrarApp(modo);
+};
+window.resetarIntro = () => {
+  localStorage.removeItem("modo_atendimento");
+  delete window.chatState;
+  document.body.classList.add("intro");
+  const voz   = document.getElementById("voz-area");
+  const chat  = document.getElementById("chat-area");
+  const app   = document.getElementById("app-content");
+  const intro = document.getElementById("intro-screen");
+  if (voz)   voz.style.display   = "none";
+  if (chat)  chat.style.display  = "none";
+  if (app)   app.style.display   = "none";
+  if (intro) intro.style.display = "flex";
+  iniciarIntro();
+};
 
-<!-- ================= FUNDO ANIMADO ERA ================= -->
-<canvas id="era-bg-canvas"></canvas>
-<div class="era-orb era-orb-1"></div>
-<div class="era-orb era-orb-2"></div>
-<div class="era-orb era-orb-3"></div>
-<div class="era-orb era-orb-4"></div>
-
-  <!-- ================= HEADER ================= -->
-    <header class="app-header resumo-header">
-  
-    <div class="header-left">
-      <img src="./assets/image.png" class="app-logo" />
-    </div>
-  
-    <div class="header-center">
-      <h1 class="app-title">Resumo da Configuração</h1>
-    </div>
-  
-    <div class="header-right">
-      <button id="toggleTheme" class="theme-toggle">🌙</button>
-      <button class="btn-voltar-intro" onclick="voltar()">
-        ← Voltar ao início
-      </button>
-    </div>
-  
-  </header>
-
-  <!-- ================= CONTEÚDO ================= -->
-  <main id="resumo" class="form-container"></main>
-
-
-  <!-- ================= BOTÃO FINAL ================= -->
-  <div class="acoes-resumo">
-    <button onclick="confirmarConfiguracao()" class="btn-salvar">
-      Confirmar Configuração
-    </button>
-  </div>
-
-
-  <!-- ================= LIBS ================= -->
-
-  <!-- jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <!-- AutoTable (tabelas bonitas) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-
-
-  <!-- ================= SEU JS ================= -->
-  <script src="./resumo.js"></script>
-
-
-<script>
-/* ===== PARTÍCULAS ERA – CANVAS ===== */
-(function() {
-  const canvas = document.getElementById("era-bg-canvas");
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  let W, H, particles = [];
-  const LIME = [206,255,0], SLATE = [43,54,61], COUNT = 38;
-  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-  function mkParticle() {
-    const isLime = Math.random() > 0.35, rgb = isLime ? LIME : SLATE;
-    return { x: Math.random()*W, y: H + Math.random()*100, r: Math.random()*2.2+0.5,
-             speed: Math.random()*0.5+0.18, drift: (Math.random()-0.5)*0.35,
-             alpha: Math.random()*0.5+0.15, rgb, life: 0, maxLife: Math.random()*300+160 };
-  }
-  function init() {
-    particles = [];
-    for (let i=0;i<COUNT;i++) { const p=mkParticle(); p.y=Math.random()*H; p.life=Math.random()*p.maxLife; particles.push(p); }
-  }
-  function draw() {
-    ctx.clearRect(0,0,W,H);
-    particles.forEach((p,i) => {
-      p.y -= p.speed; p.x += p.drift; p.life++;
-      const t=p.life/p.maxLife, fade=t<0.15?t/0.15:t>0.85?(1-t)/0.15:1, alpha=p.alpha*fade;
-      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(${p.rgb[0]},${p.rgb[1]},${p.rgb[2]},${alpha})`; ctx.fill();
-      if (p.rgb===LIME && p.r>1.4) {
-        ctx.beginPath(); ctx.arc(p.x,p.y,p.r*2.5,0,Math.PI*2);
-        ctx.fillStyle=`rgba(206,255,0,${alpha*0.12})`; ctx.fill();
-      }
-      if (p.life>=p.maxLife) particles[i]=mkParticle();
-    });
-    requestAnimationFrame(draw);
-  }
-  window.addEventListener("resize",()=>{resize();init();});
-  resize(); init(); draw();
-})();
-</script>
-
-</body>
-</html>
+/* ================= INIT ================= */
+document.addEventListener("DOMContentLoaded", () => {
+  const modo = localStorage.getItem("modo_atendimento");
+  if (modo === "voz" || modo === "chat" || modo === "ambos") mostrarApp(modo);
+  else mostrarIntro();
+});
