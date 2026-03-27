@@ -350,3 +350,12 @@ window.importarUsuariosChat = window.acionarImportacaoUsuariosChat;
 window.processarCSVUsuariosChat = processarCSVUsuariosChat;
 
 console.log("✅ Chat.js carregado e consistente");
+/* =====================================================
+   INICIALIZAÇÃO – chamada pelo initCaderno
+   ===================================================== */
+window.inicializarChatUI = function () {
+  // Força atualização dos agentes chat a partir das duas fontes
+  if (typeof gerarAgentesChatAPartirUsuarios === "function") {
+    gerarAgentesChatAPartirUsuarios();
+  }
+};
