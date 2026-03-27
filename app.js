@@ -776,46 +776,66 @@ function criarOpcaoURA() {
 function gerarAgentesAPartirUsuarios() {
     const listaAgentes = document.getElementById("listaAgentes");
     if (!listaAgentes) return;
-    const ramaisSalvos = {};
+
+    // Salva ramal E multiskill de cada agente antes de recriar
+    const estadoSalvo = {};
     listaAgentes.querySelectorAll(".campo-descricao").forEach(a => {
-        const nome  = a.querySelector(".campo-nome")?.value;
-        const ramal = a.getRamal ? a.getRamal() : "";
-        if (nome && ramal) ramaisSalvos[nome] = ramal;
+        const nome = a.querySelector(".campo-nome")?.value;
+        if (!nome) return;
+        estadoSalvo[nome] = {
+            ramal:      a.getRamal     ? a.getRamal()     : "",
+            multiskill: a.isMultiskill ? a.isMultiskill() : false,
+        };
     });
+
     listaAgentes.innerHTML = "";
+
     document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
-        if (u.isAgente && u.isAgente() && u.getNome()) {
-            const wrap = document.createElement("div");
-            wrap.className = "campo-descricao";
-            const linha = document.createElement("div");
-            linha.className = "linha-principal";
-            const nome = document.createElement("input");
-            nome.value = u.getNome();
-            nome.disabled = true;
-            nome.className = "campo-nome";
-            linha.append(nome);
-            wrap.append(linha);
-            const selectRamal = document.createElement("select");
-            selectRamal.innerHTML = `<option value="">Ramal (obrigatório)</option>`;
-            document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
-                if (r.getNome()) selectRamal.add(new Option(r.getNome(), r.getNome()));
-            });
-            if (ramaisSalvos[u.getNome()]) selectRamal.value = ramaisSalvos[u.getNome()];
-            wrap.append(selectRamal);
-            const btnMultiskill = document.createElement("button");
-            btnMultiskill.textContent = "Multiskill";
-            btnMultiskill.className = "btn-multiskill";
-            btnMultiskill.dataset.ativo = "false";
-            btnMultiskill.onclick = () => {
-                const ativo = btnMultiskill.dataset.ativo === "true";
-                btnMultiskill.dataset.ativo = (!ativo).toString();
-                btnMultiskill.classList.toggle("ativo", !ativo);
-            };
-            wrap.append(btnMultiskill);
-            wrap.isMultiskill = () => btnMultiskill.dataset.ativo === "true";
-            wrap.getRamal     = () => selectRamal.value;
-            listaAgentes.append(wrap);
-        }
+        if (!u.isAgente || !u.isAgente() || !u.getNome()) return;
+
+        const wrap = document.createElement("div");
+        wrap.className = "campo-descricao";
+
+        const linha = document.createElement("div");
+        linha.className = "linha-principal";
+        const nomeInput = document.createElement("input");
+        nomeInput.value    = u.getNome();
+        nomeInput.disabled = true;
+        nomeInput.className = "campo-nome";
+        linha.append(nomeInput);
+        wrap.append(linha);
+
+        // Select de ramal
+        const selectRamal = document.createElement("select");
+        selectRamal.innerHTML = `<option value="">Ramal (obrigatório)</option>`;
+        document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
+            if (r.getNome()) selectRamal.add(new Option(r.getNome(), r.getNome()));
+        });
+
+        // Restaura ramal salvo
+        const salvo = estadoSalvo[u.getNome()];
+        if (salvo?.ramal) selectRamal.value = salvo.ramal;
+        wrap.append(selectRamal);
+
+        // Botão multiskill
+        const btnMultiskill = document.createElement("button");
+        btnMultiskill.textContent    = "Multiskill";
+        btnMultiskill.className      = "btn-multiskill";
+        // Restaura estado multiskill salvo
+        const multiskillAtivo = salvo?.multiskill === true;
+        btnMultiskill.dataset.ativo  = multiskillAtivo.toString();
+        if (multiskillAtivo) btnMultiskill.classList.add("ativo");
+
+        btnMultiskill.onclick = () => {
+            const ativo = btnMultiskill.dataset.ativo === "true";
+            btnMultiskill.dataset.ativo = (!ativo).toString();
+            btnMultiskill.classList.toggle("ativo", !ativo);
+        };
+        wrap.append(btnMultiskill);
+
+        wrap.isMultiskill = () => btnMultiskill.dataset.ativo === "true";
+        wrap.getRamal     = () => selectRamal.value;
+        listaAgentes.append(wrap);
     });
 }
 function gerarAgentesChatAPartirUsuarios() {
