@@ -526,16 +526,31 @@ function criarCampo(tipo) {
         msg.placeholder = "Mensagem da URA Ex: Olá seja bem-vindo...";
         msg.style.marginTop = "12px";
         wrap.append(msg);
-        const titulo = document.createElement("h4");
-        titulo.textContent = "Opções da URA";
-        titulo.style.marginTop = "12px";
-        wrap.append(titulo);
+        const secOpcoes = document.createElement("div");
+        secOpcoes.style.marginTop = "14px";
+
+        const titulo = document.createElement("div");
+        titulo.innerHTML = "⌨️ <strong>Opções da URA</strong>";
+        titulo.style.cssText = "font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-soft)";
+        secOpcoes.append(titulo);
+
+        // Header das colunas
+        const hdr = document.createElement("div");
+        hdr.className = "ura-opcoes-header";
+        hdr.innerHTML = "<span>Tecla</span><span>Destino</span><span>Descrição</span><span></span>";
+        secOpcoes.append(hdr);
+
         const listaOpcoes = document.createElement("div");
-        wrap.append(listaOpcoes);
+        secOpcoes.append(listaOpcoes);
+
         const btnNova = document.createElement("button");
-        btnNova.textContent = "+ Nova opção";
+        btnNova.innerHTML = "+ Nova opção";
+        btnNova.style.cssText = "width:100%;margin-top:6px;padding:8px;border-radius:8px;border:1px dashed rgba(206,255,0,0.25);background:rgba(206,255,0,0.03);color:rgba(206,255,0,0.7);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.18s";
+        btnNova.onmouseover = () => { btnNova.style.background="rgba(206,255,0,0.08)"; btnNova.style.borderColor="#CEFF00"; btnNova.style.color="#CEFF00"; };
+        btnNova.onmouseout  = () => { btnNova.style.background="rgba(206,255,0,0.03)"; btnNova.style.borderColor="rgba(206,255,0,0.25)"; btnNova.style.color="rgba(206,255,0,0.7)"; };
         btnNova.onclick = () => listaOpcoes.appendChild(criarOpcaoURA());
-        wrap.append(btnNova);
+        secOpcoes.append(btnNova);
+        wrap.append(secOpcoes);
     }
     /* ===== FILA ===== */
     if (tipo === "fila") {
@@ -645,16 +660,35 @@ function criarCampo(tipo) {
 /* ================= OPÇÃO URA ================= */
 function criarOpcaoURA() {
     const wrap = document.createElement("div");
-    wrap.className = "opcao-ura";
-    const tecla   = document.createElement("input");
+    wrap.className = "opcao-ura-row";
+
+    // Número da tecla (pequeno)
+    const tecla = document.createElement("input");
     tecla.placeholder = "Tecla";
+    tecla.className = "ura-tecla";
+    tecla.maxLength = 2;
+
+    // Select de destino
     const destino = document.createElement("select");
+    destino.className = "ura-destino";
     atualizarDestinosURA(destino);
+
+    // Descrição
     const desc = document.createElement("input");
-    desc.placeholder = "Descrição";
+    desc.placeholder = "Descrição (ex: Suporte, Financeiro)";
+    desc.className = "ura-desc";
+
+    // Botão remover
     const del = document.createElement("button");
-    del.textContent = "🗑";
-    del.onclick = () => wrap.remove();
+    del.innerHTML = "✕";
+    del.className = "ura-del";
+    del.title = "Remover opção";
+    del.onclick = () => {
+        wrap.style.opacity = "0";
+        wrap.style.transform = "translateX(8px)";
+        setTimeout(() => wrap.remove(), 180);
+    };
+
     wrap.append(tecla, destino, desc, del);
     return wrap;
 }
@@ -766,47 +800,148 @@ window.adicionarRegraTempo = function () {
     atualizarTodosDestinosURA();
     syncTudo();
 };
+function criarFaixaHoraria() {
+    const row = document.createElement("div");
+    row.className = "faixa-horaria-row";
+
+    const label = document.createElement("span");
+    label.className = "faixa-label";
+    label.textContent = "Das";
+
+    const inicio = document.createElement("input");
+    inicio.type = "time";
+    inicio.className = "faixa-time";
+
+    const sep = document.createElement("span");
+    sep.className = "faixa-sep";
+    sep.textContent = "às";
+
+    const fim = document.createElement("input");
+    fim.type = "time";
+    fim.className = "faixa-time";
+
+    const del = document.createElement("button");
+    del.innerHTML = "✕";
+    del.className = "faixa-del";
+    del.title = "Remover horário";
+    del.onclick = () => {
+        if (row.parentElement.querySelectorAll(".faixa-horaria-row").length <= 1) return;
+        row.style.opacity = "0";
+        setTimeout(() => row.remove(), 180);
+    };
+
+    row.append(label, inicio, sep, fim, del);
+    row.getHorario = () => ({ inicio: inicio.value, fim: fim.value });
+    return row;
+}
+
 function criarRegraTempo() {
     const wrap = document.createElement("div");
-    wrap.className = "campo-descricao";
+    wrap.className = "campo-descricao regra-tempo-card";
+
+    // Cabeçalho
     const linhaTopo = document.createElement("div");
     linhaTopo.className = "linha-principal";
     const nome = document.createElement("input");
-    nome.placeholder = "Nome da regra de tempo";
-    const btn = document.createElement("button");
-    btn.textContent = "✖";
-    btn.onclick = () => wrap.remove();
-    linhaTopo.append(nome, btn);
+    nome.placeholder = "Nome da regra (ex: Horário Comercial)";
+    nome.className = "campo-nome";
+    const btnDel = document.createElement("button");
+    btnDel.innerHTML = "✕";
+    btnDel.className = "btn-del-regra";
+    btnDel.onclick = () => {
+        wrap.style.opacity = "0";
+        wrap.style.transform = "translateY(-4px)";
+        setTimeout(() => { wrap.remove(); atualizarTodosDestinosURA(); }, 180);
+    };
+    linhaTopo.append(nome, btnDel);
     wrap.append(linhaTopo);
-    const diasSemana     = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+
+    // Dias da semana
+    const diasSemana = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+    const diasCompletos = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
     const diasSelecionados = new Set();
     const diasBox = document.createElement("div");
-    diasBox.style.cssText = "display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;";
-    diasSemana.forEach(dia => {
+    diasBox.className = "dias-semana-box";
+
+    diasSemana.forEach((dia, idx) => {
         const btnDia = document.createElement("button");
         btnDia.textContent = dia;
         btnDia.className = "btn-dia";
+        btnDia.title = diasCompletos[idx];
+        btnDia.type = "button";
         btnDia.onclick = () => {
             btnDia.classList.toggle("ativo");
-            btnDia.classList.contains("ativo") ? diasSelecionados.add(dia) : diasSelecionados.delete(dia);
+            const diaCompleto = diasCompletos[idx];
+            btnDia.classList.contains("ativo")
+                ? diasSelecionados.add(diaCompleto)
+                : diasSelecionados.delete(diaCompleto);
         };
         diasBox.appendChild(btnDia);
     });
-    wrap.appendChild(diasBox);
-    const horarios = document.createElement("div");
-    horarios.style.cssText = "display:flex;gap:10px;margin-top:10px;";
-    const inicio = document.createElement("input");
-    inicio.type = "time";
-    const fim = document.createElement("input");
-    fim.type = "time";
-    horarios.append(inicio, fim);
-    wrap.append(horarios);
-    wrap.getData = () => ({
-        nome:        nome.value,
-        dias:        [...diasSelecionados],
-        hora_inicio: inicio.value,
-        hora_fim:    fim.value
+
+    // Atalhos rápidos
+    const atalhos = document.createElement("div");
+    atalhos.className = "dias-atalhos";
+    const atalhosList = [
+        { label: "Seg–Sex", dias: ["Segunda","Terça","Quarta","Quinta","Sexta"] },
+        { label: "Seg–Sáb", dias: ["Segunda","Terça","Quarta","Quinta","Sexta","Sábado"] },
+        { label: "Todos",   dias: ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"] },
+        { label: "Limpar",  dias: [] },
+    ];
+    atalhosList.forEach(a => {
+        const btn = document.createElement("button");
+        btn.textContent = a.label;
+        btn.className = "btn-atalho-dia";
+        btn.type = "button";
+        btn.onclick = () => {
+            diasSelecionados.clear();
+            diasBox.querySelectorAll(".btn-dia").forEach((b, i) => {
+                const dc = diasCompletos[i];
+                if (a.dias.includes(dc)) { b.classList.add("ativo"); diasSelecionados.add(dc); }
+                else b.classList.remove("ativo");
+            });
+        };
+        atalhos.appendChild(btn);
     });
+
+    wrap.append(diasBox, atalhos);
+
+    // Faixas de horário
+    const faixasLabel = document.createElement("div");
+    faixasLabel.className = "faixas-titulo";
+    faixasLabel.innerHTML = "🕐 Faixas de horário";
+
+    const faixasContainer = document.createElement("div");
+    faixasContainer.className = "faixas-container";
+    faixasContainer.appendChild(criarFaixaHoraria());
+
+    const btnAddFaixa = document.createElement("button");
+    btnAddFaixa.className = "btn-add-faixa";
+    btnAddFaixa.type = "button";
+    btnAddFaixa.innerHTML = "+ Adicionar faixa de horário";
+    btnAddFaixa.onclick = () => faixasContainer.appendChild(criarFaixaHoraria());
+
+    wrap.append(faixasLabel, faixasContainer, btnAddFaixa);
+
+    // getData retorna múltiplas faixas
+    wrap.getData = () => {
+        const faixas = [];
+        faixasContainer.querySelectorAll(".faixa-horaria-row").forEach(r => {
+            if (r.getHorario) {
+                const h = r.getHorario();
+                if (h.inicio || h.fim) faixas.push(h);
+            }
+        });
+        // Compatibilidade: hora_inicio/hora_fim = primeira faixa
+        const primeira = faixas[0] || {};
+        return {
+            nome:        nome.value,
+            dias:        [...diasSelecionados],
+            hora_inicio: primeira.inicio || "",
+            hora_fim:    primeira.fim    || "",
+            faixas:      faixas,
+        };
+    };
     return wrap;
 }
 /* ================= RANGE RAMAIS ================= */
@@ -869,9 +1004,12 @@ function coletarURAs() {
     const nome     = ura.querySelector(".campo-nome")?.value || "";
     const mensagem = ura.querySelector("textarea")?.value    || "";
     const opcoes   = [];
-    ura.querySelectorAll(".opcao-ura").forEach(o => {
-      const inputs = o.querySelectorAll("input");
-      opcoes.push({ tecla: inputs[0]?.value || "", destino: o.querySelector("select")?.value || "", descricao: inputs[1]?.value || "" });
+    // Suporta tanto .opcao-ura-row (novo) quanto .opcao-ura (legado)
+    ura.querySelectorAll(".opcao-ura-row, .opcao-ura").forEach(o => {
+      const tecla   = o.querySelector(".ura-tecla,   input:first-child")?.value   || "";
+      const destino = o.querySelector(".ura-destino, select")?.value               || "";
+      const descricao = o.querySelector(".ura-desc, input:last-of-type")?.value   || "";
+      if (tecla || destino) opcoes.push({ tecla, destino, descricao });
     });
     if (nome) uras.push({ nome, mensagem, opcoes });
   });
