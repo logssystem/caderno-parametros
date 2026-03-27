@@ -545,9 +545,8 @@ function criarCampo(tipo) {
 
         const btnNova = document.createElement("button");
         btnNova.innerHTML = "+ Nova opção";
-        btnNova.style.cssText = "width:100%;margin-top:6px;padding:8px;border-radius:8px;border:1px dashed rgba(206,255,0,0.25);background:rgba(206,255,0,0.03);color:rgba(206,255,0,0.7);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.18s";
-        btnNova.onmouseover = () => { btnNova.style.background="rgba(206,255,0,0.08)"; btnNova.style.borderColor="#CEFF00"; btnNova.style.color="#CEFF00"; };
-        btnNova.onmouseout  = () => { btnNova.style.background="rgba(206,255,0,0.03)"; btnNova.style.borderColor="rgba(206,255,0,0.25)"; btnNova.style.color="rgba(206,255,0,0.7)"; };
+        btnNova.className = "btn-add-faixa";
+        btnNova.style.cssText = "";
         btnNova.onclick = () => listaOpcoes.appendChild(criarOpcaoURA());
         secOpcoes.append(btnNova);
         wrap.append(secOpcoes);
