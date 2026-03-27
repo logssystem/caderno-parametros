@@ -1154,13 +1154,28 @@ function coletarEntradas() {
 /* ================= CHAT – COLETA FINAL ================= */
 window.coletarChatDoDOM = function () {
   const numeroQr = document.getElementById("numeroQr");
+  const tiposAtivos = window._tiposAtivos || new Set();
+
+  // Conta: API usa chatState.conta, QR usa o input
+  let contaApi = window.chatState?.conta || null;
+  let contaQr  = (numeroQr && numeroQr.value.trim()) ? numeroQr.value.trim() : null;
+
+  // Define conta final baseada nos tipos ativos
   let contaFinal = null;
-  if (numeroQr && numeroQr.value.trim()) contaFinal = numeroQr.value.trim();
-  else if (window.chatState?.conta)       contaFinal = window.chatState.conta;
+  if (tiposAtivos.has("api") && tiposAtivos.has("qr")) {
+    // Ambos: salva objeto com as duas contas
+    contaFinal = { api: contaApi, qr: contaQr };
+  } else if (tiposAtivos.has("qr")) {
+    contaFinal = contaQr;
+  } else {
+    contaFinal = contaApi;
+  }
+
   const chat = {
     tipo:          window.chatState?.tipo  || null,
     api:           window.chatState?.api   || null,
     conta:         contaFinal,
+    numero_qr:     contaQr,
     canais:        window.chatState?.canais || [],
     usuarios:      [],
     agentes:       [],
@@ -1342,21 +1357,55 @@ window.explorar = function () {
   }
 };
 /* ================= CHAT – TIPO / API / CONTA / CANAL ================= */
-window.selecionarTipoChat = function (el, tipo) {
+/* ── Tipos ativos: Set que pode ter "api", "qr" ou ambos ── */
+window._tiposAtivos = window._tiposAtivos || new Set();
+
+function _atualizarBlocosTipo() {
+  const s     = window._tiposAtivos;
+  const apiBox = document.getElementById("api-oficial");
+  const qrBox  = document.getElementById("chat-qr");
+
+  if (apiBox) apiBox.style.display = s.has("api") ? "block" : "none";
+  if (qrBox)  qrBox.style.display  = s.has("qr")  ? "block" : "none";
+
+  // Atualiza chatState.tipo
   window.chatState = window.chatState || {};
-  window.chatState.tipo = tipo;
-  document.querySelectorAll(".tipo-chat .chat-card").forEach(c => c.classList.remove("active"));
-  if (el) el.classList.add("active");
-  const numeroQr = document.getElementById("numeroQr");
-  if (numeroQr && numeroQr.value) window.chatState.conta = numeroQr.value;
-  const apiBox    = document.getElementById("api-oficial");
-  const qrBox     = document.getElementById("chat-qr");
-  const blocoConta = document.getElementById("bloco-conta-api");
-  const canais    = document.getElementById("chat-canais");
-  if (apiBox)     apiBox.style.display     = tipo === "api" ? "block" : "none";
-  if (qrBox)      qrBox.style.display      = tipo === "qr"  ? "block" : "none";
-  if (blocoConta) blocoConta.style.display = "none";
-  if (canais)     canais.style.display     = "none";
+  if (s.has("api") && s.has("qr")) window.chatState.tipo = "ambos";
+  else if (s.has("api"))            window.chatState.tipo = "api";
+  else if (s.has("qr"))             window.chatState.tipo = "qr";
+  else                              window.chatState.tipo = null;
+
+  // Se API foi removida, esconde fornecedor/conta/canais
+  if (!s.has("api")) {
+    const bc = document.getElementById("bloco-conta-api");
+    const ca = document.getElementById("chat-canais");
+    if (bc) bc.style.display = "none";
+    if (ca) ca.style.display = "none";
+  }
+
+  atualizarModuloChat();
+}
+
+window.toggleTipoChat = function (el, tipo) {
+  window.chatState = window.chatState || {};
+  window._tiposAtivos = window._tiposAtivos || new Set();
+
+  if (window._tiposAtivos.has(tipo)) {
+    // Deselecionar
+    window._tiposAtivos.delete(tipo);
+    if (el) el.classList.remove("active");
+  } else {
+    // Selecionar
+    window._tiposAtivos.add(tipo);
+    if (el) el.classList.add("active");
+  }
+
+  _atualizarBlocosTipo();
+};
+
+/* Compatibilidade com chamadas antigas */
+window.selecionarTipoChat = function (el, tipo) {
+  window.toggleTipoChat(el, tipo);
 };
 document.addEventListener("DOMContentLoaded", () => {
   const numeroQr = document.getElementById("numeroQr");
@@ -1404,7 +1453,8 @@ function salvarConfiguracao() {
 function atualizarModuloChat() {
     const moduloChat = document.getElementById("modulochat");
     if (!moduloChat) return;
-    const temChat = window.chatState?.tipo === "api" || window.chatState?.tipo === "qr";
+    const tipo = window.chatState?.tipo;
+    const temChat = tipo === "api" || tipo === "qr" || tipo === "ambos";
     moduloChat.style.display = temChat ? "block" : "none";
 }
 document.addEventListener("DOMContentLoaded", () => {
@@ -1465,18 +1515,24 @@ document.addEventListener("keydown", e => {
 window.initCaderno = function () {
   window.chatState = window.chatState || { tipo: null, api: null, conta: null, canais: [], usuarios: [], agentes: [], departamentos: [] };
   const modo = localStorage.getItem("modo_atendimento");
+  const modoValido = modo === "voz" || modo === "chat" || modo === "ambos";
+
+  // Só interfere na exibição se o modo estiver definido
+  // Se não tiver modo, intro.js já cuida de mostrar a tela de início
+  if (!modoValido) return;
+
   const cardUsuariosOmni = document.getElementById("cardUsuariosOmni");
   if (cardUsuariosOmni) cardUsuariosOmni.style.display = modo === "chat" ? "block" : "none";
-  if (typeof mostrarApp === "function") mostrarApp(modo);
-  else if (typeof window.mostrarApp === "function") window.mostrarApp(modo);
 
-  // Aguarda DOM estar estável antes de inicializar chat e sincronizar
+  const fn = typeof mostrarApp === "function" ? mostrarApp : window.mostrarApp;
+  if (fn) fn(modo);
+
+  // Aguarda DOM estável antes de inicializar chat e sincronizar
   setTimeout(() => {
     if (modo === "chat" || modo === "ambos") {
       if (typeof window.inicializarChatUI === "function") window.inicializarChatUI();
     }
     syncTudo();
-    // Segunda passada para garantir que agentes chat carregam
     if (modo === "chat" || modo === "ambos") {
       setTimeout(gerarAgentesChatAPartirUsuarios, 150);
     }
