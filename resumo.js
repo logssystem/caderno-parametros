@@ -76,21 +76,489 @@ window.renderResumoChat = function (container, data) {
 /* ======================================================
    RESUMO – PRINCIPAL
 ====================================================== */
-document.addEventListener("DOMContentLoaded", () => {
+/* ======================================================
+   ESTADO GLOBAL DO RESUMO
+====================================================== */
+let _dadosResumo   = {};
+let _modoCompacto  = false;
+let _paginasState  = {}; // { secaoId: paginaAtual }
+const PAGE_SIZE    = 9;
+
+/* ── Modo compacto / completo ── */
+window.toggleModoResumo = function () {
+  _modoCompacto = !_modoCompacto;
+  const btn   = document.getElementById("btnModoResumo");
+  const label = btn?.querySelector(".modo-label");
+  const icone = btn?.querySelector(".modo-icone");
+  if (label) label.textContent = _modoCompacto ? "Compacto" : "Completo";
+  if (icone) icone.textContent = _modoCompacto ? "🗂️" : "📋";
+  document.querySelectorAll(".campo-sensivel").forEach(el => {
+    el.style.display = _modoCompacto ? "none" : "";
+  });
+  document.querySelectorAll(".resumo-card").forEach(card => {
+    card.classList.toggle("modo-compacto", _modoCompacto);
+  });
+};
+
+/* ── Copiar para clipboard ── */
+window.copiarCampo = function (texto, btn) {
+  navigator.clipboard.writeText(texto).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = "✓";
+    btn.classList.add("copiado");
+    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove("copiado"); }, 1500);
+  }).catch(() => {
+    const ta = document.createElement("textarea");
+    ta.value = texto;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    btn.innerHTML = "✓";
+    setTimeout(() => { btn.innerHTML = "⧉"; }, 1200);
+  });
+};
+
+function btnCopiar(texto) {
+  if (!texto || texto === "-" || texto === "—") return "";
+  const safe = texto.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  return `<button class="btn-copiar" onclick="copiarCampo('${safe}', this)" title="Copiar">⧉</button>`;
+}
+
+function campoCopia(label, valor, sensivel = false) {
+  const cls = sensivel ? ' class="campo-sensivel"' : "";
+  return `<div${cls}><strong>${label}:</strong> <span>${valor || "—"}</span>${btnCopiar(valor)}</div>`;
+}
+
+/* ── Busca ── */
+window.limparBusca = function () {
+  const inp = document.getElementById("resumoBusca");
+  if (inp) { inp.value = ""; inp.dispatchEvent(new Event("input")); }
+};
+
+function initBusca() {
+  const inp   = document.getElementById("resumoBusca");
+  const clear = document.getElementById("btnClearBusca");
+  if (!inp) return;
+  inp.addEventListener("input", () => {
+    const q = inp.value.trim().toLowerCase();
+    if (clear) clear.style.display = q ? "block" : "none";
+    document.querySelectorAll(".resumo-card").forEach(card => {
+      const txt = card.textContent.toLowerCase();
+      card.style.display = (!q || txt.includes(q)) ? "" : "none";
+    });
+    // Mostra seções que têm resultados
+    document.querySelectorAll(".resumo-bloco").forEach(bloco => {
+      if (bloco.classList.contains("modulo-titulo")) return;
+      const cards = bloco.querySelectorAll(".resumo-card");
+      const visivel = [...cards].some(c => c.style.display !== "none");
+      bloco.style.display = (!q || visivel) ? "" : "none";
+    });
+  });
+}
+
+/* ── Paginação ── */
+function renderPaginado(itens, secaoId, renderFn) {
+  if (!_paginasState[secaoId]) _paginasState[secaoId] = 1;
+  const total  = Math.ceil(itens.length / PAGE_SIZE);
+  const pagina = Math.min(_paginasState[secaoId], total);
+  const slice  = itens.slice((pagina - 1) * PAGE_SIZE, pagina * PAGE_SIZE);
+
+  let html = `<div class="resumo-grid">${slice.map(renderFn).join("")}</div>`;
+
+  if (total > 1) {
+    html += `<div class="paginacao">`;
+    if (pagina > 1)
+      html += `<button class="btn-pag" onclick="irPagina('${secaoId}',${pagina - 1})">‹ Ant.</button>`;
+    html += `<span class="pag-info">Pág. ${pagina} / ${total} <span class="pag-total">(${itens.length} itens)</span></span>`;
+    if (pagina < total)
+      html += `<button class="btn-pag" onclick="irPagina('${secaoId}',${pagina + 1})">Próx. ›</button>`;
+    html += `</div>`;
+  }
+  return html;
+}
+
+window.irPagina = function (secaoId, pagina) {
+  _paginasState[secaoId] = pagina;
+  renderResumoCompleto();
+  // Rola para a seção
+  setTimeout(() => {
+    const el = document.getElementById(secaoId);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 60);
+};
+
+/* ── Sidebar nav ── */
+function buildNav(secoes) {
+  const lista = document.getElementById("navLista");
+  if (!lista) return;
+  lista.innerHTML = secoes.map(s =>
+    `<li><a class="nav-link" href="#${s.id}" onclick="navClick('${s.id}',event)">
+      <span class="nav-icone">${s.icone}</span>
+      <span class="nav-nome">${s.nome}</span>
+      ${s.count ? `<span class="nav-badge">${s.count}</span>` : ""}
+    </a></li>`
+  ).join("");
+
+  // Observer para destacar seção ativa
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        document.querySelectorAll(".nav-link").forEach(l => {
+          l.classList.toggle("ativo", l.getAttribute("href") === `#${id}`);
+        });
+      }
+    });
+  }, { rootMargin: "-30% 0px -60% 0px" });
+
+  secoes.forEach(s => {
+    const el = document.getElementById(s.id);
+    if (el) observer.observe(el);
+  });
+}
+
+window.navClick = function (id, e) {
+  e.preventDefault();
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
+/* ── Alertas ── */
+function buildAlertas(dados) {
+  const voz  = dados.voz  || {};
+  const alertas = [];
+
+  // Agentes sem ramal
+  (voz.agentes || []).forEach(a => {
+    if (!a.ramal) alertas.push({ tipo: "erro", msg: `Agente <strong>${a.nome}</strong> sem ramal vinculado` });
+  });
+
+  // Filas sem agentes
+  (voz.filas || []).forEach(f => {
+    if (!f.agentes?.length) alertas.push({ tipo: "aviso", msg: `Fila <strong>${f.nome}</strong> sem agentes configurados` });
+  });
+
+  // URAs com opções sem destino
+  (voz.uras || []).forEach(u => {
+    (u.opcoes || []).forEach(o => {
+      if (!o.destino) alertas.push({ tipo: "aviso", msg: `URA <strong>${u.nome}</strong> — tecla ${o.tecla} sem destino definido` });
+    });
+  });
+
+  // Grupo de ring sem ramais
+  (voz.grupo_ring || []).forEach(g => {
+    if (!g.ramais?.length) alertas.push({ tipo: "aviso", msg: `Grupo de Ring <strong>${g.nome}</strong> sem ramais` });
+  });
+
+  // Usuários sem permissão
+  (voz.usuarios || []).forEach(u => {
+    if (!u.permissao) alertas.push({ tipo: "info", msg: `Usuário <strong>${u.nome}</strong> sem permissão definida` });
+  });
+
+  // Domínio inválido
+  const dom = dados.cliente?.dominio || "";
+  if (dom && !dom.endsWith(".sobreip.com.br"))
+    alertas.push({ tipo: "erro", msg: `Domínio <strong>${dom}</strong> não termina com .sobreip.com.br` });
+
+  const painel = document.getElementById("painelAlertas");
+  if (!painel) return;
+  if (!alertas.length) { painel.style.display = "none"; return; }
+
+  const icons  = { erro: "🔴", aviso: "🟡", info: "🔵" };
+  const erros  = alertas.filter(a => a.tipo === "erro").length;
+  const avisos = alertas.filter(a => a.tipo === "aviso").length;
+
+  painel.style.display = "block";
+  painel.innerHTML = `
+    <div class="alertas-header">
+      <span class="alertas-titulo">⚠️ Verificações automáticas</span>
+      <div class="alertas-resumo">
+        ${erros  ? `<span class="badge-alerta erro">${erros} erro${erros > 1 ? "s" : ""}</span>` : ""}
+        ${avisos ? `<span class="badge-alerta aviso">${avisos} aviso${avisos > 1 ? "s" : ""}</span>` : ""}
+      </div>
+      <button class="alertas-toggle" onclick="this.closest('.painel-alertas').classList.toggle('expandido')">▾</button>
+    </div>
+    <ul class="alertas-lista">
+      ${alertas.map(a => `<li class="alerta-item alerta-${a.tipo}">${icons[a.tipo]} ${a.msg}</li>`).join("")}
+    </ul>`;
+}
+
+/* ── Render principal ── */
+function renderResumoCompleto() {
   const resumo = document.getElementById("resumo");
   if (!resumo) return;
+  const dados = _dadosResumo;
+  const voz   = dados.voz  || {};
+  const cli   = dados.cliente || {};
+  resumo.innerHTML = "";
 
+  const secoes = []; // para a sidebar
+
+  function secao(id, icone, titulo, count) {
+    secoes.push({ id, icone, nome: titulo, count });
+    return `<section class="resumo-bloco" id="${id}">
+      <h2 class="resumo-secao-titulo"><span>${icone}</span> ${titulo}
+        ${count ? `<span class="secao-count">${count}</span>` : ""}
+      </h2>`;
+  }
+
+  function fecharSecao() { return `</section>`; }
+
+  function identificarDestino(nome) {
+    if (!nome) return "—";
+    if (voz.regras_tempo?.some(r => r.nome === nome)) return `⏰ ${nome}`;
+    if (voz.filas?.some(f => f.nome === nome))        return `📞 ${nome}`;
+    if (voz.grupo_ring?.some(g => g.nome === nome))   return `🔔 ${nome}`;
+    if (voz.uras?.some(u => u.nome === nome))         return `🎙️ ${nome}`;
+    if (voz.ramais?.some(r => String(r.ramal) === String(nome))) return `☎️ ${nome}`;
+    return nome;
+  }
+
+  let html = "";
+
+  // ── Módulo Voz ──────────────────────────────────────
+  const temVoz = voz.usuarios?.length || voz.ramais?.length || voz.agentes?.length || voz.filas?.length;
+  if (temVoz) html += `<div class="modulo-titulo"><h1>📞 Voz / Call Center</h1></div>`;
+
+  // Cliente
+  if (cli.empresa || cli.dominio || cli.cnpj) {
+    html += secao("sec-cliente", "🏢", "Cliente");
+    html += `<div class="resumo-card">
+      ${campoCopia("Empresa", cli.empresa)}
+      ${campoCopia("Domínio", cli.dominio)}
+      ${campoCopia("CNPJ / CPF", cli.cnpj)}
+    </div>`;
+    html += fecharSecao();
+  }
+
+  // Usuários Web
+  if (voz.usuarios?.length) {
+    html += secao("sec-usuarios", "👤", "Usuários Web", voz.usuarios.length);
+    html += renderPaginado(voz.usuarios, "sec-usuarios", u => `
+      <div class="resumo-card">
+        <div class="titulo">${u.nome}</div>
+        <div>📧 ${u.email || "—"}${btnCopiar(u.email)}</div>
+        <div class="campo-sensivel">🔐 ${u.senha || "—"}${btnCopiar(u.senha)}</div>
+        <div class="campo-sensivel">🛡 ${u.permissao || "—"}</div>
+        ${u.agente_callcenter || u.agente ? `<span class="badge">Agente CC</span>` : ""}
+        ${u.agente_omnichannel ? `<span class="badge badge-omni">Agente Omni</span>` : ""}
+      </div>`);
+    html += fecharSecao();
+  }
+
+  // Entradas
+  if (voz.entradas?.length) {
+    html += secao("sec-entradas", "📞", "Entradas / Números", voz.entradas.length);
+    html += `<div class="resumo-grid">
+      ${voz.entradas.map(e => `<div class="resumo-card">
+        <div class="titulo">${e.numero}${btnCopiar(e.numero)}</div>
+      </div>`).join("")}
+    </div>`;
+    html += fecharSecao();
+  }
+
+  // Ramais — paginado
+  if (voz.ramais?.length) {
+    html += secao("sec-ramais", "☎️", "Ramais", voz.ramais.length);
+    html += renderPaginado(voz.ramais, "sec-ramais", r => `
+      <div class="resumo-card">
+        <div class="titulo">Ramal ${r.ramal}${btnCopiar(r.ramal)}</div>
+        <div class="campo-sensivel">🔐 ${r.senha || "—"}${btnCopiar(r.senha)}</div>
+      </div>`);
+    html += fecharSecao();
+  }
+
+  // Agentes — paginado
+  if (voz.agentes?.length) {
+    html += secao("sec-agentes", "🎧", "Agentes", voz.agentes.length);
+    html += renderPaginado(voz.agentes, "sec-agentes", a => `
+      <div class="resumo-card ${!a.ramal ? "card-alerta" : ""}">
+        <div class="titulo">${a.nome}</div>
+        <div>☎️ Ramal: ${a.ramal || '<span class="sem-ramal">⚠ sem ramal</span>'}${btnCopiar(a.ramal)}</div>
+        ${a.multiskill ? `<span class="badge badge-multi">Multiskill</span>` : ""}
+      </div>`);
+    html += fecharSecao();
+  }
+
+  // Regras de Tempo
+  if (voz.regras_tempo?.length) {
+    html += secao("sec-regras", "⏰", "Regras de Tempo", voz.regras_tempo.length);
+    html += `<div class="resumo-grid">${voz.regras_tempo.map(r => {
+      const faixas = r.faixas?.length ? r.faixas
+        : (r.hora_inicio ? [{ inicio: r.hora_inicio, fim: r.hora_fim }] : []);
+      return `<div class="resumo-card">
+        <div class="titulo">${r.nome}</div>
+        <div><strong>Dias:</strong> ${(r.dias || []).join(", ") || "—"}</div>
+        <div style="margin-top:6px">${faixas.map(f =>
+          `<span class="resumo-chip">🕐 ${f.inicio || "--:--"} às ${f.fim || "--:--"}</span>`
+        ).join(" ")}</div>
+      </div>`;
+    }).join("")}</div>`;
+    html += fecharSecao();
+  }
+
+  // Grupo de Ring
+  if (voz.grupo_ring?.length) {
+    html += secao("sec-grupo-ring", "🔔", "Grupo de Ring", voz.grupo_ring.length);
+    html += `<div class="resumo-grid">${voz.grupo_ring.map(g => `
+      <div class="resumo-card">
+        <div class="titulo">${g.nome}</div>
+        <div><strong>Estratégia:</strong> ${g.estrategia || "—"}</div>
+        <div class="lista">${(g.ramais || []).map(r => `<span class="chip">${r}</span>`).join("")}</div>
+      </div>`).join("")}</div>`;
+    html += fecharSecao();
+  }
+
+  // Filas
+  if (voz.filas?.length) {
+    html += secao("sec-filas", "📋", "Filas", voz.filas.length);
+    html += `<div class="resumo-grid">${voz.filas.map(f => `
+      <div class="resumo-card ${!f.agentes?.length ? "card-alerta" : ""}">
+        <div class="titulo">${f.nome}</div>
+        <div class="lista">${(f.agentes || []).length
+          ? f.agentes.map(a => `<span class="chip">${a}</span>`).join("")
+          : '<span class="sem-ramal">⚠ sem agentes</span>'}
+        </div>
+      </div>`).join("")}</div>`;
+    html += fecharSecao();
+  }
+
+  // URA
+  if (voz.uras?.length) {
+    html += secao("sec-ura", "🎙️", "URA", voz.uras.length);
+    html += voz.uras.map(u => `
+      <div class="resumo-card">
+        <div class="titulo">${u.nome}</div>
+        ${u.mensagem ? `<div class="campo-sensivel" style="opacity:.8;font-size:13px">${u.mensagem}</div>` : ""}
+        ${(u.opcoes || []).length ? `<table class="ura-table">
+          <thead><tr><th>Tecla</th><th>Destino</th><th>Descrição</th></tr></thead>
+          <tbody>${u.opcoes.map(o => `<tr>
+            <td><strong>${o.tecla || "—"}</strong></td>
+            <td>${identificarDestino(o.destino) || '<span class="sem-ramal">⚠ sem destino</span>'}</td>
+            <td>${o.descricao || "—"}</td>
+          </tr>`).join("")}</tbody>
+        </table>` : ""}
+      </div>`).join("");
+    html += fecharSecao();
+  }
+
+  // Pausas
+  if (voz.pausas?.length) {
+    html += secao("sec-pausas", "⏸️", "Pausas", voz.pausas.length);
+    html += voz.pausas.map(p => `
+      <div class="resumo-card">
+        <div class="titulo">${p.grupo}</div>
+        <div class="lista">${(p.itens || []).map(i =>
+          `<span class="chip">${i.nome} <em>(${i.tempo})</em></span>`).join("")}
+        </div>
+      </div>`).join("");
+    html += fecharSecao();
+  }
+
+  // Pesquisa
+  if (voz.pesquisas?.length) {
+    html += secao("sec-pesquisa", "⭐", "Pesquisa de Satisfação", voz.pesquisas.length);
+    html += voz.pesquisas.map(p => `
+      <div class="resumo-card">
+        <div class="titulo">${p.nome}</div>
+        ${p.introducao    ? `<div><strong>Introdução:</strong> ${p.introducao}</div>`   : ""}
+        <div><strong>Pergunta:</strong> ${p.pergunta || "—"}</div>
+        <ul style="margin-top:8px">${(p.respostas || []).map(r =>
+          `<li>${r.nota} — ${r.descricao}</li>`).join("")}</ul>
+        ${p.encerramento  ? `<div style="margin-top:6px"><strong>Encerramento:</strong> ${p.encerramento}</div>` : ""}
+      </div>`).join("");
+    html += fecharSecao();
+  }
+
+  // ── Módulo Chat ──────────────────────────────────────
+  const chat = dados.chat || {};
+  if (chat.tipo || chat.usuarios?.length || chat.agentes?.length) {
+    html += `<div class="modulo-titulo"><h1>💬 Chat / Omnichannel</h1></div>`;
+
+    html += secao("sec-chat-config", "⚙️", "Configuração de Chat");
+    if (chat.tipo === "qr") {
+      html += `<div class="resumo-card">
+        <div><strong>Tipo:</strong> QR Code</div>
+        <div>📱 ${Array.isArray(chat.numero_qr) ? chat.numero_qr.join(", ") : (chat.conta || "—")}${btnCopiar(chat.conta)}</div>
+      </div>`;
+    } else if (chat.tipo === "api" || chat.tipo === "ambos") {
+      html += `<div class="resumo-card">
+        <div><strong>Tipo:</strong> ${chat.tipo === "ambos" ? "API + QR Code" : "API Oficial"}</div>
+        ${campoCopia("API", chat.api)}
+        ${campoCopia("Conta", typeof chat.conta === "object" ? chat.conta?.api : chat.conta)}
+      </div>`;
+    }
+    if (chat.canais?.length) {
+      html += `<div style="margin-top:8px" class="lista">${chat.canais.map(c =>
+        `<span class="chip">${c}</span>`).join("")}</div>`;
+    }
+    html += fecharSecao();
+
+    if (chat.usuarios?.length) {
+      html += secao("sec-chat-usuarios", "👤", "Usuários do Chat", chat.usuarios.length);
+      html += renderPaginado(chat.usuarios, "sec-chat-usuarios", u => `
+        <div class="resumo-card">
+          <div class="titulo">${u.nome}</div>
+          <div>📧 ${u.email || "—"}${btnCopiar(u.email)}</div>
+          <div class="campo-sensivel">🔐 ${u.senha || "—"}${btnCopiar(u.senha)}</div>
+          <div class="campo-sensivel">🛡 ${u.permissao || "—"}</div>
+        </div>`);
+      html += fecharSecao();
+    }
+
+    if (chat.agentes?.length) {
+      html += secao("sec-chat-agentes", "🎧", "Agentes do Chat", chat.agentes.length);
+      html += renderPaginado(chat.agentes, "sec-chat-agentes", a => `
+        <div class="resumo-card">
+          <div class="titulo">${a.nome}</div>
+          <div class="lista">${(a.departamentos || []).map(d =>
+            `<span class="chip">${d}</span>`).join("") || '<span style="opacity:.5">Sem departamento</span>'}
+          </div>
+        </div>`);
+      html += fecharSecao();
+    }
+
+    if (chat.departamentos?.length) {
+      html += secao("sec-chat-depto", "🏢", "Departamentos", chat.departamentos.length);
+      html += `<div class="resumo-grid">${chat.departamentos.map(d => `
+        <div class="resumo-card">
+          <div class="titulo">${d.nome}</div>
+          <div class="lista">${(d.agentes || []).map(a =>
+            `<span class="chip">${a}</span>`).join("") || '<span style="opacity:.5">Sem agentes</span>'}
+          </div>
+        </div>`).join("")}</div>`;
+      html += fecharSecao();
+    }
+  }
+
+  resumo.innerHTML = html;
+
+  // Aplica modo compacto se ativo
+  if (_modoCompacto) {
+    document.querySelectorAll(".campo-sensivel").forEach(el => el.style.display = "none");
+  }
+
+  buildNav(secoes);
+  buildAlertas(dados);
+  initBusca();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
   const raw = localStorage.getItem("CONFIG_CADERNO");
+
   if (!raw || raw === "null") {
-    resumo.innerHTML = `<div class="resumo-card">⚠️ Nenhum dado encontrado.<br><br>Volte e preencha a configuração antes de acessar o resumo.</div>`;
+    document.getElementById("resumoEmpty").style.display = "block";
     return;
   }
 
-  let dados = {};
-  try { dados = JSON.parse(raw) || {}; } catch (e) { dados = {}; }
+  try { _dadosResumo = JSON.parse(raw) || {}; } catch (e) { _dadosResumo = {}; }
 
-  resumo.innerHTML = "";
-  const voz = dados.voz || {};
+  // Mostra layout
+  document.getElementById("resumoToolbar").style.display = "flex";
+  document.getElementById("resumoLayout").style.display  = "flex";
+
+  const voz = _dadosResumo.voz || {};
 
   if (voz.usuarios?.length || voz.ramais?.length || voz.agentes?.length || voz.filas?.length || voz.uras?.length || voz.grupo_ring?.length) {
     resumo.innerHTML += `<section class="resumo-bloco modulo-titulo"><h1>📞 Voz / Call Center</h1></section>`;
@@ -106,158 +574,8 @@ document.addEventListener("DOMContentLoaded", () => {
     return nome;
   }
 
-  if (dados.cliente) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco"><h2>🏢 Cliente</h2>
-        <div class="resumo-card">
-          <div><strong>Empresa:</strong> ${dados.cliente.empresa || "-"}</div>
-          <div><strong>Domínio:</strong> ${dados.cliente.dominio || "-"}</div>
-          <div><strong>CNPJ:</strong> ${dados.cliente.cnpj || "-"}</div>
-        </div>
-      </section>`;
-  }
+  renderResumoCompleto();
 
-  if (voz.usuarios?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco"><h2>👤 Usuários Web</h2>
-        <div class="resumo-grid">
-          ${voz.usuarios.map(u => `<div class="resumo-card">
-            <div class="titulo">${u.nome}</div>
-            <div>📧 ${u.email || "-"}</div>
-            <div>🔐 Senha: ${u.senha || "-"}</div>
-            <div>🛡 Permissão: ${u.permissao || "-"}</div>
-            ${u.agente ? `<span class="badge">Agente</span>` : ""}
-          </div>`).join("")}
-        </div>
-      </section>`;
-  }
-
-  if (voz.entradas?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco"><h2>📞 Entradas / Números</h2>
-        <div class="resumo-grid">
-          ${voz.entradas.map(e => `<div class="resumo-card"><div class="titulo">${e.numero}</div></div>`).join("")}
-        </div>
-      </section>`;
-  }
-
-  if (voz.ramais?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco"><h2>☎️ Ramais</h2>
-        <div class="resumo-grid">
-          ${voz.ramais.map(r => `<div class="resumo-card">
-            <div class="titulo">Ramal ${r.ramal}</div>
-            <div>🔐 ${r.senha || "-"}</div>
-          </div>`).join("")}
-        </div>
-      </section>`;
-  }
-
-  if (voz.agentes?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco"><h2>🎧 Agentes</h2>
-        <div class="resumo-grid">
-          ${voz.agentes.map(a => `<div class="resumo-card">
-            <div class="titulo">${a.nome}</div>
-            <div>📞 Ramal: ${a.ramal || "-"}</div>
-            ${a.multiskill ? `<span class="badge">Multiskill</span>` : ""}
-          </div>`).join("")}
-        </div>
-      </section>`;
-  }
-
-  if (voz.regras_tempo?.length) {
-    const faixasHTML = (r) => {
-      const faixas = r.faixas?.length ? r.faixas
-        : (r.hora_inicio ? [{ inicio: r.hora_inicio, fim: r.hora_fim }] : []);
-      if (!faixas.length) return "<em style='opacity:.5'>Sem horário definido</em>";
-      return faixas.map(f => `<span class="resumo-chip">🕐 ${f.inicio || "--:--"} às ${f.fim || "--:--"}</span>`).join(" ");
-    };
-    resumo.innerHTML += `
-      <section class="resumo-bloco"><h2>⏰ Regras de Tempo</h2>
-        <div class="resumo-grid">
-          ${voz.regras_tempo.map(r => `<div class="resumo-card">
-            <div class="titulo">${r.nome}</div>
-            <div><strong>Dias:</strong> ${(r.dias || []).join(", ") || "—"}</div>
-            <div style="margin-top:6px">${faixasHTML(r)}</div>
-          </div>`).join("")}
-        </div>
-      </section>`;
-  }
-
-  if (voz.grupo_ring?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco"><h2>🔔 Grupo de Ring</h2>
-        <div class="resumo-grid">
-          ${voz.grupo_ring.map(g => `<div class="resumo-card">
-            <div class="titulo">${g.nome}</div>
-            <div><strong>Estratégia:</strong> ${g.estrategia || "-"}</div>
-            ${g.ramais?.length ? `<div class="lista">${g.ramais.map(r => `<span class="chip">${r}</span>`).join("")}</div>` : ""}
-          </div>`).join("")}
-        </div>
-      </section>`;
-  }
-
-  if (voz.filas?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco"><h2>📞 Filas</h2>
-        <div class="resumo-grid">
-          ${voz.filas.map(f => `<div class="resumo-card">
-            <div class="titulo">${f.nome}</div>
-            ${f.agentes?.length ? `<div class="lista">${f.agentes.map(a => `<span class="chip">${a}</span>`).join("")}</div>` : ""}
-          </div>`).join("")}
-        </div>
-      </section>`;
-  }
-
-  if (voz.uras?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco"><h2>🎙️ URA</h2>
-        <div class="resumo-grid">
-          ${voz.uras.map(u => {
-            const opcoes = u.opcoes || [];
-            return `<div class="resumo-card">
-              <div class="titulo">${u.nome}</div>
-              <div>${u.mensagem || ""}</div>
-              <ul>${opcoes.map(o => `<li>Tecla ${o.tecla} → ${identificarDestino(o.destino)}</li>`).join("")}</ul>
-            </div>`;
-          }).join("")}
-        </div>
-      </section>`;
-  }
-
-  if (voz.pausas?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco"><h2>⏸️ Pausas</h2>
-        <div class="resumo-grid">
-          ${voz.pausas.map(p => `<div class="resumo-card">
-            <div class="titulo">${p.grupo}</div>
-            <div class="lista">${(p.itens || []).map(i => `<span class="chip">${i.nome} (${i.tempo})</span>`).join("")}</div>
-          </div>`).join("")}
-        </div>
-      </section>`;
-  }
-
-  if (voz.pesquisas?.length) {
-    resumo.innerHTML += `
-      <section class="resumo-bloco"><h2>⭐ Pesquisa de Satisfação</h2>
-        <div class="resumo-grid">
-          ${voz.pesquisas.map(p => `<div class="resumo-card">
-            <div class="titulo">${p.nome}</div>
-            ${p.introducao ? `<div><strong>Áudio inicial:</strong> ${p.introducao}</div>` : ""}
-            <div style="margin-top:6px;"><strong>Pergunta:</strong><br>${p.pergunta || "-"}</div>
-            <ul style="margin-top:8px;">${(p.respostas || []).map(r => `<li>${r.nota} - ${r.descricao}</li>`).join("")}</ul>
-            ${p.encerramento ? `<div style="margin-top:8px;"><strong>Áudio final:</strong> ${p.encerramento}</div>` : ""}
-          </div>`).join("")}
-        </div>
-      </section>`;
-  }
-
-  if (dados.chat && (dados.chat.tipo || dados.chat.usuarios?.length || dados.chat.agentes?.length)) {
-    resumo.innerHTML += `<section class="resumo-bloco modulo-titulo"><h1>💬 Chat / Omnichannel</h1></section>`;
-  }
-
-  window.renderResumoChat(resumo, dados);
 });
 
 /* ================= VOLTAR ================= */
