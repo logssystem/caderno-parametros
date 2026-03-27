@@ -1504,3 +1504,36 @@ body.light .btn-add-faixa:hover {
   .faixa-time { min-width: 100px; }
   .dias-semana-box .btn-dia { min-width: 38px; padding: 6px 6px !important; }
 }
+
+/* ======================================================
+   NÚMERO DE ENTRADA – VALIDAÇÃO
+====================================================== */
+.entrada-feedback {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  margin-top: 4px;
+  min-height: 0;
+  transition: all 0.2s ease;
+}
+.entrada-ok {
+  background: rgba(206,255,0,0.10);
+  color: #CEFF00;
+  border-left: 3px solid #CEFF00;
+}
+.entrada-erro {
+  background: rgba(239,68,68,0.12);
+  color: #fca5a5;
+  border-left: 3px solid #ef4444;
+}
+body.light .entrada-ok {
+  background: #f0fde4;
+  color: #3a5200;
+  border-left-color: #7aa600;
+}
+body.light .entrada-erro {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-left-color: #ef4444;
+}
