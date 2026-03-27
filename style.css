@@ -1218,3 +1218,279 @@ textarea {
   padding: 2px 8px;
   font-size: 12px;
 }
+
+/* ======================================================
+   URA – OPÇÕES COMPACTAS EM LINHA
+====================================================== */
+.opcao-ura-row {
+  display: grid;
+  grid-template-columns: 64px 1fr 1fr 36px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  background: rgba(206,255,0,0.04);
+  border: 1px solid rgba(206,255,0,0.12);
+  border-radius: 10px;
+  margin-bottom: 6px;
+  transition: background 0.2s, border-color 0.2s, opacity 0.18s, transform 0.18s;
+}
+.opcao-ura-row:hover {
+  background: rgba(206,255,0,0.07);
+  border-color: rgba(206,255,0,0.22);
+}
+.ura-tecla {
+  width: 100% !important;
+  min-height: 36px !important;
+  text-align: center;
+  font-weight: 800;
+  font-size: 15px;
+  padding: 6px 4px !important;
+  border-radius: 8px !important;
+  color: #CEFF00 !important;
+}
+.ura-destino, .ura-desc {
+  width: 100% !important;
+  min-height: 36px !important;
+  padding: 6px 10px !important;
+  border-radius: 8px !important;
+  font-size: 13px;
+}
+.ura-del {
+  width: 36px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  background: rgba(239,68,68,0.1) !important;
+  border: 1px solid rgba(239,68,68,0.2) !important;
+  color: #fca5a5 !important;
+  font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+}
+.ura-del:hover {
+  background: rgba(239,68,68,0.25) !important;
+  border-color: #ef4444 !important;
+  color: #fff !important;
+}
+/* Header das opções URA */
+.ura-opcoes-header {
+  display: grid;
+  grid-template-columns: 64px 1fr 1fr 36px;
+  gap: 8px;
+  padding: 4px 10px;
+  margin-bottom: 4px;
+}
+.ura-opcoes-header span {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 640px) {
+  .opcao-ura-row {
+    grid-template-columns: 52px 1fr 36px;
+    grid-template-rows: auto auto;
+  }
+  .ura-desc {
+    grid-column: 1 / -2;
+    grid-row: 2;
+  }
+  .ura-del { grid-column: 3; grid-row: 1 / 3; }
+}
+
+/* ======================================================
+   REGRA DE TEMPO – REDESIGN
+====================================================== */
+.regra-tempo-card {
+  background: rgba(43,54,61,0.35) !important;
+  border: 1px solid rgba(206,255,0,0.15) !important;
+  border-radius: 14px !important;
+  padding: 16px !important;
+  transition: opacity 0.18s, transform 0.18s;
+}
+body.light .regra-tempo-card {
+  background: #f8fafc !important;
+  border-color: rgba(168,204,0,0.3) !important;
+}
+.btn-del-regra {
+  background: rgba(239,68,68,0.1) !important;
+  border: 1px solid rgba(239,68,68,0.2) !important;
+  color: #fca5a5 !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.btn-del-regra:hover {
+  background: rgba(239,68,68,0.25) !important;
+  border-color: #ef4444 !important;
+  color: #fff !important;
+}
+
+/* Dias da semana */
+.dias-semana-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+.btn-dia {
+  padding: 7px 10px !important;
+  font-size: 12px !important;
+  font-weight: 700;
+  border-radius: 8px !important;
+  border: 1.5px solid var(--border) !important;
+  background: transparent !important;
+  color: var(--text) !important;
+  min-height: 36px !important;
+  transition: all 0.18s ease;
+  flex: 1 1 auto;
+  min-width: 44px;
+  text-align: center;
+}
+.btn-dia:hover { border-color: #CEFF00 !important; color: #CEFF00 !important; }
+.btn-dia.ativo {
+  background: #CEFF00 !important;
+  border-color: #CEFF00 !important;
+  color: #1a2226 !important;
+  box-shadow: 0 0 10px rgba(206,255,0,0.3);
+}
+
+/* Atalhos rápidos */
+.dias-atalhos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.btn-atalho-dia {
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+  font-weight: 600;
+  border-radius: 99px !important;
+  border: 1px solid rgba(206,255,0,0.2) !important;
+  background: rgba(206,255,0,0.05) !important;
+  color: rgba(206,255,0,0.8) !important;
+  min-height: 28px !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-atalho-dia:hover {
+  background: rgba(206,255,0,0.15) !important;
+  border-color: #CEFF00 !important;
+  color: #CEFF00 !important;
+}
+body.light .btn-atalho-dia {
+  border-color: rgba(168,204,0,0.3) !important;
+  background: rgba(168,204,0,0.07) !important;
+  color: #5a7a00 !important;
+}
+
+/* Título das faixas */
+.faixas-titulo {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-soft);
+  margin: 14px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Faixas de horário */
+.faixas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.faixa-horaria-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.15);
+  border: 1px solid rgba(206,255,0,0.1);
+  border-radius: 10px;
+  transition: opacity 0.18s, border-color 0.2s;
+}
+.faixa-horaria-row:hover { border-color: rgba(206,255,0,0.25); }
+body.light .faixa-horaria-row {
+  background: #f1f5f9;
+  border-color: rgba(168,204,0,0.2);
+}
+.faixa-label, .faixa-sep {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-soft);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.faixa-time {
+  width: auto !important;
+  min-height: 36px !important;
+  flex: 1;
+  padding: 6px 10px !important;
+  border-radius: 8px !important;
+  font-size: 14px;
+  font-weight: 700;
+  color: #CEFF00 !important;
+  text-align: center;
+}
+body.light .faixa-time { color: #4a6600 !important; }
+.faixa-del {
+  width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 0 !important;
+  flex-shrink: 0;
+  border-radius: 6px !important;
+  background: rgba(239,68,68,0.08) !important;
+  border: 1px solid rgba(239,68,68,0.15) !important;
+  color: #fca5a5 !important;
+  font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.faixa-del:hover {
+  background: rgba(239,68,68,0.2) !important;
+  color: #fff !important;
+}
+
+/* Botão adicionar faixa */
+.btn-add-faixa {
+  margin-top: 8px;
+  width: 100%;
+  padding: 8px !important;
+  min-height: 36px !important;
+  border-radius: 8px !important;
+  border: 1px dashed rgba(206,255,0,0.25) !important;
+  background: rgba(206,255,0,0.03) !important;
+  color: rgba(206,255,0,0.7) !important;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.btn-add-faixa:hover {
+  background: rgba(206,255,0,0.08) !important;
+  border-color: #CEFF00 !important;
+  color: #CEFF00 !important;
+}
+body.light .btn-add-faixa {
+  border-color: rgba(168,204,0,0.3) !important;
+  color: #5a7a00 !important;
+  background: transparent !important;
+}
+
+@media (max-width: 480px) {
+  .faixa-horaria-row { flex-wrap: wrap; gap: 6px; }
+  .faixa-time { min-width: 100px; }
+  .dias-semana-box .btn-dia { min-width: 38px; padding: 6px 6px !important; }
+}
