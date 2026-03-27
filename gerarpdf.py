@@ -1,376 +1,71 @@
+const introMensagem =
+  "Bem-vindo ao Caderno de Parâmetros da ERA.\n\n" +
+  "Este assistente foi criado para ajudar você a organizar\n" +
+  "e documentar as configurações do seu ambiente de atendimento.\n\n" +
+  "Selecione o tipo de serviço para continuar.";
+let pos = 0;
+let digitando = false;
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>Caderno de Parâmetros</title>
-  <link rel="stylesheet" href="./style.css" />
-</head>
-<body>
+/* ================= INTRO ================= */
+function iniciarIntro() {
+  const el = document.getElementById("typing-text");
+  if (!el || digitando) return;
+  el.innerHTML = "";
+  pos = 0;
+  digitando = true;
+  (function digitar() {
+    if (pos >= introMensagem.length) { digitando = false; return; }
+    el.innerHTML += introMensagem[pos] === "\n" ? "<br>" : introMensagem[pos];
+    pos++;
+    setTimeout(digitar, 30);
+  })();
+}
+function mostrarIntro() {
+  const intro = document.getElementById("intro-screen");
+  const app   = document.getElementById("app-content");
+  document.body.classList.add("intro");
+  if (intro) intro.style.display = "flex";
+  if (app)   app.style.display   = "none";
+  iniciarIntro();
+}
+function mostrarApp(modo) {
+  const intro = document.getElementById("intro-screen");
+  const app   = document.getElementById("app-content");
+  const voz   = document.getElementById("voz-area");
+  const chat  = document.getElementById("chat-area");
+  document.body.classList.remove("intro");
+  if (intro) intro.style.display = "none";
+  if (app)   app.style.display   = "block";
+  if (voz)   voz.style.display   = "none";
+  if (chat)  chat.style.display  = "none";
+  if (modo === "voz"  || modo === "ambos") if (voz)  voz.style.display  = "block";
+  if (modo === "chat" || modo === "ambos") if (chat) chat.style.display = "block";
+}
 
-<!-- ================= FUNDO ANIMADO ERA ================= -->
-<canvas id="era-bg-canvas"></canvas>
-<div class="era-orb era-orb-1"></div>
-<div class="era-orb era-orb-2"></div>
-<div class="era-orb era-orb-3"></div>
-<div class="era-orb era-orb-4"></div>
+/* ================= AÇÕES ================= */
+window.mostrarApp = mostrarApp;
+window.selecionarModo = modo => {
+  localStorage.setItem("modo_atendimento", modo);
+  mostrarApp(modo);
+};
+window.resetarIntro = () => {
+  localStorage.removeItem("modo_atendimento");
+  delete window.chatState;
+  document.body.classList.add("intro");
+  const voz   = document.getElementById("voz-area");
+  const chat  = document.getElementById("chat-area");
+  const app   = document.getElementById("app-content");
+  const intro = document.getElementById("intro-screen");
+  if (voz)   voz.style.display   = "none";
+  if (chat)  chat.style.display  = "none";
+  if (app)   app.style.display   = "none";
+  if (intro) intro.style.display = "flex";
+  iniciarIntro();
+};
 
-<!-- ================= HEADER ================= -->
-<header class="app-header" id="headerApp">
-  <img src="./assets/image.png" class="app-logo" />
-  <h1 class="app-title">Caderno de Parâmetros</h1>
-  <button id="toggleTheme" class="theme-toggle">🌙</button>
-  <button class="btn-voltar-intro" onclick="resetarIntro()">⬅ Voltar ao início</button>
-</header>
-
-<!-- ================= INTRO ================= -->
-<div id="intro-screen">
-  <div class="background"></div>
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
-  <div class="intro-box nova-intro">
-    <img src="./assets/image.png" class="logo-intro">
-    <h1 class="titulo-intro">
-      <span id="typing-text"></span><span class="cursor">|</span>
-    </h1>
-    <p class="subtitulo-intro">
-      Configure e documente seu ambiente de atendimento de forma simples e profissional.
-    </p>
-    <div class="intro-actions">
-      <button class="botao-intro" onclick="selecionarModo('voz')">
-        📞 Atendimento por Voz
-      </button>
-      <button class="botao-intro" onclick="selecionarModo('chat')">
-        💬 Atendimento por Chat
-      </button>
-      <button class="botao-intro destaque" onclick="selecionarModo('ambos')">
-        📞 + 💬 Voz + Chat
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ================= CONTEÚDO ================= -->
-<main id="app-content" class="form-container" style="display:none">
-
-  <!-- ================= DADOS DO CLIENTE ================= -->
-  <section class="card">
-    <h2>Dados do Cliente</h2>
-    <div class="campo-descricao campo-cliente">
-      <div class="bloco-campo">
-        <label>Nome da empresa / cliente</label>
-        <input id="empresaCliente" placeholder="Ex: ERA Telecom, Clínica São José">
-      </div>
-      <div class="bloco-campo">
-        <label>Domínio do cliente</label>
-        <input id="dominioCliente" placeholder="Ex: suporteera.sobreip.com.br">
-        <div id="regraDominio"></div>
-      </div>
-      <div class="bloco-campo">
-        <label>CNPJ / CPF</label>
-        <input id="cnpjCliente" placeholder="Ex: 12.345.678/0001-99 ou 123.456.789-09">
-        <div id="regraCNPJ"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= VOZ / PBX ================= -->
-  <section id="voz-area" style="display:none">
-    <section class="card">
-      <h2>Usuários Web</h2>
-      <div class="acoes-card">
-        <button class="btn-add" onclick="adicionarCampo('usuario_web')">+</button>
-        <button class="btn-import" onclick="acionarImportacao('usuario_web')">📥 Importar</button>
-        <button class="btn-import" onclick="baixarTemplateUsuarios()">📥 Baixar template CSV</button>
-        <input type="file" id="importUsuarios" hidden>
-      </div>
-      <div id="listaUsuariosWeb"></div>
-    </section>
-    <section class="card">
-      <h2>Ramais</h2>
-      <div class="acoes-card">
-        <input id="ramalInicio" placeholder="Ramal inicial" inputmode="numeric">
-        <input id="ramalFim" placeholder="Ramal final" inputmode="numeric">
-        <button class="btn-add" onclick="criarRangeRamais()">Criar range</button>
-      </div>
-      <div class="acoes-card">
-        <button class="btn-add" onclick="adicionarCampo('ring')">+</button>
-        <button class="btn-import" onclick="acionarImportacao('ring')">📥 Importar</button>
-        <button class="btn-import" onclick="baixarTemplateRamais()">📥 Baixar template CSV</button>
-        <input type="file" id="importRamais" hidden>
-      </div>
-      <div id="listaRings"></div>
-    </section>
-    <section class="card">
-      <h2>Agentes</h2>
-      <div id="listaAgentes"></div>
-      <button class="btn-add" onclick="adicionarCampo('agente')">🔄 Atualizar agentes</button>
-    </section>
-    <section class="card">
-      <h2>Números de Entrada</h2>
-      <div id="listaEntradas"></div>
-      <button class="btn-add" onclick="adicionarCampo('entrada')">+</button>
-    </section>
-    <section class="card">
-      <h2>Grupo de Ring</h2>
-      <div id="listaGrupoRing"></div>
-      <button class="btn-add" onclick="adicionarCampo('grupo_ring')">+</button>
-    </section>
-    <section class="card">
-      <h2>Filas</h2>
-      <div id="listaFilas"></div>
-      <button class="btn-add" onclick="adicionarCampo('fila')">+</button>
-    </section>
-    <section class="card">
-      <h2>Regras de Tempo</h2>
-      <button class="btn-add" onclick="adicionarRegraTempo()">+ Nova regra</button>
-      <div id="listaRegrasTempo"></div>
-    </section>
-    <section class="card">
-      <h2>URAs</h2>
-      <div id="listaURAs"></div>
-      <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
-    </section>
-    <section class="card">
-      <h2>Pesquisa de Satisfação</h2>
-      <button class="btn-add" onclick="togglePesquisaSatisfacao()">+</button>
-      <div id="pesquisaSatisfacaoConteudo" style="display:none">
-        <div class="campo-descricao">
-          <input id="pesquisaNome" placeholder="Ex: Pesquisa de Atendimento Telefônico">
-          <textarea id="pesquisaAudioIntro" placeholder="Ex: Sua opinião é muito importante para nós."></textarea>
-          <textarea id="pesquisaPergunta" placeholder="Ex: De 0 a 5, como você avalia nosso atendimento?"></textarea>
-          <div id="listaRespostasPesquisa"></div>
-          <button class="btn-add" onclick="adicionarRespostaPesquisa()">+ Adicionar resposta</button>
-          <p style="opacity:.7;font-size:13px">Ex: 0-Péssimo | 1-Ruim | 2-Regular | 3-Bom | 4-Muito Bom | 5-Excelente</p>
-          <textarea id="pesquisaAudioFim" placeholder="Ex: Obrigado por participar da nossa pesquisa."></textarea>
-        </div>
-      </div>
-    </section>
-    <section class="card">
-      <h2>Pausas do Call Center</h2>
-      <button class="btn-add" onclick="togglePausas()">+</button>
-      <div id="pausasConteudo" style="display:none">
-        <div class="campo-descricao">
-          <input id="nomeGrupoPausas" placeholder="Ex: Pausas Operacionais">
-          <div id="listaPausas"></div>
-          <button class="btn-add" onclick="adicionarPausa()">+ Adicionar pausa</button>
-        </div>
-      </div>
-    </section>
-  </section>
-
-  <!-- ================= CHAT ================= -->
-  <section id="chat-area" style="display:none">
-    <section id="modulochat">
-      <section class="card" id="cardUsuariosOmni">
-        <h2>Usuários Omnichannel</h2>
-        <div class="acoes-card">
-          <button class="btn-add" onclick="adicionarUsuarioChat()">+</button>
-          <button class="btn-import" onclick="acionarImportacaoUsuariosChat()">📥 Importar</button>
-          <button class="btn-import" onclick="baixarTemplateUsuariosChat()">📥 Baixar template CSV</button>
-          <input type="file" id="importUsuariosChat" hidden>
-        </div>
-        <div id="listaUsuariosChat"></div>
-      </section>
-      <section class="card">
-        <h2>Agentes Omnichannel</h2>
-        <div id="listaAgentesChat"></div>
-      </section>
-      <section class="card">
-        <h2>Departamentos (Chat)</h2>
-        <div id="listaDepartamentosChat"></div>
-        <button class="btn-add" onclick="adicionarDepartamentoChat()">+ Adicionar departamento</button>
-      </section>
-      <section class="card">
-        <h2>Configuração de Chat</h2>
-        <!-- TIPO DE INTEGRAÇÃO — toggle, deselect, ambos -->
-        <div class="chat-section">
-          <h3>Tipo de Integração</h3>
-          <div class="chat-grid" id="tipo-integracao-grid">
-            <div class="chat-card" data-tipo="api" onclick="toggleTipoChat(this, 'api')">
-              <img src="./assets/APIS.png"><h4>API Oficial</h4>
-            </div>
-            <div class="chat-card" data-tipo="qr" onclick="toggleTipoChat(this, 'qr')">
-              <img src="./assets/qrcode.png"><h4>QR Code</h4>
-            </div>
-          </div>
-        </div>
-
-        <!-- BLOCO API OFICIAL -->
-        <div id="api-oficial" class="chat-section chat-tipo-bloco" style="display:none">
-          <h3>Fornecedor (API Oficial)</h3>
-          <div class="chat-grid">
-            <div class="chat-card" data-api="meta" onclick="selecionarApi(this,'meta')">
-              <div class="logo-wrapper meta"><img src="./assets/Meta.png" alt="Meta"></div>
-              <h4>Meta</h4>
-            </div>
-            <div class="chat-card" data-api="360" onclick="selecionarApi(this,'360')">
-              <div class="logo-wrapper"><img src="./assets/360.png" alt="360 Dialog"></div>
-              <h4>360 Dialog</h4>
-            </div>
-            <div class="chat-card" data-api="gupshup" onclick="selecionarApi(this,'gupshup')">
-              <div class="logo-wrapper"><img src="./assets/gupshup.png" alt="Gupshup"></div>
-              <h4>Gupshup</h4>
-            </div>
-          </div>
-
-          <div id="bloco-conta-api" class="chat-section" style="display:none">
-            <h3>Conta</h3>
-            <div class="chat-grid">
-              <div class="chat-card" data-conta="cliente" onclick="selecionarConta(this,'cliente')">Cliente</div>
-              <div class="chat-card" data-conta="era"     onclick="selecionarConta(this,'era')">ERA</div>
-            </div>
-          </div>
-
-          <div id="chat-canais" class="chat-section" style="display:none">
-            <h3>Canais Integrados</h3>
-            <div class="chat-grid">
-              <div class="chat-card" data-canal="whatsapp"    onclick="toggleCanal(this)"><img src="./assets/whats.png"><h4>WhatsApp</h4></div>
-              <div class="chat-card" data-canal="instagram"   onclick="toggleCanal(this)"><img src="./assets/instagram.png"><h4>Instagram</h4></div>
-              <div class="chat-card" data-canal="messenger"   onclick="toggleCanal(this)"><img src="./assets/messenger.png"><h4>Messenger</h4></div>
-              <div class="chat-card" data-canal="telegram"    onclick="toggleCanal(this)"><img src="./assets/telegram.png"><h4>Telegram</h4></div>
-              <div class="chat-card" data-canal="email"       onclick="toggleCanal(this)"><img src="./assets/email.png"><h4>E-mail</h4></div>
-              <div class="chat-card" data-canal="google_chat" onclick="toggleCanal(this)"><img src="./assets/google.png"><h4>Google Chat</h4></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- BLOCO QR CODE -->
-        <div id="chat-qr" class="chat-section chat-tipo-bloco" style="display:none">
-          <h3>Número WhatsApp (QR Code)</h3>
-          <div id="listaNumeroQr"></div>
-          <button class="btn-add-faixa" style="margin-top:8px" onclick="adicionarNumeroQr()">+ Adicionar número</button>
-        </div>
-      </section>
-    </section>
-  </section>
-
-  <!-- ================= RESULTADO ================= -->
-  <section class="card">
-    <h2>Salvar configuração</h2>
-    <button class="btn-explorar" onclick="salvarConfiguracao()">Salvar</button>
-    <pre id="resultado"></pre>
-  </section>
-</main>
-
-<!-- ================= BOTÃO DÚVIDAS (FLUTUANTE) ================= -->
-<button class="btn-duvidas" onclick="abrirModalDuvidas()">
-  ❓ Dúvidas
-  <span class="badge-ajuda">?</span>
-</button>
-
-<!-- ================= MODAL DÚVIDAS ================= -->
-<div id="modalDuvidasOverlay" class="modal-duvidas-overlay" onclick="fecharModalDuvidasOverlay(event)">
-  <div class="modal-duvidas">
-    <div class="modal-duvidas-header">
-      <h3>❓ Dúvidas no preenchimento</h3>
-      <button class="modal-duvidas-fechar" onclick="fecharModalDuvidas()">✕</button>
-    </div>
-    <div class="modal-duvidas-categorias" id="categoriasDuvida">
-      <!-- gerado pelo JS -->
-    </div>
-    <div class="modal-duvidas-corpo" id="conteudoDuvida">
-      <div class="duvida-placeholder">
-        <span>🗂️</span>
-        Selecione uma categoria acima para ver as dúvidas
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ================= TOAST ================= -->
-<div id="toastGlobal" class="toast">
-  <span id="toastMessage"></span>
-</div>
-
-<script src="./intro.js"></script>
-<script src="./app.js"></script>
-<script src="./chat.js"></script>
-
-<script>
-/* ===== PARTÍCULAS ERA – CANVAS ===== */
-(function() {
-  const canvas = document.getElementById("era-bg-canvas");
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-
-  let W, H, particles = [], animId;
-  const LIME  = [206, 255, 0];
-  const SLATE = [43,  54,  61];
-  const COUNT = 38;
-
-  function resize() {
-    W = canvas.width  = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-
-  function mkParticle() {
-    const isLime = Math.random() > 0.35;
-    const rgb    = isLime ? LIME : SLATE;
-    return {
-      x:     Math.random() * W,
-      y:     H + Math.random() * 100,
-      r:     Math.random() * 2.2 + 0.5,
-      speed: Math.random() * 0.5 + 0.18,
-      drift: (Math.random() - 0.5) * 0.35,
-      alpha: Math.random() * 0.5 + 0.15,
-      rgb,
-      life:  0,
-      maxLife: Math.random() * 300 + 160,
-    };
-  }
-
-  function init() {
-    particles = [];
-    for (let i = 0; i < COUNT; i++) {
-      const p = mkParticle();
-      p.y = Math.random() * H;  // distribuir na tela no início
-      p.life = Math.random() * p.maxLife;
-      particles.push(p);
-    }
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-
-    particles.forEach((p, i) => {
-      p.y    -= p.speed;
-      p.x    += p.drift;
-      p.life += 1;
-
-      // Fade in/out suave
-      const t     = p.life / p.maxLife;
-      const fade  = t < 0.15 ? t / 0.15 : t > 0.85 ? (1 - t) / 0.15 : 1;
-      const alpha = p.alpha * fade;
-
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${p.rgb[0]},${p.rgb[1]},${p.rgb[2]},${alpha})`;
-      ctx.fill();
-
-      // Brilho para partículas limão maiores
-      if (p.rgb === LIME && p.r > 1.4) {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(206,255,0,${alpha * 0.12})`;
-        ctx.fill();
-      }
-
-      if (p.life >= p.maxLife) particles[i] = mkParticle();
-    });
-
-    animId = requestAnimationFrame(draw);
-  }
-
-  window.addEventListener("resize", () => { resize(); init(); });
-  resize();
-  init();
-  draw();
-})();
-</script>
-
-</body>
-</html>
+/* ================= INIT ================= */
+document.addEventListener("DOMContentLoaded", () => {
+  const modo = localStorage.getItem("modo_atendimento");
+  if (modo === "voz" || modo === "chat" || modo === "ambos") mostrarApp(modo);
+  else mostrarIntro();
+});
