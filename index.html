@@ -11,6 +11,13 @@
 </head>
 <body>
 
+<!-- ================= FUNDO ANIMADO ERA ================= -->
+<canvas id="era-bg-canvas"></canvas>
+<div class="era-orb era-orb-1"></div>
+<div class="era-orb era-orb-2"></div>
+<div class="era-orb era-orb-3"></div>
+<div class="era-orb era-orb-4"></div>
+
 <!-- ================= HEADER ================= -->
 <header class="app-header" id="headerApp">
   <img src="./assets/image.png" class="app-logo" />
@@ -274,5 +281,88 @@
 <script src="./intro.js"></script>
 <script src="./app.js"></script>
 <script src="./chat.js"></script>
+
+<script>
+/* ===== PARTÍCULAS ERA – CANVAS ===== */
+(function() {
+  const canvas = document.getElementById("era-bg-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+
+  let W, H, particles = [], animId;
+  const LIME  = [206, 255, 0];
+  const SLATE = [43,  54,  61];
+  const COUNT = 38;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function mkParticle() {
+    const isLime = Math.random() > 0.35;
+    const rgb    = isLime ? LIME : SLATE;
+    return {
+      x:     Math.random() * W,
+      y:     H + Math.random() * 100,
+      r:     Math.random() * 2.2 + 0.5,
+      speed: Math.random() * 0.5 + 0.18,
+      drift: (Math.random() - 0.5) * 0.35,
+      alpha: Math.random() * 0.5 + 0.15,
+      rgb,
+      life:  0,
+      maxLife: Math.random() * 300 + 160,
+    };
+  }
+
+  function init() {
+    particles = [];
+    for (let i = 0; i < COUNT; i++) {
+      const p = mkParticle();
+      p.y = Math.random() * H;  // distribuir na tela no início
+      p.life = Math.random() * p.maxLife;
+      particles.push(p);
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    particles.forEach((p, i) => {
+      p.y    -= p.speed;
+      p.x    += p.drift;
+      p.life += 1;
+
+      // Fade in/out suave
+      const t     = p.life / p.maxLife;
+      const fade  = t < 0.15 ? t / 0.15 : t > 0.85 ? (1 - t) / 0.15 : 1;
+      const alpha = p.alpha * fade;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.rgb[0]},${p.rgb[1]},${p.rgb[2]},${alpha})`;
+      ctx.fill();
+
+      // Brilho para partículas limão maiores
+      if (p.rgb === LIME && p.r > 1.4) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(206,255,0,${alpha * 0.12})`;
+        ctx.fill();
+      }
+
+      if (p.life >= p.maxLife) particles[i] = mkParticle();
+    });
+
+    animId = requestAnimationFrame(draw);
+  }
+
+  window.addEventListener("resize", () => { resize(); init(); });
+  resize();
+  init();
+  draw();
+})();
+</script>
+
 </body>
 </html>
