@@ -1245,6 +1245,26 @@ window.confirmarConfiguracao = async function () {
   }
 };
 
+
+/* ── Ajuste dinâmico da toolbar e sidebar conforme header real ── */
+function ajustarPosicoes() {
+  const header  = document.querySelector(".app-header, .resumo-header");
+  const toolbar = document.getElementById("resumoToolbar");
+  const nav     = document.getElementById("resumoNav");
+  if (!header) return;
+
+  const hh = header.getBoundingClientRect().height; // altura real do header
+  const th = toolbar ? toolbar.getBoundingClientRect().height : 0;
+
+  if (toolbar) toolbar.style.top = hh + "px";
+  if (nav)     nav.style.top     = (hh + th + 8) + "px";
+  if (nav)     nav.style.maxHeight = "calc(100vh - " + (hh + th + 24) + "px)";
+}
+
+window.addEventListener("load",   ajustarPosicoes);
+window.addEventListener("resize", ajustarPosicoes);
+setTimeout(ajustarPosicoes, 200);
+
 /* ================= TEMA ================= */
 (function initTema() {
   const btn = document.getElementById("toggleTheme");
