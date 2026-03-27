@@ -607,19 +607,21 @@ window.confirmarConfiguracao = async function () {
 
   // ── PALETA ──────────────────────────────────────────
   const C = {
-    primary:   [13,  71, 161],   // azul escuro
-    accent:    [14, 165, 233],   // azul vibrante
-    accent2:   [99, 102, 241],   // índigo
-    success:   [16, 185, 129],   // verde
+    primary:   [43,  54,  61],   // #2B363D slate
+    accent:    [206, 255,  0],   // #CEFF00 limão
+    accent2:   [43,  54,  61],   // slate
+    accentDark:[168, 204,  0],   // #a8cc00 limão escuro
+    success:   [206, 255,  0],
     white:     [255, 255, 255],
-    text:      [15,  23,  42],
-    textSoft:  [100, 116, 139],
-    bgLight:   [240, 247, 255],
-    bgGray:    [248, 250, 252],
-    border:    [203, 213, 225],
-    chipBg:    [224, 231, 255],
-    chipText:  [55,  48, 163],
-    gold:      [245, 158,  11],
+    black:     [14,  22,  25],
+    text:      [26,  34,  38],
+    textSoft:  [90, 107, 114],
+    bgLight:   [247, 252, 232],
+    bgGray:    [244, 245, 242],
+    border:    [212, 219, 176],
+    chipBg:    [237, 255, 160],
+    chipText:  [43,  54,  61],
+    gold:      [206, 255,  0],
   };
 
   const hoje = new Date().toLocaleDateString("pt-BR");
@@ -635,22 +637,23 @@ window.confirmarConfiguracao = async function () {
   function setFont(sz, style="normal") { doc.setFontSize(sz); doc.setFont("helvetica", style); }
 
   function pageFooter() {
-    setFill(C.primary);
-    doc.rect(0, PH - 10, PW, 10, "F");
-    setTextC(C.white);
-    setFont(7);
-    doc.text(`Caderno de Parâmetros  •  ${cli.empresa || ""}`, ML, PH - 3.5);
-    doc.text(`Página ${paginaAtual}`, PW - MR, PH - 3.5, { align: "right" });
+    setFill(C.primary); doc.rect(0,PH-10,PW,10,"F");
+    setFill(C.accent);  doc.rect(0,PH-10,PW,0.8,"F");
+    doc.setTextColor(206,255,0); setFont(7,"bold"); doc.text("SobreIP",ML,PH-3.5);
+    setTextC(C.white); setFont(7,"normal"); doc.text("Caderno de Parametros  -  "+(cli.empresa||""),ML+20,PH-3.5);
+    doc.setTextColor(206,255,0); setFont(7.5,"bold"); doc.text("Pag."+paginaAtual,PW-MR,PH-3.5,{align:"right"});
   }
 
   function pageHeader() {
     if (paginaAtual === 1) return;
-    setFill(C.primary);
-    doc.rect(0, 0, PW, 12, "F");
-    setTextC(C.white);
-    setFont(8, "bold");
-    doc.text("CADERNO DE PARÂMETROS", ML, 7.5);
-    doc.text(hoje, PW - MR, 7.5, { align: "right" });
+    setFill(C.primary); doc.rect(0,0,PW,13,"F");
+    setFill(C.accent);  doc.rect(0,13,PW,1.2,"F");
+    setTextC(C.white); setFont(8,"bold");
+    doc.text("CADERNO DE PARAMETROS", ML, 8);
+    doc.setTextColor(206,255,0); setFont(6.5,"normal");
+    doc.text("SobreIP - Configuracao do Cliente", ML, 12);
+    doc.setTextColor(206,255,0); setFont(7.5,"normal");
+    doc.text(hoje, PW-MR, 8, { align:"right" });
   }
 
   function novaPage() {
@@ -670,14 +673,13 @@ window.confirmarConfiguracao = async function () {
   // ── BARRA DE SEÇÃO ───────────────────────────────────
   function sectionBar(y, titulo, cor = C.primary) {
     y = checkY(y, 14);
-    setFill(cor);
-    doc.rect(ML, y, CW, 11, "F");
-    setFill(C.accent);
-    doc.rect(ML, y, 3, 11, "F");
-    setTextC(C.white);
-    setFont(10, "bold");
-    doc.text(titulo, ML + 6, y + 7.5);
-    return y + 15;
+    doc.setFillColor(0,0,0,0.08); doc.rect(ML+1,y+1,CW,11,"F");
+    setFill(C.primary); doc.rect(ML,y,CW,11,"F");
+    setFill(C.accent);  doc.rect(ML,y,4,11,"F");
+    setFill(C.accentDark); doc.rect(ML,y,CW,0.8,"F");
+    setTextC(C.white); setFont(10,"bold");
+    doc.text(titulo, ML+8, y+7.5);
+    return y+15;
   }
 
   // ── TABELA GENÉRICA ──────────────────────────────────
@@ -694,6 +696,8 @@ window.confirmarConfiguracao = async function () {
         fontSize:   8,
         halign:     "center",
         cellPadding: 4,
+        lineColor:  [168,204,0],
+        lineWidth:  0.5,
       },
       bodyStyles: {
         fontSize:    8,
@@ -794,71 +798,64 @@ window.confirmarConfiguracao = async function () {
   // ════════════════════════════════════════════════════
   //  CAPA
   // ════════════════════════════════════════════════════
-  // Fundo degradê
-  for (let i = 0; i < 50; i++) {
-    const t = i / 50;
-    const r = Math.round(5  + t * (13  - 5));
-    const g = Math.round(11 + t * (71  - 11));
-    const b = Math.round(24 + t * (161 - 24));
-    doc.setFillColor(r, g, b);
-    doc.rect(0, (PH / 50) * i, PW, PH / 50 + 0.5, "F");
+  // Fundo navy ERA
+  doc.setFillColor(14,22,25); doc.rect(0,0,PW,PH,"F");
+  // Orbs limão
+  doc.setFillColor(206,255,0,0.06); doc.circle(PW,0,55,"F");
+  doc.setFillColor(206,255,0,0.04); doc.circle(PW,0,35,"F");
+  doc.setFillColor(206,255,0,0.03); doc.circle(0,PH,45,"F");
+  // Barra gradiente topo
+  for(let i=0;i<PW;i++){
+    const t=i/PW;
+    doc.setFillColor(Math.round(206*(1-t)+168*t),Math.round(255*(1-t)+204*t),0);
+    doc.rect(i,0,1.2,3,"F");
   }
-  // Círculos decorativos
-  doc.setFillColor(14, 165, 233, 0.15);
-  doc.circle(PW * 0.85, PH * 0.28, 30, "F");
-  doc.circle(PW * 0.1,  PH * 0.72, 20, "F");
-  doc.circle(PW * 0.9,  PH * 0.82, 12, "F");
+  // Simbolo ERA (hexagono aproximado)
+  const hcx=PW/2, hcy=PH*0.30, hr=18;
+  doc.setFillColor(206,255,0,0.08); doc.circle(hcx,hcy,hr*2.2,"F");
+  doc.setFillColor(206,255,0,0.05); doc.circle(hcx,hcy,hr*1.5,"F");
+  doc.setDrawColor(206,255,0); doc.setLineWidth(1.2);
+  doc.setFillColor(43,54,61,0.9); doc.circle(hcx,hcy,hr,"FD");
+  doc.setTextColor(206,255,0); setFont(13,"bold");
+  doc.text("ERA",hcx,hcy+4.5,{align:"center"});
 
-  // Barra topo
-  setFill(C.accent);
-  doc.rect(0, 0, PW, 3, "F");
+  setTextC(C.white); setFont(24,"bold");
+  doc.text("Caderno de Parametros", PW/2, PH*0.455, {align:"center"});
+  doc.setTextColor(206,255,0); setFont(11,"normal");
+  doc.text("Resumo da Configuracao do Cliente", PW/2, PH*0.490, {align:"center"});
 
-  // Círculo logo
-  doc.setFillColor(255, 255, 255, 0.08);
-  doc.circle(PW / 2, PH * 0.32, 22, "F");
-  setFill(C.accent);
-  doc.circle(PW / 2, PH * 0.32, 18, "F");
-  setTextC(C.white);
-  setFont(20, "bold");
-  doc.text("CP", PW / 2, PH * 0.32 + 7, { align: "center" });
+  doc.setDrawColor(206,255,0); doc.setLineWidth(1.2);
+  doc.line(PW*0.28, PH*0.515, PW*0.72, PH*0.515);
 
-  // Título
-  setTextC(C.white);
-  setFont(26, "bold");
-  doc.text("Caderno de Parâmetros", PW / 2, PH * 0.46, { align: "center" });
-  doc.setTextColor(176, 212, 241);
-  setFont(12, "normal");
-  doc.text("Resumo da Configuração do Cliente", PW / 2, PH * 0.50, { align: "center" });
+  setTextC(C.white); setFont(17,"bold");
+  doc.text(cli.empresa||"—", PW/2, PH*0.548, {align:"center"});
 
-  // Divisor dourado
-  setDraw(C.accent);
-  doc.setLineWidth(1.5);
-  doc.line(PW * 0.3, PH * 0.535, PW * 0.7, PH * 0.535);
-
-  // Nome empresa
-  setTextC(C.white);
-  setFont(18, "bold");
-  doc.text(cli.empresa || "—", PW / 2, PH * 0.575, { align: "center" });
-
-  // Infos
-  doc.setTextColor(176, 212, 241);
-  setFont(10, "normal");
-  let cy = PH * 0.615;
-  [
-    ["Domínio", cli.dominio || "—"],
-    ["CNPJ",    cli.cnpj    || "—"],
-    ["Data",    hoje],
-  ].forEach(([l, v]) => {
-    doc.text(`${l}:  ${v}`, PW / 2, cy, { align: "center" });
-    cy += 7;
+  // Card infos
+  const cix=PW*0.15, ciw=PW*0.70, cih=42, cis=PH*0.570;
+  doc.setFillColor(255,255,255,0.04); doc.roundedRect(cix,cis,ciw,cih,4,4,"F");
+  doc.setDrawColor(206,255,0,0.18); doc.setLineWidth(0.5); doc.roundedRect(cix,cis,ciw,cih,4,4,"S");
+  let iy=cis+10;
+  [["Dominio",cli.dominio||"—"],["CNPJ / CPF",cli.cnpj||"—"],["Data",hoje]].forEach(([l,v])=>{
+    doc.setFillColor(206,255,0); doc.circle(cix+8,iy-1.5,1.2,"F");
+    doc.setTextColor(206,255,0); setFont(8,"bold"); doc.text(l+":",cix+13,iy);
+    setTextC(C.white); setFont(8,"normal"); doc.text(v,cix+14+doc.getTextWidth(l+":"),iy);
+    iy+=12;
+  });
+  // Stats
+  const statsD=[["Usuarios",String(voz.usuarios?.length||0)],["Ramais",String(voz.ramais?.length||0)],["Filas",String(voz.filas?.length||0)],["URAs",String(voz.uras?.length||0)],["Agentes",String(voz.agentes?.length||0)],["Chat",dados.chat?.tipo?"Sim":"Nao"]];
+  const sw2=ciw/statsD.length, sy2=cis+cih+8;
+  statsD.forEach(([lb,vl],i)=>{
+    const sx=cix+i*sw2;
+    doc.setFillColor(206,255,0,0.06); doc.roundedRect(sx+1,sy2,sw2-3,22,3,3,"F");
+    doc.setDrawColor(206,255,0,0.14); doc.setLineWidth(0.4); doc.roundedRect(sx+1,sy2,sw2-3,22,3,3,"S");
+    doc.setTextColor(206,255,0); setFont(11,"bold"); doc.text(vl,sx+sw2/2,sy2+12,{align:"center"});
+    doc.setTextColor(255,255,255,0.45); setFont(6.5,"normal"); doc.text(lb,sx+sw2/2,sy2+19,{align:"center"});
   });
 
-  // Rodapé capa
-  doc.setFillColor(255, 255, 255, 0.1);
-  doc.rect(0, PH - 14, PW, 14, "F");
-  setTextC(C.white);
-  setFont(8);
-  doc.text("Documento gerado automaticamente pelo Caderno de Parâmetros SobreIP", PW / 2, PH - 5.5, { align: "center" });
+  doc.setFillColor(0,0,0,0.4); doc.rect(0,PH-11,PW,11,"F");
+  doc.setTextColor(206,255,0,0.85); setFont(7,"bold"); doc.text("SobreIP",10,PH-4);
+  setTextC(C.white); setFont(7,"normal"); doc.text("Documento gerado automaticamente pelo Caderno de Parametros",PW/2,PH-4,{align:"center"});
+  doc.setTextColor(206,255,0,0.6); doc.text(hoje,PW-10,PH-4,{align:"right"});
 
   // ── Página 2: Índice ─────────────────────────────────
   doc.addPage();
@@ -866,7 +863,7 @@ window.confirmarConfiguracao = async function () {
   pageHeader();
 
   let y = 22;
-  y = sectionBar(y, "ÍNDICE DO DOCUMENTO", C.accent2);
+  y = sectionBar(y, "INDICE DO DOCUMENTO", C.accent2);
 
   const modulos = [];
   if (cli)                        modulos.push("🏢  Dados do Cliente");
@@ -923,7 +920,7 @@ window.confirmarConfiguracao = async function () {
   // ── USUÁRIOS WEB ─────────────────────────────────────
   if (voz.usuarios?.length) {
     y = checkY(y, 30);
-    y = sectionBar(y, "USUÁRIOS WEB", C.primary);
+    y = sectionBar(y, "USUARIOS WEB", C.primary);
     const cols = [CW*0.22, CW*0.27, CW*0.21, CW*0.25, CW*0.05];
     const rows = voz.usuarios.map(u => [
       u.nome || "—", u.email || "—", u.senha || "—", u.permissao || "—",
@@ -935,7 +932,7 @@ window.confirmarConfiguracao = async function () {
   // ── ENTRADAS ─────────────────────────────────────────
   if (voz.entradas?.length) {
     y = checkY(y, 20);
-    y = sectionBar(y, "NÚMEROS DE ENTRADA", C.primary);
+    y = sectionBar(y, "NUMEROS DE ENTRADA", C.primary);
     y = chips(y, voz.entradas.map(e => e.numero || "—"));
   }
 
@@ -1000,7 +997,7 @@ window.confirmarConfiguracao = async function () {
   // ── URA ──────────────────────────────────────────────
   if (voz.uras?.length) {
     y = checkY(y, 30);
-    y = sectionBar(y, "URA — ATENDIMENTO AUTOMÁTICO", C.primary);
+    y = sectionBar(y, "URA - ATENDIMENTO AUTOMATICO", C.primary);
     voz.uras.forEach(u => {
       y = checkY(y, 30);
       setTextC(C.primary);
@@ -1045,7 +1042,7 @@ window.confirmarConfiguracao = async function () {
   // ── PESQUISA ─────────────────────────────────────────
   if (voz.pesquisas?.length) {
     y = checkY(y, 40);
-    y = sectionBar(y, "PESQUISA DE SATISFAÇÃO", C.primary);
+    y = sectionBar(y, "PESQUISA DE SATISFACAO", C.primary);
     voz.pesquisas.forEach(p => {
       y = checkY(y, 50);
       y = cardInfo(y, [
@@ -1093,7 +1090,7 @@ window.confirmarConfiguracao = async function () {
 
     if (chat.usuarios?.length) {
       y = checkY(y, 30);
-      y = sectionBar(y, "USUÁRIOS DO CHAT", C.accent2);
+      y = sectionBar(y, "USUARIOS DO CHAT", C.accent2);
       const cols = [CW*0.25, CW*0.30, CW*0.22, CW*0.23];
       const rows = chat.usuarios.map(u => [u.nome || "—", u.email || "—", u.senha || "—", u.permissao || "—"]);
       y = tabelaAutoTable(y, ["Nome","E-mail","Senha","Permissão"], rows, cols);
