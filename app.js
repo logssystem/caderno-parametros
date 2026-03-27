@@ -841,25 +841,43 @@ function gerarAgentesAPartirUsuarios() {
 function gerarAgentesChatAPartirUsuarios() {
     const lista = document.getElementById("listaAgentesChat");
     if (!lista) return;
-    lista.innerHTML = "";
-    let usuarios = document.querySelectorAll("#listaUsuariosWeb .campo-descricao");
-    if (!usuarios.length) usuarios = document.querySelectorAll("#listaUsuariosChat .campo-descricao");
-    usuarios.forEach(u => {
-        const nome    = u.querySelector(".campo-nome")?.value;
-        const chkOmni = u.querySelector(".checkbox-omni") || u.querySelector("input[type=checkbox]");
-        if (chkOmni && chkOmni.checked && nome) {
-            const wrap = document.createElement("div");
-            wrap.className = "campo-descricao";
-            const linha = document.createElement("div");
-            linha.className = "linha-principal";
-            const inputNome = document.createElement("input");
-            inputNome.className = "campo-nome";
-            inputNome.value = nome;
-            inputNome.disabled = true;
-            linha.append(inputNome);
-            wrap.append(linha);
-            lista.appendChild(wrap);
+
+    const modo = localStorage.getItem("modo_atendimento");
+
+    // Coleta agentes de TODAS as fontes possíveis
+    const agentesEncontrados = new Map(); // nome -> true (dedup)
+
+    // Fonte 1: usuários web marcados como omni (modo ambos)
+    document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
+        const nome    = u.querySelector(".campo-nome")?.value?.trim();
+        const chkOmni = u.querySelector(".checkbox-omni");
+        if (chkOmni && chkOmni.checked && nome) agentesEncontrados.set(nome, true);
+    });
+
+    // Fonte 2: usuários do chat marcados como agente (modo chat)
+    document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
+        const nome = u.querySelector(".campo-nome")?.value?.trim();
+        const chk  = u.querySelector("input[type=checkbox]");
+        // Evita duplicar quem já veio da fonte 1
+        if (chk && chk.checked && nome && !agentesEncontrados.has(nome)) {
+            agentesEncontrados.set(nome, true);
         }
+    });
+
+    lista.innerHTML = "";
+
+    agentesEncontrados.forEach((_, nome) => {
+        const wrap = document.createElement("div");
+        wrap.className = "campo-descricao";
+        const linha = document.createElement("div");
+        linha.className = "linha-principal";
+        const inputNome = document.createElement("input");
+        inputNome.className = "campo-nome";
+        inputNome.value = nome;
+        inputNome.disabled = true;
+        linha.append(inputNome);
+        wrap.append(linha);
+        lista.appendChild(wrap);
     });
 }
 /* ================= SELECTS DINÂMICOS ================= */
@@ -1451,10 +1469,18 @@ window.initCaderno = function () {
   if (cardUsuariosOmni) cardUsuariosOmni.style.display = modo === "chat" ? "block" : "none";
   if (typeof mostrarApp === "function") mostrarApp(modo);
   else if (typeof window.mostrarApp === "function") window.mostrarApp(modo);
-  if (modo === "chat" || modo === "ambos") {
-    if (typeof window.inicializarChatUI === "function") window.inicializarChatUI();
-  }
-  setTimeout(syncTudo, 200);
+
+  // Aguarda DOM estar estável antes de inicializar chat e sincronizar
+  setTimeout(() => {
+    if (modo === "chat" || modo === "ambos") {
+      if (typeof window.inicializarChatUI === "function") window.inicializarChatUI();
+    }
+    syncTudo();
+    // Segunda passada para garantir que agentes chat carregam
+    if (modo === "chat" || modo === "ambos") {
+      setTimeout(gerarAgentesChatAPartirUsuarios, 150);
+    }
+  }, 120);
 };
 document.addEventListener("DOMContentLoaded", () => {
   if (typeof window.initCaderno === "function") window.initCaderno();
