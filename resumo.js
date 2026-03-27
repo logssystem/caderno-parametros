@@ -682,12 +682,14 @@ window.confirmarConfiguracao = async function () {
   // ── BARRA DE SEÇÃO ───────────────────────────────────
   function sectionBar(y, titulo, cor = C.primary) {
     y = checkY(y, 14);
-    setFill(C.primary);
+    // sectionBar: fundo slate + faixa limão
+    doc.setFillColor(43, 54, 61);
     doc.rect(ML, y, CW, 11, "F");
     doc.setFillColor(206, 255, 0);
     doc.rect(ML, y, 4, 11, "F");
-    setTextC(C.white);
-    setFont(10, "bold");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
     doc.text(titulo, ML + 8, y + 7.5);
     return y + 15;
   }
@@ -806,96 +808,163 @@ window.confirmarConfiguracao = async function () {
   // ════════════════════════════════════════════════════
   //  CAPA
   // ════════════════════════════════════════════════════
-  // Fundo degradê azul profissional
-  for (let i = 0; i < 50; i++) {
-    const t = i / 50;
-    const r = Math.round(5  + t * (13  - 5));
-    const g = Math.round(11 + t * (71  - 11));
-    const b = Math.round(24 + t * (161 - 24));
-    doc.setFillColor(r, g, b);
-    doc.rect(0, (PH / 50) * i, PW, PH / 50 + 0.5, "F");
-  }
-  // Círculos decorativos
-  doc.setFillColor(14, 165, 233, 0.15);
-  doc.circle(PW * 0.85, PH * 0.28, 30, "F");
-  doc.circle(PW * 0.1,  PH * 0.72, 20, "F");
-  doc.circle(PW * 0.9,  PH * 0.82, 12, "F");
+  // ════════════════════════════════════════════
+  //  CAPA
+  // ════════════════════════════════════════════
 
-  // Barra topo limão
+  // 1. Fundo degradê navy (de cima pra baixo)
+  for (let i = 0; i < 60; i++) {
+    const t = i / 60;
+    doc.setFillColor(
+      Math.round(5  + t * (8  - 5)),
+      Math.round(11 + t * (28 - 11)),
+      Math.round(24 + t * (55 - 24))
+    );
+    doc.rect(0, (PH / 60) * i, PW, PH / 60 + 0.5, "F");
+  }
+
+  // 2. Círculos decorativos
+  doc.setFillColor(14, 165, 233);
+  doc.setGState(new doc.GState({ opacity: 0.10 }));
+  doc.circle(PW * 0.85, PH * 0.25, 32, "F");
+  doc.circle(PW * 0.10, PH * 0.75, 22, "F");
+  doc.circle(PW * 0.92, PH * 0.80, 13, "F");
+  doc.setGState(new doc.GState({ opacity: 1 }));
+
+  // 3. Barra topo limão
   doc.setFillColor(206, 255, 0);
   doc.rect(0, 0, PW, 3, "F");
 
-  // Círculo logo ERA
-  doc.setFillColor(255, 255, 255, 0.08);
-  doc.circle(PW / 2, PH * 0.32, 22, "F");
-  doc.setFillColor(43, 54, 61);
-  doc.circle(PW / 2, PH * 0.32, 18, "F");
-  doc.setDrawColor(206, 255, 0);
-  doc.setLineWidth(1.2);
-  doc.circle(PW / 2, PH * 0.32, 18, "S");
-  doc.setTextColor(206, 255, 0);
-  setFont(14, "bold");
-  doc.text("ERA", PW / 2, PH * 0.32 + 5, { align: "center" });
+  // 4. Círculo ERA – halo externo suave
+  const lcx = PW / 2;
+  const lcy = PH * 0.295;
 
-  setTextC(C.white);
-  setFont(26, "bold");
-  doc.text("Caderno de Parametros", PW / 2, PH * 0.46, { align: "center" });
-  doc.setTextColor(206, 255, 0);
-  setFont(12, "normal");
-  doc.text("Resumo da Configuracao do Cliente", PW / 2, PH * 0.50, { align: "center" });
+  // halo suave
+  doc.setFillColor(206, 255, 0);
+  doc.setGState(new doc.GState({ opacity: 0.08 }));
+  doc.circle(lcx, lcy, 28, "F");
+  doc.setGState(new doc.GState({ opacity: 1 }));
 
+  // círculo sólido escuro (fundo do ícone)
+  doc.setFillColor(10, 20, 40);
+  doc.circle(lcx, lcy, 20, "F");
+
+  // borda limão
   doc.setDrawColor(206, 255, 0);
   doc.setLineWidth(1.5);
-  doc.line(PW * 0.3, PH * 0.535, PW * 0.7, PH * 0.535);
+  doc.circle(lcx, lcy, 20, "S");
 
-  setTextC(C.white);
-  setFont(18, "bold");
-  doc.text(cli.empresa || "—", PW / 2, PH * 0.575, { align: "center" });
+  // borda interna menor
+  doc.setDrawColor(206, 255, 0);
+  doc.setLineWidth(0.5);
+  doc.setGState(new doc.GState({ opacity: 0.35 }));
+  doc.circle(lcx, lcy, 15.5, "S");
+  doc.setGState(new doc.GState({ opacity: 1 }));
 
-  // Infos centralizadas
+  // texto ERA em limão — centralizado verticalmente no círculo
+  doc.setTextColor(206, 255, 0);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text("ERA", lcx, lcy + 4.2, { align: "center" });
+
+  // 5. Título principal
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(26);
+  doc.text("Caderno de Parametros", PW / 2, PH * 0.455, { align: "center" });
+
+  // 6. Subtítulo em azul claro
   doc.setTextColor(176, 212, 241);
-  setFont(10, "normal");
-  let cy = PH * 0.615;
-  [
-    ["Dominio",   cli.dominio || "—"],
-    ["CNPJ",      cli.cnpj    || "—"],
-    ["Data",      hoje],
-  ].forEach(([l, v]) => {
-    doc.text(l + ":  " + v, PW / 2, cy, { align: "center" });
-    cy += 7;
-  });
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(12);
+  doc.text("Resumo da Configuracao do Cliente", PW / 2, PH * 0.492, { align: "center" });
 
-  // Stats box
-  const statsD = [
-    ["Usuarios", String(voz.usuarios?.length || 0)],
-    ["Ramais",   String(voz.ramais?.length   || 0)],
-    ["Filas",    String(voz.filas?.length    || 0)],
-    ["URAs",     String(voz.uras?.length     || 0)],
-    ["Agentes",  String(voz.agentes?.length  || 0)],
-    ["Chat",     dados.chat?.tipo ? "Sim" : "Nao"],
+  // 7. Linha divisória limão
+  doc.setDrawColor(206, 255, 0);
+  doc.setLineWidth(1.5);
+  doc.line(PW * 0.30, PH * 0.520, PW * 0.70, PH * 0.520);
+
+  // 8. Nome da empresa
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(19);
+  doc.text(cli.empresa || "", PW / 2, PH * 0.558, { align: "center" });
+
+  // 9. Infos: Domínio, CNPJ, Data
+  doc.setTextColor(176, 212, 241);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  const infos = [
+    ["Dominio",    cli.dominio || "—"],
+    ["CNPJ",       cli.cnpj    || "—"],
+    ["Data",       hoje],
   ];
-  const sw2 = (PW * 0.72) / statsD.length;
-  const sx0 = PW * 0.14, sy2 = PH * 0.695;
-  statsD.forEach(([lb, vl], i) => {
-    const sx = sx0 + i * sw2;
-    doc.setFillColor(255, 255, 255, 0.07);
-    doc.roundedRect(sx + 1, sy2, sw2 - 3, 22, 3, 3, "F");
-    doc.setDrawColor(206, 255, 0, 0.25);
-    doc.setLineWidth(0.4);
-    doc.roundedRect(sx + 1, sy2, sw2 - 3, 22, 3, 3, "S");
-    doc.setTextColor(206, 255, 0);
-    setFont(11, "bold");
-    doc.text(vl, sx + sw2 / 2, sy2 + 13, { align: "center" });
-    doc.setTextColor(255, 255, 255, 0.5);
-    setFont(6.5, "normal");
-    doc.text(lb, sx + sw2 / 2, sy2 + 19.5, { align: "center" });
+  let iy = PH * 0.595;
+  infos.forEach(([label, val]) => {
+    doc.text(label + ":  " + val, PW / 2, iy, { align: "center" });
+    iy += 7;
   });
 
-  doc.setFillColor(255, 255, 255, 0.1);
+  // 10. Stats — 6 mini-cards alinhados
+  const stats = [
+    { label: "Usuarios", val: String(voz.usuarios?.length  || 0) },
+    { label: "Ramais",   val: String(voz.ramais?.length    || 0) },
+    { label: "Filas",    val: String(voz.filas?.length     || 0) },
+    { label: "URAs",     val: String(voz.uras?.length      || 0) },
+    { label: "Agentes",  val: String(voz.agentes?.length   || 0) },
+    { label: "Chat",     val: dados.chat?.tipo ? "Sim" : "Nao"  },
+  ];
+  const N       = stats.length;
+  const statsTW = PW - 28;         // largura total usável
+  const statsX0 = 14;              // margem esquerda
+  const statW   = statsTW / N;
+  const statY   = PH * 0.690;
+  const statH   = 24;
+
+  stats.forEach(({ label, val }, i) => {
+    const bx = statsX0 + i * statW + 1;
+    const bw = statW - 3;
+
+    // fundo translúcido
+    doc.setFillColor(255, 255, 255);
+    doc.setGState(new doc.GState({ opacity: 0.07 }));
+    doc.roundedRect(bx, statY, bw, statH, 3, 3, "F");
+    doc.setGState(new doc.GState({ opacity: 1 }));
+
+    // borda limão suave
+    doc.setDrawColor(206, 255, 0);
+    doc.setLineWidth(0.35);
+    doc.setGState(new doc.GState({ opacity: 0.30 }));
+    doc.roundedRect(bx, statY, bw, statH, 3, 3, "S");
+    doc.setGState(new doc.GState({ opacity: 1 }));
+
+    // valor em limão
+    doc.setTextColor(206, 255, 0);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text(val, bx + bw / 2, statY + 14, { align: "center" });
+
+    // label em branco suave
+    doc.setTextColor(255, 255, 255);
+    doc.setGState(new doc.GState({ opacity: 0.55 }));
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(6.5);
+    doc.text(label, bx + bw / 2, statY + 20.5, { align: "center" });
+    doc.setGState(new doc.GState({ opacity: 1 }));
+  });
+
+  // 11. Rodapé da capa
+  doc.setFillColor(0, 0, 0);
+  doc.setGState(new doc.GState({ opacity: 0.30 }));
   doc.rect(0, PH - 14, PW, 14, "F");
-  setTextC(C.white);
-  setFont(8);
-  doc.text("Documento gerado automaticamente pelo Caderno de Parametros SobreIP", PW / 2, PH - 5.5, { align: "center" });
+  doc.setGState(new doc.GState({ opacity: 1 }));
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.text(
+    "Documento gerado automaticamente pelo Caderno de Parametros SobreIP",
+    PW / 2, PH - 5.5, { align: "center" }
+  );
 
   // ── Página 2: Índice ─────────────────────────────────
   doc.addPage();
