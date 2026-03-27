@@ -1153,12 +1153,12 @@ function coletarEntradas() {
 }
 /* ================= CHAT – COLETA FINAL ================= */
 window.coletarChatDoDOM = function () {
-  const numeroQr = document.getElementById("numeroQr");
   const tiposAtivos = window._tiposAtivos || new Set();
 
   // Conta: API usa chatState.conta, QR usa o input
   let contaApi = window.chatState?.conta || null;
-  let contaQr  = (numeroQr && numeroQr.value.trim()) ? numeroQr.value.trim() : null;
+  const numerosQr = (window.chatState?.numeros_qr || []).filter(Boolean);
+  let contaQr = numerosQr.length ? (numerosQr.length === 1 ? numerosQr[0] : numerosQr) : null;
 
   // Define conta final baseada nos tipos ativos
   let contaFinal = null;
@@ -1175,7 +1175,7 @@ window.coletarChatDoDOM = function () {
     tipo:          window.chatState?.tipo  || null,
     api:           window.chatState?.api   || null,
     conta:         contaFinal,
-    numero_qr:     contaQr,
+    numero_qr:     numerosQr,
     canais:        window.chatState?.canais || [],
     usuarios:      [],
     agentes:       [],
@@ -1383,7 +1383,6 @@ function _atualizarBlocosTipo() {
     if (ca) ca.style.display = "none";
   }
 
-  atualizarModuloChat();
 }
 
 window.toggleTipoChat = function (el, tipo) {
@@ -1407,13 +1406,66 @@ window.toggleTipoChat = function (el, tipo) {
 window.selecionarTipoChat = function (el, tipo) {
   window.toggleTipoChat(el, tipo);
 };
-document.addEventListener("DOMContentLoaded", () => {
-  const numeroQr = document.getElementById("numeroQr");
-  if (!numeroQr) return;
-  numeroQr.addEventListener("input", function () {
-    window.chatState = window.chatState || {};
-    window.chatState.conta = this.value;
+/* ── LISTA DE NÚMEROS QR ── */
+window.adicionarNumeroQr = function () {
+  const lista = document.getElementById("listaNumeroQr");
+  if (!lista) return;
+
+  const row = document.createElement("div");
+  row.className = "qr-numero-row";
+
+  const input = document.createElement("input");
+  input.placeholder  = "Ex: (11) 99999-9999";
+  input.inputMode    = "numeric";
+  input.className    = "qr-numero-input campo-nome";
+
+  // Formata e valida igual ao campo de entrada
+  input.addEventListener("input", () => {
+    if (typeof formatarTelefone === "function") formatarTelefone(input);
+    _sincronizarNumerosQr();
   });
+
+  const del = document.createElement("button");
+  del.innerHTML = "✕";
+  del.className = "faixa-del";
+  del.title     = "Remover número";
+  del.onclick   = () => {
+    if (lista.querySelectorAll(".qr-numero-row").length <= 1) return;
+    row.style.opacity = "0";
+    setTimeout(() => { row.remove(); _sincronizarNumerosQr(); }, 180);
+  };
+
+  row.append(input, del);
+  lista.appendChild(row);
+  input.focus();
+  _sincronizarNumerosQr();
+};
+
+function _sincronizarNumerosQr() {
+  const numeros = [];
+  document.querySelectorAll("#listaNumeroQr .qr-numero-input").forEach(inp => {
+    const v = inp.value.trim();
+    if (v) numeros.push(v);
+  });
+  window.chatState = window.chatState || {};
+  window.chatState.numeros_qr = numeros;
+  window.chatState.conta = numeros[0] || null; // compatibilidade
+}
+
+// Inicializa com 1 campo quando o bloco QR é exibido
+document.addEventListener("DOMContentLoaded", () => {
+  // Observa quando o bloco chat-qr é exibido pela primeira vez
+  const qrBox = document.getElementById("chat-qr");
+  if (!qrBox) return;
+  const obs = new MutationObserver(() => {
+    if (qrBox.style.display !== "none") {
+      const lista = document.getElementById("listaNumeroQr");
+      if (lista && lista.children.length === 0) {
+        window.adicionarNumeroQr();
+      }
+    }
+  });
+  obs.observe(qrBox, { attributes: true, attributeFilter: ["style"] });
 });
 window.selecionarApi = function (el, api) {
     window.chatState = window.chatState || {};
@@ -1451,11 +1503,13 @@ function salvarConfiguracao() {
   window.location.href = "resumo.html";
 }
 function atualizarModuloChat() {
+    // modulochat (usuários, agentes, departamentos) NUNCA some
+    // ele é controlado apenas pelo modo (chat/ambos), não pelo tipo de integração
     const moduloChat = document.getElementById("modulochat");
     if (!moduloChat) return;
-    const tipo = window.chatState?.tipo;
-    const temChat = tipo === "api" || tipo === "qr" || tipo === "ambos";
-    moduloChat.style.display = temChat ? "block" : "none";
+    const modo = localStorage.getItem("modo_atendimento");
+    const visivel = modo === "chat" || modo === "ambos";
+    moduloChat.style.display = visivel ? "block" : "none";
 }
 document.addEventListener("DOMContentLoaded", () => {
   const blocoAgentesChat = document.querySelector("#listaAgentesChat")?.parentElement;
@@ -1529,6 +1583,9 @@ window.initCaderno = function () {
 
   // Aguarda DOM estável antes de inicializar chat e sincronizar
   setTimeout(() => {
+    // Garante modulochat visível antes de qualquer sync
+    atualizarModuloChat();
+
     if (modo === "chat" || modo === "ambos") {
       if (typeof window.inicializarChatUI === "function") window.inicializarChatUI();
     }
@@ -1743,7 +1800,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* Formatar números de entrada como telefone */
   document.addEventListener("input", (e) => {
     const ph = e.target.placeholder || "";
-    if (ph.toLowerCase().includes("número de entrada") || ph.toLowerCase().includes("número de entrada") || (e.target.closest("#listaEntradas") && e.target.classList.contains("campo-nome"))) {
+    if (ph.toLowerCase().includes("número de entrada") || e.target.classList.contains("qr-numero-input") || (e.target.closest("#listaEntradas") && e.target.classList.contains("campo-nome"))) {
       formatarTelefone(e.target);
     }
   });
