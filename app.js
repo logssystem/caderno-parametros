@@ -240,25 +240,7 @@ window.validarDominioCliente = function () {
 if (dominioInput) {
     dominioInput.addEventListener("input", window.validarDominioCliente);
 }
-const cnpjInput = document.getElementById("cnpjCliente");
-const regraCNPJ = document.getElementById("regraCNPJ");
-if (cnpjInput) {
-  cnpjInput.addEventListener("input", () => {
-    let v = cnpjInput.value.replace(/\D/g, "").slice(0, 14);
-    v = v.replace(/^(\d{2})(\d)/, "$1.$2");
-    v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-    v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
-    v = v.replace(/(\d{4})(\d)/, "$1-$2");
-    cnpjInput.value = v;
-    if (v.length === 18) {
-      regraCNPJ.textContent = "CNPJ preenchido";
-      regraCNPJ.style.color = "green";
-    } else {
-      regraCNPJ.textContent = "CNPJ incompleto";
-      regraCNPJ.style.color = "red";
-    }
-  });
-}
+// Listener CNPJ/CPF unificado — ver bloco melhorarDocumento() abaixo
 /* ================= ADICIONAR CAMPO ================= */
 window.adicionarCampo = function (tipo) {
     if (tipo === "agente") {
@@ -1619,6 +1601,20 @@ window.validarCNPJReal = function(cnpj) {
   return calc(12) && calc(13);
 };
 
+/* ---------- CPF real ---------- */
+window.validarCPFReal = function(cpf) {
+  cpf = cpf.replace(/\D/g, "");
+  if (cpf.length !== 11) return false;
+  if (/^(\d)+$/.test(cpf)) return false;
+  const calc = (len) => {
+    let sum = 0;
+    for (let i = 0; i < len; i++) sum += parseInt(cpf[i]) * (len + 1 - i);
+    const r = (sum * 10) % 11;
+    return (r === 10 || r === 11 ? 0 : r) === parseInt(cpf[len]);
+  };
+  return calc(9) && calc(10);
+};
+
 /* ---------- E-mail ---------- */
 window.validarEmail = function(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
@@ -1689,38 +1685,74 @@ window.validarSenhaV2 = function(input, container) {
   }
 };
 
-/* ---------- CNPJ – listener aprimorado ---------- */
-(function melhorarCNPJ() {
-  const cnpjInput = document.getElementById("cnpjCliente");
-  const regraCNPJ = document.getElementById("regraCNPJ");
-  if (!cnpjInput || !regraCNPJ) return;
+/* ---------- CNPJ / CPF – listener unificado ---------- */
+(function melhorarDocumento() {
+  const input  = document.getElementById("cnpjCliente");
+  const regra  = document.getElementById("regraCNPJ");
+  if (!input || !regra) return;
 
-  cnpjInput.addEventListener("input", () => {
-    let v = cnpjInput.value.replace(/\D/g, "").slice(0, 14);
-    v = v.replace(/^(\d{2})(\d)/, "$1.$2");
-    v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-    v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
-    v = v.replace(/(\d{4})(\d)/, "$1-$2");
-    cnpjInput.value = v;
+  function formatarDoc(digits) {
+    if (digits.length <= 11) {
+      // Formata como CPF: 000.000.000-00
+      let v = digits;
+      v = v.replace(/(\d{3})(\d)/, "$1.$2");
+      v = v.replace(/(\d{3})\.(\d{3})(\d)/, "$1.$2.$3");
+      v = v.replace(/\.(\d{3})(\d)/, ".$1-$2");
+      return v;
+    } else {
+      // Formata como CNPJ: 00.000.000/0000-00
+      let v = digits;
+      v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+      v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+      v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+      v = v.replace(/(\d{4})(\d)/, "$1-$2");
+      return v;
+    }
+  }
 
-    if (v.replace(/\D/g,"").length < 14) {
-      regraCNPJ.className = "regra-neutra";
-      regraCNPJ.textContent = "Digite os 14 dígitos do CNPJ";
-      cnpjInput.classList.remove("campo-valido","campo-obrigatorio-erro");
+  input.addEventListener("input", () => {
+    const digits = input.value.replace(/\D/g, "").slice(0, 14);
+    input.value  = formatarDoc(digits);
+    const len    = digits.length;
+
+    // Neutro enquanto digita
+    if (len === 0) {
+      regra.className   = "";
+      regra.textContent = "";
+      input.classList.remove("campo-valido", "campo-obrigatorio-erro");
       return;
     }
-    const valido = validarCNPJReal(v);
-    if (valido) {
-      regraCNPJ.className = "regra-ok";
-      regraCNPJ.textContent = "✓ CNPJ válido";
-      cnpjInput.classList.add("campo-valido");
-      cnpjInput.classList.remove("campo-obrigatorio-erro");
-    } else {
-      regraCNPJ.className = "regra-erro";
-      regraCNPJ.textContent = "✗ CNPJ inválido";
-      cnpjInput.classList.add("campo-obrigatorio-erro");
-      cnpjInput.classList.remove("campo-valido");
+
+    // CPF: 11 dígitos
+    if (len <= 11) {
+      if (len < 11) {
+        regra.className   = "regra-neutra";
+        regra.textContent = `CPF — faltam ${11 - len} dígito${11 - len > 1 ? "s" : ""}`;
+        input.classList.remove("campo-valido", "campo-obrigatorio-erro");
+      } else {
+        const ok = validarCPFReal(digits);
+        regra.className   = ok ? "regra-ok"  : "regra-erro";
+        regra.textContent = ok ? "✓ CPF válido" : "✗ CPF inválido";
+        input.classList.toggle("campo-valido",            ok);
+        input.classList.toggle("campo-obrigatorio-erro", !ok);
+      }
+      return;
     }
+
+    // CNPJ: 12-13 dígitos (ainda digitando)
+    if (len < 14) {
+      regra.className   = "regra-neutra";
+      regra.textContent = `CNPJ — faltam ${14 - len} dígito${14 - len > 1 ? "s" : ""}`;
+      input.classList.remove("campo-valido", "campo-obrigatorio-erro");
+      return;
+    }
+
+    // CNPJ: 14 dígitos completo
+    const ok = validarCNPJReal(digits);
+    regra.className   = ok ? "regra-ok"  : "regra-erro";
+    regra.textContent = ok ? "✓ CNPJ válido" : "✗ CNPJ inválido";
+    input.classList.toggle("campo-valido",            ok);
+    input.classList.toggle("campo-obrigatorio-erro", !ok);
   });
 })();
 
@@ -1824,7 +1856,11 @@ window.salvarConfiguracao = function() {
   if (!dominio || !dominio.endsWith(".sobreip.com.br")) erros.push("Domínio inválido");
 
   const cnpj = document.getElementById("cnpjCliente")?.value.trim();
-  if (cnpj && !validarCNPJReal(cnpj)) erros.push("CNPJ inválido");
+  if (cnpj) {
+    const digits = cnpj.replace(/\D/g, "");
+    const docValido = digits.length === 11 ? validarCPFReal(cnpj) : validarCNPJReal(cnpj);
+    if (!docValido) erros.push(digits.length <= 11 ? "CPF inválido" : "CNPJ inválido");
+  }
 
   // Verifica e-mails de usuários
   document.querySelectorAll("#listaUsuariosWeb input[type=email]").forEach((el, i) => {
