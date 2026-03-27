@@ -1669,30 +1669,34 @@ body.light .chat-tipo-bloco > h3 { color: #5a7a00 !important; }
 ====================================================== */
 .resumo-layout {
   display: flex;
+  align-items: flex-start;
   min-height: calc(100vh - 80px);
   max-width: 1300px;
   margin: 0 auto;
-  padding: 0 16px 40px;
-  gap: 24px;
+  padding: 20px 16px 60px;
+  gap: 20px;
   position: relative;
   z-index: 1;
 }
 
 /* ── SIDEBAR NAV ── */
 .resumo-nav {
-  width: 210px;
+  width: 195px;
   flex-shrink: 0;
+  /* sticky abaixo do header + toolbar */
   position: sticky;
-  top: 80px;
+  top: 160px;
   height: fit-content;
-  max-height: calc(100vh - 100px);
+  max-height: calc(100vh - 180px);
   overflow-y: auto;
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px 0;
+  border-radius: 12px;
+  padding: 14px 0;
   backdrop-filter: blur(10px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  /* nunca sobrepõe o conteúdo */
+  z-index: 2;
 }
 .resumo-nav::-webkit-scrollbar { width: 3px; }
 .resumo-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
@@ -1715,14 +1719,14 @@ body.light .chat-tipo-bloco > h3 { color: #5a7a00 !important; }
 .nav-link {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  font-size: 13px;
+  gap: 7px;
+  padding: 7px 14px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-soft);
   text-decoration: none;
   border-left: 3px solid transparent;
-  transition: all 0.18s ease;
+  transition: all 0.15s ease;
   cursor: pointer;
 }
 .nav-link:hover { color: var(--text); background: rgba(206,255,0,0.05); }
@@ -1748,21 +1752,25 @@ body.light .nav-badge { background: rgba(168,204,0,0.15); color: #3a5200; }
 .resumo-main {
   flex: 1;
   min-width: 0;
+  /* garante que cards ficam dentro do próprio espaço */
+  overflow: hidden;
 }
 
 /* ── TOOLBAR ── */
 .resumo-toolbar {
   position: sticky;
-  top: 64px;
-  z-index: 500;
+  top: 96px;          /* abaixo do header real (logo 64 + padding 32) */
+  z-index: 400;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 24px;
+  padding: 8px 20px;
   background: var(--header-bg);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
+  border-top: 1px solid var(--border);
   max-width: 100%;
+  min-height: 52px;
 }
 .toolbar-search {
   display: flex;
@@ -1968,12 +1976,12 @@ body.light .ura-table td { border-color: #f0f0f0; }
 .resumo-empty { max-width: 600px; margin: 80px auto; padding: 0 20px; z-index: 1; position: relative; }
 
 /* ── RESPONSIVO ── */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .resumo-nav { display: none; }
-  .resumo-layout { padding: 0 12px 40px; }
+  .resumo-layout { padding: 12px 12px 40px; gap: 0; }
 }
 @media (max-width: 640px) {
-  .resumo-toolbar { flex-wrap: wrap; gap: 8px; top: 56px; padding: 8px 12px; }
+  .resumo-toolbar { flex-wrap: wrap; gap: 8px; top: 72px; padding: 8px 12px; min-height: auto; }
   .toolbar-search { max-width: 100%; }
   .toolbar-controles { width: 100%; justify-content: flex-end; }
 }
