@@ -1221,3 +1221,252 @@ window.initCaderno = function () {
 document.addEventListener("DOMContentLoaded", () => {
   if (typeof window.initCaderno === "function") window.initCaderno();
 });
+/* ======================================================
+   MELHORIAS DE VALIDAÇÃO – v2
+====================================================== */
+
+/* ---------- CNPJ real ---------- */
+window.validarCNPJReal = function(cnpj) {
+  cnpj = cnpj.replace(/\D/g, "");
+  if (cnpj.length !== 14) return false;
+  if (/^(\d)\1+$/.test(cnpj)) return false;
+  const calc = (n) => {
+    let sum = 0, pos = n - 7;
+    for (let i = n; i >= 1; i--) {
+      sum += parseInt(cnpj.charAt(n - i)) * pos--;
+      if (pos < 2) pos = 9;
+    }
+    const r = sum % 11 < 2 ? 0 : 11 - (sum % 11);
+    return r === parseInt(cnpj.charAt(n));
+  };
+  return calc(12) && calc(13);
+};
+
+/* ---------- E-mail ---------- */
+window.validarEmail = function(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
+};
+
+/* ---------- Telefone / número de entrada ---------- */
+window.formatarTelefone = function(input) {
+  let v = input.value.replace(/\D/g, "").slice(0, 11);
+  if (v.length <= 10)
+    v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+  else
+    v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
+  input.value = v.replace(/-$/, "");
+};
+
+/* ---------- Força de senha com barra visual ---------- */
+window.avaliarForcaSenha = function(senha) {
+  let score = 0;
+  if (senha.length >= 11)          score++;
+  if (/[A-Z]/.test(senha))         score++;
+  if (/[0-9]/.test(senha))         score++;
+  if (/[^A-Za-z0-9]/.test(senha))  score++;
+  if (score <= 1) return "fraca";
+  if (score <= 2) return "media";
+  return "forte";
+};
+
+window.validarSenhaV2 = function(input, container) {
+  if (!container) return;
+  const v = input.value || "";
+  const temMin      = v.length >= 11;
+  const temMaiuscula = /[A-Z]/.test(v);
+  const temNumero   = /\d/.test(v);
+  const temEspecial = /[^A-Za-z0-9]/.test(v);
+  const ok = temMin && temMaiuscula && temNumero && temEspecial;
+  const forca = avaliarForcaSenha(v);
+
+  // Barra de força
+  let bar = container.querySelector(".senha-strength-bar");
+  if (!bar && v.length > 0) {
+    bar = document.createElement("div");
+    bar.className = "senha-strength-bar";
+    container.prepend(bar);
+  }
+  if (bar) bar.dataset.forca = v.length ? forca : "";
+
+  // Texto de feedback
+  let msg = container.querySelector(".regra-msg");
+  if (!msg) { msg = document.createElement("div"); msg.className = "regra-msg"; container.appendChild(msg); }
+
+  if (!v.length) { msg.innerHTML = ""; if(bar) bar.dataset.forca = ""; return; }
+
+  if (ok) {
+    msg.className = "regra-msg regra-ok";
+    msg.textContent = "✓ Senha forte";
+    input.classList.remove("campo-obrigatorio-erro");
+    input.classList.add("campo-valido");
+  } else {
+    const falta = [];
+    if (!temMin)       falta.push(`${11 - v.length} car. a mais`);
+    if (!temMaiuscula) falta.push("maiúscula");
+    if (!temNumero)    falta.push("número");
+    if (!temEspecial)  falta.push("especial");
+    msg.className = "regra-msg regra-erro";
+    msg.textContent = "Falta: " + falta.join(" · ");
+    input.classList.add("campo-obrigatorio-erro");
+    input.classList.remove("campo-valido");
+  }
+};
+
+/* ---------- CNPJ – listener aprimorado ---------- */
+(function melhorarCNPJ() {
+  const cnpjInput = document.getElementById("cnpjCliente");
+  const regraCNPJ = document.getElementById("regraCNPJ");
+  if (!cnpjInput || !regraCNPJ) return;
+
+  cnpjInput.addEventListener("input", () => {
+    let v = cnpjInput.value.replace(/\D/g, "").slice(0, 14);
+    v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+    v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+    v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+    v = v.replace(/(\d{4})(\d)/, "$1-$2");
+    cnpjInput.value = v;
+
+    if (v.replace(/\D/g,"").length < 14) {
+      regraCNPJ.className = "regra-neutra";
+      regraCNPJ.textContent = "Digite os 14 dígitos do CNPJ";
+      cnpjInput.classList.remove("campo-valido","campo-obrigatorio-erro");
+      return;
+    }
+    const valido = validarCNPJReal(v);
+    if (valido) {
+      regraCNPJ.className = "regra-ok";
+      regraCNPJ.textContent = "✓ CNPJ válido";
+      cnpjInput.classList.add("campo-valido");
+      cnpjInput.classList.remove("campo-obrigatorio-erro");
+    } else {
+      regraCNPJ.className = "regra-erro";
+      regraCNPJ.textContent = "✗ CNPJ inválido";
+      cnpjInput.classList.add("campo-obrigatorio-erro");
+      cnpjInput.classList.remove("campo-valido");
+    }
+  });
+})();
+
+/* ---------- Domínio – feedback aprimorado ---------- */
+(function melhorarDominio() {
+  const dominioInput = document.getElementById("dominioCliente");
+  const regraDominio = document.getElementById("regraDominio");
+  if (!dominioInput || !regraDominio) return;
+
+  dominioInput.addEventListener("input", () => {
+    const v = dominioInput.value.trim().toLowerCase();
+    if (!v) {
+      regraDominio.innerHTML = "";
+      dominioInput.classList.remove("campo-valido","campo-obrigatorio-erro");
+      return;
+    }
+    const ok = v.endsWith(".sobreip.com.br") && v.length > ".sobreip.com.br".length;
+    if (ok) {
+      regraDominio.className = "regra-ok";
+      regraDominio.textContent = "✓ Domínio válido";
+      dominioInput.classList.add("campo-valido");
+      dominioInput.classList.remove("campo-obrigatorio-erro");
+    } else {
+      regraDominio.className = "regra-erro";
+      regraDominio.textContent = "✗ Deve terminar com .sobreip.com.br";
+      dominioInput.classList.add("campo-obrigatorio-erro");
+      dominioInput.classList.remove("campo-valido");
+    }
+  });
+})();
+
+/* ---------- Patch criarCampo para usar validações novas ---------- */
+const _criarCampoOriginal = criarCampo;
+// Override: ao criar usuário_web, substitui validação de senha e adiciona validação de email
+document.addEventListener("DOMContentLoaded", () => {
+  // Delegate para senhas já existentes e novas
+  document.addEventListener("input", (e) => {
+    if (e.target.classList.contains("campo-senha")) {
+      const container = e.target.parentElement?.querySelector("div[style]") ||
+                        e.target.closest(".campo-descricao")?.querySelector("div[style*='margin-top']");
+      // Usa validação v2 se o container de regras existir próximo
+      const regrasEl = e.target.nextElementSibling || e.target.parentElement?.nextElementSibling;
+      if (regrasEl && (regrasEl.classList.contains("regra-ok") || regrasEl.classList.contains("regra-erro") || regrasEl.classList.contains("regra-neutra") || !regrasEl.tagName)) {
+        // fallback ao original — validação v2 é aplicada pelo listener do campo
+      }
+    }
+    // Validação de e-mail em tempo real
+    if (e.target.type === "email") {
+      const v = e.target.value.trim();
+      if (!v) { e.target.classList.remove("campo-valido","campo-obrigatorio-erro"); return; }
+      if (validarEmail(v)) {
+        e.target.classList.add("campo-valido");
+        e.target.classList.remove("campo-obrigatorio-erro");
+      } else {
+        e.target.classList.add("campo-obrigatorio-erro");
+        e.target.classList.remove("campo-valido");
+      }
+    }
+  });
+
+  // Senha: usa validação v2 via delegação
+  document.addEventListener("input", (e) => {
+    if (!e.target.classList.contains("campo-senha")) return;
+    // Encontra o div de regras mais próximo
+    let regrasEl = null;
+    let el = e.target.nextElementSibling;
+    while (el) {
+      if (el.tagName === "DIV") { regrasEl = el; break; }
+      el = el.nextElementSibling;
+    }
+    if (!regrasEl) {
+      regrasEl = e.target.closest(".campo-descricao")?.querySelector("div:last-child");
+    }
+    if (regrasEl) validarSenhaV2(e.target, regrasEl);
+  });
+
+  /* Formatar números de entrada como telefone */
+  document.addEventListener("input", (e) => {
+    const ph = e.target.placeholder || "";
+    if (ph.toLowerCase().includes("número de entrada") || ph.toLowerCase().includes("número de entrada") || (e.target.closest("#listaEntradas") && e.target.classList.contains("campo-nome"))) {
+      formatarTelefone(e.target);
+    }
+  });
+
+  /* Número QR */
+  const qrInput = document.getElementById("numeroQr");
+  if (qrInput) {
+    qrInput.addEventListener("input", () => formatarTelefone(qrInput));
+  }
+});
+
+/* ---------- Validação completa ao salvar ---------- */
+const _salvarOriginal = window.salvarConfiguracao || function(){};
+window.salvarConfiguracao = function() {
+  const erros = [];
+
+  const empresa = document.getElementById("empresaCliente")?.value.trim();
+  if (!empresa) erros.push("Nome da empresa é obrigatório");
+
+  const dominio = document.getElementById("dominioCliente")?.value.trim().toLowerCase();
+  if (!dominio || !dominio.endsWith(".sobreip.com.br")) erros.push("Domínio inválido");
+
+  const cnpj = document.getElementById("cnpjCliente")?.value.trim();
+  if (cnpj && !validarCNPJReal(cnpj)) erros.push("CNPJ inválido");
+
+  // Verifica e-mails de usuários
+  document.querySelectorAll("#listaUsuariosWeb input[type=email]").forEach((el, i) => {
+    if (el.value && !validarEmail(el.value)) erros.push(`E-mail do usuário ${i+1} inválido`);
+  });
+
+  // Verifica agentes sem ramal
+  document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a, i) => {
+    if (a.getRamal && !a.getRamal()) erros.push(`Agente ${a.querySelector(".campo-nome")?.value || (i+1)} sem ramal`);
+  });
+
+  if (erros.length) {
+    mostrarToast(erros[0], true);
+    console.warn("Erros de validação:", erros);
+    return;
+  }
+
+  const dados = window.explorar?.();
+  if (!dados) return;
+  localStorage.setItem("CONFIG_CADERNO", JSON.stringify(dados));
+  window.location.href = "resumo.html";
+};
