@@ -39,15 +39,46 @@
   
   </header>
 
-  <!-- ================= CONTEÚDO ================= -->
-  <main id="resumo" class="form-container"></main>
+  <!-- ================= TOOLBAR ================= -->
+  <div class="resumo-toolbar" id="resumoToolbar" style="display:none">
+    <!-- Busca -->
+    <div class="toolbar-search">
+      <span class="toolbar-search-icon">🔍</span>
+      <input id="resumoBusca" placeholder="Buscar nome, ramal, e-mail..." autocomplete="off">
+      <button class="toolbar-search-clear" id="btnClearBusca" style="display:none" onclick="limparBusca()">✕</button>
+    </div>
+    <!-- Controles -->
+    <div class="toolbar-controles">
+      <button class="toolbar-btn" id="btnModoResumo" onclick="toggleModoResumo()" title="Alternar modo">
+        <span class="modo-icone">📋</span> <span class="modo-label">Completo</span>
+      </button>
+      <button class="btn-salvar" onclick="confirmarConfiguracao()" style="padding:8px 18px;font-size:13px">
+        ⬇ Gerar PDF
+      </button>
+    </div>
+  </div>
 
+  <!-- ================= LAYOUT PRINCIPAL ================= -->
+  <div class="resumo-layout" id="resumoLayout" style="display:none">
 
-  <!-- ================= BOTÃO FINAL ================= -->
-  <div class="acoes-resumo">
-    <button onclick="confirmarConfiguracao()" class="btn-salvar">
-      Confirmar Configuração
-    </button>
+    <!-- SIDEBAR NAV -->
+    <nav class="resumo-nav" id="resumoNav">
+      <div class="nav-titulo">Índice</div>
+      <ul class="nav-lista" id="navLista"></ul>
+    </nav>
+
+    <!-- CONTEÚDO -->
+    <div class="resumo-main">
+      <!-- Painel de Alertas -->
+      <div id="painelAlertas" class="painel-alertas" style="display:none"></div>
+      <!-- Seções -->
+      <main id="resumo"></main>
+    </div>
+  </div>
+
+  <!-- Estado de carregamento -->
+  <div class="resumo-empty" id="resumoEmpty" style="display:none">
+    <div class="resumo-card">⚠️ Nenhum dado encontrado.<br><br>Volte e preencha a configuração antes de acessar o resumo.</div>
   </div>
 
 
