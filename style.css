@@ -1641,3 +1641,25 @@ body.light .chat-tipo-bloco > h3 { color: #5a7a00 !important; }
 #tipo-integracao-grid .chat-card.active {
   border-color: #CEFF00;
 }
+
+/* ======================================================
+   LISTA DE NÚMEROS QR
+====================================================== */
+#listaNumeroQr { display: flex; flex-direction: column; gap: 8px; }
+
+.qr-numero-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.18s ease;
+}
+.qr-numero-input {
+  flex: 1;
+  min-height: 44px !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  font-weight: 600;
+}
+.qr-numero-row .faixa-del {
+  flex-shrink: 0;
+}
