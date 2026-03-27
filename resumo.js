@@ -167,13 +167,19 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (voz.regras_tempo?.length) {
+    const faixasHTML = (r) => {
+      const faixas = r.faixas?.length ? r.faixas
+        : (r.hora_inicio ? [{ inicio: r.hora_inicio, fim: r.hora_fim }] : []);
+      if (!faixas.length) return "<em style='opacity:.5'>Sem horário definido</em>";
+      return faixas.map(f => `<span class="resumo-chip">🕐 ${f.inicio || "--:--"} às ${f.fim || "--:--"}</span>`).join(" ");
+    };
     resumo.innerHTML += `
       <section class="resumo-bloco"><h2>⏰ Regras de Tempo</h2>
         <div class="resumo-grid">
           ${voz.regras_tempo.map(r => `<div class="resumo-card">
             <div class="titulo">${r.nome}</div>
-            <div><strong>Dias:</strong> ${(r.dias || []).join(", ")}</div>
-            <div><strong>Horário:</strong> ${r.hora_inicio || "-"} às ${r.hora_fim || "-"}</div>
+            <div><strong>Dias:</strong> ${(r.dias || []).join(", ") || "—"}</div>
+            <div style="margin-top:6px">${faixasHTML(r)}</div>
           </div>`).join("")}
         </div>
       </section>`;
@@ -638,12 +644,14 @@ window.confirmarConfiguracao = async function () {
     y = checkY(y, 30);
     y = sectionBar(y, "REGRAS DE TEMPO", C.primary);
     voz.regras_tempo.forEach(r => {
+      const faixas = r.faixas?.length ? r.faixas
+        : (r.hora_inicio ? [{ inicio: r.hora_inicio, fim: r.hora_fim }] : []);
+      const faixasStr = faixas.map(f => `${f.inicio || "--:--"} às ${f.fim || "--:--"}`).join("  |  ") || "—";
       y = checkY(y, 40);
       y = cardInfo(y, [
-        ["Nome",    r.nome || "—"],
-        ["Dias",    (r.dias || []).join(", ") || "—"],
-        ["Início",  r.hora_inicio || "—"],
-        ["Fim",     r.hora_fim    || "—"],
+        ["Nome",     r.nome || "—"],
+        ["Dias",     (r.dias || []).join(", ") || "—"],
+        ["Horários", faixasStr],
       ]);
     });
   }
