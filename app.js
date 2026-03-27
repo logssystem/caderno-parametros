@@ -636,6 +636,87 @@ function criarCampo(tipo) {
             });
         }
     }
+    /* ===== NÚMERO DE ENTRADA ===== */
+    if (tipo === "entrada") {
+        nome.placeholder = "Ex: (11) 3000-1000 ou (11) 99999-0000";
+        nome.inputMode   = "numeric";
+
+        const feedbackEl = document.createElement("div");
+        feedbackEl.className = "entrada-feedback";
+        wrap.append(feedbackEl);
+
+        // DDDs válidos no Brasil
+        const DDDS_VALIDOS = new Set([
+            11,12,13,14,15,16,17,18,19,
+            21,22,24,27,28,
+            31,32,33,34,35,37,38,
+            41,42,43,44,45,46,47,48,49,
+            51,53,54,55,
+            61,62,63,64,65,66,67,68,69,
+            71,73,74,75,77,79,
+            81,82,83,84,85,86,87,88,89,
+            91,92,93,94,95,96,97,98,99
+        ]);
+
+        function formatarEntrada(val) {
+            let digits = val.replace(/\D/g, "").slice(0, 11);
+            if (digits.length <= 2)  return digits;
+            if (digits.length <= 6)  return `(${digits.slice(0,2)}) ${digits.slice(2)}`;
+            if (digits.length <= 10) return `(${digits.slice(0,2)}) ${digits.slice(2,6)}-${digits.slice(6)}`;
+            return `(${digits.slice(0,2)}) ${digits.slice(2,7)}-${digits.slice(7)}`;
+        }
+
+        function validarEntrada(val) {
+            const digits = val.replace(/\D/g, "");
+            if (!digits) return { ok: null, msg: "" };
+
+            const ddd    = parseInt(digits.slice(0, 2), 10);
+            const numero = digits.slice(2);
+
+            if (digits.length < 10)
+                return { ok: false, msg: "Número incompleto — mínimo 10 dígitos com DDD" };
+            if (digits.length > 11)
+                return { ok: false, msg: "Número muito longo — máximo 11 dígitos com DDD" };
+            if (!DDDS_VALIDOS.has(ddd))
+                return { ok: false, msg: `DDD ${ddd} inválido — não existe no Brasil` };
+
+            // Celular: 11 dígitos, começa com 9
+            if (digits.length === 11 && numero[0] !== "9")
+                return { ok: false, msg: "Celular com 11 dígitos deve começar com 9" };
+
+            // Fixo: 10 dígitos, começa com 2-5
+            if (digits.length === 10 && !["2","3","4","5"].includes(numero[0]))
+                return { ok: false, msg: "Fixo com 10 dígitos deve começar com 2, 3, 4 ou 5" };
+
+            // Número 0800/especial (começam com 0)
+            const tipo_num = digits.length === 11 ? "Celular" : "Fixo";
+            return { ok: true, msg: `✓ ${tipo_num} — DDD ${ddd} válido` };
+        }
+
+        function atualizarEntrada() {
+            nome.value = formatarEntrada(nome.value);
+            const { ok, msg } = validarEntrada(nome.value);
+            if (ok === null) {
+                feedbackEl.className = "entrada-feedback";
+                feedbackEl.textContent = "";
+                nome.classList.remove("campo-valido", "campo-obrigatorio-erro");
+            } else if (ok) {
+                feedbackEl.className = "entrada-feedback entrada-ok";
+                feedbackEl.textContent = msg;
+                nome.classList.add("campo-valido");
+                nome.classList.remove("campo-obrigatorio-erro");
+            } else {
+                feedbackEl.className = "entrada-feedback entrada-erro";
+                feedbackEl.textContent = "✗ " + msg;
+                nome.classList.add("campo-obrigatorio-erro");
+                nome.classList.remove("campo-valido");
+            }
+        }
+
+        nome.addEventListener("input", atualizarEntrada);
+        nome.addEventListener("blur",  atualizarEntrada);
+    }
+
     function validarSenha(input, regrasEl) {
         if (!regrasEl) return;
         const v = input.value || "";
