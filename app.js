@@ -438,7 +438,7 @@ function criarCampo(tipo) {
         chkAgente.type = "checkbox";
         chkAgente.addEventListener("change", () => syncTudo());
         const txt = document.createElement("span");
-        txt.textContent = "Este usuário é um agente";
+        txt.textContent = "Este usuário é agente de call center";
         boxAgente.append(chkAgente, txt);
         wrap.append(boxAgente);
         const boxOmni = document.createElement("label");
