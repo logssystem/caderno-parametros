@@ -367,18 +367,44 @@ function renderNode(n) {
     });
     body += `</div><button class="btn-add-opt" onclick="n_add_opt(${n.id})">+ Adicionar opção</button>`;
   } else if (n.type === "horario") {
-    body += `<select onchange="n_set(${n.id},'horario',this.value)">
-      <option value="comercial" ${n.data.horario==="comercial"?"selected":""}>Horário Comercial</option>
-      <option value="fora" ${n.data.horario==="fora"?"selected":""}>Fora do Horário</option>
-      <option value="personalizado" ${n.data.horario==="personalizado"?"selected":""}>Personalizado</option>
-    </select>`;
+    const _regras = getRegrasTempo();
+    if (_regras.length) {
+      body += `<select onchange="n_set(${n.id},'horario',this.value)" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;outline:none;">
+        <option value="">Selecione a regra...</option>
+        ${_regras.map(r => `<option value="${r}" ${n.data.horario===r?"selected":""}>${r}</option>`).join("")}
+      </select>`;
+      body += `<div style="font-size:10px;color:var(--soft);margin-top:4px;">Saída superior = dentro do horário &nbsp;·&nbsp; inferior = fora</div>`;
+    } else {
+      body += `<select onchange="n_set(${n.id},'horario',this.value)" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;outline:none;">
+        <option value="comercial" ${n.data.horario==="comercial"?"selected":""}>Horário Comercial</option>
+        <option value="fora"      ${n.data.horario==="fora"?"selected":""}>Fora do Horário</option>
+      </select>`;
+      body += `<div style="font-size:10px;color:var(--soft);margin-top:4px;">Crie regras no formulário para listá-las aqui</div>`;
+    }
   } else if (n.type === "dados") {
     body += `<input type="text" placeholder="Nome do campo (ex: CPF, Nome...)" value="${n.data.campo||""}" onchange="n_set(${n.id},'campo',this.value)">
     <input type="text" placeholder="Mensagem de solicitação..." value="${n.data.text||""}" onchange="n_set(${n.id},'text',this.value)">`;
   } else if (n.type === "agente") {
-    body += `<input type="text" placeholder="Nome do agente (opcional)" value="${n.data.text||""}" onchange="n_set(${n.id},'text',this.value)">`;
+    const _agentes = getAgentes();
+    if (_agentes.length) {
+      body += `<select onchange="n_set(${n.id},'text',this.value)" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;outline:none;">
+        <option value="">Qualquer agente disponível</option>
+        ${_agentes.map(a => `<option value="${a}" ${n.data.text===a?"selected":""}>${a}</option>`).join("")}
+      </select>`;
+    } else {
+      body += `<input type="text" placeholder="Nome do agente (opcional)" value="${n.data.text||""}" onchange="n_set(${n.id},'text',this.value)">`;
+    }
   } else if (n.type === "depto") {
-    body += `<input type="text" placeholder="Nome do departamento" value="${n.data.text||""}" onchange="n_set(${n.id},'text',this.value)">`;
+    const _deptos = getDepartamentos();
+    if (_deptos.length) {
+      body += `<select onchange="n_set(${n.id},'text',this.value)" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;outline:none;">
+        <option value="">Selecione o departamento...</option>
+        ${_deptos.map(d => `<option value="${d}" ${n.data.text===d?"selected":""}>${d}</option>`).join("")}
+      </select>`;
+    } else {
+      body += `<input type="text" placeholder="Nome do departamento" value="${n.data.text||""}" onchange="n_set(${n.id},'text',this.value)">`;
+      body += `<div style="font-size:10px;color:var(--soft);margin-top:4px;">Crie departamentos no formulário para listá-los aqui</div>`;
+    }
   } else if (n.type === "espera") {
     body += `<input type="text" placeholder="Tempo (ex: 30 seg)" value="${n.data.text||""}" onchange="n_set(${n.id},'text',this.value)">`;
   } else if (n.type === "finalizar") {
@@ -830,6 +856,46 @@ wrap.addEventListener("click", e => {
     }
   }
 });
+
+// ── Lê dados do caderno (localStorage) para preencher selects ──
+function getDadosCaderno() {
+  try {
+    const raw = localStorage.getItem("CONFIG_CADERNO");
+    return raw ? JSON.parse(raw) : {};
+  } catch(e) { return {}; }
+}
+
+function getRegrasTempo() {
+  const d = getDadosCaderno();
+  const vozRegras  = (d.voz?.regras_tempo  || []).map(r => r.nome).filter(Boolean);
+  const chatRegras = (d.chat?.regras_tempo || []).map(r => r.nome).filter(Boolean);
+  return [...new Set([...vozRegras, ...chatRegras])];
+}
+
+function getDepartamentos() {
+  const d = getDadosCaderno();
+  return (d.chat?.departamentos || []).map(dep => dep.nome).filter(Boolean);
+}
+
+function getAgentes() {
+  const d = getDadosCaderno();
+  const voz  = (d.voz?.agentes  || []).map(a => a.nome).filter(Boolean);
+  const chat = (d.chat?.agentes || []).map(a => a.nome).filter(Boolean);
+  return [...new Set([...voz, ...chat])];
+}
+
+function getFilas() {
+  const d = getDadosCaderno();
+  return (d.voz?.filas || []).map(f => f.nome).filter(Boolean);
+}
+
+function makeSelect(items, placeholder) {
+  if (!items.length) return `<input type="text" placeholder="${placeholder}" style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;outline:none;">`;
+  const opts = items.map(i => `<option value="${i}">${i}</option>`).join("");
+  return `<select style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;outline:none;">
+    <option value="">${placeholder}</option>${opts}
+  </select>`;
+}
 
 // ── INIT: Start node ──
 addNode("start", 60, 80);
