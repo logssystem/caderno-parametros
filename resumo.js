@@ -863,27 +863,23 @@ window.confirmarConfiguracao = async function () {
   let y = 22;
   y = sectionBar(y, "INDICE DO DOCUMENTO", C.accent2);
   const modulos = [];
-  if (cli)                        modulos.push("🏢  Dados do Cliente");
-  if (voz.usuarios?.length)       modulos.push("👤  Usuários Web");
-  if (voz.entradas?.length)       modulos.push("📞  Números de Entrada");
-  if (voz.ramais?.length)         modulos.push("☎️   Ramais");
-  if (voz.agentes?.length)        modulos.push("🎧  Agentes");
-  if (voz.regras_tempo?.length)   modulos.push("⏰  Regras de Tempo");
-  if (voz.grupo_ring?.length)     modulos.push("🔔  Grupo de Ring");
-  if (voz.filas?.length)          modulos.push("📋  Filas");
-  if (voz.uras?.length)           modulos.push("🎙️   URA");
-  if (voz.pausas?.length)         modulos.push("⏸️   Pausas do Call Center");
-  if (voz.pesquisas?.length)      modulos.push("⭐  Pesquisa de Satisfação");
-  if (chat.tipo) {
-    modulos.push("💬  Chat / Omnichannel");
-    if (chat.usuarios?.length)      modulos.push("     └─ Usuários do Chat");
-    if (chat.agentes?.length)       modulos.push("     └─ Agentes do Chat");
-    if (chat.departamentos?.length) modulos.push("     └─ Departamentos");
-  } else if (chat.usuarios?.length || chat.agentes?.length || chat.departamentos?.length) {
-    modulos.push("💬  Chat / Omnichannel");
-    if (chat.usuarios?.length)      modulos.push("     └─ Usuários do Chat");
-    if (chat.agentes?.length)       modulos.push("     └─ Agentes do Chat");
-    if (chat.departamentos?.length) modulos.push("     └─ Departamentos");
+  if (cli)                        modulos.push("  Dados do Cliente");
+  if (voz.usuarios?.length)       modulos.push("  Usuarios Web");
+  if (voz.entradas?.length)       modulos.push("  Numeros de Entrada");
+  if (voz.ramais?.length)         modulos.push("  Ramais");
+  if (voz.agentes?.length)        modulos.push("  Agentes");
+  if (voz.regras_tempo?.length)   modulos.push("  Regras de Tempo");
+  if (voz.grupo_ring?.length)     modulos.push("  Grupo de Ring");
+  if (voz.filas?.length)          modulos.push("  Filas");
+  if (voz.uras?.length)           modulos.push("  URA");
+  if (voz.pausas?.length)         modulos.push("  Pausas do Call Center");
+  if (voz.pesquisas?.length)      modulos.push("  Pesquisa de Satisfacao");
+  const temChatIdx = chat.tipo || chat.usuarios?.length || chat.agentes?.length || chat.departamentos?.length;
+  if (temChatIdx) {
+    modulos.push("  Chat / Omnichannel");
+    if (chat.usuarios?.length)      modulos.push("     |- Usuarios do Chat");
+    if (chat.agentes?.length)       modulos.push("     |- Agentes do Chat");
+    if (chat.departamentos?.length) modulos.push("     |- Departamentos");
   }
   modulos.forEach((m, i) => {
     y = checkY(y, 10);
@@ -1095,9 +1091,61 @@ window.confirmarConfiguracao = async function () {
     if (chat.departamentos?.length) {
       y = checkY(y, 30);
       y = sectionBar(y, "DEPARTAMENTOS", C.accent2);
-      const colsDC = [CW*0.45, CW*0.55];
-      const rowsDC = chat.departamentos.map(d => [d.nome || "—", (d.agentes || []).join(", ") || "—"]);
-      y = tabelaAutoTable(y, ["Departamento","Agentes"], rowsDC, colsDC);
+      chat.departamentos.forEach(dep => {
+        y = checkY(y, 24);
+        const agentes = dep.agentes || [];
+        // Linha do nome do departamento
+        setFill(C.primary);
+        doc.rect(ML, y, CW, 9, "F");
+        setFill([206, 255, 0]);
+        doc.rect(ML, y, 4, 9, "F");
+        setTextC(C.white);
+        setFont(9, "bold");
+        doc.text(dep.nome || "—", ML + 8, y + 6.2);
+        const countLabel = agentes.length === 0 ? "Sem agentes"
+                         : agentes.length === 1 ? "1 agente"
+                         : agentes.length + " agentes";
+        setTextC([206, 255, 0]);
+        setFont(8, "normal");
+        doc.text(countLabel, PW - MR, y + 6.2, { align: "right" });
+        y += 9;
+        if (agentes.length) {
+          // Grid de agentes: 3 por linha
+          const cols3 = 3;
+          const colW3 = CW / cols3;
+          const rowH3 = 8;
+          for (let i = 0; i < agentes.length; i += cols3) {
+            y = checkY(y, rowH3 + 1);
+            const grupo = agentes.slice(i, i + cols3);
+            while (grupo.length < cols3) grupo.push(null);
+            grupo.forEach((ag, j) => {
+              const x = ML + j * colW3;
+              setFill(j % 2 === 0 ? C.bgLight : C.bgGray);
+              doc.rect(x, y, colW3, rowH3, "F");
+              setDraw(C.border);
+              doc.setLineWidth(0.25);
+              doc.rect(x, y, colW3, rowH3, "S");
+              if (ag) {
+                setTextC(C.text);
+                setFont(8, "normal");
+                doc.text(ag, x + colW3 / 2, y + 5.5, { align: "center" });
+              }
+            });
+            y += rowH3;
+          }
+        } else {
+          setFill(C.bgGray);
+          doc.rect(ML, y, CW, 8, "F");
+          setDraw(C.border);
+          doc.setLineWidth(0.25);
+          doc.rect(ML, y, CW, 8, "S");
+          setTextC(C.textSoft);
+          setFont(8, "normal");
+          doc.text("Nenhum agente vinculado", ML + CW / 2, y + 5.5, { align: "center" });
+          y += 8;
+        }
+        y += 4;
+      });
     }
   }
   pageFooter();
