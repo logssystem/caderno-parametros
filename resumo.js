@@ -1149,8 +1149,16 @@ window.confirmarConfiguracao = async function () {
     }
   }
   pageFooter();
-  doc.save("caderno-parametros.pdf");
-  // ── ENVIA PARA API ────────────────────────────────────
+
+  // ── NOME DO ARQUIVO COM EMPRESA + DATA ───────────────
+  const _empresa  = (cli.empresa || "caderno").replace(/[^a-zA-Z0-9À-ÿ ]/g, "").trim().replace(/\s+/g, "-");
+  const _hoje     = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+  const nomeArq   = `${_empresa}-${_hoje}.pdf`;
+
+  // ── SALVA LOCALMENTE ─────────────────────────────────
+  doc.save(nomeArq);
+
+  // ── ENVIA PARA API PHP ───────────────────────────────
   try {
     const res = await fetch("/app/caderno/api/salvar.php", {
       method: "POST",
@@ -1161,9 +1169,59 @@ window.confirmarConfiguracao = async function () {
     if (!res.ok) throw new Error(`Erro ${res.status}: ${texto}`);
     let r;
     try { r = JSON.parse(texto); } catch { throw new Error(`Resposta não é JSON: ${texto}`); }
-    console.log("API:", r);
+    console.log("API PHP:", r);
   } catch (e) {
-    console.error("Erro ao enviar para API", e);
+    console.error("Erro ao enviar para API PHP:", e);
+  }
+
+  // ── ENVIA PARA GOOGLE DRIVE ──────────────────────────
+  // Cole aqui a URL gerada após implantar o DriveUpload.gs no Google Apps Script
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbglSzGkS6-PAQGIN04u_ASpJMsGnR5iYB-gJcGCzwz1HNEmTirlxHLjaf326ZMDdl/exec";
+
+  if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== "COLE_AQUI_A_URL_DO_APPS_SCRIPT") {
+    (async () => {
+      try {
+        // Gera o PDF como base64 (sem baixar de novo)
+        const pdfBlob  = doc.output("blob");
+        const b64      = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload  = () => resolve(reader.result.split(",")[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(pdfBlob);
+        });
+
+        const payload = JSON.stringify({
+          nome:    nomeArq,
+          empresa: cli.empresa || "",
+          pdf:     b64
+        });
+
+        const resp = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          body:   payload,
+          // Apps Script não aceita Content-Type application/json via CORS simples
+          // usa text/plain para evitar preflight bloqueado
+          headers: { "Content-Type": "text/plain" }
+        });
+
+        const json = await resp.json();
+        if (json.ok) {
+          console.log("Drive: arquivo salvo —", json.nome, json.url);
+          // Toast de confirmação (opcional)
+          const toast = document.getElementById("toastGlobal");
+          const msg   = document.getElementById("toastMessage");
+          if (toast && msg) {
+            msg.textContent = "PDF salvo no Drive com sucesso!";
+            toast.className = "toast show";
+            setTimeout(() => toast.classList.remove("show"), 4000);
+          }
+        } else {
+          console.warn("Drive: erro ao salvar —", json.erro);
+        }
+      } catch (err) {
+        console.error("Drive: falha no envio —", err);
+      }
+    })();
   }
 };
 /* ================= TEMA ================= */
