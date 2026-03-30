@@ -1509,7 +1509,7 @@ function bloquearLetrasRamalRange() {
 document.addEventListener("DOMContentLoaded", bloquearLetrasRamalRange);
 document.addEventListener("contextmenu", e => e.preventDefault());
 document.addEventListener("keydown", e => {
-  if (e.key === "F129") e.preventDefault();
+  if (e.key === "F12") e.preventDefault();
   if (e.ctrlKey && e.shiftKey && e.key === "I") e.preventDefault();
   if (e.ctrlKey && e.shiftKey && e.key === "J") e.preventDefault();
   if (e.ctrlKey && e.key === "U") e.preventDefault();
@@ -1538,6 +1538,23 @@ window.initCaderno = function () {
 };
 document.addEventListener("DOMContentLoaded", () => {
   if (typeof window.initCaderno === "function") window.initCaderno();
+
+  // ── Scroll para seção ao voltar do resumo (editar) ──
+  const ancora = sessionStorage.getItem("CADERNO_EDIT_ANCORA");
+  if (ancora) {
+    sessionStorage.removeItem("CADERNO_EDIT_ANCORA");
+    // Aguarda render do app antes de scrollar
+    setTimeout(() => {
+      const el = document.querySelector(ancora);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        // Destaca o elemento brevemente
+        el.style.transition = "box-shadow 0.3s";
+        el.style.boxShadow  = "0 0 0 3px rgba(206,255,0,0.6)";
+        setTimeout(() => { el.style.boxShadow = ""; }, 2000);
+      }
+    }, 600);
+  }
 });
 
 /* ======================================================
@@ -1759,32 +1776,260 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-const _salvarOriginal = window.salvarConfiguracao || function(){};
-window.salvarConfiguracao = function() {
-  const erros = [];
+/* =======================================================
+   BACKUP LOCAL AUTOMÁTICO
+======================================================= */
+const BACKUP_KEY    = "CONFIG_CADERNO_BACKUPS";
+const BACKUP_MAX    = 5;
+const BACKUP_INTERVALO = 60 * 1000; // 60 segundos
+
+function _fazerBackup(dados) {
+  if (!dados) return;
+  try {
+    const backups = JSON.parse(localStorage.getItem(BACKUP_KEY) || "[]");
+    backups.unshift({ ts: new Date().toISOString(), dados });
+    if (backups.length > BACKUP_MAX) backups.length = BACKUP_MAX;
+    localStorage.setItem(BACKUP_KEY, JSON.stringify(backups));
+    console.log("[Backup] salvo em", new Date().toLocaleTimeString("pt-BR"));
+  } catch(e) {
+    console.warn("[Backup] erro:", e);
+  }
+}
+
+// Auto-backup a cada 60s se houver dados no formulário
+setInterval(() => {
   const empresa = document.getElementById("empresaCliente")?.value.trim();
-  if (!empresa) erros.push("Nome da empresa é obrigatório");
+  if (!empresa) return;
+  try {
+    const dados = window.explorar?.();
+    if (dados) _fazerBackup(dados);
+  } catch(_) {}
+}, BACKUP_INTERVALO);
+
+/* Baixa o JSON atual como arquivo .json */
+window.baixarBackupJSON = function () {
+  try {
+    const dados = window.explorar?.();
+    if (!dados) { mostrarToast("Preencha os dados antes de fazer backup", true); return; }
+    _fazerBackup(dados);
+    const empresa = (dados.cliente?.empresa || "caderno").replace(/\s+/g, "-");
+    const data    = new Date().toISOString().slice(0, 10);
+    const nome    = `backup-${empresa}-${data}.json`;
+    const blob    = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
+    const url     = URL.createObjectURL(blob);
+    const a       = document.createElement("a");
+    a.href = url; a.download = nome;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+    mostrarToast("Backup JSON baixado!");
+  } catch(e) {
+    mostrarToast("Erro ao gerar backup", true);
+  }
+};
+
+/* Restaura backup — abre seletor de arquivo .json */
+window.restaurarBackupJSON = function () {
+  const input = document.createElement("input");
+  input.type  = "file";
+  input.accept = ".json,application/json";
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const dados = JSON.parse(e.target.result);
+        if (!dados.cliente) throw new Error("JSON inválido");
+        localStorage.setItem("CONFIG_CADERNO", JSON.stringify(dados));
+        mostrarToast("Backup restaurado! Redirecionando ao resumo...");
+        setTimeout(() => window.location.href = "resumo.html", 1500);
+      } catch(_) {
+        mostrarToast("Arquivo JSON inválido", true);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+};
+
+/* =======================================================
+   MODAL DE VALIDAÇÃO ANTES DE SALVAR
+======================================================= */
+function _criarModalValidacao() {
+  if (document.getElementById("modalValidacao")) return;
+
+  const overlay = document.createElement("div");
+  overlay.id = "modalValidacao";
+  overlay.style.cssText = `
+    position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);
+    z-index:9000;display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity 0.25s ease;
+  `;
+
+  overlay.innerHTML = `
+    <div id="modalValidacaoBox" style="
+      background:var(--card-bg);border:1px solid var(--border);border-radius:20px;
+      width:520px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;
+      box-shadow:0 30px 80px rgba(0,0,0,0.5);overflow:hidden;
+      transform:translateY(20px) scale(0.97);transition:transform 0.25s ease;
+    ">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 14px;border-bottom:1px solid var(--border);">
+        <h3 id="modalValidacaoTitulo" style="margin:0;font-size:17px;font-weight:800;color:var(--text)"></h3>
+        <button onclick="fecharModalValidacao()" style="
+          width:34px;height:34px;border-radius:8px;border:1px solid var(--border);
+          background:transparent;color:var(--text);font-size:18px;cursor:pointer;
+          display:flex;align-items:center;justify-content:center;
+        ">✕</button>
+      </div>
+      <div id="modalValidacaoLista" style="overflow-y:auto;padding:20px 24px;flex:1;display:flex;flex-direction:column;gap:8px;"></div>
+      <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="fecharModalValidacao()" style="
+          padding:10px 20px;border-radius:10px;border:1px solid var(--border);
+          background:transparent;color:var(--text);font-weight:700;cursor:pointer;font-size:13px;
+        ">Corrigir</button>
+        <button id="btnContinuarMesmoAssim" style="
+          padding:10px 20px;border-radius:10px;border:none;
+          background:linear-gradient(90deg,#f59e0b,#ef4444);
+          color:#fff;font-weight:700;cursor:pointer;font-size:13px;display:none;
+        " onclick="_confirmarSalvar()">Continuar mesmo assim</button>
+        <button id="btnSalvarOk" style="
+          padding:10px 24px;border-radius:10px;border:none;
+          background:linear-gradient(90deg,#00ffa3,#00cfff);
+          color:#000;font-weight:800;cursor:pointer;font-size:13px;display:none;
+        " onclick="_confirmarSalvar()">Salvar ✓</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  overlay.addEventListener("click", e => {
+    if (e.target === overlay) fecharModalValidacao();
+  });
+}
+
+window.fecharModalValidacao = function () {
+  const overlay = document.getElementById("modalValidacao");
+  if (!overlay) return;
+  overlay.style.opacity = "0";
+  overlay.style.pointerEvents = "none";
+  const box = document.getElementById("modalValidacaoBox");
+  if (box) box.style.transform = "translateY(20px) scale(0.97)";
+};
+
+function _abrirModalValidacao(erros, avisos) {
+  _criarModalValidacao();
+  const overlay = document.getElementById("modalValidacao");
+  const titulo  = document.getElementById("modalValidacaoTitulo");
+  const lista   = document.getElementById("modalValidacaoLista");
+  const btnCont = document.getElementById("btnContinuarMesmoAssim");
+  const btnOk   = document.getElementById("btnSalvarOk");
+
+  const temErros  = erros.length  > 0;
+  const temAvisos = avisos.length > 0;
+
+  titulo.textContent = temErros
+    ? `⛔ ${erros.length} erro${erros.length > 1 ? "s" : ""} encontrado${erros.length > 1 ? "s" : ""}`
+    : `⚠️ ${avisos.length} aviso${avisos.length > 1 ? "s" : ""} antes de salvar`;
+
+  lista.innerHTML = "";
+
+  erros.forEach(e => {
+    const el = document.createElement("div");
+    el.style.cssText = "padding:10px 14px;border-radius:10px;font-size:13px;line-height:1.5;background:rgba(239,68,68,0.12);border-left:3px solid #ef4444;color:var(--text)";
+    el.innerHTML = `🔴 <strong>Erro:</strong> ${e}`;
+    lista.appendChild(el);
+  });
+
+  avisos.forEach(a => {
+    const el = document.createElement("div");
+    el.style.cssText = "padding:10px 14px;border-radius:10px;font-size:13px;line-height:1.5;background:rgba(251,191,36,0.10);border-left:3px solid #f59e0b;color:var(--text)";
+    el.innerHTML = `🟡 <strong>Aviso:</strong> ${a}`;
+    lista.appendChild(el);
+  });
+
+  // Botões: se só avisos, mostra "Continuar" + "Corrigir"; se erros, só "Corrigir"
+  btnCont.style.display = (!temErros && temAvisos) ? "block" : "none";
+  btnOk.style.display   = (!temErros && !temAvisos) ? "block" : "none";
+
+  overlay.style.opacity      = "1";
+  overlay.style.pointerEvents = "all";
+  const box = document.getElementById("modalValidacaoBox");
+  if (box) box.style.transform = "translateY(0) scale(1)";
+}
+
+function _confirmarSalvar() {
+  fecharModalValidacao();
+  const dados = window.explorar?.();
+  if (!dados) return;
+  _fazerBackup(dados);
+  localStorage.setItem("CONFIG_CADERNO", JSON.stringify(dados));
+  window.location.href = "resumo.html";
+}
+
+window.salvarConfiguracao = function () {
+  const erros  = [];
+  const avisos = [];
+
+  // ── ERROS (impedem salvar) ──────────────────────────
+  const empresa = document.getElementById("empresaCliente")?.value.trim();
+  if (!empresa) erros.push("Nome da empresa é obrigatório.");
+
   const dominio = document.getElementById("dominioCliente")?.value.trim().toLowerCase();
-  if (!dominio || !dominio.endsWith(".sobreip.com.br")) erros.push("Domínio inválido");
+  if (!dominio || !dominio.endsWith(".sobreip.com.br"))
+    erros.push("Domínio inválido — deve terminar com .sobreip.com.br");
+
   const cnpj = document.getElementById("cnpjCliente")?.value.trim();
   if (cnpj) {
     const digits = cnpj.replace(/\D/g, "");
     const docValido = digits.length === 11 ? validarCPFReal(cnpj) : validarCNPJReal(cnpj);
-    if (!docValido) erros.push(digits.length <= 11 ? "CPF inválido" : "CNPJ inválido");
+    if (!docValido) erros.push(digits.length <= 11 ? "CPF inválido." : "CNPJ inválido.");
   }
+
+  document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+    if (a.getRamal && !a.getRamal()) {
+      const nome = a.querySelector(".campo-nome")?.value || "sem nome";
+      erros.push(`Agente "${nome}" sem ramal vinculado.`);
+    }
+  });
+
   document.querySelectorAll("#listaUsuariosWeb input[type=email]").forEach((el, i) => {
-    if (el.value && !validarEmail(el.value)) erros.push(`E-mail do usuário ${i+1} inválido`);
+    if (el.value && !validarEmail(el.value))
+      erros.push(`E-mail do usuário ${i + 1} inválido: "${el.value}"`);
   });
-  document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a, i) => {
-    if (a.getRamal && !a.getRamal()) erros.push(`Agente ${a.querySelector(".campo-nome")?.value || (i+1)} sem ramal`);
-  });
-  if (erros.length) {
-    mostrarToast(erros[0], true);
-    console.warn("Erros de validação:", erros);
+
+  // ── AVISOS (permitem continuar) ─────────────────────
+  const modo = localStorage.getItem("modo_atendimento");
+
+  if (modo === "voz" || modo === "ambos") {
+    if (!document.querySelectorAll("#listaRings .campo-descricao").length)
+      avisos.push("Nenhum ramal cadastrado.");
+    if (!document.querySelectorAll("#listaUsuariosWeb .campo-descricao").length)
+      avisos.push("Nenhum usuário web cadastrado.");
+    if (!document.querySelectorAll("#listaFilas .campo-descricao").length)
+      avisos.push("Nenhuma fila cadastrada.");
+    if (!document.querySelectorAll("#listaURAs .campo-descricao").length)
+      avisos.push("Nenhuma URA cadastrada.");
+    document.querySelectorAll("#listaFilas .campo-descricao").forEach(f => {
+      const nome = f.querySelector(".campo-nome")?.value?.trim();
+      const agentes = JSON.parse(f.dataset.agentes || "[]");
+      if (nome && !agentes.length) avisos.push(`Fila "${nome}" sem agentes configurados.`);
+    });
+  }
+
+  if (modo === "chat" || modo === "ambos") {
+    if (!document.querySelectorAll("#listaUsuariosChat .campo-descricao").length)
+      avisos.push("Nenhum usuário de chat cadastrado.");
+    if (!document.querySelectorAll("#listaDepartamentosChat .campo-descricao").length)
+      avisos.push("Nenhum departamento de chat cadastrado.");
+  }
+
+  // ── Decide o que fazer ──────────────────────────────
+  if (erros.length || avisos.length) {
+    _abrirModalValidacao(erros, avisos);
     return;
   }
-  const dados = window.explorar?.();
-  if (!dados) return;
-  localStorage.setItem("CONFIG_CADERNO", JSON.stringify(dados));
-  window.location.href = "resumo.html";
+
+  // Sem problemas → salva direto
+  _confirmarSalvar();
 };
