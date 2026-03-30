@@ -1562,7 +1562,7 @@ window.validarCNPJReal = function(cnpj) {
 window.validarCPFReal = function(cpf) {
   cpf = cpf.replace(/\D/g, "");
   if (cpf.length !== 11) return false;
-  if (/^(\d)+$/.test(cpf)) return false;
+  if (/^(\d)\1+$/.test(cpf)) return false;
   const calc = (len) => {
     let sum = 0;
     for (let i = 0; i < len; i++) sum += parseInt(cpf[i]) * (len + 1 - i);
