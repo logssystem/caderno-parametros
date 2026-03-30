@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -11,14 +10,12 @@
 </head>
 <body>
 
-<!-- ================= FUNDO ANIMADO ERA ================= -->
 <canvas id="era-bg-canvas"></canvas>
 <div class="era-orb era-orb-1"></div>
 <div class="era-orb era-orb-2"></div>
 <div class="era-orb era-orb-3"></div>
 <div class="era-orb era-orb-4"></div>
 
-<!-- ================= HEADER ================= -->
 <header class="app-header" id="headerApp">
   <img src="./assets/image.png" class="app-logo" />
   <h1 class="app-title">Caderno de Parâmetros</h1>
@@ -26,7 +23,6 @@
   <button class="btn-voltar-intro" onclick="resetarIntro()">⬅ Voltar ao início</button>
 </header>
 
-<!-- ================= INTRO ================= -->
 <div id="intro-screen">
   <div class="background"></div>
   <div class="orb orb1"></div>
@@ -40,23 +36,15 @@
       Configure e documente seu ambiente de atendimento de forma simples e profissional.
     </p>
     <div class="intro-actions">
-      <button class="botao-intro" onclick="selecionarModo('voz')">
-        📞 Atendimento por Voz
-      </button>
-      <button class="botao-intro" onclick="selecionarModo('chat')">
-        💬 Atendimento por Chat
-      </button>
-      <button class="botao-intro destaque" onclick="selecionarModo('ambos')">
-        📞 + 💬 Voz + Chat
-      </button>
+      <button class="botao-intro" onclick="selecionarModo('voz')">📞 Atendimento por Voz</button>
+      <button class="botao-intro" onclick="selecionarModo('chat')">💬 Atendimento por Chat</button>
+      <button class="botao-intro destaque" onclick="selecionarModo('ambos')">📞 + 💬 Voz + Chat</button>
     </div>
   </div>
 </div>
 
-<!-- ================= CONTEÚDO ================= -->
 <main id="app-content" class="form-container" style="display:none">
 
-  <!-- ================= DADOS DO CLIENTE ================= -->
   <section class="card">
     <h2>Dados do Cliente</h2>
     <div class="campo-descricao campo-cliente">
@@ -77,7 +65,6 @@
     </div>
   </section>
 
-  <!-- ================= VOZ / PBX ================= -->
   <section id="voz-area" style="display:none">
     <section class="card">
       <h2>Usuários Web</h2>
@@ -162,7 +149,6 @@
     </section>
   </section>
 
-  <!-- ================= CHAT ================= -->
   <section id="chat-area" style="display:none">
     <section id="modulochat">
       <section class="card" id="cardUsuariosOmni">
@@ -186,7 +172,6 @@
       </section>
       <section class="card">
         <h2>Configuração de Chat</h2>
-        <!-- TIPO DE INTEGRAÇÃO — toggle, deselect, ambos -->
         <div class="chat-section">
           <h3>Tipo de Integração</h3>
           <div class="chat-grid" id="tipo-integracao-grid">
@@ -198,25 +183,19 @@
             </div>
           </div>
         </div>
-
-        <!-- BLOCO API OFICIAL -->
         <div id="api-oficial" class="chat-section chat-tipo-bloco" style="display:none">
           <h3>Fornecedor (API Oficial)</h3>
           <div class="chat-grid">
             <div class="chat-card" data-api="meta" onclick="selecionarApi(this,'meta')">
-              <div class="logo-wrapper meta"><img src="./assets/Meta.png" alt="Meta"></div>
-              <h4>Meta</h4>
+              <div class="logo-wrapper meta"><img src="./assets/Meta.png" alt="Meta"></div><h4>Meta</h4>
             </div>
             <div class="chat-card" data-api="360" onclick="selecionarApi(this,'360')">
-              <div class="logo-wrapper"><img src="./assets/360.png" alt="360 Dialog"></div>
-              <h4>360 Dialog</h4>
+              <div class="logo-wrapper"><img src="./assets/360.png" alt="360 Dialog"></div><h4>360 Dialog</h4>
             </div>
             <div class="chat-card" data-api="gupshup" onclick="selecionarApi(this,'gupshup')">
-              <div class="logo-wrapper"><img src="./assets/gupshup.png" alt="Gupshup"></div>
-              <h4>Gupshup</h4>
+              <div class="logo-wrapper"><img src="./assets/gupshup.png" alt="Gupshup"></div><h4>Gupshup</h4>
             </div>
           </div>
-
           <div id="bloco-conta-api" class="chat-section" style="display:none">
             <h3>Conta</h3>
             <div class="chat-grid">
@@ -224,7 +203,6 @@
               <div class="chat-card" data-conta="era"     onclick="selecionarConta(this,'era')">ERA</div>
             </div>
           </div>
-
           <div id="chat-canais" class="chat-section" style="display:none">
             <h3>Canais Integrados</h3>
             <div class="chat-grid">
@@ -237,8 +215,6 @@
             </div>
           </div>
         </div>
-
-        <!-- BLOCO QR CODE -->
         <div id="chat-qr" class="chat-section chat-tipo-bloco" style="display:none">
           <h3>Número WhatsApp (QR Code)</h3>
           <div id="listaNumeroQr"></div>
@@ -248,30 +224,37 @@
     </section>
   </section>
 
-  <!-- ================= RESULTADO ================= -->
+  <!-- ===== SALVAR + BACKUP ===== -->
   <section class="card">
     <h2>Salvar configuração</h2>
-    <button class="btn-explorar" onclick="salvarConfiguracao()">Salvar</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+      <button class="btn-backup" onclick="baixarBackupJSON()" title="Exportar configuração como JSON">
+        💾 Exportar Backup JSON
+      </button>
+      <button class="btn-backup" onclick="restaurarBackupJSON()" title="Importar configuração de um JSON">
+        📂 Restaurar Backup
+      </button>
+    </div>
+    <button class="btn-explorar" onclick="salvarConfiguracao()">Salvar e Ver Resumo</button>
     <pre id="resultado"></pre>
   </section>
+
 </main>
 
-<!-- ================= BOTÃO DÚVIDAS (FLUTUANTE) ================= -->
+<!-- Modal de validação (criado pelo JS) -->
+
 <button class="btn-duvidas" onclick="abrirModalDuvidas()">
   ❓ Dúvidas
   <span class="badge-ajuda">?</span>
 </button>
 
-<!-- ================= MODAL DÚVIDAS ================= -->
 <div id="modalDuvidasOverlay" class="modal-duvidas-overlay" onclick="fecharModalDuvidasOverlay(event)">
   <div class="modal-duvidas">
     <div class="modal-duvidas-header">
       <h3>❓ Dúvidas no preenchimento</h3>
       <button class="modal-duvidas-fechar" onclick="fecharModalDuvidas()">✕</button>
     </div>
-    <div class="modal-duvidas-categorias" id="categoriasDuvida">
-      <!-- gerado pelo JS -->
-    </div>
+    <div class="modal-duvidas-categorias" id="categoriasDuvida"></div>
     <div class="modal-duvidas-corpo" id="conteudoDuvida">
       <div class="duvida-placeholder">
         <span>🗂️</span>
@@ -281,7 +264,6 @@
   </div>
 </div>
 
-<!-- ================= TOAST ================= -->
 <div id="toastGlobal" class="toast">
   <span id="toastMessage"></span>
 </div>
@@ -291,86 +273,32 @@
 <script src="./chat.js"></script>
 
 <script>
-/* ===== PARTÍCULAS ERA – CANVAS ===== */
 (function() {
   const canvas = document.getElementById("era-bg-canvas");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
-
   let W, H, particles = [], animId;
-  const LIME  = [206, 255, 0];
-  const SLATE = [43,  54,  61];
-  const COUNT = 38;
-
-  function resize() {
-    W = canvas.width  = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-
+  const LIME = [206,255,0], SLATE = [43,54,61], COUNT = 38;
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
   function mkParticle() {
-    const isLime = Math.random() > 0.35;
-    const rgb    = isLime ? LIME : SLATE;
-    return {
-      x:     Math.random() * W,
-      y:     H + Math.random() * 100,
-      r:     Math.random() * 2.2 + 0.5,
-      speed: Math.random() * 0.5 + 0.18,
-      drift: (Math.random() - 0.5) * 0.35,
-      alpha: Math.random() * 0.5 + 0.15,
-      rgb,
-      life:  0,
-      maxLife: Math.random() * 300 + 160,
-    };
+    const isLime = Math.random() > 0.35, rgb = isLime ? LIME : SLATE;
+    return { x: Math.random()*W, y: H+Math.random()*100, r: Math.random()*2.2+0.5, speed: Math.random()*0.5+0.18, drift: (Math.random()-0.5)*0.35, alpha: Math.random()*0.5+0.15, rgb, life: 0, maxLife: Math.random()*300+160 };
   }
-
-  function init() {
-    particles = [];
-    for (let i = 0; i < COUNT; i++) {
-      const p = mkParticle();
-      p.y = Math.random() * H;  // distribuir na tela no início
-      p.life = Math.random() * p.maxLife;
-      particles.push(p);
-    }
-  }
-
+  function init() { particles = []; for(let i=0;i<COUNT;i++){const p=mkParticle();p.y=Math.random()*H;p.life=Math.random()*p.maxLife;particles.push(p);} }
   function draw() {
-    ctx.clearRect(0, 0, W, H);
-
-    particles.forEach((p, i) => {
-      p.y    -= p.speed;
-      p.x    += p.drift;
-      p.life += 1;
-
-      // Fade in/out suave
-      const t     = p.life / p.maxLife;
-      const fade  = t < 0.15 ? t / 0.15 : t > 0.85 ? (1 - t) / 0.15 : 1;
-      const alpha = p.alpha * fade;
-
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${p.rgb[0]},${p.rgb[1]},${p.rgb[2]},${alpha})`;
-      ctx.fill();
-
-      // Brilho para partículas limão maiores
-      if (p.rgb === LIME && p.r > 1.4) {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(206,255,0,${alpha * 0.12})`;
-        ctx.fill();
-      }
-
-      if (p.life >= p.maxLife) particles[i] = mkParticle();
+    ctx.clearRect(0,0,W,H);
+    particles.forEach((p,i)=>{
+      p.y-=p.speed;p.x+=p.drift;p.life++;
+      const t=p.life/p.maxLife,fade=t<0.15?t/0.15:t>0.85?(1-t)/0.15:1,alpha=p.alpha*fade;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${p.rgb[0]},${p.rgb[1]},${p.rgb[2]},${alpha})`;ctx.fill();
+      if(p.rgb===LIME&&p.r>1.4){ctx.beginPath();ctx.arc(p.x,p.y,p.r*2.5,0,Math.PI*2);ctx.fillStyle=`rgba(206,255,0,${alpha*0.12})`;ctx.fill();}
+      if(p.life>=p.maxLife)particles[i]=mkParticle();
     });
-
-    animId = requestAnimationFrame(draw);
+    animId=requestAnimationFrame(draw);
   }
-
-  window.addEventListener("resize", () => { resize(); init(); });
-  resize();
-  init();
-  draw();
+  window.addEventListener("resize",()=>{resize();init();}); resize();init();draw();
 })();
 </script>
-
 </body>
 </html>
