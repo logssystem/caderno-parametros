@@ -1534,26 +1534,343 @@ window.initCaderno = function () {
     if (modo === "chat" || modo === "ambos") {
       setTimeout(gerarAgentesChatAPartirUsuarios, 150);
     }
-  }, 120);
+    // Recarrega dados salvos no localStorage
+    _carregarDadosSalvos();
+  }, 200);
 };
+
+/* =======================================================
+   RECARREGAR DADOS DO LOCALSTORAGE NO FORMULÁRIO
+======================================================= */
+function _carregarDadosSalvos() {
+  const raw = localStorage.getItem("CONFIG_CADERNO");
+  if (!raw || raw === "null") return;
+  let dados;
+  try { dados = JSON.parse(raw); } catch(e) { return; }
+  if (!dados) return;
+
+  const voz = dados.voz  || {};
+  const cli = dados.cliente || {};
+  const chat = dados.chat || {};
+
+  // ── Cliente ──────────────────────────────────────────
+  const fEmp = document.getElementById("empresaCliente");
+  const fDom = document.getElementById("dominioCliente");
+  const fCnpj = document.getElementById("cnpjCliente");
+  if (fEmp  && cli.empresa)  { fEmp.value  = cli.empresa;  fEmp.dispatchEvent(new Event("input")); }
+  if (fDom  && cli.dominio)  { fDom.value  = cli.dominio;  fDom.dispatchEvent(new Event("input")); }
+  if (fCnpj && cli.cnpj)     { fCnpj.value = cli.cnpj;     fCnpj.dispatchEvent(new Event("input")); }
+
+  // ── Usuários Web ─────────────────────────────────────
+  const listaUW = document.getElementById("listaUsuariosWeb");
+  if (listaUW && voz.usuarios?.length) {
+    listaUW.innerHTML = "";
+    voz.usuarios.forEach(u => {
+      const campo = criarCampo("usuario_web");
+      campo.querySelector(".campo-nome").value = u.nome || "";
+      const email = campo.querySelector("input[type=email]");
+      if (email) email.value = u.email || "";
+      const senha = campo.querySelector(".campo-senha");
+      if (senha) { senha.value = u.senha || ""; senha.dispatchEvent(new Event("input")); }
+      const perm = campo.querySelector("select");
+      if (perm && u.permissao) perm.value = u.permissao;
+      const chks = campo.querySelectorAll("input[type=checkbox]");
+      if (chks[0] && u.agente_callcenter)  chks[0].checked = true;
+      if (chks[1] && u.agente_omnichannel) chks[1].checked = true;
+      listaUW.appendChild(campo);
+    });
+  }
+
+  // ── Ramais ───────────────────────────────────────────
+  const listaR = document.getElementById("listaRings");
+  if (listaR && voz.ramais?.length) {
+    listaR.innerHTML = "";
+    voz.ramais.forEach(r => {
+      const campo = criarCampo("ring");
+      campo.querySelector(".campo-nome").value = r.ramal || "";
+      const senha = campo.querySelector(".campo-senha");
+      if (senha) senha.value = r.senha || "";
+      listaR.appendChild(campo);
+    });
+  }
+
+  // ── Entradas ─────────────────────────────────────────
+  const listaE = document.getElementById("listaEntradas");
+  if (listaE && voz.entradas?.length) {
+    listaE.innerHTML = "";
+    voz.entradas.forEach(e => {
+      const campo = criarCampo("entrada");
+      campo.querySelector(".campo-nome").value = e.numero || "";
+      campo.querySelector(".campo-nome").dispatchEvent(new Event("input"));
+      listaE.appendChild(campo);
+    });
+  }
+
+  // ── Regras de Tempo ──────────────────────────────────
+  const listaRT = document.getElementById("listaRegrasTempo");
+  if (listaRT && voz.regras_tempo?.length) {
+    listaRT.innerHTML = "";
+    voz.regras_tempo.forEach(r => {
+      const card = criarRegraTempo();
+      card.querySelector(".campo-nome").value = r.nome || "";
+      // Marca dias
+      const diasBtns = card.querySelectorAll(".btn-dia");
+      const diasCompletos = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+      diasBtns.forEach((btn, idx) => {
+        if ((r.dias || []).includes(diasCompletos[idx])) {
+          btn.click();
+        }
+      });
+      // Faixas de horário
+      const faixas = r.faixas?.length ? r.faixas
+        : (r.hora_inicio ? [{ inicio: r.hora_inicio, fim: r.hora_fim }] : []);
+      const faixaContainer = card.querySelector(".faixas-container");
+      if (faixaContainer && faixas.length) {
+        faixaContainer.innerHTML = "";
+        faixas.forEach(f => {
+          const row = criarFaixaHoraria();
+          const times = row.querySelectorAll("input[type=time]");
+          if (times[0]) times[0].value = f.inicio || "";
+          if (times[1]) times[1].value = f.fim    || "";
+          faixaContainer.appendChild(row);
+        });
+      }
+      listaRT.appendChild(card);
+    });
+  }
+
+  // ── Filas ────────────────────────────────────────────
+  const listaF = document.getElementById("listaFilas");
+  if (listaF && voz.filas?.length) {
+    listaF.innerHTML = "";
+    voz.filas.forEach(f => {
+      const campo = criarCampo("fila");
+      campo.querySelector(".campo-nome").value = f.nome || "";
+      campo.dataset.agentes = JSON.stringify(f.agentes || []);
+      // Renderiza lista de agentes
+      const lista = campo.querySelectorAll("div")[0];
+      (f.agentes || []).forEach(a => {
+        const d = document.createElement("div");
+        d.textContent = a;
+        const x = document.createElement("button");
+        x.textContent = "✖";
+        x.onclick = () => {
+          const arr = JSON.parse(campo.dataset.agentes);
+          arr.splice(arr.indexOf(a), 1);
+          campo.dataset.agentes = JSON.stringify(arr);
+          d.remove();
+        };
+        d.append(x);
+        if (lista) lista.append(d);
+      });
+      listaF.appendChild(campo);
+    });
+  }
+
+  // ── Grupo de Ring ────────────────────────────────────
+  const listaGR = document.getElementById("listaGrupoRing");
+  if (listaGR && voz.grupo_ring?.length) {
+    listaGR.innerHTML = "";
+    voz.grupo_ring.forEach(g => {
+      const campo = criarCampo("grupo_ring");
+      campo.querySelector(".campo-nome").value = g.nome || "";
+      const selEstr = campo.querySelector("select");
+      if (selEstr && g.estrategia) selEstr.value = g.estrategia;
+      campo.dataset.ramais = JSON.stringify(g.ramais || []);
+      listaGR.appendChild(campo);
+    });
+  }
+
+  // ── URAs ─────────────────────────────────────────────
+  const listaURA = document.getElementById("listaURAs");
+  if (listaURA && voz.uras?.length) {
+    listaURA.innerHTML = "";
+    voz.uras.forEach(u => {
+      const campo = criarCampo("ura");
+      campo.querySelector(".campo-nome").value = u.nome || "";
+      const ta = campo.querySelector("textarea");
+      if (ta) ta.value = u.mensagem || "";
+      const listaOpc = campo.querySelector(".opcao-ura-row")?.parentElement
+                    || campo.querySelectorAll("div")[campo.querySelectorAll("div").length - 2];
+      (u.opcoes || []).forEach(o => {
+        const row = criarOpcaoURA();
+        row.querySelector(".ura-tecla").value = o.tecla || "";
+        row.querySelector(".ura-desc").value  = o.descricao || "";
+        // Set destino after a small delay so options are populated
+        setTimeout(() => {
+          const sel = row.querySelector(".ura-destino");
+          if (sel) sel.value = o.destino || "";
+        }, 300);
+        if (listaOpc) listaOpc.appendChild(row);
+      });
+      listaURA.appendChild(campo);
+    });
+  }
+
+  // ── Pausas ───────────────────────────────────────────
+  if (voz.pausas?.length && voz.pausas[0]) {
+    const p = voz.pausas[0];
+    const nomeGrupo = document.getElementById("nomeGrupoPausas");
+    if (nomeGrupo) nomeGrupo.value = p.grupo || "";
+    const listaPausas = document.getElementById("listaPausas");
+    const bloco = document.getElementById("pausasConteudo");
+    if (listaPausas && p.itens?.length) {
+      if (bloco) bloco.style.display = "block";
+      listaPausas.innerHTML = "";
+      p.itens.forEach(item => {
+        const el = criarPausa();
+        el.querySelector("input[type=text]").value = item.nome || "";
+        const sel = el.querySelector("select");
+        if (sel) {
+          const mins = parseInt(item.tempo) || 0;
+          sel.value = mins;
+        }
+        listaPausas.appendChild(el);
+      });
+    }
+  }
+
+  // ── Pesquisa de Satisfação ───────────────────────────
+  if (voz.pesquisas?.length && voz.pesquisas[0]) {
+    const p = voz.pesquisas[0];
+    const bloco = document.getElementById("pesquisaSatisfacaoConteudo");
+    if (bloco && (p.nome || p.pergunta)) {
+      bloco.style.display = "block";
+      const fn1 = document.getElementById("pesquisaNome");
+      const fn2 = document.getElementById("pesquisaAudioIntro");
+      const fn3 = document.getElementById("pesquisaPergunta");
+      const fn4 = document.getElementById("pesquisaAudioFim");
+      if (fn1) fn1.value = p.nome || "";
+      if (fn2) fn2.value = p.introducao || "";
+      if (fn3) fn3.value = p.pergunta || "";
+      if (fn4) fn4.value = p.encerramento || "";
+      const listaResp = document.getElementById("listaRespostasPesquisa");
+      if (listaResp && p.respostas?.length) {
+        listaResp.innerHTML = "";
+        p.respostas.forEach(r => {
+          const el = criarRespostaPesquisa();
+          el.querySelector("input[type=number]").value = r.nota ?? "";
+          el.querySelector("input[type=text]").value   = r.descricao || "";
+          listaResp.appendChild(el);
+        });
+      }
+    }
+  }
+
+  // ── Chat ─────────────────────────────────────────────
+  if (chat && (chat.tipo || chat.usuarios?.length || chat.departamentos?.length)) {
+    // Tipo
+    if (chat.tipo) {
+      const tipos = chat.tipo === "ambos" ? ["api","qr"] : [chat.tipo];
+      tipos.forEach(t => {
+        const btn = document.querySelector(`[data-tipo="${t}"]`);
+        if (btn) window.toggleTipoChat(btn, t);
+      });
+    }
+    // API
+    if (chat.api) {
+      const btnApi = document.querySelector(`[data-api="${chat.api}"]`);
+      if (btnApi) window.selecionarApi(btnApi, chat.api);
+    }
+    // Conta
+    const contaVal = typeof chat.conta === "object" ? chat.conta?.api : chat.conta;
+    if (contaVal) {
+      const btnConta = document.querySelector(`[data-conta="${contaVal}"]`);
+      if (btnConta) window.selecionarConta(btnConta, contaVal);
+    }
+    // Canais
+    (chat.canais || []).forEach(canal => {
+      const btnCanal = document.querySelector(`[data-canal="${canal}"]`);
+      if (btnCanal && !btnCanal.classList.contains("active")) window.toggleCanal(btnCanal);
+    });
+    // Números QR
+    if (chat.numero_qr?.length) {
+      const listaQr = document.getElementById("listaNumeroQr");
+      if (listaQr) {
+        listaQr.innerHTML = "";
+        chat.numero_qr.forEach(n => {
+          window.adicionarNumeroQr();
+          const inputs = listaQr.querySelectorAll(".qr-numero-input");
+          const last = inputs[inputs.length - 1];
+          if (last) last.value = n;
+        });
+      }
+    }
+    // Usuários Chat
+    const listaUC = document.getElementById("listaUsuariosChat");
+    if (listaUC && chat.usuarios?.length) {
+      listaUC.innerHTML = "";
+      chat.usuarios.forEach(u => {
+        if (typeof window.adicionarUsuarioChat === "function") {
+          const wrap = window.adicionarUsuarioChat();
+          if (!wrap) return;
+          wrap.querySelector(".campo-nome").value = u.nome || "";
+          const email = wrap.querySelector("input[type=email]");
+          if (email) email.value = u.email || "";
+          const senha = wrap.querySelector(".campo-senha");
+          if (senha) senha.value = u.senha || "";
+          const perm = wrap.querySelector("select");
+          if (perm && u.permissao) perm.value = u.permissao;
+        }
+      });
+    }
+    // Departamentos Chat
+    const listaDC = document.getElementById("listaDepartamentosChat");
+    if (listaDC && chat.departamentos?.length) {
+      listaDC.innerHTML = "";
+      chat.departamentos.forEach(dep => {
+        if (typeof window.adicionarDepartamentoChat === "function") {
+          window.adicionarDepartamentoChat();
+          const cards = listaDC.querySelectorAll(".campo-descricao");
+          const last = cards[cards.length - 1];
+          if (!last) return;
+          const nomeInput = last.querySelector(".campo-nome");
+          if (nomeInput) nomeInput.value = dep.nome || "";
+          // Adicionar agentes após render
+          setTimeout(() => {
+            (dep.agentes || []).forEach(agNome => {
+              const btnAdd = last.querySelectorAll("button");
+              const addBtn = [...btnAdd].find(b => b.textContent.includes("Adicionar agente"));
+              if (addBtn) {
+                addBtn.click();
+                const selects = last.querySelectorAll("select");
+                const lastSel = selects[selects.length - 1];
+                if (lastSel) {
+                  // Tenta setar o valor
+                  setTimeout(() => { lastSel.value = agNome; }, 200);
+                }
+              }
+            });
+          }, 400);
+        }
+      });
+    }
+  }
+
+  // Sincroniza tudo após recarregar
+  setTimeout(() => {
+    syncTudo();
+    atualizarTodosDestinosURA();
+    console.log("[Caderno] Dados recarregados do localStorage");
+  }, 500);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   if (typeof window.initCaderno === "function") window.initCaderno();
 
-  // ── Scroll para seção ao voltar do resumo (editar) ──
+  // ── Scroll + destaque ao voltar do resumo (botão Editar) ──
   const ancora = sessionStorage.getItem("CADERNO_EDIT_ANCORA");
   if (ancora) {
     sessionStorage.removeItem("CADERNO_EDIT_ANCORA");
-    // Aguarda render do app antes de scrollar
     setTimeout(() => {
       const el = document.querySelector(ancora);
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
-        // Destaca o elemento brevemente
         el.style.transition = "box-shadow 0.3s";
         el.style.boxShadow  = "0 0 0 3px rgba(206,255,0,0.6)";
         setTimeout(() => { el.style.boxShadow = ""; }, 2000);
       }
-    }, 600);
+    }, 800);
   }
 });
 
