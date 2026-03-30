@@ -25,6 +25,8 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 .btn-limpar:hover{border-color:var(--red);color:var(--red);}
 .btn-pub{background:var(--green);color:#000;}
 .btn-pub:hover{filter:brightness(1.1);}
+.btn-refresh{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:var(--blue);}
+.btn-refresh:hover{background:rgba(56,189,248,.25);}
 .btn-exp{background:rgba(206,255,0,.12);border:1px solid rgba(206,255,0,.3);color:var(--lime);}
 .btn-exp:hover{background:rgba(206,255,0,.2);}
 
@@ -114,6 +116,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 <div class="hdr">
   <div class="hdr-logo">ERA</div>
   <div class="hdr-title"><input id="flowName" value="Fluxo de Atendimento" placeholder="Nome do fluxo"></div>
+  <button class="hdr-btn btn-refresh" onclick="atualizarDadosCaderno()" title="Recarrega agentes, departamentos e regras de tempo do formulário">🔄 Atualizar dados</button>
   <button class="hdr-btn btn-exp" onclick="exportarJSON()">⬇ Exportar JSON</button>
   <button class="hdr-btn btn-limpar" onclick="confirmarLimpar()">Limpar</button>
   <button class="hdr-btn btn-pub" onclick="salvarFluxo()">✓ Salvar Fluxo</button>
@@ -860,9 +863,24 @@ wrap.addEventListener("click", e => {
 // ── Lê dados do caderno (localStorage) para preencher selects ──
 function getDadosCaderno() {
   try {
-    const raw = localStorage.getItem("CONFIG_CADERNO");
+    // Tenta ler do localStorage da janela pai primeiro (caso aberto via window.open)
+    let raw = null;
+    if (window.opener && !window.opener.closed) {
+      try { raw = window.opener.localStorage.getItem("CONFIG_CADERNO"); } catch(e) {}
+    }
+    if (!raw) raw = localStorage.getItem("CONFIG_CADERNO");
     return raw ? JSON.parse(raw) : {};
   } catch(e) { return {}; }
+}
+
+/* Re-renderiza todos os nós para atualizar selects com dados do caderno */
+function atualizarDadosCaderno() {
+  nodes.forEach(n => renderNode(n));
+  renderConnections();
+  toast("Dados atualizados! " +
+    getRegrasTempo().length + " regras · " +
+    getDepartamentos().length + " departamentos · " +
+    getAgentes().length + " agentes");
 }
 
 function getRegrasTempo() {
