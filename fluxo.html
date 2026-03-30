@@ -42,10 +42,10 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 .sb-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 
 /* ── CANVAS ── */
-.canvas-wrap{flex:1;position:relative;overflow:hidden;background:var(--bg);}
+.canvas-wrap{flex:1;position:relative;overflow:hidden;background:var(--bg);} #canvas{overflow:visible;}
 .canvas-wrap::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,rgba(206,255,0,.04) 1px,transparent 1px);background-size:24px 24px;pointer-events:none;}
 #canvas{position:absolute;inset:0;width:100%;height:100%;}
-#svg-layer{position:absolute;inset:0;pointer-events:none;z-index:1;}
+#svg-layer{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:visible;}
 #nodes-layer{position:absolute;inset:0;z-index:2;}
 
 /* ── NÓ ── */
@@ -70,11 +70,18 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 .node-body .btn-add-opt:hover{background:rgba(206,255,0,.13);}
 
 /* ── PORTAS ── */
-.port{position:absolute;width:12px;height:12px;border-radius:50%;border:2px solid;cursor:crosshair;transition:transform .15s,box-shadow .15s;z-index:10;}
-.port:hover{transform:scale(1.5);box-shadow:0 0 8px currentColor;}
-.port-out{border-color:var(--lime);background:var(--bg);right:-7px;}
-.port-in{border-color:var(--blue);background:var(--bg);left:-7px;}
-.port-out-bot{border-color:var(--amber);background:var(--bg);bottom:-7px;left:50%;transform:translateX(-50%);}
+.port{position:absolute;width:20px;height:20px;border-radius:50%;border:3px solid;cursor:crosshair;transition:transform .15s,box-shadow .15s,background .15s;z-index:10;display:flex;align-items:center;justify-content:center;}
+.port:hover{transform:scale(1.4);box-shadow:0 0 14px currentColor;}
+.port::after{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.5;}
+.port-out{border-color:var(--lime);color:var(--lime);background:rgba(206,255,0,.12);right:-11px;}
+.port-out:hover{background:rgba(206,255,0,.35);}
+.port-in{border-color:var(--blue);color:var(--blue);background:rgba(56,189,248,.12);left:-11px;}
+.port-in:hover{background:rgba(56,189,248,.35);}
+.port-out-bot{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,.12);bottom:-11px;left:50%;transform:translateX(-50%);}
+.port-opt{border-color:var(--purple)!important;color:var(--purple)!important;background:rgba(167,139,250,.15)!important;right:-11px;width:22px!important;height:22px!important;}
+.port-opt:hover{background:rgba(167,139,250,.4)!important;transform:scale(1.35);}
+.port-opt-label{font-size:9px;font-weight:900;color:var(--purple);line-height:1;pointer-events:none;}
+.opt-num{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.4);color:var(--purple);font-size:10px;font-weight:800;flex-shrink:0;margin-right:4px;}
 
 /* ── CONEXÃO ── */
 .conn-line{stroke:var(--conn);stroke-width:1.8;fill:none;stroke-dasharray:5 3;animation:dash 1.5s linear infinite;}
@@ -152,7 +159,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
   <!-- CANVAS -->
   <div class="canvas-wrap" id="canvasWrap">
     <div id="canvas">
-      <svg id="svg-layer" xmlns="http://www.w3.org/2000/svg">
+      <svg id="svg-layer" xmlns="http://www.w3.org/2000/svg" overflow="visible" style="overflow:visible;">
         <defs>
           <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
             <path d="M0 0L6 3L0 6Z" class="conn-arrow"/>
@@ -194,8 +201,9 @@ let offsetX = 0;
 let offsetY = 0;
 let dragging = null;
 let dragOffX = 0, dragOffY = 0;
-let connectingFrom = null; // {nodeId, portType}
-let selected = null;
+let connectingFrom = null; // {nodeId, portKey}
+let selected       = null;
+let _connJustMade  = false; // evita cancelar conexão recém-feita no mouseup global
 
 const wrap   = document.getElementById("canvasWrap");
 const canvas = document.getElementById("canvas");
@@ -238,30 +246,49 @@ wrap.addEventListener("mousedown", e => {
 });
 window.addEventListener("mousemove", e => {
   if (panning) { offsetX=panOX+(e.clientX-panX0); offsetY=panOY+(e.clientY-panY0); applyTransform(); }
-  if (dragging) {
+  // Helper: converte coordenadas de tela para coordenadas do canvas
+  function toCanvas(cx, cy) {
     const rect = wrap.getBoundingClientRect();
-    const x = (e.clientX - rect.left - offsetX) / scale - dragOffX;
-    const y = (e.clientY - rect.top  - offsetY) / scale - dragOffY;
-    dragging.x = Math.max(0, x);
-    dragging.y = Math.max(0, y);
+    return {
+      x: (cx - rect.left - offsetX) / scale,
+      y: (cy - rect.top  - offsetY) / scale
+    };
+  }
+
+  if (dragging) {
+    const p = toCanvas(e.clientX, e.clientY);
+    dragging.x = Math.max(0, p.x - dragOffX);
+    dragging.y = Math.max(0, p.y - dragOffY);
     const el = document.getElementById("n-"+dragging.id);
     if (el) { el.style.left = dragging.x+"px"; el.style.top = dragging.y+"px"; }
     renderConnections();
   }
-  // Preview connection line
-  if (connectingFrom) {
-    const rect = wrap.getBoundingClientRect();
-    const mx = (e.clientX - rect.left - offsetX) / scale;
-    const my = (e.clientY - rect.top  - offsetY) / scale;
-    renderConnections(mx, my);
+
+  // Preview da linha de conexão — segue o mouse em tempo real
+  if (connectingFrom !== null) {
+    const p = toCanvas(e.clientX, e.clientY);
+    renderConnections(p.x, p.y);
   }
 });
 window.addEventListener("mouseup", e => {
-  panning=false; dragging=null;
-  if (connectingFrom && e.target !== e.currentTarget) {
-    // Check if released on a port-in
-    const portEl = document.elementFromPoint(e.clientX, e.clientY);
-    if (!portEl || !portEl.classList.contains("port-in")) {
+  panning = false;
+  dragging = null;
+
+  // Se onPortIn acabou de processar, não cancela
+  if (_connJustMade) {
+    _connJustMade = false;
+    return;
+  }
+
+  if (connectingFrom !== null) {
+    // Percorre elementos sob o cursor procurando port-in em qualquer profundidade
+    let el = document.elementFromPoint(e.clientX, e.clientY);
+    let emPortIn = false;
+    while (el && el !== document.body) {
+      if (el.classList && el.classList.contains("port-in")) { emPortIn = true; break; }
+      el = el.parentElement;
+    }
+    if (!emPortIn) {
       connectingFrom = null;
       renderConnections();
     }
@@ -332,7 +359,8 @@ function renderNode(n) {
     body += `<textarea placeholder="Mensagem do menu..." onchange="n_set(${n.id},'text',this.value)" style="min-height:36px">${n.data.text||""}</textarea>`;
     body += `<div id="opts-${n.id}">`;
     (n.data.opcoes||[]).forEach((op,i) => {
-      body += `<div class="opt-row">
+      body += `<div class="opt-row" style="position:relative;">
+        <span class="opt-num">${i+1}</span>
         <input type="text" placeholder="Opção ${i+1}" value="${op||""}" onchange="n_opt(${n.id},${i},this.value)">
         <button onclick="n_del_opt(${n.id},${i})">✕</button>
       </div>`;
@@ -359,9 +387,27 @@ function renderNode(n) {
   body += `</div>`;
 
   // Ports
-  const midY = 36; // vertical center of header approx
-  if (cfg.hasIn)  body += `<div class="port port-in"  style="top:${midY}px" onmouseup="onPortIn(${n.id})" title="Entrada"></div>`;
-  if (cfg.hasOut) body += `<div class="port port-out" style="top:${midY}px" onmousedown="onPortOut(event,${n.id})" title="Saída"></div>`;
+  const midY = 36;
+  if (cfg.hasIn) body += `<div class="port port-in" style="top:${midY - 10}px" onmouseup="onPortIn(${n.id}, event)" title="Clique aqui para receber conexão"></div>`;
+
+  if (n.type === "menu" && (n.data.opcoes||[]).length > 0) {
+    // Uma porta de saída por opção — posicionadas ao lado de cada opt-row
+    // Header height ~46px + textarea ~54px + each opt-row ~36px
+    const hdrH   = 46;
+    const taH    = 54;
+    const optH   = 36;
+    const padTop = 10; // node-body padding
+    (n.data.opcoes||[]).forEach((op, i) => {
+      const portY = hdrH + padTop + taH + 4 + i * optH + (optH/2) - 10;
+      body += `<div class="port port-out port-opt" style="top:${portY}px" 
+        onmousedown="onPortOut(event,${n.id},'opt_${i}')" 
+        title="Saída: Opção ${i+1}">
+        <span class="port-opt-label">${i+1}</span>
+      </div>`;
+    });
+  } else if (cfg.hasOut) {
+    body += `<div class="port port-out" style="top:${midY - 10}px" onmousedown="onPortOut(event,${n.id})" title="Saída"></div>`;
+  }
 
   el.innerHTML = body;
 
@@ -411,28 +457,39 @@ window.delNode = (id) => {
 };
 
 // ── CONNECTIONS ──
-function onPortOut(e, nodeId) {
-  connectingFrom = nodeId;
+function onPortOut(e, nodeId, portKey) {
+  connectingFrom = { nodeId, portKey: portKey || "default" };
   e.stopPropagation();
 }
-window.onPortIn = (nodeId) => {
-  if (connectingFrom !== null && connectingFrom !== nodeId) {
-    // Avoid duplicate
-    const dup = conns.find(c=>c.from===connectingFrom && c.to===nodeId);
-    if (!dup) conns.push({ from: connectingFrom, to: nodeId });
+window.onPortIn = (nodeId, e) => {
+  if (e) e.stopPropagation();
+  if (connectingFrom !== null && connectingFrom.nodeId !== nodeId) {
+    const from    = connectingFrom.nodeId;
+    const portKey = connectingFrom.portKey || "default";
+    const dup = conns.find(c => c.from === from && c.to === nodeId && c.portKey === portKey);
+    if (!dup) conns.push({ from, to: nodeId, portKey });
     connectingFrom = null;
+    _connJustMade  = true; // flag: não cancelar no mouseup global
     renderConnections();
   }
 };
 
-function getPortPos(nodeId, side) {
+function getPortPos(nodeId, side, portKey) {
   const n = nodes.find(x=>x.id===nodeId); if(!n) return null;
-  const cfg = NODE_CFG[n.type];
   const el = document.getElementById("n-"+nodeId); if(!el) return null;
-  const w = el.offsetWidth, h = el.offsetHeight;
-  if (side==="out") return { x: n.x + w + 0, y: n.y + 36 };
-  if (side==="in")  return { x: n.x - 0,     y: n.y + 36 };
-  return null;
+  const w = el.offsetWidth;
+
+  if (side === "in")  return { x: n.x,     y: n.y + 36 };
+
+  // Per-option port for menu nodes
+  if (side === "out" && n.type === "menu" && portKey && portKey.startsWith("opt_")) {
+    const i      = parseInt(portKey.replace("opt_", ""));
+    const hdrH   = 46, taH = 54, optH = 36, padTop = 10;
+    const portY  = hdrH + padTop + taH + 4 + i * optH + (optH/2);
+    return { x: n.x + w, y: n.y + portY };
+  }
+
+  return { x: n.x + w, y: n.y + 36 };
 }
 
 function renderConnections(previewX, previewY) {
@@ -440,25 +497,42 @@ function renderConnections(previewX, previewY) {
   svgL.querySelectorAll("path,line").forEach(e=>e.remove());
 
   conns.forEach(c => {
-    const a = getPortPos(c.from, "out");
+    const a = getPortPos(c.from, "out", c.portKey);
     const b = getPortPos(c.to,   "in");
     if (!a || !b) return;
-    drawCurve(a.x, a.y, b.x, b.y, "solid");
+    // Cor da linha por portKey
+    const col = c.portKey && c.portKey.startsWith("opt_") ? "#a78bfa" : "#38bdf8";
+    drawCurve(a.x, a.y, b.x, b.y, "solid", col);
+    // Label da opção na linha
+    if (c.portKey && c.portKey.startsWith("opt_")) {
+      const i   = parseInt(c.portKey.replace("opt_","")) + 1;
+      const mx  = (a.x + b.x) / 2;
+      const my  = (a.y + b.y) / 2 - 8;
+      const lbl = document.createElementNS("http://www.w3.org/2000/svg","text");
+      lbl.setAttribute("x", mx); lbl.setAttribute("y", my);
+      lbl.setAttribute("text-anchor","middle");
+      lbl.setAttribute("font-size","10");
+      lbl.setAttribute("fill","#a78bfa");
+      lbl.setAttribute("font-weight","bold");
+      lbl.textContent = `Opção ${i}`;
+      svgL.appendChild(lbl);
+    }
   });
 
   // Preview
   if (connectingFrom !== null && previewX !== undefined) {
-    const a = getPortPos(connectingFrom, "out");
-    if (a) drawCurve(a.x, a.y, previewX, previewY, "dash");
+    const a = getPortPos(connectingFrom.nodeId, "out", connectingFrom.portKey);
+    if (a) drawCurve(a.x, a.y, previewX, previewY, "dash", "#CEFF00");
   }
 }
 
-function drawCurve(x1,y1,x2,y2,style) {
+function drawCurve(x1,y1,x2,y2,style,color) {
   const dx = Math.abs(x2-x1)*0.5;
   const d = `M${x1},${y1} C${x1+dx},${y1} ${x2-dx},${y2} ${x2},${y2}`;
   const path = document.createElementNS("http://www.w3.org/2000/svg","path");
   path.setAttribute("d", d);
   path.setAttribute("class", "conn-line" + (style==="solid" ? " solid" : ""));
+  if (color) path.setAttribute("stroke", color);
   path.setAttribute("marker-end","url(#arr)");
   svgL.appendChild(path);
 }
@@ -701,6 +775,32 @@ function toast(msg, err=false) {
   clearTimeout(t._t);
   t._t = setTimeout(()=>t.classList.remove("show"), 2500);
 }
+
+// ── ESC cancela conexão em andamento ──
+window.addEventListener("keydown", e => {
+  if (e.key === "Escape" && connectingFrom !== null) {
+    connectingFrom = null;
+    renderConnections();
+  }
+  // Delete/Backspace deleta nó selecionado
+  if ((e.key === "Delete" || e.key === "Backspace") && selected) {
+    const tag = document.activeElement?.tagName?.toLowerCase();
+    if (tag !== "input" && tag !== "textarea") {
+      delNode(selected);
+      selected = null;
+    }
+  }
+});
+
+// Clique no canvas vazio também cancela conexão
+wrap.addEventListener("click", e => {
+  if (e.target === wrap || e.target === canvas || e.target === svgL || e.target === nodesL) {
+    if (connectingFrom !== null) {
+      connectingFrom = null;
+      renderConnections();
+    }
+  }
+});
 
 // ── INIT: Start node ──
 addNode("start", 60, 80);
