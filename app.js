@@ -1255,6 +1255,157 @@ function mostrarToast(msg, error = false) {
     setTimeout(() => t.classList.remove("show"), 3000);
 }
 
+/* =======================================================
+   LIMPAR TUDO — reseta caderno e volta para a intro
+======================================================= */
+function _limparTudoInterno() {
+  // Remove dados do localStorage
+  localStorage.removeItem("CONFIG_CADERNO");
+  localStorage.removeItem("CONFIG_CADERNO_BACKUPS");
+  localStorage.removeItem("modo_atendimento");
+  sessionStorage.removeItem("CADERNO_EDIT_ANCORA");
+
+  // Limpa campos do formulário
+  ["empresaCliente","dominioCliente","cnpjCliente"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ""; el.dispatchEvent(new Event("input")); }
+  });
+
+  // Limpa todas as listas dinâmicas
+  ["listaUsuariosWeb","listaRings","listaEntradas","listaAgentes",
+   "listaFilas","listaGrupoRing","listaURAs","listaRegrasTempo",
+   "listaPausas","listaRespostasPesquisa",
+   "listaUsuariosChat","listaAgentesChat","listaDepartamentosChat",
+   "listaNumeroQr"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = "";
+  });
+
+  // Fecha seções opcionais
+  const blPausas = document.getElementById("pausasConteudo");
+  const blPesq   = document.getElementById("pesquisaSatisfacaoConteudo");
+  if (blPausas) blPausas.style.display = "none";
+  if (blPesq)   blPesq.style.display   = "none";
+
+  // Reseta campos de pesquisa
+  ["pesquisaNome","pesquisaAudioIntro","pesquisaPergunta","pesquisaAudioFim",
+   "nomeGrupoPausas"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+
+  // Reseta chatState
+  window.chatState = { tipo: null, api: null, conta: null, canais: [], usuarios: [], agentes: [], departamentos: [] };
+  window._tiposAtivos = new Set();
+
+  // Reseta cards de chat (remove classe active)
+  document.querySelectorAll(".chat-card.active").forEach(c => c.classList.remove("active"));
+  document.querySelectorAll(".chat-tipo-bloco").forEach(b => b.style.display = "none");
+  const blocoApi = document.getElementById("bloco-conta-api");
+  const blocoCanais = document.getElementById("chat-canais");
+  if (blocoApi)    blocoApi.style.display    = "none";
+  if (blocoCanais) blocoCanais.style.display = "none";
+}
+
+/* Chamado ao clicar "Voltar ao início" — pede confirmação e limpa */
+window.resetarIntro = function () {
+  const raw = localStorage.getItem("CONFIG_CADERNO");
+  const temDados = raw && raw !== "null" && raw !== "{}";
+
+  if (temDados) {
+    // Abre modal de confirmação antes de limpar
+    _abrirModalLimpar();
+  } else {
+    _executarResetarIntro();
+  }
+};
+
+function _executarResetarIntro() {
+  _limparTudoInterno();
+  // Volta para a tela de intro (função do intro.js)
+  const introEl = document.getElementById("intro-screen");
+  const appEl   = document.getElementById("app-content");
+  const headerEl = document.getElementById("headerApp");
+  if (introEl)  introEl.style.display  = "flex";
+  if (appEl)    appEl.style.display    = "none";
+  if (headerEl) {
+    // Esconde o botão "Voltar ao início" na intro
+    const btnVoltar = headerEl.querySelector(".btn-voltar-intro");
+    if (btnVoltar) btnVoltar.style.display = "none";
+  }
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* Botão "Limpar tudo" — confirmação antes de apagar */
+window.limparTudoCaderno = function () {
+  _abrirModalLimpar();
+};
+
+function _abrirModalLimpar() {
+  // Cria modal se não existir
+  let modal = document.getElementById("modalLimpar");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "modalLimpar";
+    modal.style.cssText = `
+      position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);
+      z-index:9100;display:flex;align-items:center;justify-content:center;
+      opacity:0;pointer-events:none;transition:opacity 0.2s ease;
+    `;
+    modal.innerHTML = `
+      <div style="
+        background:var(--card-bg);border:1px solid var(--border);border-radius:20px;
+        width:420px;max-width:92vw;padding:28px 28px 22px;
+        box-shadow:0 30px 80px rgba(0,0,0,0.5);
+        transform:scale(0.96);transition:transform 0.2s ease;
+      " id="modalLimparBox">
+        <div style="font-size:38px;text-align:center;margin-bottom:12px;">🗑️</div>
+        <h3 style="margin:0 0 10px;text-align:center;font-size:18px;font-weight:800;color:var(--text)">
+          Limpar tudo?
+        </h3>
+        <p style="margin:0 0 22px;text-align:center;font-size:13px;color:var(--text-soft);line-height:1.6">
+          Isso vai apagar <strong>todos os dados</strong> preenchidos e voltar para a tela inicial.<br>
+          Essa ação não pode ser desfeita.
+        </p>
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <button onclick="fecharModalLimpar()" style="
+            padding:11px 24px;border-radius:10px;border:1px solid var(--border);
+            background:transparent;color:var(--text);font-weight:700;font-size:13px;cursor:pointer;
+          ">Cancelar</button>
+          <button onclick="_confirmarLimpar()" style="
+            padding:11px 24px;border-radius:10px;border:none;
+            background:linear-gradient(90deg,#ef4444,#dc2626);
+            color:#fff;font-weight:800;font-size:13px;cursor:pointer;
+          ">Sim, limpar tudo</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener("click", e => { if (e.target === modal) fecharModalLimpar(); });
+  }
+  modal.style.opacity = "1";
+  modal.style.pointerEvents = "all";
+  const box = document.getElementById("modalLimparBox");
+  if (box) box.style.transform = "scale(1)";
+}
+
+window.fecharModalLimpar = function () {
+  const modal = document.getElementById("modalLimpar");
+  if (!modal) return;
+  modal.style.opacity = "0";
+  modal.style.pointerEvents = "none";
+  const box = document.getElementById("modalLimparBox");
+  if (box) box.style.transform = "scale(0.96)";
+};
+
+window._confirmarLimpar = function () {
+  fecharModalLimpar();
+  setTimeout(() => {
+    _executarResetarIntro();
+    mostrarToast("Caderno limpo com sucesso!");
+  }, 200);
+};
+
 /* ================= SALVAR / EXPLORAR ================= */
 window.explorar = function () {
   try {
@@ -1803,107 +1954,114 @@ function _carregarDadosSalvos() {
         });
       }
     }
-    // Usuários Chat
+    // ── Usuários Chat ──────────────────────────────────────────────────
+    // Adiciona todos SEM disparar change (evita gerar agentes parcialmente)
     const listaUC = document.getElementById("listaUsuariosChat");
-    if (listaUC && chat.usuarios?.length) {
+    const _usuariosChat = chat.usuarios || [];
+    if (listaUC && _usuariosChat.length) {
       listaUC.innerHTML = "";
-      chat.usuarios.forEach(u => {
+      _usuariosChat.forEach(u => {
         if (typeof window.adicionarUsuarioChat !== "function") return;
         const wrap = window.adicionarUsuarioChat();
         if (!wrap) return;
-        wrap.querySelector(".campo-nome").value = u.nome || "";
-        const email = wrap.querySelector("input[type=email]");
-        if (email) email.value = u.email || "";
-        const senha = wrap.querySelector(".campo-senha");
-        if (senha) senha.value = u.senha || "";
-        const perm = wrap.querySelector("select");
-        if (perm && u.permissao) perm.value = u.permissao;
-        // ── Restaura checkbox "é agente omnichannel" ──
-        const chkAgente = wrap.querySelector("input[type=checkbox]");
-        if (chkAgente && (u.agente === true || u.agente_omnichannel === true)) {
-          chkAgente.checked = true;
-          chkAgente.dispatchEvent(new Event("change"));
+        // Nome
+        const nomeEl = wrap.querySelector(".campo-nome");
+        if (nomeEl) nomeEl.value = u.nome || "";
+        // Email
+        const emailEl = wrap.querySelector("input[type=email]");
+        if (emailEl) emailEl.value = u.email || "";
+        // Senha
+        const senhaEl = wrap.querySelector(".campo-senha");
+        if (senhaEl) senhaEl.value = u.senha || "";
+        // Permissão
+        const permEl = wrap.querySelector("select");
+        if (permEl && u.permissao) permEl.value = u.permissao;
+        // Checkbox agente — marca SEM disparar onchange ainda
+        // O chat.js usa closure interna; o checkbox fica dentro do <label>
+        const chk = wrap.querySelector("input[type=checkbox]");
+        if (chk) {
+          const deveSerAgente = u.agente === true || u.agente_omnichannel === true;
+          // Temporariamente desconecta o onchange para não gerar agentes em loop
+          const origOnchange = chk.onchange;
+          chk.onchange = null;
+          chk.checked = deveSerAgente;
+          chk.onchange = origOnchange;
         }
       });
     }
-    // Departamentos Chat — carregados após agentes prontos, sem usar click
-    const _depsSalvos = chat.departamentos || [];
-    if (_depsSalvos.length) {
-      setTimeout(() => {
-        const listaDC = document.getElementById("listaDepartamentosChat");
-        if (!listaDC) return;
-        listaDC.innerHTML = "";
-
-        // Coleta agentes disponíveis no DOM
-        function _getAgentesChat() {
-          const nomes = [];
-          document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
-            const n = a.querySelector(".campo-nome")?.value?.trim();
-            if (n) nomes.push(n);
-          });
-          return nomes;
-        }
-
-        _depsSalvos.forEach(dep => {
-          if (typeof window.adicionarDepartamentoChat !== "function") return;
-          window.adicionarDepartamentoChat();
-
-          const cards = listaDC.querySelectorAll(".campo-descricao");
-          const card  = cards[cards.length - 1];
-          if (!card) return;
-
-          // Nome do departamento
-          const nomeInput = card.querySelector(".campo-nome");
-          if (nomeInput) nomeInput.value = dep.nome || "";
-
-          // Agentes — cria linhas de select diretamente sem clicar no botão
-          const listaAgDiv = card.querySelector("div[style*='margin-top']") || card.querySelector("div:first-of-type");
-          const agentesDisp = _getAgentesChat();
-
-          (dep.agentes || []).forEach(agNome => {
-            // Cria linha igual ao que o botão criaria
-            const linha = document.createElement("div");
-            linha.style.cssText = "display:flex;gap:6px;margin-bottom:6px;";
-
-            const sel = document.createElement("select");
-            sel.innerHTML = `<option value="">Selecione um agente</option>`;
-
-            // Popula com agentes disponíveis
-            agentesDisp.forEach(n => sel.add(new Option(n, n)));
-            // Se não encontrou na lista, adiciona mesmo assim
-            if (!agentesDisp.includes(agNome)) sel.add(new Option(agNome, agNome));
-            sel.value = agNome;
-
-            sel.onchange = () => {};  // refresh será feito pelo chat.js se disponível
-
-            const del = document.createElement("button");
-            del.textContent = "✖";
-            del.style.flexShrink = "0";
-            del.onclick = () => { linha.remove(); };
-
-            linha.append(sel, del);
-            if (listaAgDiv) listaAgDiv.appendChild(linha);
-          });
-        });
-      }, 900);
-    }
   }
 
-  // Sincroniza tudo após recarregar — em cascata para garantir ordem correta
+  // ── CASCATA DE SINCRONIZAÇÃO ────────────────────────────────────────
+  // Passo 1 (300ms): gera agentes de voz + campos básicos prontos
   setTimeout(() => {
-    // 1ª passada: gera agentes a partir dos checkboxes restaurados
     syncTudo();
     atualizarTodosDestinosURA();
   }, 300);
 
+  // Passo 2 (700ms): gera agentes de chat (lê checkboxes já marcados)
   setTimeout(() => {
-    // 2ª passada: após agentes prontos, gera agentes chat
     if (typeof gerarAgentesChatAPartirUsuarios === "function") {
       gerarAgentesChatAPartirUsuarios();
     }
-    syncTudo();
-    console.log("[Caderno] Dados recarregados do localStorage");
-  }, 600);
+  }, 700);
+
+  // Passo 3 (1200ms): preenche departamentos com agentes já no DOM
+  setTimeout(() => {
+    const _depsSalvos = (JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}").chat || {}).departamentos || [];
+    if (!_depsSalvos.length) return;
+
+    const listaDC = document.getElementById("listaDepartamentosChat");
+    if (!listaDC) return;
+    listaDC.innerHTML = "";
+
+    // Coleta nomes dos agentes que estão no DOM agora
+    const _agentesNoDOM = [];
+    document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
+      const n = a.querySelector(".campo-nome")?.value?.trim();
+      if (n) _agentesNoDOM.push(n);
+    });
+
+    _depsSalvos.forEach(dep => {
+      if (typeof window.adicionarDepartamentoChat !== "function") return;
+
+      // Cria o card do departamento via função original (preserva closure)
+      window.adicionarDepartamentoChat();
+
+      const cards = listaDC.querySelectorAll(".campo-descricao");
+      const card  = cards[cards.length - 1];
+      if (!card) return;
+
+      // Nome
+      const nomeEl = card.querySelector(".campo-nome");
+      if (nomeEl) nomeEl.value = dep.nome || "";
+
+      // Botão "+ Adicionar agente" — existe no card criado pelo chat.js
+      const addBtn = [...card.querySelectorAll("button")]
+        .find(b => b.textContent.trim().includes("Adicionar agente"));
+      if (!addBtn) return;
+
+      // Para cada agente do departamento: clica no botão e seta imediatamente
+      (dep.agentes || []).forEach(agNome => {
+        // Desconecta onchange temporariamente do select mais recente antes de clicar
+        addBtn.click();
+
+        // O click adiciona um novo select — pega o último
+        const selects = card.querySelectorAll("select");
+        const sel = selects[selects.length - 1];
+        if (!sel) return;
+
+        // Garante que a opção existe
+        const jaTemOpcao = [...sel.options].some(o => o.value === agNome);
+        if (!jaTemOpcao) {
+          sel.add(new Option(agNome, agNome));
+        }
+        sel.value = agNome;
+        // Não dispara onchange para evitar refreshSelects em loop
+      });
+    });
+
+    console.log("[Caderno] Dados recarregados. Departamentos:", _depsSalvos.length);
+  }, 1200);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
