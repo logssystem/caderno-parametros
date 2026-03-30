@@ -449,7 +449,7 @@ function renderResumoCompleto() {
   }
   // ── Módulo Chat ──────────────────────────────────────
   const chat = dados.chat || {};
-  if (chat.tipo || chat.usuarios?.length || chat.agentes?.length || chat.fluxo || chat.fluxo_imagem) {
+  if (chat.tipo || chat.usuarios?.length || chat.agentes?.length || chat.fluxo || chat.fluxo_imagem || chat.fluxos?.length || chat.regras_tempo?.length) {
     html += `<div class="modulo-titulo"><h1>💬 Chat / Omnichannel</h1></div>`;
     html += secao("sec-chat-config", "⚙️", "Configuração de Chat");
     if (chat.tipo === "qr") {
@@ -979,7 +979,7 @@ window.confirmarConfiguracao = async function () {
   if (voz.uras?.length)           modulos.push("  URA");
   if (voz.pausas?.length)         modulos.push("  Pausas do Call Center");
   if (voz.pesquisas?.length)      modulos.push("  Pesquisa de Satisfacao");
-  const temChatIdx = chat.tipo || chat.usuarios?.length || chat.agentes?.length || chat.departamentos?.length;
+  const temChatIdx = chat.tipo || chat.usuarios?.length || chat.agentes?.length || chat.departamentos?.length || chat.fluxos?.length || chat.fluxo;
   if (temChatIdx) {
     modulos.push("  Chat / Omnichannel");
     if (chat.usuarios?.length)      modulos.push("     |- Usuarios do Chat");
@@ -1138,7 +1138,7 @@ window.confirmarConfiguracao = async function () {
       }
     });
   }
-  const temChat = chat.tipo || chat.usuarios?.length || chat.agentes?.length || chat.departamentos?.length;
+  const temChat = chat.tipo || chat.usuarios?.length || chat.agentes?.length || chat.departamentos?.length || chat.fluxos?.length || chat.fluxo_imagem;
   if (temChat) {
     doc.addPage();
     paginaAtual++;
