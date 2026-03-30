@@ -599,8 +599,8 @@ function copiarJSON() {
 /* ── ID do fluxo sendo editado (null = novo) ── */
 let _fluxoEditandoId = null;
 
-/* Inicializa: verifica se veio editar um fluxo existente */
-(function initFluxoEdit() {
+/* Inicializa: verifica se veio editar um fluxo existente — roda depois do DOM */
+function initFluxoEdit() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
   if (!id) return;
@@ -631,7 +631,7 @@ let _fluxoEditandoId = null;
     renderConnections();
     toast("Fluxo carregado: " + fluxo.nome);
   } catch(e) { console.error("Erro ao carregar fluxo:", e); }
-})();
+}
 
 function salvarFluxo() {
   const nome = document.getElementById("flowName").value.trim() || "Fluxo sem nome";
@@ -692,19 +692,19 @@ function salvarFluxo() {
       // Verifica se realmente foi salvo
       const verifica = JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}");
       const fluxosSalvos = verifica.chat?.fluxos?.length || 0;
-      toast(`✓ ${f.nome} salvo! (${fluxosSalvos} fluxo${fluxosSalvos!==1?"s":""} no caderno)`);
+      toast(`✓ ${nome} salvo! (${fluxosSalvos} fluxo${fluxosSalvos!==1?"s":""} no caderno)`);
 
       // Volta para o formulário após 1.8s
       setTimeout(() => {
         if (window.opener && !window.opener.closed) {
-          // Recarrega a página pai para pegar os fluxos atualizados
           try {
-            window.opener.location.reload();
+            // Atualiza a lista de fluxos na janela pai sem recarregar
+            if (typeof window.opener.renderizarFluxosSalvos === "function") {
+              window.opener.renderizarFluxosSalvos();
+            }
           } catch(e) {}
-          setTimeout(() => {
-            window.opener.focus();
-            window.close();
-          }, 300);
+          window.opener.focus();
+          window.close();
         } else {
           window.location.href = "index.html";
         }
@@ -1077,8 +1077,14 @@ function makeSelect(items, placeholder) {
   </select>`;
 }
 
-// ── INIT: Start node ──
-addNode("start", 60, 80);
+// ── INIT: Start node + carregar fluxo para edição ──
+const _params = new URLSearchParams(window.location.search);
+if (!_params.get("id")) {
+  addNode("start", 60, 80);
+} else {
+  // Pequeno delay para garantir que o DOM está pronto
+  setTimeout(initFluxoEdit, 100);
+}
 </script>
 </body>
 </html>
