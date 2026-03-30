@@ -1466,8 +1466,8 @@ window.explorar = function () {
       dados.chat = chat;
     }
     // JSON gerado — mantido oculto para o cliente
-    // document.getElementById("resultado").textContent = JSON.stringify(dados, null, 2);
-    mostrarToast("JSON gerado com sucesso!");
+    // mostrarToast só se chamado pelo formulário, não externamente
+    if (!window._explorarSilencioso) mostrarToast("JSON gerado com sucesso!");
     return dados;
   } catch (e) {
     console.error(e);
