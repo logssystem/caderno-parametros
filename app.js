@@ -2610,6 +2610,18 @@ function _confirmarSalvar() {
   fecharModalValidacao();
   const dados = window.explorar?.();
   if (!dados) return;
+
+  // ── Preserva fluxos salvos pelo editor (não sobrescrever) ──
+  try {
+    const anterior = JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}");
+    if (anterior.chat?.fluxos?.length) {
+      if (!dados.chat) dados.chat = {};
+      dados.chat.fluxos       = anterior.chat.fluxos;
+      dados.chat.fluxo        = anterior.chat.fluxo        || dados.chat.fluxo;
+      dados.chat.fluxo_imagem = anterior.chat.fluxo_imagem || dados.chat.fluxo_imagem;
+    }
+  } catch(e) {}
+
   _fazerBackup(dados);
   localStorage.setItem("CONFIG_CADERNO", JSON.stringify(dados));
   window.location.href = "resumo.html";
