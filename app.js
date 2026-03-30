@@ -1808,66 +1808,102 @@ function _carregarDadosSalvos() {
     if (listaUC && chat.usuarios?.length) {
       listaUC.innerHTML = "";
       chat.usuarios.forEach(u => {
-        if (typeof window.adicionarUsuarioChat === "function") {
-          const wrap = window.adicionarUsuarioChat();
-          if (!wrap) return;
-          wrap.querySelector(".campo-nome").value = u.nome || "";
-          const email = wrap.querySelector("input[type=email]");
-          if (email) email.value = u.email || "";
-          const senha = wrap.querySelector(".campo-senha");
-          if (senha) senha.value = u.senha || "";
-          const perm = wrap.querySelector("select");
-          if (perm && u.permissao) perm.value = u.permissao;
+        if (typeof window.adicionarUsuarioChat !== "function") return;
+        const wrap = window.adicionarUsuarioChat();
+        if (!wrap) return;
+        wrap.querySelector(".campo-nome").value = u.nome || "";
+        const email = wrap.querySelector("input[type=email]");
+        if (email) email.value = u.email || "";
+        const senha = wrap.querySelector(".campo-senha");
+        if (senha) senha.value = u.senha || "";
+        const perm = wrap.querySelector("select");
+        if (perm && u.permissao) perm.value = u.permissao;
+        // ── Restaura checkbox "é agente omnichannel" ──
+        const chkAgente = wrap.querySelector("input[type=checkbox]");
+        if (chkAgente && (u.agente === true || u.agente_omnichannel === true)) {
+          chkAgente.checked = true;
+          chkAgente.dispatchEvent(new Event("change"));
         }
       });
     }
-    // Departamentos Chat — carregados após agentes estarem prontos
+    // Departamentos Chat — carregados após agentes prontos, sem usar click
     const _depsSalvos = chat.departamentos || [];
     if (_depsSalvos.length) {
       setTimeout(() => {
         const listaDC = document.getElementById("listaDepartamentosChat");
         if (!listaDC) return;
         listaDC.innerHTML = "";
+
+        // Coleta agentes disponíveis no DOM
+        function _getAgentesChat() {
+          const nomes = [];
+          document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
+            const n = a.querySelector(".campo-nome")?.value?.trim();
+            if (n) nomes.push(n);
+          });
+          return nomes;
+        }
+
         _depsSalvos.forEach(dep => {
           if (typeof window.adicionarDepartamentoChat !== "function") return;
           window.adicionarDepartamentoChat();
+
           const cards = listaDC.querySelectorAll(".campo-descricao");
-          const last = cards[cards.length - 1];
-          if (!last) return;
-          const nomeInput = last.querySelector(".campo-nome");
+          const card  = cards[cards.length - 1];
+          if (!card) return;
+
+          // Nome do departamento
+          const nomeInput = card.querySelector(".campo-nome");
           if (nomeInput) nomeInput.value = dep.nome || "";
-          // Preenche agentes do departamento
+
+          // Agentes — cria linhas de select diretamente sem clicar no botão
+          const listaAgDiv = card.querySelector("div[style*='margin-top']") || card.querySelector("div:first-of-type");
+          const agentesDisp = _getAgentesChat();
+
           (dep.agentes || []).forEach(agNome => {
-            // Clica em "+ Adicionar agente"
-            const btns = [...last.querySelectorAll("button")];
-            const addBtn = btns.find(b => b.textContent.includes("Adicionar agente"));
-            if (!addBtn) return;
-            addBtn.click();
-            // Pega o último select adicionado e seta o valor
-            const selects = last.querySelectorAll("select");
-            const lastSel = selects[selects.length - 1];
-            if (lastSel) {
-              // Popula opções manualmente caso o select esteja vazio
-              if (lastSel.options.length <= 1) {
-                document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
-                  const n = a.querySelector(".campo-nome")?.value?.trim();
-                  if (n) lastSel.add(new Option(n, n));
-                });
-              }
-              lastSel.value = agNome;
-            }
+            // Cria linha igual ao que o botão criaria
+            const linha = document.createElement("div");
+            linha.style.cssText = "display:flex;gap:6px;margin-bottom:6px;";
+
+            const sel = document.createElement("select");
+            sel.innerHTML = `<option value="">Selecione um agente</option>`;
+
+            // Popula com agentes disponíveis
+            agentesDisp.forEach(n => sel.add(new Option(n, n)));
+            // Se não encontrou na lista, adiciona mesmo assim
+            if (!agentesDisp.includes(agNome)) sel.add(new Option(agNome, agNome));
+            sel.value = agNome;
+
+            sel.onchange = () => {};  // refresh será feito pelo chat.js se disponível
+
+            const del = document.createElement("button");
+            del.textContent = "✖";
+            del.style.flexShrink = "0";
+            del.onclick = () => { linha.remove(); };
+
+            linha.append(sel, del);
+            if (listaAgDiv) listaAgDiv.appendChild(linha);
           });
         });
-      }, 800); // aguarda agentes serem gerados pelo syncTudo
+      }, 900);
     }
   }
 
-  // Sincroniza tudo após recarregar
+  // Sincroniza tudo após recarregar — em cascata para garantir ordem correta
   setTimeout(() => {
+    // 1ª passada: gera agentes a partir dos checkboxes restaurados
     syncTudo();
     atualizarTodosDestinosURA();
+  }, 300);
+
+  setTimeout(() => {
+    // 2ª passada: após agentes prontos, gera agentes chat
+    if (typeof gerarAgentesChatAPartirUsuarios === "function") {
+      gerarAgentesChatAPartirUsuarios();
+    }
+    syncTudo();
     console.log("[Caderno] Dados recarregados do localStorage");
-  }, 500);
+  }, 600);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
