@@ -1177,54 +1177,74 @@ window.confirmarConfiguracao = async function () {
   // ── ENVIA PARA GOOGLE DRIVE ──────────────────────────
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIa5t0aWJwqAOGVp0WXkoJhqZlGVdU4rhrBoInoKhd3ZS8rBBSr84tLi_BQutcVuV6Yg/exec";
 
-  (async () => {
+  /* ── Helper: toast robusto ── */
+  function _driveToast(txt, erro) {
+    const t = document.getElementById("toastGlobal");
+    const m = document.getElementById("toastMessage");
+    if (!t || !m) { console.log("[Drive toast]", txt); return; }
+    m.textContent = txt;
+    t.className   = "toast show" + (erro ? " error" : "");
+    clearTimeout(t._dt);
+    t._dt = setTimeout(() => t.classList.remove("show"), 5000);
+  }
+
+  /* ── Envia via iframe form — bypassa CORS completamente ── */
+  function _enviarDrive(url, nome, empresa, b64) {
     try {
-      // Toast de "enviando..." imediato
-      const toast = document.getElementById("toastGlobal");
-      const msg   = document.getElementById("toastMessage");
-      function showToast(txt, erro) {
-        if (!toast || !msg) return;
-        msg.textContent  = txt;
-        toast.className  = "toast show" + (erro ? " error" : "");
-        clearTimeout(toast._t);
-        toast._t = setTimeout(() => toast.classList.remove("show"), 5000);
+      // Cria iframe oculto que recebe o POST silenciosamente
+      const iframeId = "_driveFrame_" + Date.now();
+      const iframe   = document.createElement("iframe");
+      iframe.name    = iframeId;
+      iframe.style   = "display:none;width:0;height:0;border:none;position:absolute;top:-9999px";
+      document.body.appendChild(iframe);
+
+      // Cria form oculto com campos individuais
+      const form       = document.createElement("form");
+      form.method      = "POST";
+      form.action      = url;
+      form.target      = iframeId;
+      form.enctype     = "application/x-www-form-urlencoded";
+      form.style       = "display:none";
+
+      function addField(n, v) {
+        const i = document.createElement("input");
+        i.type  = "hidden"; i.name = n; i.value = v;
+        form.appendChild(i);
       }
-      showToast("Enviando PDF para o Drive...");
 
-      // base64 direto do jsPDF — sem FileReader, sem CORS extra
-      const dataUri = doc.output("datauristring");
-      const b64     = dataUri.split(",")[1];
+      addField("nome",    nome);
+      addField("empresa", empresa);
+      addField("pdf",     b64);
 
-      const payload = JSON.stringify({
-        nome:    nomeArq,
-        empresa: cli.empresa || "",
-        pdf:     b64
-      });
+      document.body.appendChild(form);
+      form.submit();
 
-      // mode: no-cors — evita bloqueio CORS do Apps Script
-      // A resposta será opaca (não conseguimos ler), mas o upload ocorre normalmente
-      await fetch(APPS_SCRIPT_URL, {
-        method:  "POST",
-        mode:    "no-cors",
-        body:    payload,
-        headers: { "Content-Type": "text/plain" }
-      });
+      // Remove form após envio, mantém iframe por 15s para completar
+      setTimeout(() => {
+        try { document.body.removeChild(form); } catch(_) {}
+      }, 500);
+      setTimeout(() => {
+        try { document.body.removeChild(iframe); } catch(_) {}
+      }, 15000);
 
-      // Como no-cors não retorna resposta legível, assumimos sucesso se não lançou erro
-      showToast("PDF salvo no Drive com sucesso!");
-      console.log("Drive: enviado —", nomeArq);
+      // Toast de sucesso 3s após submit (tempo estimado de processamento)
+      setTimeout(() => _driveToast("PDF enviado ao Drive com sucesso!"), 3000);
 
-    } catch (err) {
-      console.error("Drive: falha no envio —", err);
-      const toast = document.getElementById("toastGlobal");
-      const msg   = document.getElementById("toastMessage");
-      if (toast && msg) {
-        msg.textContent = "Erro ao enviar para o Drive. Tente novamente.";
-        toast.className = "toast show error";
-        setTimeout(() => toast.classList.remove("show"), 5000);
-      }
+    } catch(err) {
+      console.error("Drive: erro ao enviar —", err);
+      _driveToast("Erro ao enviar para o Drive.", true);
     }
-  })();
+  }
+
+  // Gera base64 e dispara o envio
+  _driveToast("Enviando PDF para o Drive...");
+  try {
+    const b64 = doc.output("datauristring").split(",")[1];
+    _enviarDrive(APPS_SCRIPT_URL, nomeArq, cli.empresa || "", b64);
+  } catch(err) {
+    console.error("Drive: erro ao gerar base64 —", err);
+    _driveToast("Erro ao preparar PDF para o Drive.", true);
+  }
 };
 /* ================= TEMA ================= */
 (function initTema() {
