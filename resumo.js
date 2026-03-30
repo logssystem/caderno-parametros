@@ -521,40 +521,39 @@ function renderResumoCompleto() {
       html += fecharSecao();
     }
 
-    if (chat.fluxo_imagem || chat.fluxo) {
-      html += secao("sec-fluxo", "🔀", "Fluxo de Atendimento");
-      html += `<div class="resumo-card" style="padding:14px;">`;
-      // Info header
-      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-        <span style="font-size:14px;font-weight:800;color:var(--text)">${chat.fluxo?.nome || "Fluxo de Atendimento"}</span>
-        <span style="font-size:11px;color:var(--text-soft);background:rgba(206,255,0,.08);padding:3px 10px;border-radius:99px;border:1px solid rgba(206,255,0,.2);">
-          ${chat.fluxo?.nos?.length || 0} nós &nbsp;·&nbsp; ${chat.fluxo?.conexoes?.length || 0} conexões
-        </span>
-      </div>`;
-      if (chat.fluxo_imagem) {
-        html += `<img src="${chat.fluxo_imagem}" style="width:100%;border-radius:10px;border:1px solid var(--border);display:block;" alt="Fluxo de Atendimento">`;
-      } else {
-        html += `<div style="background:rgba(206,255,0,.05);border:1px dashed rgba(206,255,0,.2);border-radius:10px;padding:20px;text-align:center;color:var(--text-soft);font-size:13px;">
-          Fluxo salvo mas sem imagem de prévia.<br>Abra o editor, faça qualquer ajuste e clique em <strong>Salvar Fluxo</strong> novamente.
-          <br><br>
-          <button onclick="window.open('fluxo.html','_blank')" style="background:rgba(206,255,0,.15);border:1px solid rgba(206,255,0,.3);color:#CEFF00;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">
-            🔀 Abrir Editor de Fluxo
-          </button>
-        </div>`;
-      }
-      html += `</div>`;
-      html += fecharSecao();
+    // ── Fluxos de Atendimento ────────────────────────────────────────────
+    const _fluxos = chat.fluxos?.length ? chat.fluxos
+      : (chat.fluxo_imagem || chat.fluxo ? [{
+          id: "legado", nome: chat.fluxo?.nome || "Fluxo de Atendimento",
+          imagem: chat.fluxo_imagem, nos: chat.fluxo?.nos, conexoes: chat.fluxo?.conexoes
+        }] : []);
+
+    html += secao("sec-fluxo", "🔀", "Fluxos de Atendimento", _fluxos.length || null);
+
+    if (_fluxos.length) {
+      _fluxos.forEach(f => {
+        html += `<div class="resumo-card" style="padding:14px;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+            <span style="font-size:14px;font-weight:800;color:var(--text)">🔀 ${f.nome || "Fluxo de Atendimento"}</span>
+            <span style="font-size:11px;color:var(--text-soft);background:rgba(206,255,0,.08);padding:3px 10px;border-radius:99px;border:1px solid rgba(206,255,0,.2);">
+              ${f.nos?.length || 0} nós · ${f.conexoes?.length || 0} conexões
+            </span>
+          </div>`;
+        if (f.imagem) {
+          html += `<img src="${f.imagem}" style="width:100%;border-radius:10px;border:1px solid var(--border);display:block;" alt="${f.nome}">`;
+        } else {
+          html += `<div style="background:rgba(206,255,0,.05);border:1px dashed rgba(206,255,0,.2);border-radius:10px;padding:14px;text-align:center;color:var(--text-soft);font-size:12px;">
+            Sem imagem — abra o editor e salve novamente para gerar.
+          </div>`;
+        }
+        html += `</div>`;
+      });
     } else {
-      // Botão para criar fluxo se não existe ainda
-      html += secao("sec-fluxo", "🔀", "Fluxo de Atendimento");
       html += `<div class="resumo-card" style="padding:20px;text-align:center;">
-        <p style="font-size:13px;color:var(--text-soft);margin-bottom:14px;">Nenhum fluxo criado ainda.</p>
-        <button onclick="window.open('fluxo.html','_blank')" style="background:linear-gradient(90deg,rgba(206,255,0,.15),rgba(56,189,248,.15));border:1px solid rgba(206,255,0,.3);color:#CEFF00;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">
-          🔀 Criar Fluxo de Atendimento
-        </button>
+        <p style="font-size:13px;color:var(--text-soft);">Nenhum fluxo criado ainda.</p>
       </div>`;
-      html += fecharSecao();
     }
+    html += fecharSecao();
   }
   resumo.innerHTML = html;
   // Aplica modo compacto se ativo
@@ -1258,45 +1257,42 @@ window.confirmarConfiguracao = async function () {
   pageFooter();
 
   // ── FLUXO DE ATENDIMENTO NO PDF ───────────────────────
-  if (chat.fluxo_imagem) {
+  // Fluxos no PDF (suporta array e legado)
+  const _pdfFluxos = chat.fluxos?.length ? chat.fluxos
+    : (chat.fluxo_imagem ? [{ nome: chat.fluxo?.nome || "Fluxo", imagem: chat.fluxo_imagem, nos: chat.fluxo?.nos, conexoes: chat.fluxo?.conexoes }] : []);
+
+  if (_pdfFluxos.length) {
     doc.addPage();
     paginaAtual++;
     pageHeader();
     let yf = 22;
-    yf = sectionBar(yf, "FLUXO DE ATENDIMENTO", C.accent2);
+    yf = sectionBar(yf, "FLUXOS DE ATENDIMENTO", C.accent2);
 
-    // Info do fluxo
-    if (chat.fluxo?.nome) {
+    _pdfFluxos.forEach((f, idx) => {
+      yf = checkY(yf, 40);
+      // Cabeçalho do fluxo
       yf = cardInfo(yf, [
-        ["Nome do Fluxo", chat.fluxo.nome],
-        ["Nos",           String(chat.fluxo?.nos?.length || 0)],
-        ["Conexoes",      String(chat.fluxo?.conexoes?.length || 0)],
+        ["Fluxo",     f.nome || ("Fluxo " + (idx+1))],
+        ["Nos",       String(f.nos?.length || 0)],
+        ["Conexoes",  String(f.conexoes?.length || 0)],
       ]);
-    }
+      yf += 4;
 
-    yf += 4;
-    yf = checkY(yf, 40);
-
-    // Insere a imagem do fluxo
-    try {
-      const imgData  = chat.fluxo_imagem; // base64 PNG
-      // Calcula dimensões para caber na página com proporção
-      const maxW = CW;
-      const maxH = PH - yf - 20;
-      // Cria img temporária para pegar dimensões reais
-      const tmpImg = new Image();
-      tmpImg.src   = imgData;
-      // jsPDF aceita base64 direto
-      const imgW   = Math.min(maxW, maxW);
-      const imgH   = Math.min(maxH, maxW * 0.55); // proporção estimada
-      doc.addImage(imgData, "PNG", ML, yf, imgW, imgH);
-      yf += imgH + 6;
-    } catch(imgErr) {
-      console.warn("Erro ao inserir imagem do fluxo no PDF:", imgErr);
-      setTextC(C.textSoft);
-      setFont(9, "normal");
-      doc.text("Imagem do fluxo nao disponivel.", ML, yf + 6);
-    }
+      if (f.imagem) {
+        try {
+          const fmt  = f.imagem.startsWith("data:image/jpeg") ? "JPEG" : "PNG";
+          const maxH = Math.min(PH - yf - 20, CW * 0.55);
+          doc.addImage(f.imagem, fmt, ML, yf, CW, maxH);
+          yf += maxH + 8;
+        } catch(e) {
+          console.warn("Erro imagem fluxo PDF:", e);
+          setTextC(C.textSoft); setFont(9, "normal");
+          doc.text("Imagem nao disponivel.", ML, yf + 6);
+          yf += 14;
+        }
+      }
+      yf += 8;
+    });
     pageFooter();
   }
 
