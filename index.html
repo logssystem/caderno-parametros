@@ -178,13 +178,14 @@
         <button class="btn-add" onclick="adicionarRegraTempoChat()">+ Nova regra</button>
         <div id="listaRegrasTempoChat"></div>
       </section>
-      <section class="card">
-        <h2>Fluxo de Atendimento</h2>
-        <p style="font-size:13px;color:var(--text-soft);margin-bottom:14px;line-height:1.6;">
-          Monte o fluxo de mensagens do atendimento automático arrastando e conectando os nós.
+      <section class="card" id="cardFluxos">
+        <h2>Fluxos de Atendimento</h2>
+        <p style="font-size:12px;color:var(--text-soft);margin-bottom:12px;line-height:1.6;">
+          Monte o fluxo de mensagens arrastando e conectando os nós.
         </p>
-        <button class="btn-import" onclick="window.open('fluxo.html','_blank')" style="font-size:13px;padding:10px 20px;">
-          🔀 Abrir Editor de Fluxo
+        <div id="listaFluxosSalvos" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
+        <button class="btn-import" onclick="abrirNovoFluxo()" style="font-size:13px;padding:10px 20px;">
+          🔀 + Novo Fluxo
         </button>
       </section>
       <section class="card">
