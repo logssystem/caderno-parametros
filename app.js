@@ -1322,17 +1322,15 @@ window.resetarIntro = function () {
 
 function _executarResetarIntro() {
   _limparTudoInterno();
-  // Volta para a tela de intro (função do intro.js)
+  // Volta para a tela de intro (função do intro.js se disponível)
+  if (typeof window._irParaIntro === "function") {
+    window._irParaIntro();
+    return;
+  }
   const introEl = document.getElementById("intro-screen");
   const appEl   = document.getElementById("app-content");
-  const headerEl = document.getElementById("headerApp");
-  if (introEl)  introEl.style.display  = "flex";
-  if (appEl)    appEl.style.display    = "none";
-  if (headerEl) {
-    // Esconde o botão "Voltar ao início" na intro
-    const btnVoltar = headerEl.querySelector(".btn-voltar-intro");
-    if (btnVoltar) btnVoltar.style.display = "none";
-  }
+  if (introEl) introEl.style.display = "flex";
+  if (appEl)   appEl.style.display   = "none";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
