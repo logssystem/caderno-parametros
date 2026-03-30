@@ -5,98 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <meta name="mobile-web-app-capable" content="yes" />
   <title>Resumo da Configuração</title>
-
   <link rel="stylesheet" href="./style.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
-
 <body>
 
-<!-- ================= FUNDO ANIMADO ERA ================= -->
 <canvas id="era-bg-canvas"></canvas>
 <div class="era-orb era-orb-1"></div>
 <div class="era-orb era-orb-2"></div>
 <div class="era-orb era-orb-3"></div>
 <div class="era-orb era-orb-4"></div>
 
-  <!-- ================= HEADER ================= -->
-    <header class="app-header resumo-header">
-  
-    <div class="header-left">
-      <img src="./assets/image.png" class="app-logo" />
-    </div>
-  
-    <div class="header-center">
-      <h1 class="app-title">Resumo da Configuração</h1>
-    </div>
-  
-    <div class="header-right">
-      <button id="toggleTheme" class="theme-toggle">🌙</button>
-      <button class="btn-voltar-intro" onclick="voltar()">
-        ← Voltar ao início
-      </button>
-    </div>
-  
-  </header>
-
-  <!-- ================= TOOLBAR ================= -->
-  <div class="resumo-toolbar" id="resumoToolbar" style="display:none">
-    <!-- Busca -->
-    <div class="toolbar-search">
-      <span class="toolbar-search-icon">🔍</span>
-      <input id="resumoBusca" placeholder="Buscar nome, ramal, e-mail..." autocomplete="off">
-      <button class="toolbar-search-clear" id="btnClearBusca" style="display:none" onclick="limparBusca()">✕</button>
-    </div>
-    <!-- Controles -->
-    <div class="toolbar-controles">
-      <button class="toolbar-btn" id="btnModoResumo" onclick="toggleModoResumo()" title="Alternar modo">
-        <span class="modo-icone">📋</span> <span class="modo-label">Completo</span>
-      </button>
-      <button class="btn-salvar" onclick="confirmarConfiguracao()" style="padding:8px 18px;font-size:13px">
-        ⬇ Gerar PDF
-      </button>
-    </div>
+<header class="app-header resumo-header">
+  <div class="header-left">
+    <img src="./assets/image.png" class="app-logo" />
   </div>
-
-  <!-- ================= LAYOUT PRINCIPAL ================= -->
-  <div class="resumo-layout" id="resumoLayout" style="display:none">
-
-    <!-- SIDEBAR NAV -->
-    <nav class="resumo-nav" id="resumoNav">
-      <div class="nav-titulo">Índice</div>
-      <ul class="nav-lista" id="navLista"></ul>
-    </nav>
-
-    <!-- CONTEÚDO -->
-    <div class="resumo-main">
-      <!-- Painel de Alertas -->
-      <div id="painelAlertas" class="painel-alertas" style="display:none"></div>
-      <!-- Seções -->
-      <main id="resumo"></main>
-    </div>
+  <div class="header-center">
+    <h1 class="app-title">Resumo da Configuração</h1>
   </div>
-
-  <!-- Estado de carregamento -->
-  <div class="resumo-empty" id="resumoEmpty" style="display:none">
-    <div class="resumo-card">⚠️ Nenhum dado encontrado.<br><br>Volte e preencha a configuração antes de acessar o resumo.</div>
+  <div class="header-right">
+    <button id="toggleTheme" class="theme-toggle">🌙</button>
+    <button class="btn-voltar-intro" onclick="voltar()">← Voltar ao início</button>
   </div>
+</header>
 
+<div class="resumo-toolbar" id="resumoToolbar" style="display:none">
+  <div class="toolbar-search">
+    <span class="toolbar-search-icon">🔍</span>
+    <input id="resumoBusca" placeholder="Buscar nome, ramal, e-mail..." autocomplete="off">
+    <button class="toolbar-search-clear" id="btnClearBusca" style="display:none" onclick="limparBusca()">✕</button>
+  </div>
+  <div class="toolbar-controles">
+    <button class="toolbar-btn" id="btnModoResumo" onclick="toggleModoResumo()" title="Alternar modo">
+      <span class="modo-icone">📋</span> <span class="modo-label">Completo</span>
+    </button>
+    <button class="btn-backup" onclick="baixarBackupDoResumo()" title="Baixar backup JSON">
+      💾 Backup JSON
+    </button>
+    <button class="btn-salvar" onclick="confirmarConfiguracao()" style="padding:8px 18px;font-size:13px">
+      ⬇ Gerar PDF
+    </button>
+  </div>
+</div>
 
-  <!-- ================= LIBS ================= -->
+<div class="resumo-layout" id="resumoLayout" style="display:none">
+  <nav class="resumo-nav" id="resumoNav">
+    <div class="nav-titulo">Índice</div>
+    <ul class="nav-lista" id="navLista"></ul>
+  </nav>
+  <div class="resumo-main">
+    <div id="painelAlertas" class="painel-alertas" style="display:none"></div>
+    <main id="resumo"></main>
+  </div>
+</div>
 
-  <!-- jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<div class="resumo-empty" id="resumoEmpty" style="display:none">
+  <div class="resumo-card">⚠️ Nenhum dado encontrado.<br><br>Volte e preencha a configuração antes de acessar o resumo.</div>
+</div>
 
-  <!-- AutoTable (tabelas bonitas) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<div id="toastGlobal" class="toast">
+  <span id="toastMessage"></span>
+</div>
 
-
-  <!-- ================= SEU JS ================= -->
-  <script src="./resumo.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="./resumo.js"></script>
 
 <script>
-/* ===== PARTÍCULAS ERA – CANVAS ===== */
 (function() {
   const canvas = document.getElementById("era-bg-canvas");
   if (!canvas) return;
@@ -106,33 +80,23 @@
   function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
   function mkParticle() {
     const isLime = Math.random() > 0.35, rgb = isLime ? LIME : SLATE;
-    return { x: Math.random()*W, y: H + Math.random()*100, r: Math.random()*2.2+0.5,
-             speed: Math.random()*0.5+0.18, drift: (Math.random()-0.5)*0.35,
-             alpha: Math.random()*0.5+0.15, rgb, life: 0, maxLife: Math.random()*300+160 };
+    return { x: Math.random()*W, y: H+Math.random()*100, r: Math.random()*2.2+0.5, speed: Math.random()*0.5+0.18, drift: (Math.random()-0.5)*0.35, alpha: Math.random()*0.5+0.15, rgb, life: 0, maxLife: Math.random()*300+160 };
   }
-  function init() {
-    particles = [];
-    for (let i=0;i<COUNT;i++) { const p=mkParticle(); p.y=Math.random()*H; p.life=Math.random()*p.maxLife; particles.push(p); }
-  }
+  function init() { particles=[]; for(let i=0;i<COUNT;i++){const p=mkParticle();p.y=Math.random()*H;p.life=Math.random()*p.maxLife;particles.push(p);} }
   function draw() {
     ctx.clearRect(0,0,W,H);
-    particles.forEach((p,i) => {
-      p.y -= p.speed; p.x += p.drift; p.life++;
-      const t=p.life/p.maxLife, fade=t<0.15?t/0.15:t>0.85?(1-t)/0.15:1, alpha=p.alpha*fade;
-      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(${p.rgb[0]},${p.rgb[1]},${p.rgb[2]},${alpha})`; ctx.fill();
-      if (p.rgb===LIME && p.r>1.4) {
-        ctx.beginPath(); ctx.arc(p.x,p.y,p.r*2.5,0,Math.PI*2);
-        ctx.fillStyle=`rgba(206,255,0,${alpha*0.12})`; ctx.fill();
-      }
-      if (p.life>=p.maxLife) particles[i]=mkParticle();
+    particles.forEach((p,i)=>{
+      p.y-=p.speed;p.x+=p.drift;p.life++;
+      const t=p.life/p.maxLife,fade=t<0.15?t/0.15:t>0.85?(1-t)/0.15:1,alpha=p.alpha*fade;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${p.rgb[0]},${p.rgb[1]},${p.rgb[2]},${alpha})`;ctx.fill();
+      if(p.rgb===LIME&&p.r>1.4){ctx.beginPath();ctx.arc(p.x,p.y,p.r*2.5,0,Math.PI*2);ctx.fillStyle=`rgba(206,255,0,${alpha*0.12})`;ctx.fill();}
+      if(p.life>=p.maxLife)particles[i]=mkParticle();
     });
     requestAnimationFrame(draw);
   }
-  window.addEventListener("resize",()=>{resize();init();});
-  resize(); init(); draw();
+  window.addEventListener("resize",()=>{resize();init();}); resize();init();draw();
 })();
 </script>
-
 </body>
 </html>
