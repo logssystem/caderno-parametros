@@ -10,7 +10,6 @@ window.renderResumoChat = function (container, data) {
   let html = "";
   const section = document.createElement("section");
   section.className = "resumo-bloco";
-
   html += `<h2>💬 Chat / Omnichannel</h2>`;
   if (chat.tipo === "qr") {
     html += `
@@ -26,13 +25,11 @@ window.renderResumoChat = function (container, data) {
       <div><strong>Conta:</strong> ${chat.conta || "-"}</div>
     </div>`;
   }
-
   if (chat.canais?.length) {
     html += `<div class="resumo-card"><div class="titulo">Canais</div><div class="lista">
       ${chat.canais.map(c => `<span class="chip">${c}</span>`).join("")}
     </div></div>`;
   }
-
   if (usuarios.length) {
     html += `<h3>👤 Usuários do Chat</h3><div class="resumo-grid">
       ${usuarios.map(u => `<div class="resumo-card">
@@ -43,7 +40,6 @@ window.renderResumoChat = function (container, data) {
       </div>`).join("")}
     </div>`;
   }
-
   if (agentes.length) {
     html += `<h3>🎧 Agentes do Chat</h3><div class="resumo-grid">
       ${agentes.map(a => {
@@ -57,7 +53,6 @@ window.renderResumoChat = function (container, data) {
       }).join("")}
     </div>`;
   }
-
   if (chat.departamentos?.length) {
     html += `<h3>🏢 Departamentos</h3><div class="resumo-grid">
       ${chat.departamentos.map(dep => `<div class="resumo-card">
@@ -68,11 +63,9 @@ window.renderResumoChat = function (container, data) {
       </div>`).join("")}
     </div>`;
   }
-
   section.innerHTML = html;
   container.appendChild(section);
 };
-
 /* ======================================================
    RESUMO – PRINCIPAL
 ====================================================== */
@@ -83,7 +76,6 @@ let _dadosResumo   = {};
 let _modoCompacto  = false;
 let _paginasState  = {}; // { secaoId: paginaAtual }
 const PAGE_SIZE    = 9;
-
 /* ── Modo compacto / completo ── */
 window.toggleModoResumo = function () {
   _modoCompacto = !_modoCompacto;
@@ -99,7 +91,6 @@ window.toggleModoResumo = function () {
     card.classList.toggle("modo-compacto", _modoCompacto);
   });
 };
-
 /* ── Copiar para clipboard ── */
 window.copiarCampo = function (texto, btn) {
   navigator.clipboard.writeText(texto).then(() => {
@@ -118,24 +109,20 @@ window.copiarCampo = function (texto, btn) {
     setTimeout(() => { btn.innerHTML = "⧉"; }, 1200);
   });
 };
-
 function btnCopiar(texto) {
   if (!texto || texto === "-" || texto === "—") return "";
   const safe = texto.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   return `<button class="btn-copiar" onclick="copiarCampo('${safe}', this)" title="Copiar">⧉</button>`;
 }
-
 function campoCopia(label, valor, sensivel = false) {
   const cls = sensivel ? ' class="campo-sensivel"' : "";
   return `<div${cls}><strong>${label}:</strong> <span>${valor || "—"}</span>${btnCopiar(valor)}</div>`;
 }
-
 /* ── Busca ── */
 window.limparBusca = function () {
   const inp = document.getElementById("resumoBusca");
   if (inp) { inp.value = ""; inp.dispatchEvent(new Event("input")); }
 };
-
 function initBusca() {
   const inp   = document.getElementById("resumoBusca");
   const clear = document.getElementById("btnClearBusca");
@@ -156,16 +143,13 @@ function initBusca() {
     });
   });
 }
-
 /* ── Paginação ── */
 function renderPaginado(itens, secaoId, renderFn) {
   if (!_paginasState[secaoId]) _paginasState[secaoId] = 1;
   const total  = Math.ceil(itens.length / PAGE_SIZE);
   const pagina = Math.min(_paginasState[secaoId], total);
   const slice  = itens.slice((pagina - 1) * PAGE_SIZE, pagina * PAGE_SIZE);
-
   let html = `<div class="resumo-grid">${slice.map(renderFn).join("")}</div>`;
-
   if (total > 1) {
     html += `<div class="paginacao">`;
     if (pagina > 1)
@@ -177,7 +161,6 @@ function renderPaginado(itens, secaoId, renderFn) {
   }
   return html;
 }
-
 window.irPagina = function (secaoId, pagina) {
   _paginasState[secaoId] = pagina;
   renderResumoCompleto();
@@ -187,7 +170,6 @@ window.irPagina = function (secaoId, pagina) {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   }, 60);
 };
-
 /* ── Sidebar nav ── */
 function buildNav(secoes) {
   const lista = document.getElementById("navLista");
@@ -199,7 +181,6 @@ function buildNav(secoes) {
       ${s.count ? `<span class="nav-badge">${s.count}</span>` : ""}
     </a></li>`
   ).join("");
-
   // Observer para destacar seção ativa
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
@@ -211,64 +192,52 @@ function buildNav(secoes) {
       }
     });
   }, { rootMargin: "-30% 0px -60% 0px" });
-
   secoes.forEach(s => {
     const el = document.getElementById(s.id);
     if (el) observer.observe(el);
   });
 }
-
 window.navClick = function (id, e) {
   e.preventDefault();
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 };
-
 /* ── Alertas ── */
 function buildAlertas(dados) {
   const voz  = dados.voz  || {};
   const alertas = [];
-
   // Agentes sem ramal
   (voz.agentes || []).forEach(a => {
     if (!a.ramal) alertas.push({ tipo: "erro", msg: `Agente <strong>${a.nome}</strong> sem ramal vinculado` });
   });
-
   // Filas sem agentes
   (voz.filas || []).forEach(f => {
     if (!f.agentes?.length) alertas.push({ tipo: "aviso", msg: `Fila <strong>${f.nome}</strong> sem agentes configurados` });
   });
-
   // URAs com opções sem destino
   (voz.uras || []).forEach(u => {
     (u.opcoes || []).forEach(o => {
       if (!o.destino) alertas.push({ tipo: "aviso", msg: `URA <strong>${u.nome}</strong> — tecla ${o.tecla} sem destino definido` });
     });
   });
-
   // Grupo de ring sem ramais
   (voz.grupo_ring || []).forEach(g => {
     if (!g.ramais?.length) alertas.push({ tipo: "aviso", msg: `Grupo de Ring <strong>${g.nome}</strong> sem ramais` });
   });
-
   // Usuários sem permissão
   (voz.usuarios || []).forEach(u => {
     if (!u.permissao) alertas.push({ tipo: "info", msg: `Usuário <strong>${u.nome}</strong> sem permissão definida` });
   });
-
   // Domínio inválido
   const dom = dados.cliente?.dominio || "";
   if (dom && !dom.endsWith(".sobreip.com.br"))
     alertas.push({ tipo: "erro", msg: `Domínio <strong>${dom}</strong> não termina com .sobreip.com.br` });
-
   const painel = document.getElementById("painelAlertas");
   if (!painel) return;
   if (!alertas.length) { painel.style.display = "none"; return; }
-
   const icons  = { erro: "🔴", aviso: "🟡", info: "🔵" };
   const erros  = alertas.filter(a => a.tipo === "erro").length;
   const avisos = alertas.filter(a => a.tipo === "aviso").length;
-
   painel.style.display = "block";
   painel.innerHTML = `
     <div class="alertas-header">
@@ -283,7 +252,6 @@ function buildAlertas(dados) {
       ${alertas.map(a => `<li class="alerta-item alerta-${a.tipo}">${icons[a.tipo]} ${a.msg}</li>`).join("")}
     </ul>`;
 }
-
 /* ── Render principal ── */
 function renderResumoCompleto() {
   const resumo = document.getElementById("resumo");
@@ -292,9 +260,7 @@ function renderResumoCompleto() {
   const voz   = dados.voz  || {};
   const cli   = dados.cliente || {};
   resumo.innerHTML = "";
-
   const secoes = []; // para a sidebar
-
   function secao(id, icone, titulo, count) {
     secoes.push({ id, icone, nome: titulo, count });
     return `<section class="resumo-bloco" id="${id}">
@@ -302,9 +268,7 @@ function renderResumoCompleto() {
         ${count ? `<span class="secao-count">${count}</span>` : ""}
       </h2>`;
   }
-
   function fecharSecao() { return `</section>`; }
-
   function identificarDestino(nome) {
     if (!nome) return "—";
     if (voz.regras_tempo?.some(r => r.nome === nome)) return `⏰ ${nome}`;
@@ -314,13 +278,10 @@ function renderResumoCompleto() {
     if (voz.ramais?.some(r => String(r.ramal) === String(nome))) return `☎️ ${nome}`;
     return nome;
   }
-
   let html = "";
-
   // ── Módulo Voz ──────────────────────────────────────
   const temVoz = voz.usuarios?.length || voz.ramais?.length || voz.agentes?.length || voz.filas?.length;
   if (temVoz) html += `<div class="modulo-titulo"><h1>📞 Voz / Call Center</h1></div>`;
-
   // Cliente
   if (cli.empresa || cli.dominio || cli.cnpj) {
     html += secao("sec-cliente", "🏢", "Cliente");
@@ -331,7 +292,6 @@ function renderResumoCompleto() {
     </div>`;
     html += fecharSecao();
   }
-
   // Usuários Web
   if (voz.usuarios?.length) {
     html += secao("sec-usuarios", "👤", "Usuários Web", voz.usuarios.length);
@@ -346,7 +306,6 @@ function renderResumoCompleto() {
       </div>`);
     html += fecharSecao();
   }
-
   // Entradas
   if (voz.entradas?.length) {
     html += secao("sec-entradas", "📞", "Entradas / Números", voz.entradas.length);
@@ -357,7 +316,6 @@ function renderResumoCompleto() {
     </div>`;
     html += fecharSecao();
   }
-
   // Ramais — paginado
   if (voz.ramais?.length) {
     html += secao("sec-ramais", "☎️", "Ramais", voz.ramais.length);
@@ -368,7 +326,6 @@ function renderResumoCompleto() {
       </div>`);
     html += fecharSecao();
   }
-
   // Agentes — paginado
   if (voz.agentes?.length) {
     html += secao("sec-agentes", "🎧", "Agentes", voz.agentes.length);
@@ -380,7 +337,6 @@ function renderResumoCompleto() {
       </div>`);
     html += fecharSecao();
   }
-
   // Regras de Tempo
   if (voz.regras_tempo?.length) {
     html += secao("sec-regras", "⏰", "Regras de Tempo", voz.regras_tempo.length);
@@ -397,7 +353,6 @@ function renderResumoCompleto() {
     }).join("")}</div>`;
     html += fecharSecao();
   }
-
   // Grupo de Ring
   if (voz.grupo_ring?.length) {
     html += secao("sec-grupo-ring", "🔔", "Grupo de Ring", voz.grupo_ring.length);
@@ -409,7 +364,6 @@ function renderResumoCompleto() {
       </div>`).join("")}</div>`;
     html += fecharSecao();
   }
-
   // Filas
   if (voz.filas?.length) {
     html += secao("sec-filas", "📋", "Filas", voz.filas.length);
@@ -423,7 +377,6 @@ function renderResumoCompleto() {
       </div>`).join("")}</div>`;
     html += fecharSecao();
   }
-
   // URA
   if (voz.uras?.length) {
     html += secao("sec-ura", "🎙️", "URA", voz.uras.length);
@@ -442,7 +395,6 @@ function renderResumoCompleto() {
       </div>`).join("");
     html += fecharSecao();
   }
-
   // Pausas
   if (voz.pausas?.length) {
     html += secao("sec-pausas", "⏸️", "Pausas", voz.pausas.length);
@@ -455,7 +407,6 @@ function renderResumoCompleto() {
       </div>`).join("");
     html += fecharSecao();
   }
-
   // Pesquisa
   if (voz.pesquisas?.length) {
     html += secao("sec-pesquisa", "⭐", "Pesquisa de Satisfação", voz.pesquisas.length);
@@ -470,12 +421,10 @@ function renderResumoCompleto() {
       </div>`).join("");
     html += fecharSecao();
   }
-
   // ── Módulo Chat ──────────────────────────────────────
   const chat = dados.chat || {};
   if (chat.tipo || chat.usuarios?.length || chat.agentes?.length) {
     html += `<div class="modulo-titulo"><h1>💬 Chat / Omnichannel</h1></div>`;
-
     html += secao("sec-chat-config", "⚙️", "Configuração de Chat");
     if (chat.tipo === "qr") {
       html += `<div class="resumo-card">
@@ -494,7 +443,6 @@ function renderResumoCompleto() {
         `<span class="chip">${c}</span>`).join("")}</div>`;
     }
     html += fecharSecao();
-
     if (chat.usuarios?.length) {
       html += secao("sec-chat-usuarios", "👤", "Usuários do Chat", chat.usuarios.length);
       html += renderPaginado(chat.usuarios, "sec-chat-usuarios", u => `
@@ -506,7 +454,6 @@ function renderResumoCompleto() {
         </div>`);
       html += fecharSecao();
     }
-
     if (chat.agentes?.length) {
       html += secao("sec-chat-agentes", "🎧", "Agentes do Chat", chat.agentes.length);
       html += renderPaginado(chat.agentes, "sec-chat-agentes", a => `
@@ -518,7 +465,6 @@ function renderResumoCompleto() {
         </div>`);
       html += fecharSecao();
     }
-
     if (chat.departamentos?.length) {
       html += secao("sec-chat-depto", "🏢", "Departamentos", chat.departamentos.length);
       html += `<div class="resumo-grid">${chat.departamentos.map(d => `
@@ -531,39 +477,29 @@ function renderResumoCompleto() {
       html += fecharSecao();
     }
   }
-
   resumo.innerHTML = html;
-
   // Aplica modo compacto se ativo
   if (_modoCompacto) {
     document.querySelectorAll(".campo-sensivel").forEach(el => el.style.display = "none");
   }
-
   buildNav(secoes);
   buildAlertas(dados);
   initBusca();
 }
-
 document.addEventListener("DOMContentLoaded", () => {
   const raw = localStorage.getItem("CONFIG_CADERNO");
-
   if (!raw || raw === "null") {
     document.getElementById("resumoEmpty").style.display = "block";
     return;
   }
-
   try { _dadosResumo = JSON.parse(raw) || {}; } catch (e) { _dadosResumo = {}; }
-
   // Mostra layout
   document.getElementById("resumoToolbar").style.display = "flex";
   document.getElementById("resumoLayout").style.display  = "flex";
-
   const voz = _dadosResumo.voz || {};
-
   if (voz.usuarios?.length || voz.ramais?.length || voz.agentes?.length || voz.filas?.length || voz.uras?.length || voz.grupo_ring?.length) {
     resumo.innerHTML += `<section class="resumo-bloco modulo-titulo"><h1>📞 Voz / Call Center</h1></section>`;
   }
-
   function identificarDestino(nome) {
     if (!nome) return "-";
     if (voz.regras_tempo?.some(r => r.nome === nome)) return `⏰ Regra de Tempo — ${nome}`;
@@ -573,17 +509,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (voz.ramais?.some(r => String(r.ramal) === String(nome))) return `☎️ Ramal — ${nome}`;
     return nome;
   }
-
   renderResumoCompleto();
-
 });
-
 /* ================= VOLTAR ================= */
 window.voltar = function () { window.location.href = "index.html"; };
-
 /* =======================================================
    GERAR PDF PROFISSIONAL
-   Usa jsPDF + autoTable com design de nível enterprise
 ======================================================= */
 window.confirmarConfiguracao = async function () {
   const raw = localStorage.getItem("CONFIG_CADERNO");
@@ -593,22 +524,19 @@ window.confirmarConfiguracao = async function () {
       Volte e preencha os dados corretamente.</div>`;
     return;
   }
-
   const dados = JSON.parse(raw);
   const voz   = dados.voz   || {};
   const chat  = dados.chat  || {};
   const cli   = dados.cliente || {};
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: "mm", format: "a4" });
-
   const PW = 210, PH = 297;
   const ML = 14, MR = 14, MT = 14;
   const CW = PW - ML - MR;
-
   // ── PALETA ──────────────────────────────────────────
   const C = {
-    primary:   [43,  54,  61],   // #2B363D slate
-    accent:    [43,  54,  61],   // slate (borda tabela)
+    primary:   [43,  54,  61],
+    accent:    [43,  54,  61],
     accent2:   [43,  54,  61],
     accentDark:[30,  40,  46],
     success:   [16, 185, 129],
@@ -622,21 +550,17 @@ window.confirmarConfiguracao = async function () {
     chipBg:    [224, 231, 255],
     chipText:  [55,  48, 163],
     gold:      [245, 158,  11],
-    lime:      [206, 255,   0],   // ERA limão (detalhes)
+    lime:      [206, 255,   0],
   };
-
   const hoje = new Date().toLocaleDateString("pt-BR");
   let paginaAtual = 1;
   const paginas = [];
-
   // ── HELPERS ─────────────────────────────────────────
   function rgb(arr) { return { r: arr[0], g: arr[1], b: arr[2] }; }
-
   function setFill(arr)   { doc.setFillColor(...arr); }
   function setDraw(arr)   { doc.setDrawColor(...arr); }
   function setTextC(arr)  { doc.setTextColor(...arr); }
   function setFont(sz, style="normal") { doc.setFontSize(sz); doc.setFont("helvetica", style); }
-
   function pageFooter() {
     setFill(C.primary);
     doc.rect(0, PH - 10, PW, 10, "F");
@@ -649,7 +573,6 @@ window.confirmarConfiguracao = async function () {
     setFont(7.5, "bold");
     doc.text(hoje + "   |   Pag. " + paginaAtual, PW - MR, PH - 3.5, { align: "right" });
   }
-
   function pageHeader() {
     if (paginaAtual === 1) return;
     setFill(C.primary);
@@ -664,25 +587,20 @@ window.confirmarConfiguracao = async function () {
     setFont(7.5, "normal");
     doc.text(hoje, PW - MR, 7.5, { align: "right" });
   }
-
   function novaPage() {
     pageFooter();
     paginas.push(paginaAtual);
     doc.addPage();
     paginaAtual++;
     pageHeader();
-    return 22; // y inicial após header
+    return 22;
   }
-
   function checkY(y, needed = 20) {
     if (y + needed > PH - 16) return novaPage();
     return y;
   }
-
-  // ── BARRA DE SEÇÃO ───────────────────────────────────
   function sectionBar(y, titulo, cor = C.primary) {
     y = checkY(y, 14);
-    // sectionBar: fundo slate + faixa limão
     doc.setFillColor(43, 54, 61);
     doc.rect(ML, y, CW, 11, "F");
     doc.setFillColor(206, 255, 0);
@@ -693,8 +611,6 @@ window.confirmarConfiguracao = async function () {
     doc.text(titulo, ML + 8, y + 7.5);
     return y + 15;
   }
-
-  // ── TABELA GENÉRICA ──────────────────────────────────
   function tabelaAutoTable(y, head, body, colWidths, startY) {
     doc.autoTable({
       startY: startY || y,
@@ -728,8 +644,6 @@ window.confirmarConfiguracao = async function () {
     });
     return doc.lastAutoTable.finalY + 6;
   }
-
-  // ── CARD INFO ────────────────────────────────────────
   function cardInfo(y, pares) {
     y = checkY(y, pares.length * 9 + 4);
     const lw = CW * 0.34, vw = CW * 0.66;
@@ -739,7 +653,6 @@ window.confirmarConfiguracao = async function () {
       doc.rect(ML, y, CW, 8, "F");
       setFill(C.bgLight);
       doc.rect(ML, y, lw, 8, "F");
-      // borda esquerda accent
       setFill(C.accent);
       doc.rect(ML, y, 2, 8, "F");
       setDraw(C.border);
@@ -755,8 +668,6 @@ window.confirmarConfiguracao = async function () {
     });
     return y + 4;
   }
-
-  // ── CHIPS ────────────────────────────────────────────
   function chips(y, items) {
     if (!items || !items.length) return y;
     y = checkY(y, 12);
@@ -774,8 +685,6 @@ window.confirmarConfiguracao = async function () {
     });
     return y + chipH + 4;
   }
-
-  // ── RAMAIS EM GRID ───────────────────────────────────
   function ramaisGrid(y, ramais) {
     const cols = 4, colW = CW / cols, rowH = 14;
     for (let i = 0; i < ramais.length; i += cols) {
@@ -804,15 +713,9 @@ window.confirmarConfiguracao = async function () {
     }
     return y + 5;
   }
-
   // ════════════════════════════════════════════════════
   //  CAPA
   // ════════════════════════════════════════════════════
-  // ════════════════════════════════════════════
-  //  CAPA
-  // ════════════════════════════════════════════
-
-  // 1. Fundo degradê navy (de cima pra baixo)
   for (let i = 0; i < 60; i++) {
     const t = i / 60;
     doc.setFillColor(
@@ -822,75 +725,49 @@ window.confirmarConfiguracao = async function () {
     );
     doc.rect(0, (PH / 60) * i, PW, PH / 60 + 0.5, "F");
   }
-
-  // 2. Círculos decorativos
   doc.setFillColor(14, 165, 233);
   doc.setGState(new doc.GState({ opacity: 0.10 }));
   doc.circle(PW * 0.85, PH * 0.25, 32, "F");
   doc.circle(PW * 0.10, PH * 0.75, 22, "F");
   doc.circle(PW * 0.92, PH * 0.80, 13, "F");
   doc.setGState(new doc.GState({ opacity: 1 }));
-
-  // 3. Barra topo limão
   doc.setFillColor(206, 255, 0);
   doc.rect(0, 0, PW, 3, "F");
-
-  // 4. Círculo ERA – halo externo suave
   const lcx = PW / 2;
   const lcy = PH * 0.295;
-
-  // halo suave
   doc.setFillColor(206, 255, 0);
   doc.setGState(new doc.GState({ opacity: 0.08 }));
   doc.circle(lcx, lcy, 28, "F");
   doc.setGState(new doc.GState({ opacity: 1 }));
-
-  // círculo sólido escuro (fundo do ícone)
   doc.setFillColor(10, 20, 40);
   doc.circle(lcx, lcy, 20, "F");
-
-  // borda limão
   doc.setDrawColor(206, 255, 0);
   doc.setLineWidth(1.5);
   doc.circle(lcx, lcy, 20, "S");
-
-  // borda interna menor
   doc.setDrawColor(206, 255, 0);
   doc.setLineWidth(0.5);
   doc.setGState(new doc.GState({ opacity: 0.35 }));
   doc.circle(lcx, lcy, 15.5, "S");
   doc.setGState(new doc.GState({ opacity: 1 }));
-
-  // texto ERA em limão — centralizado verticalmente no círculo
   doc.setTextColor(206, 255, 0);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
   doc.text("ERA", lcx, lcy + 4.2, { align: "center" });
-
-  // 5. Título principal
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(26);
   doc.text("Caderno de Parametros", PW / 2, PH * 0.455, { align: "center" });
-
-  // 6. Subtítulo em azul claro
   doc.setTextColor(176, 212, 241);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(12);
   doc.text("Resumo da Configuracao do Cliente", PW / 2, PH * 0.492, { align: "center" });
-
-  // 7. Linha divisória limão
   doc.setDrawColor(206, 255, 0);
   doc.setLineWidth(1.5);
   doc.line(PW * 0.30, PH * 0.520, PW * 0.70, PH * 0.520);
-
-  // 8. Nome da empresa
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(19);
   doc.text(cli.empresa || "", PW / 2, PH * 0.558, { align: "center" });
-
-  // 9. Infos: Domínio, CNPJ, Data
   doc.setTextColor(176, 212, 241);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
@@ -904,8 +781,6 @@ window.confirmarConfiguracao = async function () {
     doc.text(label + ":  " + val, PW / 2, iy, { align: "center" });
     iy += 7;
   });
-
-  // 10. Stats — 6 mini-cards alinhados
   const stats = [
     { label: "Usuarios", val: String(voz.usuarios?.length  || 0) },
     { label: "Ramais",   val: String(voz.ramais?.length    || 0) },
@@ -915,36 +790,27 @@ window.confirmarConfiguracao = async function () {
     { label: "Chat",     val: dados.chat?.tipo ? "Sim" : "Nao"  },
   ];
   const N       = stats.length;
-  const statsTW = PW - 28;         // largura total usável
-  const statsX0 = 14;              // margem esquerda
+  const statsTW = PW - 28;
+  const statsX0 = 14;
   const statW   = statsTW / N;
   const statY   = PH * 0.690;
   const statH   = 24;
-
   stats.forEach(({ label, val }, i) => {
     const bx = statsX0 + i * statW + 1;
     const bw = statW - 3;
-
-    // fundo translúcido
     doc.setFillColor(255, 255, 255);
     doc.setGState(new doc.GState({ opacity: 0.07 }));
     doc.roundedRect(bx, statY, bw, statH, 3, 3, "F");
     doc.setGState(new doc.GState({ opacity: 1 }));
-
-    // borda limão suave
     doc.setDrawColor(206, 255, 0);
     doc.setLineWidth(0.35);
     doc.setGState(new doc.GState({ opacity: 0.30 }));
     doc.roundedRect(bx, statY, bw, statH, 3, 3, "S");
     doc.setGState(new doc.GState({ opacity: 1 }));
-
-    // valor em limão
     doc.setTextColor(206, 255, 0);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.text(val, bx + bw / 2, statY + 14, { align: "center" });
-
-    // label em branco suave
     doc.setTextColor(255, 255, 255);
     doc.setGState(new doc.GState({ opacity: 0.55 }));
     doc.setFont("helvetica", "normal");
@@ -952,8 +818,6 @@ window.confirmarConfiguracao = async function () {
     doc.text(label, bx + bw / 2, statY + 20.5, { align: "center" });
     doc.setGState(new doc.GState({ opacity: 1 }));
   });
-
-  // 11. Rodapé da capa
   doc.setFillColor(0, 0, 0);
   doc.setGState(new doc.GState({ opacity: 0.30 }));
   doc.rect(0, PH - 14, PW, 14, "F");
@@ -965,15 +829,12 @@ window.confirmarConfiguracao = async function () {
     "Documento gerado automaticamente pelo Caderno de Parametros SobreIP",
     PW / 2, PH - 5.5, { align: "center" }
   );
-
   // ── Página 2: Índice ─────────────────────────────────
   doc.addPage();
   paginaAtual = 2;
   pageHeader();
-
   let y = 22;
   y = sectionBar(y, "INDICE DO DOCUMENTO", C.accent2);
-
   const modulos = [];
   if (cli)                        modulos.push("🏢  Dados do Cliente");
   if (voz.usuarios?.length)       modulos.push("👤  Usuários Web");
@@ -992,7 +853,6 @@ window.confirmarConfiguracao = async function () {
     if (chat.agentes?.length)       modulos.push("     └─ Agentes do Chat");
     if (chat.departamentos?.length) modulos.push("     └─ Departamentos");
   }
-
   modulos.forEach((m, i) => {
     y = checkY(y, 10);
     setFill(i % 2 === 0 ? C.bgLight : C.white);
@@ -1007,16 +867,12 @@ window.confirmarConfiguracao = async function () {
     doc.text(m, ML + 7, y + 6);
     y += 8.5;
   });
-
   pageFooter();
-
   // ── NOVA PÁGINA: CONTEÚDO ────────────────────────────
   doc.addPage();
   paginaAtual++;
   pageHeader();
   y = 22;
-
-  // ── CLIENTE ──────────────────────────────────────────
   if (cli.empresa || cli.dominio || cli.cnpj) {
     y = sectionBar(y, "DADOS DO CLIENTE", C.primary);
     y = cardInfo(y, [
@@ -1025,8 +881,6 @@ window.confirmarConfiguracao = async function () {
       ["CNPJ",     cli.cnpj     || "—"],
     ]);
   }
-
-  // ── USUÁRIOS WEB ─────────────────────────────────────
   if (voz.usuarios?.length) {
     y = checkY(y, 30);
     y = sectionBar(y, "USUARIOS WEB", C.primary);
@@ -1037,22 +891,16 @@ window.confirmarConfiguracao = async function () {
     ]);
     y = tabelaAutoTable(y, ["Nome","E-mail","Senha","Permissão","Agente"], rows, cols);
   }
-
-  // ── ENTRADAS ─────────────────────────────────────────
   if (voz.entradas?.length) {
     y = checkY(y, 20);
     y = sectionBar(y, "NUMEROS DE ENTRADA", C.primary);
     y = chips(y, voz.entradas.map(e => e.numero || "—"));
   }
-
-  // ── RAMAIS ───────────────────────────────────────────
   if (voz.ramais?.length) {
     y = checkY(y, 30);
     y = sectionBar(y, "RAMAIS", C.primary);
     y = ramaisGrid(y, voz.ramais);
   }
-
-  // ── AGENTES ──────────────────────────────────────────
   if (voz.agentes?.length) {
     y = checkY(y, 30);
     y = sectionBar(y, "AGENTES", C.primary);
@@ -1062,8 +910,6 @@ window.confirmarConfiguracao = async function () {
     ]);
     y = tabelaAutoTable(y, ["Nome","Ramal","Multiskill"], rows, cols);
   }
-
-  // ── REGRAS DE TEMPO ──────────────────────────────────
   if (voz.regras_tempo?.length) {
     y = checkY(y, 30);
     y = sectionBar(y, "REGRAS DE TEMPO", C.primary);
@@ -1079,8 +925,6 @@ window.confirmarConfiguracao = async function () {
       ]);
     });
   }
-
-  // ── GRUPO DE RING ────────────────────────────────────
   if (voz.grupo_ring?.length) {
     y = checkY(y, 30);
     y = sectionBar(y, "GRUPO DE RING", C.primary);
@@ -1093,8 +937,6 @@ window.confirmarConfiguracao = async function () {
       ]);
     });
   }
-
-  // ── FILAS ────────────────────────────────────────────
   if (voz.filas?.length) {
     y = checkY(y, 30);
     y = sectionBar(y, "FILAS", C.primary);
@@ -1102,8 +944,6 @@ window.confirmarConfiguracao = async function () {
     const rows = voz.filas.map(f => [f.nome || "—", (f.agentes || []).join(", ")]);
     y = tabelaAutoTable(y, ["Fila","Agentes"], rows, cols);
   }
-
-  // ── URA ──────────────────────────────────────────────
   if (voz.uras?.length) {
     y = checkY(y, 30);
     y = sectionBar(y, "URA - ATENDIMENTO AUTOMATICO", C.primary);
@@ -1128,8 +968,6 @@ window.confirmarConfiguracao = async function () {
       y += 3;
     });
   }
-
-  // ── PAUSAS ───────────────────────────────────────────
   if (voz.pausas?.length) {
     y = checkY(y, 30);
     y = sectionBar(y, "PAUSAS DO CALL CENTER", C.primary);
@@ -1147,8 +985,6 @@ window.confirmarConfiguracao = async function () {
       }
     });
   }
-
-  // ── PESQUISA ─────────────────────────────────────────
   if (voz.pesquisas?.length) {
     y = checkY(y, 40);
     y = sectionBar(y, "PESQUISA DE SATISFACAO", C.primary);
@@ -1168,16 +1004,12 @@ window.confirmarConfiguracao = async function () {
       }
     });
   }
-
-  // ── CHAT ─────────────────────────────────────────────
   if (chat.tipo) {
     doc.addPage();
     paginaAtual++;
     pageHeader();
     y = 22;
-
     y = sectionBar(y, "CHAT / OMNICHANNEL", C.accent2);
-
     const tipoLabel = chat.tipo === "qr" ? "Integração via QR Code" : "Integração via API Oficial";
     const paresChat = [["Tipo", tipoLabel]];
     if (chat.tipo === "api") {
@@ -1187,7 +1019,6 @@ window.confirmarConfiguracao = async function () {
       paresChat.push(["Número WhatsApp", chat.conta || "—"]);
     }
     y = cardInfo(y, paresChat);
-
     if (chat.canais?.length) {
       y = checkY(y, 20);
       setTextC(C.primary);
@@ -1196,7 +1027,6 @@ window.confirmarConfiguracao = async function () {
       y += 4;
       y = chips(y, chat.canais);
     }
-
     if (chat.usuarios?.length) {
       y = checkY(y, 30);
       y = sectionBar(y, "USUARIOS DO CHAT", C.accent2);
@@ -1204,7 +1034,6 @@ window.confirmarConfiguracao = async function () {
       const rows = chat.usuarios.map(u => [u.nome || "—", u.email || "—", u.senha || "—", u.permissao || "—"]);
       y = tabelaAutoTable(y, ["Nome","E-mail","Senha","Permissão"], rows, cols);
     }
-
     if (chat.agentes?.length) {
       y = checkY(y, 30);
       y = sectionBar(y, "AGENTES DO CHAT", C.accent2);
@@ -1212,7 +1041,6 @@ window.confirmarConfiguracao = async function () {
       const rows = chat.agentes.map(a => [a.nome || "—", (a.departamentos || []).join(", ") || "—"]);
       y = tabelaAutoTable(y, ["Agente","Departamentos"], rows, cols);
     }
-
     if (chat.departamentos?.length) {
       y = checkY(y, 30);
       y = sectionBar(y, "DEPARTAMENTOS", C.accent2);
@@ -1221,13 +1049,8 @@ window.confirmarConfiguracao = async function () {
       y = tabelaAutoTable(y, ["Departamento","Agentes"], rows, cols);
     }
   }
-
-  // ── FOOTER ÚLTIMA PÁGINA ─────────────────────────────
   pageFooter();
-
-  // ── SALVA ────────────────────────────────────────────
   doc.save("caderno-parametros.pdf");
-
   // ── ENVIA PARA API ────────────────────────────────────
   try {
     const res = await fetch("/app/caderno/api/salvar.php", {
@@ -1244,27 +1067,6 @@ window.confirmarConfiguracao = async function () {
     console.error("Erro ao enviar para API", e);
   }
 };
-
-
-/* ── Ajuste dinâmico da toolbar e sidebar conforme header real ── */
-function ajustarPosicoes() {
-  const header  = document.querySelector(".app-header, .resumo-header");
-  const toolbar = document.getElementById("resumoToolbar");
-  const nav     = document.getElementById("resumoNav");
-  if (!header) return;
-
-  const hh = header.getBoundingClientRect().height; // altura real do header
-  const th = toolbar ? toolbar.getBoundingClientRect().height : 0;
-
-  if (toolbar) toolbar.style.top = hh + "px";
-  if (nav)     nav.style.top     = (hh + th + 8) + "px";
-  if (nav)     nav.style.maxHeight = "calc(100vh - " + (hh + th + 24) + "px)";
-}
-
-window.addEventListener("load",   ajustarPosicoes);
-window.addEventListener("resize", ajustarPosicoes);
-setTimeout(ajustarPosicoes, 200);
-
 /* ================= TEMA ================= */
 (function initTema() {
   const btn = document.getElementById("toggleTheme");
