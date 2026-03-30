@@ -486,12 +486,205 @@ function copiarJSON() {
 }
 function salvarFluxo() {
   const data = buildJSON();
-  // Salva no localStorage para integração com o caderno
-  const cad = JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}");
-  if (!cad.chat) cad.chat = {};
-  cad.chat.fluxo = data;
-  localStorage.setItem("CONFIG_CADERNO", JSON.stringify(cad));
-  toast("Fluxo salvo com sucesso!");
+  capturarImagem().then(img => {
+    const cad = JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}");
+    if (!cad.chat) cad.chat = {};
+    cad.chat.fluxo       = data;
+    cad.chat.fluxo_imagem = img; // base64 PNG
+    localStorage.setItem("CONFIG_CADERNO", JSON.stringify(cad));
+    toast("Fluxo salvo com sucesso!");
+  });
+}
+
+/* Renderiza os nós e conexões num <canvas> offscreen e retorna base64 */
+function capturarImagem() {
+  return new Promise(resolve => {
+    if (!nodes.length) { resolve(null); return; }
+
+    // Calcula bounding box de todos os nós
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    nodes.forEach(n => {
+      const el = document.getElementById("n-"+n.id);
+      const w  = el ? el.offsetWidth  : 220;
+      const h  = el ? el.offsetHeight : 120;
+      minX = Math.min(minX, n.x);
+      minY = Math.min(minY, n.y);
+      maxX = Math.max(maxX, n.x + w);
+      maxY = Math.max(maxY, n.y + h);
+    });
+
+    const PAD    = 40;
+    const cW     = (maxX - minX) + PAD * 2;
+    const cH     = (maxY - minY) + PAD * 2;
+    const ox     = PAD - minX;
+    const oy     = PAD - minY;
+
+    const cv     = document.createElement("canvas");
+    cv.width     = cW;
+    cv.height    = cH;
+    const ctx    = cv.getContext("2d");
+
+    // Fundo
+    ctx.fillStyle = "#0a0f1a";
+    ctx.fillRect(0, 0, cW, cH);
+
+    // Grid pontilhado
+    ctx.fillStyle = "rgba(206,255,0,0.04)";
+    for (let gx = 0; gx < cW; gx += 24)
+      for (let gy = 0; gy < cH; gy += 24)
+        ctx.fillRect(gx, gy, 1.5, 1.5);
+
+    // Conexões
+    ctx.strokeStyle = "#38bdf8";
+    ctx.lineWidth   = 1.8;
+    ctx.setLineDash([5, 3]);
+    conns.forEach(c => {
+      const nA = nodes.find(x=>x.id===c.from);
+      const nB = nodes.find(x=>x.id===c.to);
+      if (!nA || !nB) return;
+      const elA = document.getElementById("n-"+nA.id);
+      const elB = document.getElementById("n-"+nB.id);
+      const wA  = elA ? elA.offsetWidth  : 220;
+      const hA  = elA ? elA.offsetHeight : 120;
+      const x1  = nA.x + wA + ox;
+      const y1  = nA.y + 36  + oy;
+      const x2  = nB.x + ox;
+      const y2  = nB.y + 36  + oy;
+      const dx  = Math.abs(x2 - x1) * 0.5;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.bezierCurveTo(x1+dx, y1, x2-dx, y2, x2, y2);
+      ctx.stroke();
+      // Seta
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#38bdf8";
+      const angle = Math.atan2(y2 - (y2), x2 - (x2-dx));
+      ctx.save(); ctx.translate(x2, y2); ctx.rotate(Math.atan2(y2-(y1+(y2-y1)*0.9), x2-(x1+(x2-x1)*0.9)));
+      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-8,-4); ctx.lineTo(-8,4); ctx.closePath(); ctx.fill();
+      ctx.restore();
+      ctx.setLineDash([5,3]);
+    });
+    ctx.setLineDash([]);
+
+    // Nós
+    nodes.forEach(n => {
+      const cfg = NODE_CFG[n.type];
+      const el  = document.getElementById("n-"+n.id);
+      const w   = el ? el.offsetWidth  : 220;
+      const h   = el ? el.offsetHeight : 120;
+      const x   = n.x + ox;
+      const y   = n.y + oy;
+      const r   = 10;
+
+      // Sombra
+      ctx.shadowColor = "rgba(0,0,0,0.5)";
+      ctx.shadowBlur  = 16;
+
+      // Fundo do card
+      ctx.fillStyle = "#141c2e";
+      roundRect(ctx, x, y, w, h, r);
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+
+      // Borda
+      ctx.strokeStyle = "#1e2d47";
+      ctx.lineWidth   = 1.5;
+      roundRect(ctx, x, y, w, h, r);
+      ctx.stroke();
+
+      // Faixa colorida topo
+      ctx.fillStyle = cfg.color;
+      ctx.globalAlpha = 0.18;
+      roundRectTop(ctx, x, y, w, 38, r);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Linha separadora colorida
+      ctx.strokeStyle = cfg.color;
+      ctx.lineWidth   = 1;
+      ctx.globalAlpha = 0.5;
+      ctx.beginPath(); ctx.moveTo(x+r, y+38); ctx.lineTo(x+w-r, y+38); ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // Faixa lateral colorida
+      ctx.fillStyle = cfg.color;
+      ctx.fillRect(x, y+r, 3, 38-r);
+
+      // Ícone + Label
+      ctx.font        = "bold 10px 'Segoe UI', sans-serif";
+      ctx.fillStyle   = cfg.color;
+      ctx.textBaseline = "middle";
+      ctx.fillText(cfg.label.toUpperCase(), x+14, y+19);
+
+      // Texto do conteúdo
+      ctx.font      = "11px 'Segoe UI', sans-serif";
+      ctx.fillStyle = "#94a3b8";
+      const texto   = n.data.text || (n.type==="start" ? "Início do fluxo" : "");
+      if (texto) {
+        const linhas = wrapText(ctx, texto, w - 24);
+        linhas.forEach((ln, i) => {
+          if (y + 52 + i*15 < y + h - 8)
+            ctx.fillText(ln, x+12, y+52+i*15);
+        });
+      }
+      // Opções do menu
+      if (n.type==="menu" && n.data.opcoes?.length) {
+        n.data.opcoes.forEach((op, i) => {
+          if (!op) return;
+          ctx.fillStyle = "#64748b";
+          ctx.font = "10px 'Segoe UI', sans-serif";
+          if (y+52+i*14 < y+h-8)
+            ctx.fillText(`${i+1}. ${op}`, x+12, y+52+i*14);
+        });
+      }
+
+      // Porta saída
+      if (cfg.hasOut) {
+        ctx.strokeStyle = "#CEFF00"; ctx.lineWidth=2;
+        ctx.fillStyle   = "#0a0f1a";
+        ctx.beginPath(); ctx.arc(x+w, y+36, 6, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      }
+      // Porta entrada
+      if (cfg.hasIn) {
+        ctx.strokeStyle = "#38bdf8"; ctx.lineWidth=2;
+        ctx.fillStyle   = "#0a0f1a";
+        ctx.beginPath(); ctx.arc(x, y+36, 6, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      }
+    });
+
+    resolve(cv.toDataURL("image/png"));
+  });
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y); ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+function roundRectTop(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y); ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h); ctx.lineTo(x, y+h);
+  ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+function wrapText(ctx, text, maxW) {
+  const words = text.split(" ");
+  const lines = [];
+  let cur = "";
+  words.forEach(w => {
+    const test = cur ? cur+" "+w : w;
+    if (ctx.measureText(test).width > maxW) { lines.push(cur); cur=w; }
+    else cur = test;
+  });
+  if (cur) lines.push(cur);
+  return lines.slice(0, 4);
 }
 function confirmarLimpar() {
   if (!nodes.length || confirm("Limpar todo o fluxo?")) {
