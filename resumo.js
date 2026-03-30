@@ -278,6 +278,7 @@ function renderResumoCompleto() {
     "sec-chat-usuarios": "#listaUsuariosChat",
     "sec-chat-agentes":  "#listaAgentesChat",
     "sec-chat-depto":    "#listaDepartamentosChat",
+    "sec-fluxo":         "#modulochat",
   };
 
   function secao(id, icone, titulo, count) {
@@ -499,6 +500,24 @@ function renderResumoCompleto() {
             `<span class="chip">${a}</span>`).join("") || '<span style="opacity:.5">Sem agentes</span>'}
           </div>
         </div>`).join("")}</div>`;
+      html += fecharSecao();
+    }
+
+    // ── Fluxo de Atendimento ─────────────────────────────
+    if (chat.fluxo_imagem || chat.fluxo) {
+      html += secao("sec-fluxo", "🔀", "Fluxo de Atendimento");
+      if (chat.fluxo_imagem) {
+        html += `
+          <div class="resumo-card" style="padding:12px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="font-size:13px;font-weight:700;color:var(--text)">${(chat.fluxo?.nome || "Fluxo de Atendimento")}</span>
+              <span style="font-size:11px;color:var(--text-soft)">${chat.fluxo?.nos?.length || 0} nós · ${chat.fluxo?.conexoes?.length || 0} conexões</span>
+            </div>
+            <img src="${chat.fluxo_imagem}" style="width:100%;border-radius:10px;border:1px solid var(--border);" alt="Fluxo de Atendimento">
+          </div>`;
+      } else {
+        html += `<div class="resumo-card"><span style="color:var(--text-soft);font-size:13px;">Fluxo configurado mas sem imagem. Abra o editor e salve novamente.</span></div>`;
+      }
       html += fecharSecao();
     }
   }
@@ -932,6 +951,7 @@ window.confirmarConfiguracao = async function () {
     if (chat.usuarios?.length)      modulos.push("     |- Usuarios do Chat");
     if (chat.agentes?.length)       modulos.push("     |- Agentes do Chat");
     if (chat.departamentos?.length) modulos.push("     |- Departamentos");
+    if (chat.fluxo)                 modulos.push("     |- Fluxo de Atendimento");
   }
   modulos.forEach((m, i) => {
     y = checkY(y, 10);
@@ -1201,6 +1221,49 @@ window.confirmarConfiguracao = async function () {
     }
   }
   pageFooter();
+
+  // ── FLUXO DE ATENDIMENTO NO PDF ───────────────────────
+  if (chat.fluxo_imagem) {
+    doc.addPage();
+    paginaAtual++;
+    pageHeader();
+    let yf = 22;
+    yf = sectionBar(yf, "FLUXO DE ATENDIMENTO", C.accent2);
+
+    // Info do fluxo
+    if (chat.fluxo?.nome) {
+      yf = cardInfo(yf, [
+        ["Nome do Fluxo", chat.fluxo.nome],
+        ["Nos",           String(chat.fluxo?.nos?.length || 0)],
+        ["Conexoes",      String(chat.fluxo?.conexoes?.length || 0)],
+      ]);
+    }
+
+    yf += 4;
+    yf = checkY(yf, 40);
+
+    // Insere a imagem do fluxo
+    try {
+      const imgData  = chat.fluxo_imagem; // base64 PNG
+      // Calcula dimensões para caber na página com proporção
+      const maxW = CW;
+      const maxH = PH - yf - 20;
+      // Cria img temporária para pegar dimensões reais
+      const tmpImg = new Image();
+      tmpImg.src   = imgData;
+      // jsPDF aceita base64 direto
+      const imgW   = Math.min(maxW, maxW);
+      const imgH   = Math.min(maxH, maxW * 0.55); // proporção estimada
+      doc.addImage(imgData, "PNG", ML, yf, imgW, imgH);
+      yf += imgH + 6;
+    } catch(imgErr) {
+      console.warn("Erro ao inserir imagem do fluxo no PDF:", imgErr);
+      setTextC(C.textSoft);
+      setFont(9, "normal");
+      doc.text("Imagem do fluxo nao disponivel.", ML, yf + 6);
+    }
+    pageFooter();
+  }
 
   // ── NOME DO ARQUIVO COM EMPRESA + DATA ───────────────
   const _empresa  = (cli.empresa || "caderno").replace(/[^a-zA-Z0-9À-ÿ ]/g, "").trim().replace(/\s+/g, "-");
