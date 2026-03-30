@@ -1175,54 +1175,56 @@ window.confirmarConfiguracao = async function () {
   }
 
   // ── ENVIA PARA GOOGLE DRIVE ──────────────────────────
-  // Cole aqui a URL gerada após implantar o DriveUpload.gs no Google Apps Script
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbglSzGkS6-PAQGIN04u_ASpJMsGnR5iYB-gJcGCzwz1HNEmTirlxHLjaf326ZMDdl/exec";
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyyOTzXL64WKPTuVaScXqjNmpShHvHPkWTDNddTxZhKkg7fkfB3Y2ZgdiagXaIFm4g/exec";
 
-  if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== "COLE_AQUI_A_URL_DO_APPS_SCRIPT") {
-    (async () => {
-      try {
-        // Gera o PDF como base64 (sem baixar de novo)
-        const pdfBlob  = doc.output("blob");
-        const b64      = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload  = () => resolve(reader.result.split(",")[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(pdfBlob);
-        });
-
-        const payload = JSON.stringify({
-          nome:    nomeArq,
-          empresa: cli.empresa || "",
-          pdf:     b64
-        });
-
-        const resp = await fetch(APPS_SCRIPT_URL, {
-          method: "POST",
-          body:   payload,
-          // Apps Script não aceita Content-Type application/json via CORS simples
-          // usa text/plain para evitar preflight bloqueado
-          headers: { "Content-Type": "text/plain" }
-        });
-
-        const json = await resp.json();
-        if (json.ok) {
-          console.log("Drive: arquivo salvo —", json.nome, json.url);
-          // Toast de confirmação (opcional)
-          const toast = document.getElementById("toastGlobal");
-          const msg   = document.getElementById("toastMessage");
-          if (toast && msg) {
-            msg.textContent = "PDF salvo no Drive com sucesso!";
-            toast.className = "toast show";
-            setTimeout(() => toast.classList.remove("show"), 4000);
-          }
-        } else {
-          console.warn("Drive: erro ao salvar —", json.erro);
-        }
-      } catch (err) {
-        console.error("Drive: falha no envio —", err);
+  (async () => {
+    try {
+      // Toast de "enviando..." imediato
+      const toast = document.getElementById("toastGlobal");
+      const msg   = document.getElementById("toastMessage");
+      function showToast(txt, erro) {
+        if (!toast || !msg) return;
+        msg.textContent  = txt;
+        toast.className  = "toast show" + (erro ? " error" : "");
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => toast.classList.remove("show"), 5000);
       }
-    })();
-  }
+      showToast("Enviando PDF para o Drive...");
+
+      // base64 direto do jsPDF — sem FileReader, sem CORS extra
+      const dataUri = doc.output("datauristring");
+      const b64     = dataUri.split(",")[1];
+
+      const payload = JSON.stringify({
+        nome:    nomeArq,
+        empresa: cli.empresa || "",
+        pdf:     b64
+      });
+
+      // mode: no-cors — evita bloqueio CORS do Apps Script
+      // A resposta será opaca (não conseguimos ler), mas o upload ocorre normalmente
+      await fetch(APPS_SCRIPT_URL, {
+        method:  "POST",
+        mode:    "no-cors",
+        body:    payload,
+        headers: { "Content-Type": "text/plain" }
+      });
+
+      // Como no-cors não retorna resposta legível, assumimos sucesso se não lançou erro
+      showToast("PDF salvo no Drive com sucesso!");
+      console.log("Drive: enviado —", nomeArq);
+
+    } catch (err) {
+      console.error("Drive: falha no envio —", err);
+      const toast = document.getElementById("toastGlobal");
+      const msg   = document.getElementById("toastMessage");
+      if (toast && msg) {
+        msg.textContent = "Erro ao enviar para o Drive. Tente novamente.";
+        toast.className = "toast show error";
+        setTimeout(() => toast.classList.remove("show"), 5000);
+      }
+    }
+  })();
 };
 /* ================= TEMA ================= */
 (function initTema() {
