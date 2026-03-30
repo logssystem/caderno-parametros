@@ -289,7 +289,7 @@ function renderResumoCompleto() {
     return `<section class="resumo-bloco" id="${id}">
       <h2 class="resumo-secao-titulo">
         <span>${icone}</span> ${titulo}
-        ${count ? `<span class="secao-count">${count}</span>` : ""}
+        ${count ? `<span class="secao-count">${count}</span>` : `<span style="flex:1"></span>`}
         ${btnEdit}
       </h2>`;
   }
