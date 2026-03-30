@@ -1273,7 +1273,7 @@ function _limparTudoInterno() {
 
   // Limpa todas as listas dinâmicas
   ["listaUsuariosWeb","listaRings","listaEntradas","listaAgentes",
-   "listaFilas","listaGrupoRing","listaURAs","listaRegrasTempo",
+   "listaFilas","listaGrupoRing","listaURAs","listaRegrasTempo","listaRegrasTempoChat",
    "listaPausas","listaRespostasPesquisa",
    "listaUsuariosChat","listaAgentesChat","listaDepartamentosChat",
    "listaNumeroQr"].forEach(id => {
@@ -1461,7 +1461,10 @@ window.explorar = function () {
       if (window.chatState?.conta) chat.conta = window.chatState.conta;
     }
     const modo = localStorage.getItem("modo_atendimento");
-    if ((modo === "chat" || modo === "ambos") && chat) dados.chat = chat;
+    if ((modo === "chat" || modo === "ambos") && chat) {
+      chat.regras_tempo = coletarRegrasTempoChat();
+      dados.chat = chat;
+    }
     // JSON gerado — mantido oculto para o cliente
     // document.getElementById("resultado").textContent = JSON.stringify(dados, null, 2);
     mostrarToast("JSON gerado com sucesso!");
@@ -1617,6 +1620,25 @@ document.addEventListener("DOMContentLoaded", () => {
   info.textContent = "ℹ️ Os agentes omnichannel são gerados automaticamente a partir dos usuários marcados como agente.";
   blocoAgentesChat.insertBefore(info, blocoAgentesChat.children[1]);
 });
+
+/* ================= REGRAS DE TEMPO – CHAT ================= */
+window.adicionarRegraTempoChat = function () {
+  const container = document.getElementById("listaRegrasTempoChat");
+  if (!container) return mostrarToast("Lista não encontrada", true);
+  container.appendChild(criarRegraTempo()); // reutiliza o mesmo componente do PBX
+  syncTudo();
+};
+
+function coletarRegrasTempoChat() {
+  const regras = [];
+  document.querySelectorAll("#listaRegrasTempoChat .campo-descricao").forEach(r => {
+    if (r.getData) {
+      const data = r.getData();
+      if (data.nome) regras.push(data);
+    }
+  });
+  return regras;
+}
 
 /* ================= PAUSAS E PESQUISA ================= */
 window.togglePausas             = togglePausas;
@@ -1952,6 +1974,35 @@ function _carregarDadosSalvos() {
         });
       }
     }
+    // ── Regras de Tempo Chat ────────────────────────────────────────────
+    const listaRTC = document.getElementById("listaRegrasTempoChat");
+    if (listaRTC && chat.regras_tempo?.length) {
+      listaRTC.innerHTML = "";
+      chat.regras_tempo.forEach(r => {
+        const card = criarRegraTempo();
+        card.querySelector(".campo-nome").value = r.nome || "";
+        const diasBtns   = card.querySelectorAll(".btn-dia");
+        const diasComp   = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+        diasBtns.forEach((btn, idx) => {
+          if ((r.dias || []).includes(diasComp[idx])) btn.click();
+        });
+        const faixas = r.faixas?.length ? r.faixas
+          : (r.hora_inicio ? [{ inicio: r.hora_inicio, fim: r.hora_fim }] : []);
+        const fc = card.querySelector(".faixas-container");
+        if (fc && faixas.length) {
+          fc.innerHTML = "";
+          faixas.forEach(f => {
+            const row = criarFaixaHoraria();
+            const ts  = row.querySelectorAll("input[type=time]");
+            if (ts[0]) ts[0].value = f.inicio || "";
+            if (ts[1]) ts[1].value = f.fim    || "";
+            fc.appendChild(row);
+          });
+        }
+        listaRTC.appendChild(card);
+      });
+    }
+
     // ── Usuários Chat ──────────────────────────────────────────────────
     // Adiciona todos SEM disparar change (evita gerar agentes parcialmente)
     const listaUC = document.getElementById("listaUsuariosChat");
