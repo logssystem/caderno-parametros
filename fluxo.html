@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Editor de Fluxo</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0f1a;--panel:#0f1623;--card:#141c2e;--border:#1e2d47;
+  --text:#e2e8f0;--soft:#64748b;--lime:#CEFF00;--lime2:#a8d400;
+  --red:#ef4444;--blue:#38bdf8;--green:#22c55e;--amber:#f59e0b;
+  --purple:#a78bfa;--pink:#f472b6;--conn:#38bdf8;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none;}
+
+/* ── HEADER ── */
+.hdr{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--border);z-index:100;flex-shrink:0;}
+.hdr-logo{font-size:13px;font-weight:800;color:var(--lime);letter-spacing:1px;opacity:.7;}
+.hdr-title{flex:1;text-align:center;font-size:14px;font-weight:700;color:var(--text);}
+.hdr-title input{background:transparent;border:none;color:var(--text);font-size:14px;font-weight:700;text-align:center;width:200px;outline:none;}
+.hdr-title input:focus{border-bottom:1px solid var(--lime);}
+.hdr-btn{padding:7px 16px;border-radius:8px;border:none;font-size:12px;font-weight:700;cursor:pointer;transition:all .18s;}
+.btn-vars{background:var(--blue);color:#000;}
+.btn-limpar{background:transparent;border:1px solid var(--border);color:var(--soft);}
+.btn-limpar:hover{border-color:var(--red);color:var(--red);}
+.btn-pub{background:var(--green);color:#000;}
+.btn-pub:hover{filter:brightness(1.1);}
+.btn-exp{background:rgba(206,255,0,.12);border:1px solid rgba(206,255,0,.3);color:var(--lime);}
+.btn-exp:hover{background:rgba(206,255,0,.2);}
+
+/* ── LAYOUT ── */
+.workspace{display:flex;flex:1;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:200px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);overflow-y:auto;padding:8px;}
+.sidebar::-webkit-scrollbar{width:3px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);}
+.sb-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--soft);padding:8px 4px 6px;}
+.sb-node{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);margin-bottom:6px;cursor:grab;font-size:12px;font-weight:600;color:var(--text);transition:all .18s;}
+.sb-node:hover{border-color:var(--lime);color:var(--lime);transform:translateX(2px);}
+.sb-node:active{cursor:grabbing;}
+.sb-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+/* ── CANVAS ── */
+.canvas-wrap{flex:1;position:relative;overflow:hidden;background:var(--bg);}
+.canvas-wrap::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,rgba(206,255,0,.04) 1px,transparent 1px);background-size:24px 24px;pointer-events:none;}
+#canvas{position:absolute;inset:0;width:100%;height:100%;}
+#svg-layer{position:absolute;inset:0;pointer-events:none;z-index:1;}
+#nodes-layer{position:absolute;inset:0;z-index:2;}
+
+/* ── NÓ ── */
+.node{position:absolute;min-width:180px;max-width:240px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.4);cursor:move;transition:border-color .15s,box-shadow .15s;}
+.node:hover{box-shadow:0 6px 28px rgba(0,0,0,.6);}
+.node.selected{border-color:var(--lime);box-shadow:0 0 0 2px rgba(206,255,0,.2);}
+.node-hdr{display:flex;align-items:center;gap:7px;padding:9px 12px 7px;border-bottom:1px solid var(--border);}
+.node-icon{font-size:14px;flex-shrink:0;}
+.node-type{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;flex:1;}
+.node-del{background:transparent;border:none;color:var(--soft);font-size:14px;cursor:pointer;padding:2px 4px;border-radius:4px;line-height:1;}
+.node-del:hover{color:var(--red);background:rgba(239,68,68,.1);}
+.node-body{padding:10px 12px;font-size:12px;color:var(--soft);}
+.node-body textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;resize:vertical;min-height:48px;padding:6px 8px;font-family:inherit;outline:none;}
+.node-body textarea:focus{border-color:rgba(206,255,0,.4);}
+.node-body input[type=text]{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;font-family:inherit;outline:none;margin-bottom:4px;}
+.node-body input:focus{border-color:rgba(206,255,0,.4);}
+.node-body select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;outline:none;}
+.node-body .opt-row{display:flex;gap:4px;margin-bottom:4px;}
+.node-body .opt-row input{flex:1;margin:0;}
+.node-body .opt-row button{background:transparent;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:2px;}
+.node-body .btn-add-opt{width:100%;background:rgba(206,255,0,.07);border:1px dashed rgba(206,255,0,.25);border-radius:6px;color:var(--lime);font-size:11px;font-weight:700;padding:5px;cursor:pointer;margin-top:4px;}
+.node-body .btn-add-opt:hover{background:rgba(206,255,0,.13);}
+
+/* ── PORTAS ── */
+.port{position:absolute;width:12px;height:12px;border-radius:50%;border:2px solid;cursor:crosshair;transition:transform .15s,box-shadow .15s;z-index:10;}
+.port:hover{transform:scale(1.5);box-shadow:0 0 8px currentColor;}
+.port-out{border-color:var(--lime);background:var(--bg);right:-7px;}
+.port-in{border-color:var(--blue);background:var(--bg);left:-7px;}
+.port-out-bot{border-color:var(--amber);background:var(--bg);bottom:-7px;left:50%;transform:translateX(-50%);}
+
+/* ── CONEXÃO ── */
+.conn-line{stroke:var(--conn);stroke-width:1.8;fill:none;stroke-dasharray:5 3;animation:dash 1.5s linear infinite;}
+@keyframes dash{to{stroke-dashoffset:-20;}}
+.conn-line.solid{stroke-dasharray:none;animation:none;}
+.conn-arrow{fill:var(--conn);}
+
+/* ── MINI-PAINEL ── */
+.mini-panel{position:absolute;bottom:16px;right:16px;display:flex;gap:8px;z-index:50;}
+.mp-btn{width:34px;height:34px;border-radius:8px;background:var(--panel);border:1px solid var(--border);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;}
+.mp-btn:hover{border-color:var(--lime);color:var(--lime);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#000;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:all .3s;z-index:999;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.err{background:var(--red);color:#fff;}
+
+/* ── MODAL JSON ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-bg.open{opacity:1;pointer-events:all;}
+.modal-box{background:var(--panel);border:1px solid var(--border);border-radius:16px;width:560px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal-box h3{padding:16px 20px;font-size:15px;border-bottom:1px solid var(--border);}
+.modal-box textarea{flex:1;background:#0a0f1a;color:#7dd3fc;font-family:monospace;font-size:11px;padding:16px;border:none;outline:none;resize:none;min-height:300px;}
+.modal-box .modal-foot{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border);justify-content:flex-end;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-logo">ERA</div>
+  <div class="hdr-title"><input id="flowName" value="Fluxo de Atendimento" placeholder="Nome do fluxo"></div>
+  <button class="hdr-btn btn-exp" onclick="exportarJSON()">⬇ Exportar JSON</button>
+  <button class="hdr-btn btn-limpar" onclick="confirmarLimpar()">Limpar</button>
+  <button class="hdr-btn btn-pub" onclick="salvarFluxo()">✓ Salvar Fluxo</button>
+</div>
+
+<div class="workspace">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-title">Nós do Fluxo</div>
+    <div class="sb-node" draggable="true" data-type="start">
+      <span class="sb-dot" style="background:#22c55e"></span>Start
+    </div>
+    <div class="sb-node" draggable="true" data-type="mensagem">
+      <span class="sb-dot" style="background:#38bdf8"></span>Enviar Mensagem
+    </div>
+    <div class="sb-node" draggable="true" data-type="menu">
+      <span class="sb-dot" style="background:#a78bfa"></span>Menu de Opções
+    </div>
+    <div class="sb-node" draggable="true" data-type="horario">
+      <span class="sb-dot" style="background:#f59e0b"></span>Regra de Horário
+    </div>
+    <div class="sb-node" draggable="true" data-type="dados">
+      <span class="sb-dot" style="background:#f472b6"></span>Solicitar Dados
+    </div>
+    <div class="sb-node" draggable="true" data-type="agente">
+      <span class="sb-dot" style="background:#fb923c"></span>Transferir Agente
+    </div>
+    <div class="sb-node" draggable="true" data-type="depto">
+      <span class="sb-dot" style="background:#34d399"></span>Departamento
+    </div>
+    <div class="sb-node" draggable="true" data-type="espera">
+      <span class="sb-dot" style="background:#94a3b8"></span>Tempo de Espera
+    </div>
+    <div class="sb-node" draggable="true" data-type="finalizar">
+      <span class="sb-dot" style="background:#ef4444"></span>Finalizar
+    </div>
+    <div class="sb-title" style="margin-top:12px">Dica</div>
+    <div style="font-size:11px;color:var(--soft);line-height:1.6;padding:4px;">
+      Arraste um nó para a tela. Clique na <span style="color:var(--lime)">●</span> saída e depois na <span style="color:var(--blue)">●</span> entrada para conectar.
+    </div>
+  </div>
+
+  <!-- CANVAS -->
+  <div class="canvas-wrap" id="canvasWrap">
+    <div id="canvas">
+      <svg id="svg-layer" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0 0L6 3L0 6Z" class="conn-arrow"/>
+          </marker>
+        </defs>
+      </svg>
+      <div id="nodes-layer"></div>
+    </div>
+    <!-- Mini controles -->
+    <div class="mini-panel">
+      <button class="mp-btn" onclick="zoom(1.15)" title="Zoom +">+</button>
+      <button class="mp-btn" onclick="zoom(0.87)" title="Zoom -">−</button>
+      <button class="mp-btn" onclick="resetView()" title="Reset">⊙</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Modal JSON -->
+<div class="modal-bg" id="modalJSON">
+  <div class="modal-box">
+    <h3>📋 JSON do Fluxo</h3>
+    <textarea id="jsonOutput" readonly></textarea>
+    <div class="modal-foot">
+      <button class="hdr-btn btn-exp" onclick="copiarJSON()">Copiar</button>
+      <button class="hdr-btn btn-limpar" onclick="fecharModal()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+let nodes   = [];
+let conns   = [];
+let nodeId  = 1;
+let scale   = 1;
+let offsetX = 0;
+let offsetY = 0;
+let dragging = null;
+let dragOffX = 0, dragOffY = 0;
+let connectingFrom = null; // {nodeId, portType}
+let selected = null;
+
+const wrap   = document.getElementById("canvasWrap");
+const canvas = document.getElementById("canvas");
+const svgL   = document.getElementById("svg-layer");
+const nodesL = document.getElementById("nodes-layer");
+
+// ── NODE CONFIGS ──
+const NODE_CFG = {
+  start:     { label:"Start",            icon:"🟢", color:"#22c55e", hasIn:false, hasOut:true  },
+  mensagem:  { label:"Enviar Mensagem",  icon:"✉️",  color:"#38bdf8", hasIn:true,  hasOut:true  },
+  menu:      { label:"Menu de Opções",   icon:"📋", color:"#a78bfa", hasIn:true,  hasOut:true  },
+  horario:   { label:"Regra de Horário", icon:"⏰", color:"#f59e0b", hasIn:true,  hasOut:true  },
+  dados:     { label:"Solicitar Dados",  icon:"📝", color:"#f472b6", hasIn:true,  hasOut:true  },
+  agente:    { label:"Transferir Agente",icon:"👤", color:"#fb923c", hasIn:true,  hasOut:false },
+  depto:     { label:"Departamento",     icon:"🏢", color:"#34d399", hasIn:true,  hasOut:false },
+  espera:    { label:"Tempo de Espera",  icon:"⏱️", color:"#94a3b8", hasIn:true,  hasOut:true  },
+  finalizar: { label:"Finalizar",        icon:"🔴", color:"#ef4444", hasIn:true,  hasOut:false },
+};
+
+// ── TRANSFORM ──
+function applyTransform() {
+  canvas.style.transform = `translate(${offsetX}px,${offsetY}px) scale(${scale})`;
+  canvas.style.transformOrigin = "0 0";
+}
+
+function zoom(factor) {
+  scale = Math.max(0.3, Math.min(2.5, scale * factor));
+  applyTransform();
+}
+function resetView() { scale=1; offsetX=0; offsetY=0; applyTransform(); }
+
+// ── PAN ──
+let panning=false, panX0=0, panY0=0, panOX=0, panOY=0;
+wrap.addEventListener("mousedown", e => {
+  if (e.target === wrap || e.target === canvas || e.target === svgL || e.target === nodesL) {
+    panning=true; panX0=e.clientX; panY0=e.clientY; panOX=offsetX; panOY=offsetY;
+    selected=null; renderAll();
+    e.preventDefault();
+  }
+});
+window.addEventListener("mousemove", e => {
+  if (panning) { offsetX=panOX+(e.clientX-panX0); offsetY=panOY+(e.clientY-panY0); applyTransform(); }
+  if (dragging) {
+    const rect = wrap.getBoundingClientRect();
+    const x = (e.clientX - rect.left - offsetX) / scale - dragOffX;
+    const y = (e.clientY - rect.top  - offsetY) / scale - dragOffY;
+    dragging.x = Math.max(0, x);
+    dragging.y = Math.max(0, y);
+    const el = document.getElementById("n-"+dragging.id);
+    if (el) { el.style.left = dragging.x+"px"; el.style.top = dragging.y+"px"; }
+    renderConnections();
+  }
+  // Preview connection line
+  if (connectingFrom) {
+    const rect = wrap.getBoundingClientRect();
+    const mx = (e.clientX - rect.left - offsetX) / scale;
+    const my = (e.clientY - rect.top  - offsetY) / scale;
+    renderConnections(mx, my);
+  }
+});
+window.addEventListener("mouseup", e => {
+  panning=false; dragging=null;
+  if (connectingFrom && e.target !== e.currentTarget) {
+    // Check if released on a port-in
+    const portEl = document.elementFromPoint(e.clientX, e.clientY);
+    if (!portEl || !portEl.classList.contains("port-in")) {
+      connectingFrom = null;
+      renderConnections();
+    }
+  }
+});
+wrap.addEventListener("wheel", e => {
+  e.preventDefault();
+  zoom(e.deltaY < 0 ? 1.08 : 0.93);
+}, { passive: false });
+
+// ── DRAG FROM SIDEBAR ──
+document.querySelectorAll(".sb-node").forEach(el => {
+  el.addEventListener("dragstart", e => {
+    e.dataTransfer.setData("nodeType", el.dataset.type);
+  });
+});
+wrap.addEventListener("dragover", e => e.preventDefault());
+wrap.addEventListener("drop", e => {
+  e.preventDefault();
+  const type = e.dataTransfer.getData("nodeType");
+  if (!type) return;
+  const rect = wrap.getBoundingClientRect();
+  const x = (e.clientX - rect.left - offsetX) / scale - 90;
+  const y = (e.clientY - rect.top  - offsetY) / scale - 40;
+  addNode(type, Math.max(10,x), Math.max(10,y));
+});
+
+// ── ADD NODE ──
+function addNode(type, x, y) {
+  const cfg = NODE_CFG[type];
+  if (!cfg) return;
+  const node = { id: nodeId++, type, x, y, label: cfg.label,
+    data: { text:"", opcoes:[], campo:"", horario:"comercial", espera:3 } };
+  nodes.push(node);
+  renderNode(node);
+  renderConnections();
+  return node;
+}
+
+// ── RENDER NODE ──
+function renderNode(n) {
+  const cfg = NODE_CFG[n.type];
+  let el = document.getElementById("n-"+n.id);
+  if (!el) {
+    el = document.createElement("div");
+    el.className = "node";
+    el.id = "n-"+n.id;
+    nodesL.appendChild(el);
+  }
+  el.style.left = n.x+"px";
+  el.style.top  = n.y+"px";
+  if (selected === n.id) el.classList.add("selected");
+  else el.classList.remove("selected");
+
+  // Header
+  let body = `<div class="node-hdr" style="border-bottom-color:${cfg.color}22">
+    <span class="node-icon">${cfg.icon}</span>
+    <span class="node-type" style="color:${cfg.color}">${cfg.label}</span>
+    <button class="node-del" onclick="delNode(${n.id})">✕</button>
+  </div><div class="node-body">`;
+
+  // Body por tipo
+  if (n.type === "start") {
+    body += `<span style="color:var(--soft);font-size:11px;">Início do fluxo</span>`;
+  } else if (n.type === "mensagem") {
+    body += `<textarea placeholder="Digite a mensagem..." onchange="n_set(${n.id},'text',this.value)">${n.data.text||""}</textarea>`;
+  } else if (n.type === "menu") {
+    body += `<textarea placeholder="Mensagem do menu..." onchange="n_set(${n.id},'text',this.value)" style="min-height:36px">${n.data.text||""}</textarea>`;
+    body += `<div id="opts-${n.id}">`;
+    (n.data.opcoes||[]).forEach((op,i) => {
+      body += `<div class="opt-row">
+        <input type="text" placeholder="Opção ${i+1}" value="${op||""}" onchange="n_opt(${n.id},${i},this.value)">
+        <button onclick="n_del_opt(${n.id},${i})">✕</button>
+      </div>`;
+    });
+    body += `</div><button class="btn-add-opt" onclick="n_add_opt(${n.id})">+ Adicionar opção</button>`;
+  } else if (n.type === "horario") {
+    body += `<select onchange="n_set(${n.id},'horario',this.value)">
+      <option value="comercial" ${n.data.horario==="comercial"?"selected":""}>Horário Comercial</option>
+      <option value="fora" ${n.data.horario==="fora"?"selected":""}>Fora do Horário</option>
+      <option value="personalizado" ${n.data.horario==="personalizado"?"selected":""}>Personalizado</option>
+    </select>`;
+  } else if (n.type === "dados") {
+    body += `<input type="text" placeholder="Nome do campo (ex: CPF, Nome...)" value="${n.data.campo||""}" onchange="n_set(${n.id},'campo',this.value)">
+    <input type="text" placeholder="Mensagem de solicitação..." value="${n.data.text||""}" onchange="n_set(${n.id},'text',this.value)">`;
+  } else if (n.type === "agente") {
+    body += `<input type="text" placeholder="Nome do agente (opcional)" value="${n.data.text||""}" onchange="n_set(${n.id},'text',this.value)">`;
+  } else if (n.type === "depto") {
+    body += `<input type="text" placeholder="Nome do departamento" value="${n.data.text||""}" onchange="n_set(${n.id},'text',this.value)">`;
+  } else if (n.type === "espera") {
+    body += `<input type="text" placeholder="Tempo (ex: 30 seg)" value="${n.data.text||""}" onchange="n_set(${n.id},'text',this.value)">`;
+  } else if (n.type === "finalizar") {
+    body += `<textarea placeholder="Mensagem de encerramento..." onchange="n_set(${n.id},'text',this.value)">${n.data.text||""}</textarea>`;
+  }
+  body += `</div>`;
+
+  // Ports
+  const midY = 36; // vertical center of header approx
+  if (cfg.hasIn)  body += `<div class="port port-in"  style="top:${midY}px" onmouseup="onPortIn(${n.id})" title="Entrada"></div>`;
+  if (cfg.hasOut) body += `<div class="port port-out" style="top:${midY}px" onmousedown="onPortOut(event,${n.id})" title="Saída"></div>`;
+
+  el.innerHTML = body;
+
+  // Drag
+  el.addEventListener("mousedown", e => {
+    if (e.target.classList.contains("port") || e.target.tagName==="BUTTON" ||
+        e.target.tagName==="INPUT" || e.target.tagName==="TEXTAREA" || e.target.tagName==="SELECT") return;
+    selected = n.id;
+    dragging = n;
+    const rect = el.getBoundingClientRect();
+    const wRect = wrap.getBoundingClientRect();
+    dragOffX = (e.clientX - wRect.left - offsetX)/scale - n.x;
+    dragOffY = (e.clientY - wRect.top  - offsetY)/scale - n.y;
+    renderNode(n);
+    e.stopPropagation();
+  });
+}
+
+function renderAll() {
+  nodes.forEach(n => renderNode(n));
+  renderConnections();
+}
+
+// ── NODE DATA HELPERS ──
+window.n_set = (id, key, val) => {
+  const n = nodes.find(x=>x.id===id); if(n) n.data[key]=val;
+};
+window.n_add_opt = (id) => {
+  const n = nodes.find(x=>x.id===id); if(!n) return;
+  if (!n.data.opcoes) n.data.opcoes=[];
+  n.data.opcoes.push(""); renderNode(n); renderConnections();
+};
+window.n_del_opt = (id, i) => {
+  const n = nodes.find(x=>x.id===id); if(!n) return;
+  n.data.opcoes.splice(i,1); renderNode(n); renderConnections();
+};
+window.n_opt = (id, i, val) => {
+  const n = nodes.find(x=>x.id===id); if(!n) return;
+  n.data.opcoes[i]=val;
+};
+window.delNode = (id) => {
+  nodes = nodes.filter(x=>x.id!==id);
+  conns = conns.filter(c=>c.from!==id && c.to!==id);
+  const el = document.getElementById("n-"+id); if(el) el.remove();
+  if(selected===id) selected=null;
+  renderConnections();
+};
+
+// ── CONNECTIONS ──
+function onPortOut(e, nodeId) {
+  connectingFrom = nodeId;
+  e.stopPropagation();
+}
+window.onPortIn = (nodeId) => {
+  if (connectingFrom !== null && connectingFrom !== nodeId) {
+    // Avoid duplicate
+    const dup = conns.find(c=>c.from===connectingFrom && c.to===nodeId);
+    if (!dup) conns.push({ from: connectingFrom, to: nodeId });
+    connectingFrom = null;
+    renderConnections();
+  }
+};
+
+function getPortPos(nodeId, side) {
+  const n = nodes.find(x=>x.id===nodeId); if(!n) return null;
+  const cfg = NODE_CFG[n.type];
+  const el = document.getElementById("n-"+nodeId); if(!el) return null;
+  const w = el.offsetWidth, h = el.offsetHeight;
+  if (side==="out") return { x: n.x + w + 0, y: n.y + 36 };
+  if (side==="in")  return { x: n.x - 0,     y: n.y + 36 };
+  return null;
+}
+
+function renderConnections(previewX, previewY) {
+  // Clear existing paths
+  svgL.querySelectorAll("path,line").forEach(e=>e.remove());
+
+  conns.forEach(c => {
+    const a = getPortPos(c.from, "out");
+    const b = getPortPos(c.to,   "in");
+    if (!a || !b) return;
+    drawCurve(a.x, a.y, b.x, b.y, "solid");
+  });
+
+  // Preview
+  if (connectingFrom !== null && previewX !== undefined) {
+    const a = getPortPos(connectingFrom, "out");
+    if (a) drawCurve(a.x, a.y, previewX, previewY, "dash");
+  }
+}
+
+function drawCurve(x1,y1,x2,y2,style) {
+  const dx = Math.abs(x2-x1)*0.5;
+  const d = `M${x1},${y1} C${x1+dx},${y1} ${x2-dx},${y2} ${x2},${y2}`;
+  const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+  path.setAttribute("d", d);
+  path.setAttribute("class", "conn-line" + (style==="solid" ? " solid" : ""));
+  path.setAttribute("marker-end","url(#arr)");
+  svgL.appendChild(path);
+}
+
+// ── EXPORT / SAVE ──
+function buildJSON() {
+  return {
+    nome: document.getElementById("flowName").value,
+    nos: nodes.map(n => ({
+      id: n.id, tipo: n.type, posicao:{x:Math.round(n.x),y:Math.round(n.y)},
+      dados: n.data
+    })),
+    conexoes: conns.map(c => ({ de: c.from, para: c.to }))
+  };
+}
+
+function exportarJSON() {
+  document.getElementById("jsonOutput").value = JSON.stringify(buildJSON(), null, 2);
+  document.getElementById("modalJSON").classList.add("open");
+}
+function fecharModal() { document.getElementById("modalJSON").classList.remove("open"); }
+function copiarJSON() {
+  navigator.clipboard.writeText(document.getElementById("jsonOutput").value);
+  toast("JSON copiado!");
+}
+function salvarFluxo() {
+  const data = buildJSON();
+  // Salva no localStorage para integração com o caderno
+  const cad = JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}");
+  if (!cad.chat) cad.chat = {};
+  cad.chat.fluxo = data;
+  localStorage.setItem("CONFIG_CADERNO", JSON.stringify(cad));
+  toast("Fluxo salvo com sucesso!");
+}
+function confirmarLimpar() {
+  if (!nodes.length || confirm("Limpar todo o fluxo?")) {
+    nodes=[]; conns=[]; nodesL.innerHTML=""; renderConnections();
+    toast("Fluxo limpo");
+  }
+}
+
+// ── TOAST ──
+function toast(msg, err=false) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (err?" err":"");
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.classList.remove("show"), 2500);
+}
+
+// ── INIT: Start node ──
+addNode("start", 60, 80);
+</script>
+</body>
+</html>
