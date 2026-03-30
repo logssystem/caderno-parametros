@@ -781,14 +781,41 @@ window.confirmarConfiguracao = async function () {
     doc.text(label + ":  " + val, PW / 2, iy, { align: "center" });
     iy += 7;
   });
-  const stats = [
-    { label: "Usuarios", val: String(voz.usuarios?.length  || 0) },
-    { label: "Ramais",   val: String(voz.ramais?.length    || 0) },
-    { label: "Filas",    val: String(voz.filas?.length     || 0) },
-    { label: "URAs",     val: String(voz.uras?.length      || 0) },
-    { label: "Agentes",  val: String(voz.agentes?.length   || 0) },
-    { label: "Chat",     val: dados.chat?.tipo ? "Sim" : "Nao"  },
-  ];
+  // Stats adaptativas: mostra voz se tiver, senão mostra chat
+  const temVozStats = (voz.usuarios?.length || voz.ramais?.length || voz.agentes?.length);
+  const temChatStats = (chat.usuarios?.length || chat.agentes?.length || chat.departamentos?.length);
+  let stats;
+  if (temVozStats && temChatStats) {
+    // Modo ambos — 3 voz + 3 chat
+    stats = [
+      { label: "Usuarios Voz", val: String(voz.usuarios?.length  || 0) },
+      { label: "Ramais",       val: String(voz.ramais?.length    || 0) },
+      { label: "Filas",        val: String(voz.filas?.length     || 0) },
+      { label: "Usu. Chat",    val: String(chat.usuarios?.length || 0) },
+      { label: "Ag. Chat",     val: String(chat.agentes?.length  || 0) },
+      { label: "Depto. Chat",  val: String(chat.departamentos?.length || 0) },
+    ];
+  } else if (temChatStats && !temVozStats) {
+    // Modo chat apenas
+    stats = [
+      { label: "Usuarios",     val: String(chat.usuarios?.length     || 0) },
+      { label: "Agentes",      val: String(chat.agentes?.length      || 0) },
+      { label: "Depto.",       val: String(chat.departamentos?.length || 0) },
+      { label: "Canais",       val: String(chat.canais?.length        || 0) },
+      { label: "Tipo",         val: chat.tipo === "api" ? "API" : chat.tipo === "qr" ? "QR" : "—" },
+      { label: "Chat",         val: "Sim" },
+    ];
+  } else {
+    // Modo voz apenas (padrão original)
+    stats = [
+      { label: "Usuarios", val: String(voz.usuarios?.length  || 0) },
+      { label: "Ramais",   val: String(voz.ramais?.length    || 0) },
+      { label: "Filas",    val: String(voz.filas?.length     || 0) },
+      { label: "URAs",     val: String(voz.uras?.length      || 0) },
+      { label: "Agentes",  val: String(voz.agentes?.length   || 0) },
+      { label: "Chat",     val: dados.chat?.tipo ? "Sim" : "Nao" },
+    ];
+  }
   const N       = stats.length;
   const statsTW = PW - 28;
   const statsX0 = 14;
@@ -848,6 +875,11 @@ window.confirmarConfiguracao = async function () {
   if (voz.pausas?.length)         modulos.push("⏸️   Pausas do Call Center");
   if (voz.pesquisas?.length)      modulos.push("⭐  Pesquisa de Satisfação");
   if (chat.tipo) {
+    modulos.push("💬  Chat / Omnichannel");
+    if (chat.usuarios?.length)      modulos.push("     └─ Usuários do Chat");
+    if (chat.agentes?.length)       modulos.push("     └─ Agentes do Chat");
+    if (chat.departamentos?.length) modulos.push("     └─ Departamentos");
+  } else if (chat.usuarios?.length || chat.agentes?.length || chat.departamentos?.length) {
     modulos.push("💬  Chat / Omnichannel");
     if (chat.usuarios?.length)      modulos.push("     └─ Usuários do Chat");
     if (chat.agentes?.length)       modulos.push("     └─ Agentes do Chat");
@@ -1004,21 +1036,34 @@ window.confirmarConfiguracao = async function () {
       }
     });
   }
-  if (chat.tipo) {
+  const temChat = chat.tipo || chat.usuarios?.length || chat.agentes?.length || chat.departamentos?.length;
+  if (temChat) {
     doc.addPage();
     paginaAtual++;
     pageHeader();
     y = 22;
     y = sectionBar(y, "CHAT / OMNICHANNEL", C.accent2);
-    const tipoLabel = chat.tipo === "qr" ? "Integração via QR Code" : "Integração via API Oficial";
-    const paresChat = [["Tipo", tipoLabel]];
-    if (chat.tipo === "api") {
-      paresChat.push(["API",   chat.api   || "—"]);
-      paresChat.push(["Conta", chat.conta || "—"]);
-    } else {
-      paresChat.push(["Número WhatsApp", chat.conta || "—"]);
+
+    // ── Tipo de integração ──
+    if (chat.tipo) {
+      const tipoLabel = chat.tipo === "qr" ? "Integração via QR Code"
+                      : chat.tipo === "ambos" ? "API Oficial + QR Code"
+                      : "Integração via API Oficial";
+      const paresChat = [["Tipo", tipoLabel]];
+      if (chat.tipo === "api" || chat.tipo === "ambos") {
+        paresChat.push(["API",   chat.api   || "—"]);
+        const contaVal = typeof chat.conta === "object" ? (chat.conta?.api || "—") : (chat.conta || "—");
+        paresChat.push(["Conta", contaVal]);
+      }
+      if (chat.tipo === "qr" || chat.tipo === "ambos") {
+        const numQr = Array.isArray(chat.numero_qr) ? chat.numero_qr.join(", ")
+                    : (typeof chat.conta === "object" ? chat.conta?.qr : chat.conta) || "—";
+        paresChat.push(["Número WhatsApp", numQr]);
+      }
+      y = cardInfo(y, paresChat);
     }
-    y = cardInfo(y, paresChat);
+
+    // ── Canais ──
     if (chat.canais?.length) {
       y = checkY(y, 20);
       setTextC(C.primary);
@@ -1027,26 +1072,32 @@ window.confirmarConfiguracao = async function () {
       y += 4;
       y = chips(y, chat.canais);
     }
+
+    // ── Usuários do chat ──
     if (chat.usuarios?.length) {
       y = checkY(y, 30);
       y = sectionBar(y, "USUARIOS DO CHAT", C.accent2);
-      const cols = [CW*0.25, CW*0.30, CW*0.22, CW*0.23];
-      const rows = chat.usuarios.map(u => [u.nome || "—", u.email || "—", u.senha || "—", u.permissao || "—"]);
-      y = tabelaAutoTable(y, ["Nome","E-mail","Senha","Permissão"], rows, cols);
+      const colsUC = [CW*0.25, CW*0.30, CW*0.22, CW*0.23];
+      const rowsUC = chat.usuarios.map(u => [u.nome || "—", u.email || "—", u.senha || "—", u.permissao || "—"]);
+      y = tabelaAutoTable(y, ["Nome","E-mail","Senha","Permissão"], rowsUC, colsUC);
     }
+
+    // ── Agentes do chat ──
     if (chat.agentes?.length) {
       y = checkY(y, 30);
       y = sectionBar(y, "AGENTES DO CHAT", C.accent2);
-      const cols = [CW*0.45, CW*0.55];
-      const rows = chat.agentes.map(a => [a.nome || "—", (a.departamentos || []).join(", ") || "—"]);
-      y = tabelaAutoTable(y, ["Agente","Departamentos"], rows, cols);
+      const colsAC = [CW*0.45, CW*0.55];
+      const rowsAC = chat.agentes.map(a => [a.nome || "—", (a.departamentos || []).join(", ") || "—"]);
+      y = tabelaAutoTable(y, ["Agente","Departamentos"], rowsAC, colsAC);
     }
+
+    // ── Departamentos ──
     if (chat.departamentos?.length) {
       y = checkY(y, 30);
       y = sectionBar(y, "DEPARTAMENTOS", C.accent2);
-      const cols = [CW*0.45, CW*0.55];
-      const rows = chat.departamentos.map(d => [d.nome || "—", (d.agentes || []).join(", ") || "—"]);
-      y = tabelaAutoTable(y, ["Departamento","Agentes"], rows, cols);
+      const colsDC = [CW*0.45, CW*0.55];
+      const rowsDC = chat.departamentos.map(d => [d.nome || "—", (d.agentes || []).join(", ") || "—"]);
+      y = tabelaAutoTable(y, ["Departamento","Agentes"], rowsDC, colsDC);
     }
   }
   pageFooter();
