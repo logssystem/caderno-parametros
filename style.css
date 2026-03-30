@@ -1962,3 +1962,68 @@ body.light .ura-table td { border-color: #f0f0f0; }
   .toolbar-search { max-width: 100%; }
   .toolbar-controles { width: 100%; justify-content: flex-end; }
 }
+
+/* ======================================================
+   BOTÃO EDITAR SEÇÃO (resumo)
+====================================================== */
+.btn-editar-secao {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  padding: 4px 12px !important;
+  min-height: 28px !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(206,255,0,0.3) !important;
+  background: rgba(206,255,0,0.08) !important;
+  color: #CEFF00 !important;
+  font-size: 11px !important;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+.btn-editar-secao:hover {
+  background: rgba(206,255,0,0.18) !important;
+  border-color: #CEFF00 !important;
+  transform: translateY(-1px);
+}
+body.light .btn-editar-secao {
+  border-color: rgba(90,122,0,0.3) !important;
+  background: rgba(168,204,0,0.08) !important;
+  color: #3a5200 !important;
+}
+body.light .btn-editar-secao:hover {
+  background: rgba(168,204,0,0.18) !important;
+  border-color: #3a5200 !important;
+}
+
+/* ======================================================
+   BOTÕES DE BACKUP (index)
+====================================================== */
+.btn-backup {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px !important;
+  border-radius: 10px !important;
+  border: 1px dashed rgba(99,102,241,0.4) !important;
+  background: rgba(99,102,241,0.08) !important;
+  color: #a5b4fc !important;
+  font-size: 12px !important;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  min-height: 38px !important;
+}
+.btn-backup:hover {
+  background: rgba(99,102,241,0.16) !important;
+  border-color: #818cf8 !important;
+  color: #c7d2fe !important;
+}
+body.light .btn-backup {
+  border-color: rgba(99,102,241,0.3) !important;
+  background: rgba(99,102,241,0.06) !important;
+  color: #4338ca !important;
+}
