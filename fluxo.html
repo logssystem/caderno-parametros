@@ -522,8 +522,8 @@ function getPortPos(nodeId, side, portKey) {
 }
 
 function renderConnections(previewX, previewY) {
-  // Clear existing paths
-  svgL.querySelectorAll("path,line").forEach(e=>e.remove());
+  // Remove apenas path/line/text, preserva <defs> com o marcador de seta
+  svgL.querySelectorAll("path,line,text,g.lbl").forEach(e => e.remove());
 
   conns.forEach(c => {
     const a = getPortPos(c.from, "out", c.portKey);
@@ -537,14 +537,23 @@ function renderConnections(previewX, previewY) {
       const i   = parseInt(c.portKey.replace("opt_","")) + 1;
       const mx  = (a.x + b.x) / 2;
       const my  = (a.y + b.y) / 2 - 8;
+      // Label com fundo para legibilidade
+      const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+      g.setAttribute("class","lbl");
+      const bg = document.createElementNS("http://www.w3.org/2000/svg","rect");
+      bg.setAttribute("x", mx-18); bg.setAttribute("y", my-10);
+      bg.setAttribute("width","36"); bg.setAttribute("height","13");
+      bg.setAttribute("rx","4"); bg.setAttribute("fill","#0a0f1a");
+      bg.setAttribute("opacity","0.85");
       const lbl = document.createElementNS("http://www.w3.org/2000/svg","text");
       lbl.setAttribute("x", mx); lbl.setAttribute("y", my);
       lbl.setAttribute("text-anchor","middle");
-      lbl.setAttribute("font-size","10");
+      lbl.setAttribute("font-size","9");
       lbl.setAttribute("fill","#a78bfa");
       lbl.setAttribute("font-weight","bold");
-      lbl.textContent = `Opção ${i}`;
-      svgL.appendChild(lbl);
+      lbl.textContent = `Op.${i}`;
+      g.appendChild(bg); g.appendChild(lbl);
+      svgL.appendChild(g);
     }
   });
 
@@ -587,42 +596,104 @@ function copiarJSON() {
   navigator.clipboard.writeText(document.getElementById("jsonOutput").value);
   toast("JSON copiado!");
 }
-function salvarFluxo() {
-  const data = buildJSON();
+/* ── ID do fluxo sendo editado (null = novo) ── */
+let _fluxoEditandoId = null;
 
-  // Feedback imediato
-  toast("Gerando imagem do fluxo...");
+/* Inicializa: verifica se veio editar um fluxo existente */
+(function initFluxoEdit() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+  if (!id) return;
+  _fluxoEditandoId = id;
+  // Carrega o fluxo salvo
+  try {
+    const raw = localStorage.getItem("CONFIG_CADERNO");
+    const cad = raw ? JSON.parse(raw) : {};
+    const fluxos = cad.chat?.fluxos || [];
+    const fluxo = fluxos.find(f => f.id === id);
+    if (!fluxo) return;
+    document.getElementById("flowName").value = fluxo.nome || "Fluxo";
+    // Restaura nós e conexões
+    nodes = []; conns = []; nodesL.innerHTML = "";
+    nodeId = 1;
+    if (fluxo.nos) {
+      fluxo.nos.forEach(n => {
+        const novo = { id: n.id, type: n.tipo, x: n.posicao.x, y: n.posicao.y,
+          label: NODE_CFG[n.tipo]?.label || n.tipo, data: n.dados || {} };
+        nodes.push(novo);
+        if (n.id >= nodeId) nodeId = n.id + 1;
+      });
+    }
+    if (fluxo.conexoes) {
+      fluxo.conexoes.forEach(c => conns.push({ from: c.de, to: c.para, portKey: c.portKey || "default" }));
+    }
+    nodes.forEach(n => renderNode(n));
+    renderConnections();
+    toast("Fluxo carregado: " + fluxo.nome);
+  } catch(e) { console.error("Erro ao carregar fluxo:", e); }
+})();
+
+function salvarFluxo() {
+  const nome = document.getElementById("flowName").value.trim() || "Fluxo sem nome";
+  const data = buildJSON();
+  data.nome = nome;
+
+  toast("Gerando imagem...");
 
   capturarImagem().then(img => {
     try {
-      // Lê o CONFIG_CADERNO do localStorage compartilhado
-      const raw = localStorage.getItem("CONFIG_CADERNO");
+      // Lê o caderno — tenta da janela pai primeiro
+      let raw = null;
+      if (window.opener && !window.opener.closed) {
+        try { raw = window.opener.localStorage.getItem("CONFIG_CADERNO"); } catch(e) {}
+      }
+      if (!raw) raw = localStorage.getItem("CONFIG_CADERNO");
       const cad = raw && raw !== "null" ? JSON.parse(raw) : {};
       if (!cad.chat) cad.chat = {};
+      if (!cad.chat.fluxos) cad.chat.fluxos = [];
+
+      // Gera ID se novo
+      const fluxoId = _fluxoEditandoId || ("fluxo_" + Date.now());
+      _fluxoEditandoId = fluxoId;
+
+      // Remove versão antiga se existir
+      cad.chat.fluxos = cad.chat.fluxos.filter(f => f.id !== fluxoId);
+
+      // Adiciona atualizado
+      cad.chat.fluxos.push({
+        id:      fluxoId,
+        nome:    nome,
+        imagem:  img,
+        nos:     data.nos,
+        conexoes: data.conexoes,
+        savedAt: new Date().toISOString()
+      });
+
+      // Mantém compatibilidade com campo único (primeiro fluxo)
       cad.chat.fluxo        = data;
       cad.chat.fluxo_imagem = img;
-      localStorage.setItem("CONFIG_CADERNO", JSON.stringify(cad));
 
-      // Tenta atualizar a janela pai (index.html) se aberta via window.open
+      // Salva em ambos os locais
+      const json = JSON.stringify(cad);
+      localStorage.setItem("CONFIG_CADERNO", json);
       if (window.opener && !window.opener.closed) {
-        try {
-          window.opener.localStorage.setItem("CONFIG_CADERNO", JSON.stringify(cad));
-          console.log("[Fluxo] Sincronizado com janela pai");
-        } catch(e) {
-          console.warn("[Fluxo] Não foi possível sincronizar com janela pai:", e);
-        }
+        try { window.opener.localStorage.setItem("CONFIG_CADERNO", json); } catch(e) {}
       }
 
-      // Verifica se salvou mesmo
-      const check = JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}");
-      if (check.chat?.fluxo) {
-        toast("✓ Fluxo salvo! " + (data.nos?.length||0) + " nós, " + (data.conexoes?.length||0) + " conexões");
-        console.log("[Fluxo] Salvo com sucesso. Imagem:", img ? img.substring(0,50)+"..." : "null");
-      } else {
-        toast("Erro: dados não foram salvos", true);
-      }
+      toast("✓ Fluxo salvo! Voltando ao formulário...");
+
+      // Volta para o formulário após 1.5s
+      setTimeout(() => {
+        if (window.opener && !window.opener.closed) {
+          window.opener.focus();
+          window.close();
+        } else {
+          window.location.href = "index.html";
+        }
+      }, 1500);
+
     } catch(err) {
-      console.error("[Fluxo] Erro ao salvar:", err);
+      console.error("[Fluxo] Erro:", err);
       toast("Erro ao salvar: " + err.message, true);
     }
   });
@@ -785,7 +856,8 @@ function capturarImagem() {
       }
     });
 
-    resolve(cv.toDataURL("image/png"));
+    // Comprime para JPEG 80% para caber no localStorage (PNG pode ser >5MB)
+    resolve(cv.toDataURL("image/jpeg", 0.82));
   });
 }
 
