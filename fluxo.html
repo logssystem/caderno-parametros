@@ -676,21 +676,39 @@ function salvarFluxo() {
       // Salva em ambos os locais
       const json = JSON.stringify(cad);
       localStorage.setItem("CONFIG_CADERNO", json);
+
+      // Salva também na janela pai SE disponível
+      let salvouNaPai = false;
       if (window.opener && !window.opener.closed) {
-        try { window.opener.localStorage.setItem("CONFIG_CADERNO", json); } catch(e) {}
+        try {
+          window.opener.localStorage.setItem("CONFIG_CADERNO", json);
+          salvouNaPai = true;
+          console.log("[Fluxo] Sincronizado com janela pai. Fluxos:", cad.chat.fluxos?.length);
+        } catch(e) {
+          console.warn("[Fluxo] Erro ao sincronizar com pai:", e);
+        }
       }
 
-      toast("✓ Fluxo salvo! Voltando ao formulário...");
+      // Verifica se realmente foi salvo
+      const verifica = JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}");
+      const fluxosSalvos = verifica.chat?.fluxos?.length || 0;
+      toast(`✓ ${f.nome} salvo! (${fluxosSalvos} fluxo${fluxosSalvos!==1?"s":""} no caderno)`);
 
-      // Volta para o formulário após 1.5s
+      // Volta para o formulário após 1.8s
       setTimeout(() => {
         if (window.opener && !window.opener.closed) {
-          window.opener.focus();
-          window.close();
+          // Recarrega a página pai para pegar os fluxos atualizados
+          try {
+            window.opener.location.reload();
+          } catch(e) {}
+          setTimeout(() => {
+            window.opener.focus();
+            window.close();
+          }, 300);
         } else {
           window.location.href = "index.html";
         }
-      }, 1500);
+      }, 1800);
 
     } catch(err) {
       console.error("[Fluxo] Erro:", err);
