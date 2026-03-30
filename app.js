@@ -1461,10 +1461,25 @@ window.explorar = function () {
       if (window.chatState?.conta) chat.conta = window.chatState.conta;
     }
     const modo = localStorage.getItem("modo_atendimento");
-    if ((modo === "chat" || modo === "ambos") && chat) {
+    if (modo === "chat" || modo === "ambos") {
+      if (!chat) chat = {};
       chat.regras_tempo = coletarRegrasTempoChat();
       dados.chat = chat;
     }
+
+    // ── Sempre preserva fluxos e dados extras do chat anterior ──
+    try {
+      const anterior = JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}");
+      if (anterior.chat) {
+        if (!dados.chat) dados.chat = {};
+        // Preserva fluxos
+        if (anterior.chat.fluxos?.length) {
+          dados.chat.fluxos       = anterior.chat.fluxos;
+          dados.chat.fluxo        = anterior.chat.fluxo;
+          dados.chat.fluxo_imagem = anterior.chat.fluxo_imagem;
+        }
+      }
+    } catch(_e) {}
     // JSON gerado — mantido oculto para o cliente
     // mostrarToast só se chamado pelo formulário, não externamente
     if (!window._explorarSilencioso) mostrarToast("JSON gerado com sucesso!");
