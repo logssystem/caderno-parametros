@@ -504,6 +504,23 @@ function renderResumoCompleto() {
     }
 
     // ── Fluxo de Atendimento ─────────────────────────────
+    // ── Regras de Tempo Chat ──────────────────────────────────────────
+    if (chat.regras_tempo?.length) {
+      html += secao("sec-regras-chat", "⏰", "Regras de Tempo (Chat)", chat.regras_tempo.length);
+      html += `<div class="resumo-grid">${chat.regras_tempo.map(r => {
+        const faixas = r.faixas?.length ? r.faixas
+          : (r.hora_inicio ? [{ inicio: r.hora_inicio, fim: r.hora_fim }] : []);
+        return `<div class="resumo-card">
+          <div class="titulo">${r.nome}</div>
+          <div><strong>Dias:</strong> ${(r.dias||[]).join(", ") || "—"}</div>
+          <div style="margin-top:6px">${faixas.map(f =>
+            `<span class="resumo-chip">🕐 ${f.inicio||"--:--"} às ${f.fim||"--:--"}</span>`
+          ).join(" ")}</div>
+        </div>`;
+      }).join("")}</div>`;
+      html += fecharSecao();
+    }
+
     if (chat.fluxo_imagem || chat.fluxo) {
       html += secao("sec-fluxo", "🔀", "Fluxo de Atendimento");
       html += `<div class="resumo-card" style="padding:14px;">`;
