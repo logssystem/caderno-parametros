@@ -560,13 +560,42 @@ function copiarJSON() {
 }
 function salvarFluxo() {
   const data = buildJSON();
+
+  // Feedback imediato
+  toast("Gerando imagem do fluxo...");
+
   capturarImagem().then(img => {
-    const cad = JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}");
-    if (!cad.chat) cad.chat = {};
-    cad.chat.fluxo       = data;
-    cad.chat.fluxo_imagem = img; // base64 PNG
-    localStorage.setItem("CONFIG_CADERNO", JSON.stringify(cad));
-    toast("Fluxo salvo com sucesso!");
+    try {
+      // Lê o CONFIG_CADERNO do localStorage compartilhado
+      const raw = localStorage.getItem("CONFIG_CADERNO");
+      const cad = raw && raw !== "null" ? JSON.parse(raw) : {};
+      if (!cad.chat) cad.chat = {};
+      cad.chat.fluxo        = data;
+      cad.chat.fluxo_imagem = img;
+      localStorage.setItem("CONFIG_CADERNO", JSON.stringify(cad));
+
+      // Tenta atualizar a janela pai (index.html) se aberta via window.open
+      if (window.opener && !window.opener.closed) {
+        try {
+          window.opener.localStorage.setItem("CONFIG_CADERNO", JSON.stringify(cad));
+          console.log("[Fluxo] Sincronizado com janela pai");
+        } catch(e) {
+          console.warn("[Fluxo] Não foi possível sincronizar com janela pai:", e);
+        }
+      }
+
+      // Verifica se salvou mesmo
+      const check = JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}");
+      if (check.chat?.fluxo) {
+        toast("✓ Fluxo salvo! " + (data.nos?.length||0) + " nós, " + (data.conexoes?.length||0) + " conexões");
+        console.log("[Fluxo] Salvo com sucesso. Imagem:", img ? img.substring(0,50)+"..." : "null");
+      } else {
+        toast("Erro: dados não foram salvos", true);
+      }
+    } catch(err) {
+      console.error("[Fluxo] Erro ao salvar:", err);
+      toast("Erro ao salvar: " + err.message, true);
+    }
   });
 }
 
