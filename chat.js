@@ -80,6 +80,11 @@ window.adicionarUsuarioChat = function () {
     agente: chkAgente.checked
   });
 
+  wrap.getNome      = () => nome.value.trim();
+  wrap.getEmail     = () => email.value.trim();
+  wrap.getSenha     = () => senha.value;
+  wrap.getPermissao = () => permissao.value || "";
+
   chkAgente.onchange = gerarAgentesChatAPartirUsuarios;
 
   wrap.append(nome, email, senha, regras, permissao, lbl, del);
@@ -89,7 +94,7 @@ window.adicionarUsuarioChat = function () {
 };
 
 /* =====================================================
-   PROCESSAMENTO CSV – USUÁRIOS CHAT (ROBUSTO)
+   PROCESSAMENTO CSV – USUÁRIOS CHAT
    ===================================================== */
 function processarCSVUsuariosChat(texto) {
   const linhas = texto.replace(/\r/g, "").split("\n").filter(l => l.trim());
@@ -132,7 +137,6 @@ function processarCSVUsuariosChat(texto) {
         });
       }
 
-      // Revalida senha (SE existir função)
       const senhaInput = wrap.querySelector(".campo-senha");
       const regras = wrap.querySelector("div");
       if (senhaInput && typeof window.validarSenha === "function") {
@@ -148,7 +152,7 @@ function processarCSVUsuariosChat(texto) {
 }
 
 /* =====================================================
-   DEPARTAMENTOS CHAT
+   DEPARTAMENTOS CHAT — com filtro de agentes já adicionados
    ===================================================== */
 window.adicionarDepartamentoChat = function () {
   const lista = document.getElementById("listaDepartamentosChat");
@@ -164,6 +168,7 @@ window.adicionarDepartamentoChat = function () {
   const nome = document.createElement("input");
   nome.placeholder = "Nome do departamento";
   nome.style.flex = "1";
+  nome.classList.add("campo-nome");
 
   const btnDel = document.createElement("button");
   btnDel.textContent = "🗑";
@@ -175,6 +180,36 @@ window.adicionarDepartamentoChat = function () {
   const listaAgentes = document.createElement("div");
   listaAgentes.style.marginTop = "8px";
 
+  /* ── Retorna Set com nomes dos agentes já selecionados NESTE departamento ── */
+  function getJaSelecionados() {
+    const set = new Set();
+    listaAgentes.querySelectorAll("select").forEach(s => {
+      if (s.value) set.add(s.value);
+    });
+    return set;
+  }
+
+  /* ── Atualiza TODOS os selects deste departamento excluindo já-selecionados ── */
+  function refreshSelects() {
+    const jaSelected = getJaSelecionados();
+    listaAgentes.querySelectorAll("select").forEach(s => {
+      const valorAtual = s.value;
+      s.innerHTML = `<option value="">Selecione um agente</option>`;
+      document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
+        const nomeAg = a.querySelector(".campo-nome")?.value?.trim();
+        if (!nomeAg) return;
+        /* Mostra se: não está selecionado OU é o valor atual deste select */
+        if (!jaSelected.has(nomeAg) || nomeAg === valorAtual) {
+          const opt = document.createElement("option");
+          opt.value = nomeAg;
+          opt.textContent = nomeAg;
+          s.appendChild(opt);
+        }
+      });
+      s.value = valorAtual;
+    });
+  }
+
   const btnAdd = document.createElement("button");
   btnAdd.textContent = "+ Adicionar agente";
 
@@ -182,27 +217,33 @@ window.adicionarDepartamentoChat = function () {
     const linha = document.createElement("div");
     linha.style.display = "flex";
     linha.style.gap = "6px";
+    linha.style.marginBottom = "6px";
 
     const select = document.createElement("select");
-    select.innerHTML = `<option value="">Selecione um agente</option>`;
 
+    /* Popula excluindo já-selecionados neste departamento */
+    const jaSelected = getJaSelecionados();
+    select.innerHTML = `<option value="">Selecione um agente</option>`;
     document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
-   
-     const nome = a.querySelector(".campo-nome")?.value;
-   
-     if (!nome) return;
-   
-     const opt = document.createElement("option");
-     opt.value = nome;
-     opt.textContent = nome;
-   
-     select.appendChild(opt);
-   
-   });
+      const nomeAg = a.querySelector(".campo-nome")?.value?.trim();
+      if (nomeAg && !jaSelected.has(nomeAg)) {
+        const opt = document.createElement("option");
+        opt.value = nomeAg;
+        opt.textContent = nomeAg;
+        select.appendChild(opt);
+      }
+    });
+
+    /* Ao mudar seleção, atualiza os outros selects */
+    select.onchange = () => refreshSelects();
 
     const del = document.createElement("button");
     del.textContent = "✖";
-    del.onclick = () => linha.remove();
+    del.style.flexShrink = "0";
+    del.onclick = () => {
+      linha.remove();
+      refreshSelects(); /* Agente removido volta aos outros selects */
+    };
 
     linha.append(select, del);
     listaAgentes.appendChild(linha);
@@ -216,6 +257,28 @@ window.adicionarDepartamentoChat = function () {
     return { nome: nome.value.trim(), agentes };
   };
 
+  /* dataset.agentes para compatibilidade com coletarChatDoDOM */
+  Object.defineProperty(wrap, "dataset", {
+    get() {
+      return new Proxy({}, {
+        get(_, key) {
+          if (key === "agentes") {
+            const agentes = [];
+            listaAgentes.querySelectorAll("select").forEach(s => {
+              if (s.value) agentes.push(s.value);
+            });
+            return JSON.stringify(agentes);
+          }
+          return wrap.getAttribute(`data-${key}`);
+        },
+        set(_, key, value) {
+          wrap.setAttribute(`data-${key}`, value);
+          return true;
+        }
+      });
+    }
+  });
+
   wrap.append(listaAgentes, btnAdd);
   lista.appendChild(wrap);
 };
@@ -226,7 +289,6 @@ window.adicionarDepartamentoChat = function () {
 window.coletarChatDoDOM = function () {
 
   const numeroQr = document.getElementById("numeroQr");
-
   let contaFinal = null;
 
   if (numeroQr && numeroQr.value.trim()) {
@@ -246,12 +308,9 @@ window.coletarChatDoDOM = function () {
   };
 
   /* ================= USUÁRIOS ================= */
-
   document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
-
     const d = u.getData?.();
     if (!d?.nome) return;
-
     chat.usuarios.push({
       nome: d.nome,
       email: d.email,
@@ -259,71 +318,40 @@ window.coletarChatDoDOM = function () {
       permissao: d.permissao,
       agente: d.agente
     });
-
   });
 
   /* ================= AGENTES ================= */
-
   document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
-
     const nome = a.querySelector(".campo-nome")?.value;
-
     if (!nome) return;
-
-    chat.agentes.push({
-      nome: nome,
-      departamentos: []
-    });
-
+    chat.agentes.push({ nome, departamentos: [] });
   });
 
   /* ================= DEPARTAMENTOS ================= */
-
   document.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
-
     const dep = d.getData?.();
-
     if (dep?.nome) {
       chat.departamentos.push(dep);
     }
-
   });
 
   /* ================= MAPA AGENTE → DEPARTAMENTO ================= */
-
   const mapa = {};
-
   chat.departamentos.forEach(dep => {
-
     dep.agentes.forEach(a => {
-
       const key = String(a).trim().toLowerCase();
-
-      if (!mapa[key]) {
-        mapa[key] = new Set();
-      }
-
+      if (!mapa[key]) mapa[key] = new Set();
       mapa[key].add(dep.nome);
-
     });
-
   });
 
   chat.agentes = chat.agentes.map(a => {
-
     const key = String(a.nome).trim().toLowerCase();
-
-    return {
-      ...a,
-      departamentos: mapa[key] ? [...mapa[key]] : []
-    };
-
+    return { ...a, departamentos: mapa[key] ? [...mapa[key]] : [] };
   });
 
   console.log("CHAT FINAL:", chat);
-
   return chat;
-
 };
 
 /* =====================================================
@@ -332,14 +360,11 @@ window.coletarChatDoDOM = function () {
 window.acionarImportacaoUsuariosChat = function () {
   const input = document.getElementById("importUsuariosChat");
   if (!input) return;
-
   input.value = "";
   input.click();
-
   input.onchange = () => {
     const file = input.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = e => processarCSVUsuariosChat(e.target.result);
     reader.readAsText(file);
@@ -350,11 +375,11 @@ window.importarUsuariosChat = window.acionarImportacaoUsuariosChat;
 window.processarCSVUsuariosChat = processarCSVUsuariosChat;
 
 console.log("✅ Chat.js carregado e consistente");
+
 /* =====================================================
-   INICIALIZAÇÃO – chamada pelo initCaderno
+   INICIALIZAÇÃO
    ===================================================== */
 window.inicializarChatUI = function () {
-  // Força atualização dos agentes chat a partir das duas fontes
   if (typeof gerarAgentesChatAPartirUsuarios === "function") {
     gerarAgentesChatAPartirUsuarios();
   }
