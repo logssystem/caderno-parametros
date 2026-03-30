@@ -449,7 +449,7 @@ function renderResumoCompleto() {
   }
   // ── Módulo Chat ──────────────────────────────────────
   const chat = dados.chat || {};
-  if (chat.tipo || chat.usuarios?.length || chat.agentes?.length) {
+  if (chat.tipo || chat.usuarios?.length || chat.agentes?.length || chat.fluxo || chat.fluxo_imagem) {
     html += `<div class="modulo-titulo"><h1>💬 Chat / Omnichannel</h1></div>`;
     html += secao("sec-chat-config", "⚙️", "Configuração de Chat");
     if (chat.tipo === "qr") {
@@ -506,18 +506,36 @@ function renderResumoCompleto() {
     // ── Fluxo de Atendimento ─────────────────────────────
     if (chat.fluxo_imagem || chat.fluxo) {
       html += secao("sec-fluxo", "🔀", "Fluxo de Atendimento");
+      html += `<div class="resumo-card" style="padding:14px;">`;
+      // Info header
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <span style="font-size:14px;font-weight:800;color:var(--text)">${chat.fluxo?.nome || "Fluxo de Atendimento"}</span>
+        <span style="font-size:11px;color:var(--text-soft);background:rgba(206,255,0,.08);padding:3px 10px;border-radius:99px;border:1px solid rgba(206,255,0,.2);">
+          ${chat.fluxo?.nos?.length || 0} nós &nbsp;·&nbsp; ${chat.fluxo?.conexoes?.length || 0} conexões
+        </span>
+      </div>`;
       if (chat.fluxo_imagem) {
-        html += `
-          <div class="resumo-card" style="padding:12px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-              <span style="font-size:13px;font-weight:700;color:var(--text)">${(chat.fluxo?.nome || "Fluxo de Atendimento")}</span>
-              <span style="font-size:11px;color:var(--text-soft)">${chat.fluxo?.nos?.length || 0} nós · ${chat.fluxo?.conexoes?.length || 0} conexões</span>
-            </div>
-            <img src="${chat.fluxo_imagem}" style="width:100%;border-radius:10px;border:1px solid var(--border);" alt="Fluxo de Atendimento">
-          </div>`;
+        html += `<img src="${chat.fluxo_imagem}" style="width:100%;border-radius:10px;border:1px solid var(--border);display:block;" alt="Fluxo de Atendimento">`;
       } else {
-        html += `<div class="resumo-card"><span style="color:var(--text-soft);font-size:13px;">Fluxo configurado mas sem imagem. Abra o editor e salve novamente.</span></div>`;
+        html += `<div style="background:rgba(206,255,0,.05);border:1px dashed rgba(206,255,0,.2);border-radius:10px;padding:20px;text-align:center;color:var(--text-soft);font-size:13px;">
+          Fluxo salvo mas sem imagem de prévia.<br>Abra o editor, faça qualquer ajuste e clique em <strong>Salvar Fluxo</strong> novamente.
+          <br><br>
+          <button onclick="window.open('fluxo.html','_blank')" style="background:rgba(206,255,0,.15);border:1px solid rgba(206,255,0,.3);color:#CEFF00;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">
+            🔀 Abrir Editor de Fluxo
+          </button>
+        </div>`;
       }
+      html += `</div>`;
+      html += fecharSecao();
+    } else {
+      // Botão para criar fluxo se não existe ainda
+      html += secao("sec-fluxo", "🔀", "Fluxo de Atendimento");
+      html += `<div class="resumo-card" style="padding:20px;text-align:center;">
+        <p style="font-size:13px;color:var(--text-soft);margin-bottom:14px;">Nenhum fluxo criado ainda.</p>
+        <button onclick="window.open('fluxo.html','_blank')" style="background:linear-gradient(90deg,rgba(206,255,0,.15),rgba(56,189,248,.15));border:1px solid rgba(206,255,0,.3);color:#CEFF00;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">
+          🔀 Criar Fluxo de Atendimento
+        </button>
+      </div>`;
       html += fecharSecao();
     }
   }
