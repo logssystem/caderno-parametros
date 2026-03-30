@@ -1256,44 +1256,109 @@ window.confirmarConfiguracao = async function () {
   }
   pageFooter();
 
-  // ── FLUXO DE ATENDIMENTO NO PDF ───────────────────────
-  // Fluxos no PDF (suporta array e legado)
+  // ── FLUXOS DE ATENDIMENTO NO PDF ─────────────────────
   const _pdfFluxos = chat.fluxos?.length ? chat.fluxos
-    : (chat.fluxo_imagem ? [{ nome: chat.fluxo?.nome || "Fluxo", imagem: chat.fluxo_imagem, nos: chat.fluxo?.nos, conexoes: chat.fluxo?.conexoes }] : []);
+    : (chat.fluxo_imagem ? [{ nome: chat.fluxo?.nome||"Fluxo de Atendimento",
+        imagem: chat.fluxo_imagem, nos: chat.fluxo?.nos, conexoes: chat.fluxo?.conexoes }] : []);
+
+  const NODE_LABEL_PDF = {
+    start:"Inicio", mensagem:"Enviar Mensagem", menu:"Menu de Opcoes",
+    horario:"Regra de Horario", dados:"Solicitar Dados", agente:"Transferir Agente",
+    depto:"Departamento", espera:"Tempo de Espera", finalizar:"Finalizar"
+  };
 
   if (_pdfFluxos.length) {
-    doc.addPage();
-    paginaAtual++;
-    pageHeader();
-    let yf = 22;
-    yf = sectionBar(yf, "FLUXOS DE ATENDIMENTO", C.accent2);
-
     _pdfFluxos.forEach((f, idx) => {
-      yf = checkY(yf, 40);
-      // Cabeçalho do fluxo
-      yf = cardInfo(yf, [
-        ["Fluxo",     f.nome || ("Fluxo " + (idx+1))],
-        ["Nos",       String(f.nos?.length || 0)],
-        ["Conexoes",  String(f.conexoes?.length || 0)],
-      ]);
-      yf += 4;
+      // Página separada para cada fluxo
+      doc.addPage();
+      paginaAtual++;
+      pageHeader();
+      let yf = 22;
 
+      // Barra do fluxo com nome
+      yf = sectionBar(yf, "FLUXO: " + (f.nome || "Fluxo " + (idx+1)).toUpperCase(), C.accent2);
+
+      // Info resumida
+      yf = cardInfo(yf, [
+        ["Nome",     f.nome || "Fluxo " + (idx+1)],
+        ["Nos",      String(f.nos?.length || 0)],
+        ["Conexoes", String(f.conexoes?.length || 0)],
+      ]);
+      yf += 6;
+
+      // ── Imagem do fluxo ──────────────────────────────
       if (f.imagem) {
         try {
           const fmt  = f.imagem.startsWith("data:image/jpeg") ? "JPEG" : "PNG";
-          const maxH = Math.min(PH - yf - 20, CW * 0.55);
-          doc.addImage(f.imagem, fmt, ML, yf, CW, maxH);
+          const maxH = Math.min(PH - yf - 70, 120); // espaço para tabela abaixo
+          doc.addImage(f.imagem, fmt, ML, yf, CW, maxH, undefined, "FAST");
           yf += maxH + 8;
         } catch(e) {
-          console.warn("Erro imagem fluxo PDF:", e);
-          setTextC(C.textSoft); setFont(9, "normal");
-          doc.text("Imagem nao disponivel.", ML, yf + 6);
+          console.warn("Erro imagem fluxo:", e);
+          setTextC(C.textSoft); setFont(9,"normal");
+          doc.text("Imagem nao disponivel.", ML, yf+6);
           yf += 14;
         }
       }
-      yf += 8;
+
+      // ── Tabela de nós com descrição ──────────────────
+      if (f.nos?.length) {
+        yf = checkY(yf, 30);
+
+        // Header da tabela
+        setFill(C.primary);
+        doc.rect(ML, yf, CW, 8, "F");
+        setFill([206,255,0]);
+        doc.rect(ML, yf, 3, 8, "F");
+        setTextC(C.white);
+        setFont(8, "bold");
+        doc.text("TIPO DE NO", ML+6, yf+5.4);
+        doc.text("CONTEUDO / CONFIGURACAO", ML+58, yf+5.4);
+        yf += 8;
+
+        f.nos.forEach((no, i) => {
+          yf = checkY(yf, 10);
+          const tipo  = NODE_LABEL_PDF[no.tipo] || no.tipo || "—";
+          const dados = no.dados || {};
+          let desc = "";
+          if (no.tipo === "mensagem" || no.tipo === "finalizar") desc = dados.text || "";
+          else if (no.tipo === "menu") {
+            desc = (dados.text ? dados.text + " → " : "") +
+                   (dados.opcoes||[]).filter(Boolean).map((o,j)=>`${j+1}. ${o}`).join(" | ");
+          }
+          else if (no.tipo === "horario") desc = dados.horario || "Horario Comercial";
+          else if (no.tipo === "dados")   desc = (dados.campo ? "Campo: "+dados.campo : "") + (dados.text ? " — "+dados.text : "");
+          else if (no.tipo === "agente")  desc = dados.text || "Qualquer agente disponivel";
+          else if (no.tipo === "depto")   desc = dados.text || "Departamento";
+          else if (no.tipo === "espera")  desc = dados.text || "Aguardando resposta";
+          else if (no.tipo === "start")   desc = "Inicio do fluxo";
+          if (!desc) desc = "—";
+
+          const bg = i % 2 === 0 ? C.bgGray : C.white;
+          setFill(bg);
+          doc.rect(ML, yf, CW, 9, "F");
+          setDraw(C.border);
+          doc.setLineWidth(0.25);
+          doc.rect(ML, yf, CW, 9, "S");
+          // Faixa vertical separadora
+          doc.rect(ML+52, yf, 0.4, 9, "S");
+
+          // Tipo
+          setTextC(C.primary);
+          setFont(7.5, "bold");
+          doc.text(tipo, ML+4, yf+6);
+
+          // Descrição
+          setTextC(C.text);
+          setFont(7.5, "normal");
+          const descTxt = desc.length > 120 ? desc.substring(0,120)+"..." : desc;
+          doc.text(descTxt, ML+56, yf+6, { maxWidth: CW-60 });
+          yf += 9;
+        });
+      }
+
+      pageFooter();
     });
-    pageFooter();
   }
 
   // ── NOME DO ARQUIVO COM EMPRESA + DATA ───────────────
