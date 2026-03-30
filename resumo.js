@@ -261,11 +261,36 @@ function renderResumoCompleto() {
   const cli   = dados.cliente || {};
   resumo.innerHTML = "";
   const secoes = []; // para a sidebar
+  // Mapa de secoes para âncoras no formulário principal
+  const _EDIT_MAP = {
+    "sec-cliente":       "#empresaCliente",
+    "sec-usuarios":      "#listaUsuariosWeb",
+    "sec-entradas":      "#listaEntradas",
+    "sec-ramais":        "#listaRings",
+    "sec-agentes":       "#listaAgentes",
+    "sec-regras":        "#listaRegrasTempo",
+    "sec-grupo-ring":    "#listaGrupoRing",
+    "sec-filas":         "#listaFilas",
+    "sec-ura":           "#listaURAs",
+    "sec-pausas":        "#pausasConteudo",
+    "sec-pesquisa":      "#pesquisaSatisfacaoConteudo",
+    "sec-chat-config":   "#modulochat",
+    "sec-chat-usuarios": "#listaUsuariosChat",
+    "sec-chat-agentes":  "#listaAgentesChat",
+    "sec-chat-depto":    "#listaDepartamentosChat",
+  };
+
   function secao(id, icone, titulo, count) {
     secoes.push({ id, icone, nome: titulo, count });
+    const ancora = _EDIT_MAP[id] || "";
+    const btnEdit = ancora
+      ? `<button class="btn-editar-secao" onclick="editarSecao('${ancora}')" title="Editar esta seção">✏️ Editar</button>`
+      : "";
     return `<section class="resumo-bloco" id="${id}">
-      <h2 class="resumo-secao-titulo"><span>${icone}</span> ${titulo}
+      <h2 class="resumo-secao-titulo">
+        <span>${icone}</span> ${titulo}
         ${count ? `<span class="secao-count">${count}</span>` : ""}
+        ${btnEdit}
       </h2>`;
   }
   function fecharSecao() { return `</section>`; }
@@ -486,6 +511,26 @@ function renderResumoCompleto() {
   buildAlertas(dados);
   initBusca();
 }
+/* Baixa backup do JSON a partir do resumo */
+window.baixarBackupDoResumo = function() {
+  const raw = localStorage.getItem("CONFIG_CADERNO");
+  if (!raw || raw === "null") return;
+  try {
+    const dados  = JSON.parse(raw);
+    const emp    = (dados.cliente?.empresa || "caderno").replace(/\s+/g, "-");
+    const data   = new Date().toISOString().slice(0, 10);
+    const blob   = new Blob([JSON.stringify(dados, null, 2)], { type: "application/json" });
+    const url    = URL.createObjectURL(blob);
+    const a      = document.createElement("a");
+    a.href = url; a.download = `backup-${emp}-${data}.json`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+    const t = document.getElementById("toastGlobal");
+    const m = document.getElementById("toastMessage");
+    if (t && m) { m.textContent = "Backup JSON baixado!"; t.className = "toast show"; setTimeout(() => t.classList.remove("show"), 3000); }
+  } catch(e) { console.error("Backup:", e); }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   const raw = localStorage.getItem("CONFIG_CADERNO");
   if (!raw || raw === "null") {
@@ -513,6 +558,13 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 /* ================= VOLTAR ================= */
 window.voltar = function () { window.location.href = "index.html"; };
+
+/* ================= EDITAR SEÇÃO ================= */
+window.editarSecao = function (ancora) {
+  // Salva âncora para scroll automático ao retornar ao index
+  sessionStorage.setItem("CADERNO_EDIT_ANCORA", ancora);
+  window.location.href = "index.html";
+};
 /* =======================================================
    GERAR PDF PROFISSIONAL
 ======================================================= */
