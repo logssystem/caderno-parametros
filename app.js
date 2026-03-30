@@ -1621,6 +1621,73 @@ document.addEventListener("DOMContentLoaded", () => {
   blocoAgentesChat.insertBefore(info, blocoAgentesChat.children[1]);
 });
 
+/* ================= FLUXOS DE ATENDIMENTO ================= */
+window.abrirNovoFluxo = function() {
+  window.open("fluxo.html", "_blank");
+};
+
+window.editarFluxo = function(id) {
+  window.open("fluxo.html?id=" + id, "_blank");
+};
+
+window.excluirFluxo = function(id) {
+  if (!confirm("Excluir este fluxo?")) return;
+  const raw = localStorage.getItem("CONFIG_CADERNO");
+  const cad = raw ? JSON.parse(raw) : {};
+  if (cad.chat?.fluxos) {
+    cad.chat.fluxos = cad.chat.fluxos.filter(f => f.id !== id);
+    // Atualiza fluxo principal se era esse
+    if (cad.chat.fluxo?.id === id || !cad.chat.fluxos.length) {
+      cad.chat.fluxo = cad.chat.fluxos[0] || null;
+      cad.chat.fluxo_imagem = cad.chat.fluxos[0]?.imagem || null;
+    }
+  }
+  localStorage.setItem("CONFIG_CADERNO", JSON.stringify(cad));
+  renderizarFluxosSalvos();
+  mostrarToast("Fluxo excluído");
+};
+
+function renderizarFluxosSalvos() {
+  const container = document.getElementById("listaFluxosSalvos");
+  if (!container) return;
+  const raw = localStorage.getItem("CONFIG_CADERNO");
+  const cad = raw ? JSON.parse(raw) : {};
+  const fluxos = cad.chat?.fluxos || [];
+
+  if (!fluxos.length) {
+    container.innerHTML = "";
+    return;
+  }
+
+  container.innerHTML = fluxos.map(f => `
+    <div style="
+      display:flex;align-items:center;gap:10px;
+      background:rgba(206,255,0,.05);border:1px solid rgba(206,255,0,.15);
+      border-radius:10px;padding:10px 14px;
+    ">
+      <span style="font-size:16px;">🔀</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.nome}</div>
+        <div style="font-size:11px;color:var(--text-soft);">${f.nos?.length||0} nós · ${f.conexoes?.length||0} conexões</div>
+      </div>
+      <button onclick="editarFluxo('${f.id}')" style="
+        padding:6px 12px;border-radius:8px;border:1px solid rgba(206,255,0,.3);
+        background:rgba(206,255,0,.08);color:#CEFF00;font-size:11px;font-weight:700;cursor:pointer;
+        white-space:nowrap;
+      ">✏️ Editar</button>
+      <button onclick="excluirFluxo('${f.id}')" style="
+        padding:6px 10px;border-radius:8px;border:1px solid rgba(239,68,68,.3);
+        background:rgba(239,68,68,.08);color:#fca5a5;font-size:11px;cursor:pointer;
+      ">🗑</button>
+    </div>
+  `).join("");
+}
+
+/* Atualiza lista de fluxos ao carregar dados salvos */
+function _renderizarFluxosAposCarregar() {
+  setTimeout(renderizarFluxosSalvos, 700);
+}
+
 /* ================= REGRAS DE TEMPO – CHAT ================= */
 window.adicionarRegraTempoChat = function () {
   const container = document.getElementById("listaRegrasTempoChat");
@@ -2045,6 +2112,7 @@ function _carregarDadosSalvos() {
   setTimeout(() => {
     syncTudo();
     atualizarTodosDestinosURA();
+    renderizarFluxosSalvos(); // mostra fluxos salvos na lista
   }, 300);
 
   // Passo 2 (700ms): gera agentes de chat (lê checkboxes já marcados)
@@ -2115,6 +2183,11 @@ function _carregarDadosSalvos() {
 
 document.addEventListener("DOMContentLoaded", () => {
   if (typeof window.initCaderno === "function") window.initCaderno();
+
+  // ── Atualiza lista de fluxos quando a janela recebe foco (voltando do editor) ──
+  window.addEventListener("focus", () => {
+    setTimeout(renderizarFluxosSalvos, 300);
+  });
 
   // ── Scroll + destaque ao voltar do resumo (botão Editar) ──
   const ancora = sessionStorage.getItem("CADERNO_EDIT_ANCORA");
