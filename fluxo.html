@@ -863,12 +863,27 @@ wrap.addEventListener("click", e => {
 // ── Lê dados do caderno (localStorage) para preencher selects ──
 function getDadosCaderno() {
   try {
-    // Tenta ler do localStorage da janela pai primeiro (caso aberto via window.open)
-    let raw = null;
+    // 1. Tenta ler direto do DOM da janela pai (dados não salvos ainda)
     if (window.opener && !window.opener.closed) {
-      try { raw = window.opener.localStorage.getItem("CONFIG_CADERNO"); } catch(e) {}
+      try {
+        const explorar = window.opener.window.explorar;
+        if (typeof explorar === "function") {
+          window.opener.window._explorarSilencioso = true;
+          const dados = explorar();
+          window.opener.window._explorarSilencioso = false;
+          if (dados) return dados;
+        }
+      } catch(e) {}
+
+      // 2. Tenta pelo localStorage da janela pai
+      try {
+        const raw = window.opener.localStorage.getItem("CONFIG_CADERNO");
+        if (raw) return JSON.parse(raw);
+      } catch(e) {}
     }
-    if (!raw) raw = localStorage.getItem("CONFIG_CADERNO");
+
+    // 3. Fallback: localStorage local
+    const raw = localStorage.getItem("CONFIG_CADERNO");
     return raw ? JSON.parse(raw) : {};
   } catch(e) { return {}; }
 }
