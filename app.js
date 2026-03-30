@@ -46,15 +46,15 @@ const DUVIDAS = {
         tipo: "lista",
         texto: "Permissões disponíveis e suas funções:",
         itens: [
-          "Administrador do Módulo de PABX: acesso total às configurações de voz (ramais, URA, filas, agentes e regras de tempo).",
+          "Administrador do Módulo de PABX: acesso total às configurações de voz.",
           "Agente: utilizado para usuários que realizam atendimento telefônico.",
           "Supervisor: pode acompanhar Agentes de call center e Ramais administrativos.",
           "CRM: acesso ao módulo de CRM, sem permissões administrativas.",
           "CRM Owner: acesso total ao módulo de CRM.",
-          "Administrador do Módulo de Omnichannel: acesso total às configurações de chat e canais digitais.",
+          "Administrador do Módulo de Omnichannel: acesso total às configurações de chat.",
           "Agente Omnichannel: utilizado para usuários que realizam atendimento via chat.",
           "Supervisor(a) Omnichannel: pode acompanhar agentes e atendimentos do chat.",
-          "Super Administrador: acesso total a todos os módulos e configurações do sistema."
+          "Super Administrador: acesso total a todos os módulos."
         ]
       },
       { tipo: "alerta", texto: "Evite conceder permissão de Administrador para usuários que não são responsáveis técnicos." },
@@ -162,7 +162,6 @@ window.abrirModalDuvidas = function () {
   const overlay = document.getElementById("modalDuvidasOverlay");
   if (!overlay) return;
   renderizarBotoesCategorias();
-  // reseta conteúdo para placeholder
   const corpo = document.getElementById("conteudoDuvida");
   if (corpo) {
     corpo.innerHTML = `
@@ -219,7 +218,6 @@ function renderizarDuvidas(chave) {
   });
 }
 
-// compatibilidade com chamadas antigas
 window.toggleDuvidas = window.abrirModalDuvidas;
 
 /* ================= DADOS DO CLIENTE ================= */
@@ -240,7 +238,7 @@ window.validarDominioCliente = function () {
 if (dominioInput) {
     dominioInput.addEventListener("input", window.validarDominioCliente);
 }
-// Listener CNPJ/CPF unificado — ver bloco melhorarDocumento() abaixo
+
 /* ================= ADICIONAR CAMPO ================= */
 window.adicionarCampo = function (tipo) {
     if (tipo === "agente") {
@@ -257,6 +255,7 @@ window.adicionarCampo = function (tipo) {
     atualizarTodosDestinosURA();
     syncTudo();
 };
+
 /* ================= PESQUISA DE SATISFAÇÃO ================= */
 function togglePesquisaSatisfacao() {
   const bloco = document.getElementById("pesquisaSatisfacaoConteudo");
@@ -284,6 +283,7 @@ function criarRespostaPesquisa() {
   wrap.append(nota, descricao, del);
   return wrap;
 }
+
 /* ================= PAUSAS DO CALL CENTER ================= */
 function togglePausas() {
   const bloco = document.getElementById("pausasConteudo");
@@ -319,6 +319,7 @@ function criarPausa() {
   wrap.append(nome, timeout, del);
   return wrap;
 }
+
 /* ================= DESTINOS URA ================= */
 function atualizarDestinosURA(select) {
   if (!select) return;
@@ -348,6 +349,7 @@ function atualizarTodosDestinosURA() {
         select.value = atual;
     });
 }
+
 /* ================= CRIAR CAMPO ================= */
 function ramalJaExiste(valor, atual) {
     let existe = false;
@@ -440,6 +442,7 @@ function criarCampo(tipo) {
         wrap.append(regras);
         senhaInput.oninput = () => validarSenha(senhaInput, regras);
     }
+
     /* ===== RAMAL ===== */
     if (tipo === "ring") {
         nome.style.width = "260px";
@@ -502,6 +505,7 @@ function criarCampo(tipo) {
         senhaInput.oninput = () => validarSenha(senhaInput, regras);
         wrap.append(infoRamal);
     }
+
     /* ===== URA ===== */
     if (tipo === "ura") {
         const msg = document.createElement("textarea");
@@ -510,44 +514,57 @@ function criarCampo(tipo) {
         wrap.append(msg);
         const secOpcoes = document.createElement("div");
         secOpcoes.style.marginTop = "14px";
-
         const titulo = document.createElement("div");
         titulo.innerHTML = "⌨️ <strong>Opções da URA</strong>";
         titulo.style.cssText = "font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-soft)";
         secOpcoes.append(titulo);
-
-        // Header das colunas
         const hdr = document.createElement("div");
         hdr.className = "ura-opcoes-header";
         hdr.innerHTML = "<span>Tecla</span><span>Destino</span><span>Descrição</span><span></span>";
         secOpcoes.append(hdr);
-
         const listaOpcoes = document.createElement("div");
         secOpcoes.append(listaOpcoes);
-
         const btnNova = document.createElement("button");
         btnNova.innerHTML = "+ Nova opção";
         btnNova.className = "btn-add-faixa";
-        btnNova.style.cssText = "";
         btnNova.onclick = () => listaOpcoes.appendChild(criarOpcaoURA());
         secOpcoes.append(btnNova);
         wrap.append(secOpcoes);
     }
-    /* ===== FILA ===== */
+
+    /* ===== FILA — com filtro de agentes já adicionados ===== */
     if (tipo === "fila") {
         const titulo = document.createElement("h4");
         titulo.textContent = "Agentes da fila";
         titulo.style.marginTop = "12px";
         wrap.append(titulo);
+
         const select = document.createElement("select");
         select.innerHTML = `<option value="">Selecione um agente</option>`;
         wrap.append(select);
+
         const btnAdd = document.createElement("button");
         btnAdd.textContent = "Adicionar agente";
         wrap.append(btnAdd);
+
         const lista = document.createElement("div");
         wrap.append(lista);
         wrap.dataset.agentes = "[]";
+
+        /* Reconstrói o select excluindo quem já foi adicionado */
+        function refreshSelect() {
+            const jaAdicionados = JSON.parse(wrap.dataset.agentes);
+            select.innerHTML = `<option value="">Selecione um agente</option>`;
+            document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+                const nomeA = a.querySelector(".campo-nome")?.value;
+                const ramal = a.getRamal ? a.getRamal() : "";
+                if (nomeA && !jaAdicionados.includes(nomeA)) {
+                    const label = ramal ? `${nomeA} (${ramal})` : `${nomeA} (sem ramal)`;
+                    select.add(new Option(label, nomeA));
+                }
+            });
+        }
+
         btnAdd.onclick = () => {
             if (!select.value) return;
             const arr = JSON.parse(wrap.dataset.agentes);
@@ -555,6 +572,7 @@ function criarCampo(tipo) {
             wrap.dataset.agentes = JSON.stringify(arr);
             render();
         };
+
         function render() {
             lista.innerHTML = "";
             JSON.parse(wrap.dataset.agentes).forEach((a, i) => {
@@ -566,13 +584,18 @@ function criarCampo(tipo) {
                     const arr = JSON.parse(wrap.dataset.agentes);
                     arr.splice(i, 1);
                     wrap.dataset.agentes = JSON.stringify(arr);
-                    render();
+                    render(); // render já chama refreshSelect
                 };
                 d.append(x);
                 lista.append(d);
             });
+            refreshSelect(); // ← atualiza select após cada render
         }
+
+        /* Expõe para atualizarSelectAgentesFila */
+        wrap.refreshFilaSelect = refreshSelect;
     }
+
     /* ===== GRUPO DE RING ===== */
     if (tipo === "grupo_ring") {
         const estr = document.createElement("select");
@@ -618,6 +641,7 @@ function criarCampo(tipo) {
             });
         }
     }
+
     /* ===== NÚMERO DE ENTRADA ===== */
     if (tipo === "entrada") {
         nome.placeholder = "Ex: (11) 3000-1000 ou (11) 99999-0000";
@@ -627,7 +651,6 @@ function criarCampo(tipo) {
         feedbackEl.className = "entrada-feedback";
         wrap.append(feedbackEl);
 
-        // DDDs válidos no Brasil
         const DDDS_VALIDOS = new Set([
             11,12,13,14,15,16,17,18,19,
             21,22,24,27,28,
@@ -651,26 +674,18 @@ function criarCampo(tipo) {
         function validarEntrada(val) {
             const digits = val.replace(/\D/g, "");
             if (!digits) return { ok: null, msg: "" };
-
             const ddd    = parseInt(digits.slice(0, 2), 10);
             const numero = digits.slice(2);
-
             if (digits.length < 10)
                 return { ok: false, msg: "Número incompleto — mínimo 10 dígitos com DDD" };
             if (digits.length > 11)
                 return { ok: false, msg: "Número muito longo — máximo 11 dígitos com DDD" };
             if (!DDDS_VALIDOS.has(ddd))
                 return { ok: false, msg: `DDD ${ddd} inválido — não existe no Brasil` };
-
-            // Celular: 11 dígitos, começa com 9
             if (digits.length === 11 && numero[0] !== "9")
                 return { ok: false, msg: "Celular com 11 dígitos deve começar com 9" };
-
-            // Fixo: 10 dígitos, começa com 2-5
             if (digits.length === 10 && !["2","3","4","5"].includes(numero[0]))
                 return { ok: false, msg: "Fixo com 10 dígitos deve começar com 2, 3, 4 ou 5" };
-
-            // Número 0800/especial (começam com 0)
             const tipo_num = digits.length === 11 ? "Celular" : "Fixo";
             return { ok: true, msg: `✓ ${tipo_num} — DDD ${ddd} válido` };
         }
@@ -719,28 +734,21 @@ function criarCampo(tipo) {
     wrap.isAgenteOmni = () => chkAgenteOmni ? chkAgenteOmni.checked : false;
     return wrap;
 }
+
 /* ================= OPÇÃO URA ================= */
 function criarOpcaoURA() {
     const wrap = document.createElement("div");
     wrap.className = "opcao-ura-row";
-
-    // Número da tecla (pequeno)
     const tecla = document.createElement("input");
     tecla.placeholder = "Tecla";
     tecla.className = "ura-tecla";
     tecla.maxLength = 2;
-
-    // Select de destino
     const destino = document.createElement("select");
     destino.className = "ura-destino";
     atualizarDestinosURA(destino);
-
-    // Descrição
     const desc = document.createElement("input");
     desc.placeholder = "Descrição (ex: Suporte, Financeiro)";
     desc.className = "ura-desc";
-
-    // Botão remover
     const del = document.createElement("button");
     del.innerHTML = "✕";
     del.className = "ura-del";
@@ -750,16 +758,15 @@ function criarOpcaoURA() {
         wrap.style.transform = "translateX(8px)";
         setTimeout(() => wrap.remove(), 180);
     };
-
     wrap.append(tecla, destino, desc, del);
     return wrap;
 }
+
 /* ================= AGENTES AUTOMÁTICOS ================= */
 function gerarAgentesAPartirUsuarios() {
     const listaAgentes = document.getElementById("listaAgentes");
     if (!listaAgentes) return;
 
-    // Salva ramal E multiskill de cada agente antes de recriar
     const estadoSalvo = {};
     listaAgentes.querySelectorAll(".campo-descricao").forEach(a => {
         const nome = a.querySelector(".campo-nome")?.value;
@@ -787,23 +794,19 @@ function gerarAgentesAPartirUsuarios() {
         linha.append(nomeInput);
         wrap.append(linha);
 
-        // Select de ramal
         const selectRamal = document.createElement("select");
         selectRamal.innerHTML = `<option value="">Ramal (obrigatório)</option>`;
         document.querySelectorAll("#listaRings .campo-descricao").forEach(r => {
             if (r.getNome()) selectRamal.add(new Option(r.getNome(), r.getNome()));
         });
 
-        // Restaura ramal salvo
         const salvo = estadoSalvo[u.getNome()];
         if (salvo?.ramal) selectRamal.value = salvo.ramal;
         wrap.append(selectRamal);
 
-        // Botão multiskill
         const btnMultiskill = document.createElement("button");
         btnMultiskill.textContent    = "Multiskill";
         btnMultiskill.className      = "btn-multiskill";
-        // Restaura estado multiskill salvo
         const multiskillAtivo = salvo?.multiskill === true;
         btnMultiskill.dataset.ativo  = multiskillAtivo.toString();
         if (multiskillAtivo) btnMultiskill.classList.add("ativo");
@@ -820,27 +823,22 @@ function gerarAgentesAPartirUsuarios() {
         listaAgentes.append(wrap);
     });
 }
+
 function gerarAgentesChatAPartirUsuarios() {
     const lista = document.getElementById("listaAgentesChat");
     if (!lista) return;
 
-    const modo = localStorage.getItem("modo_atendimento");
+    const agentesEncontrados = new Map();
 
-    // Coleta agentes de TODAS as fontes possíveis
-    const agentesEncontrados = new Map(); // nome -> true (dedup)
-
-    // Fonte 1: usuários web marcados como omni (modo ambos)
     document.querySelectorAll("#listaUsuariosWeb .campo-descricao").forEach(u => {
         const nome    = u.querySelector(".campo-nome")?.value?.trim();
         const chkOmni = u.querySelector(".checkbox-omni");
         if (chkOmni && chkOmni.checked && nome) agentesEncontrados.set(nome, true);
     });
 
-    // Fonte 2: usuários do chat marcados como agente (modo chat)
     document.querySelectorAll("#listaUsuariosChat .campo-descricao").forEach(u => {
         const nome = u.querySelector(".campo-nome")?.value?.trim();
         const chk  = u.querySelector("input[type=checkbox]");
-        // Evita duplicar quem já veio da fonte 1
         if (chk && chk.checked && nome && !agentesEncontrados.has(nome)) {
             agentesEncontrados.set(nome, true);
         }
@@ -862,24 +860,31 @@ function gerarAgentesChatAPartirUsuarios() {
         lista.appendChild(wrap);
     });
 }
+
 /* ================= SELECTS DINÂMICOS ================= */
 function atualizarSelectAgentesFila() {
     document.querySelectorAll("#listaFilas .campo-descricao").forEach(fila => {
-        const select = fila.querySelector("select");
-        if (!select) return;
-        const atual = select.value;
-        select.innerHTML = `<option value="">Selecione um agente</option>`;
-        document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
-            const nome  = a.querySelector(".campo-nome")?.value;
-            const ramal = a.getRamal ? a.getRamal() : "";
-            if (nome) {
-                const label = ramal ? `${nome} (${ramal})` : `${nome} (sem ramal)`;
-                select.add(new Option(label, nome));
-            }
-        });
-        select.value = atual;
+        /* Usa refreshFilaSelect se disponível (mantém filtro de já-adicionados) */
+        if (typeof fila.refreshFilaSelect === "function") {
+            fila.refreshFilaSelect();
+        } else {
+            const select = fila.querySelector("select");
+            if (!select) return;
+            const atual = select.value;
+            select.innerHTML = `<option value="">Selecione um agente</option>`;
+            document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+                const nome  = a.querySelector(".campo-nome")?.value;
+                const ramal = a.getRamal ? a.getRamal() : "";
+                if (nome) {
+                    const label = ramal ? `${nome} (${ramal})` : `${nome} (sem ramal)`;
+                    select.add(new Option(label, nome));
+                }
+            });
+            select.value = atual;
+        }
     });
 }
+
 function atualizarSelectRamaisGrupo() {
     document.querySelectorAll("#listaGrupoRing .campo-descricao").forEach(g => {
         const s = g.querySelectorAll("select")[1];
@@ -892,6 +897,7 @@ function atualizarSelectRamaisGrupo() {
         s.value = atual;
     });
 }
+
 /* ================= REGRA DE TEMPO ================= */
 window.adicionarRegraTempo = function () {
     const container = document.getElementById("listaRegrasTempo");
@@ -903,23 +909,18 @@ window.adicionarRegraTempo = function () {
 function criarFaixaHoraria() {
     const row = document.createElement("div");
     row.className = "faixa-horaria-row";
-
     const label = document.createElement("span");
     label.className = "faixa-label";
     label.textContent = "Das";
-
     const inicio = document.createElement("input");
     inicio.type = "time";
     inicio.className = "faixa-time";
-
     const sep = document.createElement("span");
     sep.className = "faixa-sep";
     sep.textContent = "às";
-
     const fim = document.createElement("input");
     fim.type = "time";
     fim.className = "faixa-time";
-
     const del = document.createElement("button");
     del.innerHTML = "✕";
     del.className = "faixa-del";
@@ -929,7 +930,6 @@ function criarFaixaHoraria() {
         row.style.opacity = "0";
         setTimeout(() => row.remove(), 180);
     };
-
     row.append(label, inicio, sep, fim, del);
     row.getHorario = () => ({ inicio: inicio.value, fim: fim.value });
     return row;
@@ -938,8 +938,6 @@ function criarFaixaHoraria() {
 function criarRegraTempo() {
     const wrap = document.createElement("div");
     wrap.className = "campo-descricao regra-tempo-card";
-
-    // Cabeçalho
     const linhaTopo = document.createElement("div");
     linhaTopo.className = "linha-principal";
     const nome = document.createElement("input");
@@ -956,7 +954,6 @@ function criarRegraTempo() {
     linhaTopo.append(nome, btnDel);
     wrap.append(linhaTopo);
 
-    // Dias da semana
     const diasSemana = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
     const diasCompletos = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
     const diasSelecionados = new Set();
@@ -979,7 +976,6 @@ function criarRegraTempo() {
         diasBox.appendChild(btnDia);
     });
 
-    // Atalhos rápidos
     const atalhos = document.createElement("div");
     atalhos.className = "dias-atalhos";
     const atalhosList = [
@@ -1006,7 +1002,6 @@ function criarRegraTempo() {
 
     wrap.append(diasBox, atalhos);
 
-    // Faixas de horário
     const faixasLabel = document.createElement("div");
     faixasLabel.className = "faixas-titulo";
     faixasLabel.innerHTML = "🕐 Faixas de horário";
@@ -1023,7 +1018,6 @@ function criarRegraTempo() {
 
     wrap.append(faixasLabel, faixasContainer, btnAddFaixa);
 
-    // getData retorna múltiplas faixas
     wrap.getData = () => {
         const faixas = [];
         faixasContainer.querySelectorAll(".faixa-horaria-row").forEach(r => {
@@ -1032,7 +1026,6 @@ function criarRegraTempo() {
                 if (h.inicio || h.fim) faixas.push(h);
             }
         });
-        // Compatibilidade: hora_inicio/hora_fim = primeira faixa
         const primeira = faixas[0] || {};
         return {
             nome:        nome.value,
@@ -1044,6 +1037,7 @@ function criarRegraTempo() {
     };
     return wrap;
 }
+
 /* ================= RANGE RAMAIS ================= */
 window.criarRangeRamais = function () {
     const ini = parseInt(ramalInicio.value.replace(/\D/g, ""), 10);
@@ -1066,6 +1060,7 @@ window.criarRangeRamais = function () {
     syncTudo();
     mostrarToast("Ramais criados com sucesso");
 };
+
 /* ================= COLETAS ================= */
 function coletarPausas() {
   const container = document.getElementById("pausasConteudo");
@@ -1104,7 +1099,6 @@ function coletarURAs() {
     const nome     = ura.querySelector(".campo-nome")?.value || "";
     const mensagem = ura.querySelector("textarea")?.value    || "";
     const opcoes   = [];
-    // Suporta tanto .opcao-ura-row (novo) quanto .opcao-ura (legado)
     ura.querySelectorAll(".opcao-ura-row, .opcao-ura").forEach(o => {
       const tecla   = o.querySelector(".ura-tecla,   input:first-child")?.value   || "";
       const destino = o.querySelector(".ura-destino, select")?.value               || "";
@@ -1133,26 +1127,21 @@ function coletarEntradas() {
   });
   return entradas;
 }
+
 /* ================= CHAT – COLETA FINAL ================= */
 window.coletarChatDoDOM = function () {
   const tiposAtivos = window._tiposAtivos || new Set();
-
-  // Conta: API usa chatState.conta, QR usa o input
   let contaApi = window.chatState?.conta || null;
   const numerosQr = (window.chatState?.numeros_qr || []).filter(Boolean);
   let contaQr = numerosQr.length ? (numerosQr.length === 1 ? numerosQr[0] : numerosQr) : null;
-
-  // Define conta final baseada nos tipos ativos
   let contaFinal = null;
   if (tiposAtivos.has("api") && tiposAtivos.has("qr")) {
-    // Ambos: salva objeto com as duas contas
     contaFinal = { api: contaApi, qr: contaQr };
   } else if (tiposAtivos.has("qr")) {
     contaFinal = contaQr;
   } else {
     contaFinal = contaApi;
   }
-
   const chat = {
     tipo:          window.chatState?.tipo  || null,
     api:           window.chatState?.api   || null,
@@ -1176,6 +1165,7 @@ window.coletarChatDoDOM = function () {
   });
   return chat;
 };
+
 /* ================= MOTOR ================= */
 function syncTudo() {
     gerarAgentesAPartirUsuarios();
@@ -1186,21 +1176,12 @@ function syncTudo() {
 }
 document.addEventListener("input",  e => { if (e.target.closest(".campo-descricao")) syncTudo(); });
 document.addEventListener("change", e => { if (e.target.closest(".campo-descricao")) syncTudo(); });
+
 /* ================= TEMPLATE CSV ================= */
 window.baixarTemplateUsuarios = function () {
   const csv = [
     "usuario;email;senha;permissao;agente;;;;permissoes_validas",
-    "teste;teste@empresa.com;Senha@12345;Agente de Call Center;sim",
-    "",
-    ";;;;;;;;Administrador do Modulo de PABX",
-    ";;;;;;;;Agente de Call Center",
-    ";;;;;;;;Supervisor(a) de Call Center",
-    ";;;;;;;;CRM",
-    ";;;;;;;;CRM Owner",
-    ";;;;;;;;Administrador do Modulo de Omnichannel",
-    ";;;;;;;;Agente Omnichannel",
-    ";;;;;;;;Supervisor(a) Omnichannel",
-    ";;;;;;;;Super Administrador"
+    "teste;teste@empresa.com;Senha@12345;Agente de Call Center;sim"
   ].join("\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url  = URL.createObjectURL(blob);
@@ -1218,6 +1199,7 @@ window.baixarTemplateRamais = function () {
   document.body.appendChild(a); a.click();
   document.body.removeChild(a); URL.revokeObjectURL(url);
 };
+
 /* ================= IMPORTAÇÃO CSV ================= */
 window.acionarImportacao = function (tipo) {
     const input = document.getElementById(tipo === "usuario_web" ? "importUsuarios" : "importRamais");
@@ -1263,6 +1245,7 @@ function processarCSV(tipo, texto) {
     syncTudo();
     mostrarToast("CSV importado com sucesso!");
 }
+
 function mostrarToast(msg, error = false) {
     const t = document.getElementById("toastGlobal");
     const m = document.getElementById("toastMessage");
@@ -1271,6 +1254,7 @@ function mostrarToast(msg, error = false) {
     t.className = "toast show" + (error ? " error" : "");
     setTimeout(() => t.classList.remove("show"), 3000);
 }
+
 /* ================= SALVAR / EXPLORAR ================= */
 window.explorar = function () {
   try {
@@ -1338,75 +1322,59 @@ window.explorar = function () {
     return null;
   }
 };
+
 /* ================= CHAT – TIPO / API / CONTA / CANAL ================= */
-/* ── Tipos ativos: Set que pode ter "api", "qr" ou ambos ── */
 window._tiposAtivos = window._tiposAtivos || new Set();
 
 function _atualizarBlocosTipo() {
   const s     = window._tiposAtivos;
   const apiBox = document.getElementById("api-oficial");
   const qrBox  = document.getElementById("chat-qr");
-
   if (apiBox) apiBox.style.display = s.has("api") ? "block" : "none";
   if (qrBox)  qrBox.style.display  = s.has("qr")  ? "block" : "none";
-
-  // Atualiza chatState.tipo
   window.chatState = window.chatState || {};
   if (s.has("api") && s.has("qr")) window.chatState.tipo = "ambos";
   else if (s.has("api"))            window.chatState.tipo = "api";
   else if (s.has("qr"))             window.chatState.tipo = "qr";
   else                              window.chatState.tipo = null;
-
-  // Se API foi removida, esconde fornecedor/conta/canais
   if (!s.has("api")) {
     const bc = document.getElementById("bloco-conta-api");
     const ca = document.getElementById("chat-canais");
     if (bc) bc.style.display = "none";
     if (ca) ca.style.display = "none";
   }
-
 }
 
 window.toggleTipoChat = function (el, tipo) {
   window.chatState = window.chatState || {};
   window._tiposAtivos = window._tiposAtivos || new Set();
-
   if (window._tiposAtivos.has(tipo)) {
-    // Deselecionar
     window._tiposAtivos.delete(tipo);
     if (el) el.classList.remove("active");
   } else {
-    // Selecionar
     window._tiposAtivos.add(tipo);
     if (el) el.classList.add("active");
   }
-
   _atualizarBlocosTipo();
 };
 
-/* Compatibilidade com chamadas antigas */
 window.selecionarTipoChat = function (el, tipo) {
   window.toggleTipoChat(el, tipo);
 };
-/* ── LISTA DE NÚMEROS QR ── */
+
 window.adicionarNumeroQr = function () {
   const lista = document.getElementById("listaNumeroQr");
   if (!lista) return;
-
   const row = document.createElement("div");
   row.className = "qr-numero-row";
-
   const input = document.createElement("input");
   input.placeholder  = "Ex: (11) 99999-9999";
   input.inputMode    = "numeric";
   input.className    = "qr-numero-input campo-nome";
-
-  // Formata e valida igual ao campo de entrada
   input.addEventListener("input", () => {
     if (typeof formatarTelefone === "function") formatarTelefone(input);
     _sincronizarNumerosQr();
   });
-
   const del = document.createElement("button");
   del.innerHTML = "✕";
   del.className = "faixa-del";
@@ -1416,7 +1384,6 @@ window.adicionarNumeroQr = function () {
     row.style.opacity = "0";
     setTimeout(() => { row.remove(); _sincronizarNumerosQr(); }, 180);
   };
-
   row.append(input, del);
   lista.appendChild(row);
   input.focus();
@@ -1431,12 +1398,10 @@ function _sincronizarNumerosQr() {
   });
   window.chatState = window.chatState || {};
   window.chatState.numeros_qr = numeros;
-  window.chatState.conta = numeros[0] || null; // compatibilidade
+  window.chatState.conta = numeros[0] || null;
 }
 
-// Inicializa com 1 campo quando o bloco QR é exibido
 document.addEventListener("DOMContentLoaded", () => {
-  // Observa quando o bloco chat-qr é exibido pela primeira vez
   const qrBox = document.getElementById("chat-qr");
   if (!qrBox) return;
   const obs = new MutationObserver(() => {
@@ -1449,6 +1414,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   obs.observe(qrBox, { attributes: true, attributeFilter: ["style"] });
 });
+
 window.selecionarApi = function (el, api) {
     window.chatState = window.chatState || {};
     window.chatState.api = api;
@@ -1485,8 +1451,6 @@ function salvarConfiguracao() {
   window.location.href = "resumo.html";
 }
 function atualizarModuloChat() {
-    // modulochat (usuários, agentes, departamentos) NUNCA some
-    // ele é controlado apenas pelo modo (chat/ambos), não pelo tipo de integração
     const moduloChat = document.getElementById("modulochat");
     if (!moduloChat) return;
     const modo = localStorage.getItem("modo_atendimento");
@@ -1503,11 +1467,13 @@ document.addEventListener("DOMContentLoaded", () => {
   info.textContent = "ℹ️ Os agentes omnichannel são gerados automaticamente a partir dos usuários marcados como agente.";
   blocoAgentesChat.insertBefore(info, blocoAgentesChat.children[1]);
 });
+
 /* ================= PAUSAS E PESQUISA ================= */
 window.togglePausas             = togglePausas;
 window.adicionarPausa           = adicionarPausa;
 window.togglePesquisaSatisfacao = togglePesquisaSatisfacao;
 window.adicionarRespostaPesquisa = adicionarRespostaPesquisa;
+
 /* ================= MODO ESCURO ================= */
 (function initTema() {
   const btn       = document.querySelector(".theme-toggle");
@@ -1528,6 +1494,7 @@ window.adicionarRespostaPesquisa = adicionarRespostaPesquisa;
     });
   }
 })();
+
 function bloquearLetrasRamalRange() {
   const inicio = document.getElementById("ramalInicio");
   const fim    = document.getElementById("ramalFim");
@@ -1547,27 +1514,19 @@ document.addEventListener("keydown", e => {
   if (e.ctrlKey && e.shiftKey && e.key === "J") e.preventDefault();
   if (e.ctrlKey && e.key === "U") e.preventDefault();
 });
+
 /* ================= INIT GLOBAL ================= */
 window.initCaderno = function () {
   window.chatState = window.chatState || { tipo: null, api: null, conta: null, canais: [], usuarios: [], agentes: [], departamentos: [] };
   const modo = localStorage.getItem("modo_atendimento");
   const modoValido = modo === "voz" || modo === "chat" || modo === "ambos";
-
-  // Só interfere na exibição se o modo estiver definido
-  // Se não tiver modo, intro.js já cuida de mostrar a tela de início
   if (!modoValido) return;
-
   const cardUsuariosOmni = document.getElementById("cardUsuariosOmni");
   if (cardUsuariosOmni) cardUsuariosOmni.style.display = modo === "chat" ? "block" : "none";
-
   const fn = typeof mostrarApp === "function" ? mostrarApp : window.mostrarApp;
   if (fn) fn(modo);
-
-  // Aguarda DOM estável antes de inicializar chat e sincronizar
   setTimeout(() => {
-    // Garante modulochat visível antes de qualquer sync
     atualizarModuloChat();
-
     if (modo === "chat" || modo === "ambos") {
       if (typeof window.inicializarChatUI === "function") window.inicializarChatUI();
     }
@@ -1580,11 +1539,10 @@ window.initCaderno = function () {
 document.addEventListener("DOMContentLoaded", () => {
   if (typeof window.initCaderno === "function") window.initCaderno();
 });
+
 /* ======================================================
    MELHORIAS DE VALIDAÇÃO – v2
 ====================================================== */
-
-/* ---------- CNPJ real ---------- */
 window.validarCNPJReal = function(cnpj) {
   cnpj = cnpj.replace(/\D/g, "");
   if (cnpj.length !== 14) return false;
@@ -1601,11 +1559,10 @@ window.validarCNPJReal = function(cnpj) {
   return calc(12) && calc(13);
 };
 
-/* ---------- CPF real ---------- */
 window.validarCPFReal = function(cpf) {
   cpf = cpf.replace(/\D/g, "");
   if (cpf.length !== 11) return false;
-  if (/^(\d)+$/.test(cpf)) return false;
+  if (/^(\d)+$/.test(cpf)) return false;
   const calc = (len) => {
     let sum = 0;
     for (let i = 0; i < len; i++) sum += parseInt(cpf[i]) * (len + 1 - i);
@@ -1615,12 +1572,10 @@ window.validarCPFReal = function(cpf) {
   return calc(9) && calc(10);
 };
 
-/* ---------- E-mail ---------- */
 window.validarEmail = function(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
 };
 
-/* ---------- Telefone / número de entrada ---------- */
 window.formatarTelefone = function(input) {
   let v = input.value.replace(/\D/g, "").slice(0, 11);
   if (v.length <= 10)
@@ -1630,7 +1585,6 @@ window.formatarTelefone = function(input) {
   input.value = v.replace(/-$/, "");
 };
 
-/* ---------- Força de senha com barra visual ---------- */
 window.avaliarForcaSenha = function(senha) {
   let score = 0;
   if (senha.length >= 11)          score++;
@@ -1651,8 +1605,6 @@ window.validarSenhaV2 = function(input, container) {
   const temEspecial = /[^A-Za-z0-9]/.test(v);
   const ok = temMin && temMaiuscula && temNumero && temEspecial;
   const forca = avaliarForcaSenha(v);
-
-  // Barra de força
   let bar = container.querySelector(".senha-strength-bar");
   if (!bar && v.length > 0) {
     bar = document.createElement("div");
@@ -1660,13 +1612,9 @@ window.validarSenhaV2 = function(input, container) {
     container.prepend(bar);
   }
   if (bar) bar.dataset.forca = v.length ? forca : "";
-
-  // Texto de feedback
   let msg = container.querySelector(".regra-msg");
   if (!msg) { msg = document.createElement("div"); msg.className = "regra-msg"; container.appendChild(msg); }
-
   if (!v.length) { msg.innerHTML = ""; if(bar) bar.dataset.forca = ""; return; }
-
   if (ok) {
     msg.className = "regra-msg regra-ok";
     msg.textContent = "✓ Senha forte";
@@ -1685,22 +1633,18 @@ window.validarSenhaV2 = function(input, container) {
   }
 };
 
-/* ---------- CNPJ / CPF – listener unificado ---------- */
 (function melhorarDocumento() {
   const input  = document.getElementById("cnpjCliente");
   const regra  = document.getElementById("regraCNPJ");
   if (!input || !regra) return;
-
   function formatarDoc(digits) {
     if (digits.length <= 11) {
-      // Formata como CPF: 000.000.000-00
       let v = digits;
       v = v.replace(/(\d{3})(\d)/, "$1.$2");
       v = v.replace(/(\d{3})\.(\d{3})(\d)/, "$1.$2.$3");
       v = v.replace(/\.(\d{3})(\d)/, ".$1-$2");
       return v;
     } else {
-      // Formata como CNPJ: 00.000.000/0000-00
       let v = digits;
       v = v.replace(/^(\d{2})(\d)/, "$1.$2");
       v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
@@ -1709,21 +1653,16 @@ window.validarSenhaV2 = function(input, container) {
       return v;
     }
   }
-
   input.addEventListener("input", () => {
     const digits = input.value.replace(/\D/g, "").slice(0, 14);
     input.value  = formatarDoc(digits);
     const len    = digits.length;
-
-    // Neutro enquanto digita
     if (len === 0) {
       regra.className   = "";
       regra.textContent = "";
       input.classList.remove("campo-valido", "campo-obrigatorio-erro");
       return;
     }
-
-    // CPF: 11 dígitos
     if (len <= 11) {
       if (len < 11) {
         regra.className   = "regra-neutra";
@@ -1738,16 +1677,12 @@ window.validarSenhaV2 = function(input, container) {
       }
       return;
     }
-
-    // CNPJ: 12-13 dígitos (ainda digitando)
     if (len < 14) {
       regra.className   = "regra-neutra";
       regra.textContent = `CNPJ — faltam ${14 - len} dígito${14 - len > 1 ? "s" : ""}`;
       input.classList.remove("campo-valido", "campo-obrigatorio-erro");
       return;
     }
-
-    // CNPJ: 14 dígitos completo
     const ok = validarCNPJReal(digits);
     regra.className   = ok ? "regra-ok"  : "regra-erro";
     regra.textContent = ok ? "✓ CNPJ válido" : "✗ CNPJ inválido";
@@ -1756,12 +1691,10 @@ window.validarSenhaV2 = function(input, container) {
   });
 })();
 
-/* ---------- Domínio – feedback aprimorado ---------- */
 (function melhorarDominio() {
   const dominioInput = document.getElementById("dominioCliente");
   const regraDominio = document.getElementById("regraDominio");
   if (!dominioInput || !regraDominio) return;
-
   dominioInput.addEventListener("input", () => {
     const v = dominioInput.value.trim().toLowerCase();
     if (!v) {
@@ -1784,22 +1717,8 @@ window.validarSenhaV2 = function(input, container) {
   });
 })();
 
-/* ---------- Patch criarCampo para usar validações novas ---------- */
-const _criarCampoOriginal = criarCampo;
-// Override: ao criar usuário_web, substitui validação de senha e adiciona validação de email
 document.addEventListener("DOMContentLoaded", () => {
-  // Delegate para senhas já existentes e novas
   document.addEventListener("input", (e) => {
-    if (e.target.classList.contains("campo-senha")) {
-      const container = e.target.parentElement?.querySelector("div[style]") ||
-                        e.target.closest(".campo-descricao")?.querySelector("div[style*='margin-top']");
-      // Usa validação v2 se o container de regras existir próximo
-      const regrasEl = e.target.nextElementSibling || e.target.parentElement?.nextElementSibling;
-      if (regrasEl && (regrasEl.classList.contains("regra-ok") || regrasEl.classList.contains("regra-erro") || regrasEl.classList.contains("regra-neutra") || !regrasEl.tagName)) {
-        // fallback ao original — validação v2 é aplicada pelo listener do campo
-      }
-    }
-    // Validação de e-mail em tempo real
     if (e.target.type === "email") {
       const v = e.target.value.trim();
       if (!v) { e.target.classList.remove("campo-valido","campo-obrigatorio-erro"); return; }
@@ -1813,10 +1732,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Senha: usa validação v2 via delegação
   document.addEventListener("input", (e) => {
     if (!e.target.classList.contains("campo-senha")) return;
-    // Encontra o div de regras mais próximo
     let regrasEl = null;
     let el = e.target.nextElementSibling;
     while (el) {
@@ -1829,7 +1746,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (regrasEl) validarSenhaV2(e.target, regrasEl);
   });
 
-  /* Formatar números de entrada como telefone */
   document.addEventListener("input", (e) => {
     const ph = e.target.placeholder || "";
     if (ph.toLowerCase().includes("número de entrada") || e.target.classList.contains("qr-numero-input") || (e.target.closest("#listaEntradas") && e.target.classList.contains("campo-nome"))) {
@@ -1837,47 +1753,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /* Número QR */
   const qrInput = document.getElementById("numeroQr");
   if (qrInput) {
     qrInput.addEventListener("input", () => formatarTelefone(qrInput));
   }
 });
 
-/* ---------- Validação completa ao salvar ---------- */
 const _salvarOriginal = window.salvarConfiguracao || function(){};
 window.salvarConfiguracao = function() {
   const erros = [];
-
   const empresa = document.getElementById("empresaCliente")?.value.trim();
   if (!empresa) erros.push("Nome da empresa é obrigatório");
-
   const dominio = document.getElementById("dominioCliente")?.value.trim().toLowerCase();
   if (!dominio || !dominio.endsWith(".sobreip.com.br")) erros.push("Domínio inválido");
-
   const cnpj = document.getElementById("cnpjCliente")?.value.trim();
   if (cnpj) {
     const digits = cnpj.replace(/\D/g, "");
     const docValido = digits.length === 11 ? validarCPFReal(cnpj) : validarCNPJReal(cnpj);
     if (!docValido) erros.push(digits.length <= 11 ? "CPF inválido" : "CNPJ inválido");
   }
-
-  // Verifica e-mails de usuários
   document.querySelectorAll("#listaUsuariosWeb input[type=email]").forEach((el, i) => {
     if (el.value && !validarEmail(el.value)) erros.push(`E-mail do usuário ${i+1} inválido`);
   });
-
-  // Verifica agentes sem ramal
   document.querySelectorAll("#listaAgentes .campo-descricao").forEach((a, i) => {
     if (a.getRamal && !a.getRamal()) erros.push(`Agente ${a.querySelector(".campo-nome")?.value || (i+1)} sem ramal`);
   });
-
   if (erros.length) {
     mostrarToast(erros[0], true);
     console.warn("Erros de validação:", erros);
     return;
   }
-
   const dados = window.explorar?.();
   if (!dados) return;
   localStorage.setItem("CONFIG_CADERNO", JSON.stringify(dados));
