@@ -1175,7 +1175,7 @@ window.confirmarConfiguracao = async function () {
   }
 
   // ── ENVIA PARA GOOGLE DRIVE ──────────────────────────
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyyOTzXL64WKPTuVaScXqjNmpShHvHPkWTDNddTxZhKkg7fkfB3Y2ZgdiagXaIFm4g/exec";
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIa5t0aWJwqAOGVp0WXkoJhqZlGVdU4rhrBoInoKhd3ZS8rBBSr84tLi_BQutcVuV6Yg/exec";
 
   (async () => {
     try {
