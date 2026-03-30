@@ -704,180 +704,237 @@ function capturarImagem() {
   return new Promise(resolve => {
     if (!nodes.length) { resolve(null); return; }
 
-    // Calcula bounding box de todos os nós
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    // Bounding box
+    let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
     nodes.forEach(n => {
       const el = document.getElementById("n-"+n.id);
       const w  = el ? el.offsetWidth  : 220;
-      const h  = el ? el.offsetHeight : 120;
-      minX = Math.min(minX, n.x);
-      minY = Math.min(minY, n.y);
-      maxX = Math.max(maxX, n.x + w);
-      maxY = Math.max(maxY, n.y + h);
+      const h  = el ? el.offsetHeight : 140;
+      minX=Math.min(minX,n.x); minY=Math.min(minY,n.y);
+      maxX=Math.max(maxX,n.x+w); maxY=Math.max(maxY,n.y+h);
     });
 
-    const PAD    = 40;
-    const cW     = (maxX - minX) + PAD * 2;
-    const cH     = (maxY - minY) + PAD * 2;
-    const ox     = PAD - minX;
-    const oy     = PAD - minY;
+    const PAD  = 48;
+    const SCALE = 1.4; // qualidade boa mas não enorme
+    const cW   = ((maxX-minX)+PAD*2) * SCALE;
+    const cH   = ((maxY-minY)+PAD*2) * SCALE;
+    const ox   = (PAD - minX) * SCALE;
+    const oy   = (PAD - minY) * SCALE;
 
-    const cv     = document.createElement("canvas");
-    cv.width     = cW;
-    cv.height    = cH;
-    const ctx    = cv.getContext("2d");
+    const cv   = document.createElement("canvas");
+    cv.width   = Math.min(cW, 2400); // limita largura máxima
+    cv.height  = Math.min(cH, 1800);
+    const s    = Math.min(cv.width/cW, cv.height/cH, 1); // scale fit
+    const ctx  = cv.getContext("2d");
 
-    // Fundo
+    // Fundo escuro ERA
     ctx.fillStyle = "#0a0f1a";
-    ctx.fillRect(0, 0, cW, cH);
+    ctx.fillRect(0,0,cv.width,cv.height);
 
     // Grid pontilhado
-    ctx.fillStyle = "rgba(206,255,0,0.04)";
-    for (let gx = 0; gx < cW; gx += 24)
-      for (let gy = 0; gy < cH; gy += 24)
-        ctx.fillRect(gx, gy, 1.5, 1.5);
+    ctx.fillStyle = "rgba(206,255,0,0.035)";
+    for(let gx=0;gx<cv.width;gx+=20*s) for(let gy=0;gy<cv.height;gy+=20*s)
+      ctx.fillRect(gx,gy,1.5*s,1.5*s);
 
-    // Conexões
-    ctx.strokeStyle = "#38bdf8";
-    ctx.lineWidth   = 1.8;
-    ctx.setLineDash([5, 3]);
+    const sc = SCALE * s;
+
+    // ── Conexões ──
+    ctx.save();
     conns.forEach(c => {
-      const nA = nodes.find(x=>x.id===c.from);
-      const nB = nodes.find(x=>x.id===c.to);
-      if (!nA || !nB) return;
-      const elA = document.getElementById("n-"+nA.id);
-      const elB = document.getElementById("n-"+nB.id);
-      const wA  = elA ? elA.offsetWidth  : 220;
-      const hA  = elA ? elA.offsetHeight : 120;
-      const x1  = nA.x + wA + ox;
-      const y1  = nA.y + 36  + oy;
-      const x2  = nB.x + ox;
-      const y2  = nB.y + 36  + oy;
-      const dx  = Math.abs(x2 - x1) * 0.5;
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.bezierCurveTo(x1+dx, y1, x2-dx, y2, x2, y2);
-      ctx.stroke();
-      // Seta
-      ctx.setLineDash([]);
-      ctx.fillStyle = "#38bdf8";
-      const angle = Math.atan2(y2 - (y2), x2 - (x2-dx));
-      ctx.save(); ctx.translate(x2, y2); ctx.rotate(Math.atan2(y2-(y1+(y2-y1)*0.9), x2-(x1+(x2-x1)*0.9)));
-      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-8,-4); ctx.lineTo(-8,4); ctx.closePath(); ctx.fill();
-      ctx.restore();
-      ctx.setLineDash([5,3]);
+      const nA=nodes.find(x=>x.id===c.from), nB=nodes.find(x=>x.id===c.to);
+      if(!nA||!nB) return;
+      const elA=document.getElementById("n-"+nA.id), elB=document.getElementById("n-"+nB.id);
+      const wA=elA?elA.offsetWidth:220;
+      const isOpt = c.portKey && c.portKey.startsWith("opt_");
+      const col   = isOpt ? "#a78bfa" : "#38bdf8";
+      const x1 = nA.x*sc + ox*s + wA*sc;
+      const y1 = nA.y*sc + oy*s + 36*sc;
+      const x2 = nB.x*sc + ox*s;
+      const y2 = nB.y*sc + oy*s + 36*sc;
+      if(isOpt && c.portKey) {
+        const i=parseInt(c.portKey.replace("opt_",""));
+        const elAh=elA?elA.offsetHeight:140;
+        const portY=(46+10+54+4+i*36+(36/2));
+        const py1 = nA.y*sc + oy*s + portY*sc;
+        _drawConn(ctx, nA.x*sc+ox*s+wA*sc, py1, x2, nB.y*sc+oy*s+36*sc, col, sc);
+        // Label da opção
+        ctx.font = `bold ${10*sc}px 'Segoe UI',sans-serif`;
+        ctx.fillStyle = col;
+        ctx.textAlign = "center";
+        const mx=(nA.x*sc+ox*s+wA*sc+x2)/2;
+        const my=(py1+nB.y*sc+oy*s+36*sc)/2 - 6*sc;
+        ctx.fillStyle="rgba(10,15,26,0.75)";
+        const lw=ctx.measureText("Opção "+(i+1)).width+8*sc;
+        ctx.fillRect(mx-lw/2, my-9*sc, lw, 13*sc);
+        ctx.fillStyle=col;
+        ctx.fillText("Opção "+(i+1), mx, my);
+      } else {
+        _drawConn(ctx, x1, y1, x2, y2, col, sc);
+      }
     });
-    ctx.setLineDash([]);
+    ctx.restore();
 
-    // Nós
+    // ── Nós ──
     nodes.forEach(n => {
       const cfg = NODE_CFG[n.type];
       const el  = document.getElementById("n-"+n.id);
-      const w   = el ? el.offsetWidth  : 220;
-      const h   = el ? el.offsetHeight : 120;
-      const x   = n.x + ox;
-      const y   = n.y + oy;
-      const r   = 10;
+      const w   = (el ? el.offsetWidth  : 220) * sc;
+      const h   = (el ? el.offsetHeight : 140) * sc;
+      const x   = n.x*sc + ox*s;
+      const y   = n.y*sc + oy*s;
+      const r   = 10*sc;
 
       // Sombra
-      ctx.shadowColor = "rgba(0,0,0,0.5)";
-      ctx.shadowBlur  = 16;
-
-      // Fundo do card
-      ctx.fillStyle = "#141c2e";
-      roundRect(ctx, x, y, w, h, r);
-      ctx.fill();
-
-      ctx.shadowBlur = 0;
+      ctx.shadowColor="rgba(0,0,0,0.55)"; ctx.shadowBlur=18*sc;
+      ctx.fillStyle="#141c2e";
+      _rr(ctx,x,y,w,h,r); ctx.fill();
+      ctx.shadowBlur=0;
 
       // Borda
-      ctx.strokeStyle = "#1e2d47";
-      ctx.lineWidth   = 1.5;
-      roundRect(ctx, x, y, w, h, r);
-      ctx.stroke();
+      ctx.strokeStyle="#1e2d47"; ctx.lineWidth=1.5*sc;
+      _rr(ctx,x,y,w,h,r); ctx.stroke();
 
-      // Faixa colorida topo
-      ctx.fillStyle = cfg.color;
-      ctx.globalAlpha = 0.18;
-      roundRectTop(ctx, x, y, w, 38, r);
-      ctx.fill();
-      ctx.globalAlpha = 1;
+      // Faixa colorida lateral
+      ctx.fillStyle=cfg.color;
+      ctx.fillRect(x, y+r, 3.5*sc, 36*sc-r);
 
-      // Linha separadora colorida
-      ctx.strokeStyle = cfg.color;
-      ctx.lineWidth   = 1;
-      ctx.globalAlpha = 0.5;
-      ctx.beginPath(); ctx.moveTo(x+r, y+38); ctx.lineTo(x+w-r, y+38); ctx.stroke();
-      ctx.globalAlpha = 1;
+      // Faixa topo colorida
+      ctx.globalAlpha=0.15;
+      ctx.fillStyle=cfg.color;
+      _rrTop(ctx,x,y,w,36*sc,r); ctx.fill();
+      ctx.globalAlpha=1;
 
-      // Faixa lateral colorida
-      ctx.fillStyle = cfg.color;
-      ctx.fillRect(x, y+r, 3, 38-r);
+      // Separador
+      ctx.strokeStyle=cfg.color+"88"; ctx.lineWidth=0.8*sc;
+      ctx.beginPath(); ctx.moveTo(x+r,y+36*sc); ctx.lineTo(x+w-r,y+36*sc); ctx.stroke();
 
-      // Ícone + Label
-      ctx.font        = "bold 10px 'Segoe UI', sans-serif";
-      ctx.fillStyle   = cfg.color;
-      ctx.textBaseline = "middle";
-      ctx.fillText(cfg.label.toUpperCase(), x+14, y+19);
+      // Tipo
+      ctx.font=`700 ${9*sc}px 'Segoe UI',sans-serif`;
+      ctx.fillStyle=cfg.color;
+      ctx.textAlign="left";
+      ctx.textBaseline="middle";
+      ctx.fillText(cfg.label.toUpperCase(), x+12*sc, y+18*sc);
 
-      // Texto do conteúdo
-      ctx.font      = "11px 'Segoe UI', sans-serif";
-      ctx.fillStyle = "#94a3b8";
-      const texto   = n.data.text || (n.type==="start" ? "Início do fluxo" : "");
-      if (texto) {
-        const linhas = wrapText(ctx, texto, w - 24);
-        linhas.forEach((ln, i) => {
-          if (y + 52 + i*15 < y + h - 8)
-            ctx.fillText(ln, x+12, y+52+i*15);
+      // Conteúdo do nó
+      ctx.fillStyle="#94a3b8";
+      ctx.font=`${10*sc}px 'Segoe UI',sans-serif`;
+      const maxW = w - 24*sc;
+      let ty = y + 46*sc;
+
+      if(n.type==="mensagem"||n.type==="finalizar") {
+        const linhas=_wrap(ctx, n.data.text||"", maxW);
+        linhas.slice(0,5).forEach(ln => { ctx.fillText(ln,x+12*sc,ty); ty+=14*sc; });
+      } else if(n.type==="menu") {
+        const linhas=_wrap(ctx, n.data.text||"", maxW);
+        linhas.slice(0,2).forEach(ln => { ctx.fillText(ln,x+12*sc,ty); ty+=13*sc; });
+        ty+=2*sc;
+        (n.data.opcoes||[]).forEach((op,i) => {
+          // Pill da opção
+          const txt=`${i+1}. ${op||"Opção "+(i+1)}`;
+          ctx.fillStyle="rgba(167,139,250,0.15)";
+          const pw=Math.min(ctx.measureText(txt).width+16*sc, maxW);
+          ctx.fillRect(x+12*sc, ty-9*sc, pw, 18*sc);
+          ctx.strokeStyle="rgba(167,139,250,0.4)"; ctx.lineWidth=0.8*sc;
+          ctx.strokeRect(x+12*sc, ty-9*sc, pw, 18*sc);
+          ctx.fillStyle="#a78bfa";
+          ctx.font=`600 ${9*sc}px 'Segoe UI',sans-serif`;
+          ctx.fillText(txt, x+20*sc, ty);
+          ctx.font=`${10*sc}px 'Segoe UI',sans-serif`;
+          ty+=20*sc;
         });
-      }
-      // Opções do menu
-      if (n.type==="menu" && n.data.opcoes?.length) {
-        n.data.opcoes.forEach((op, i) => {
-          if (!op) return;
-          ctx.fillStyle = "#64748b";
-          ctx.font = "10px 'Segoe UI', sans-serif";
-          if (y+52+i*14 < y+h-8)
-            ctx.fillText(`${i+1}. ${op}`, x+12, y+52+i*14);
-        });
+      } else if(n.type==="horario") {
+        ctx.fillStyle="#f59e0b";
+        ctx.font=`600 ${10*sc}px 'Segoe UI',sans-serif`;
+        ctx.fillText("⏰ "+(n.data.horario||"Horário Comercial"), x+12*sc, ty);
+      } else if(n.type==="dados") {
+        ctx.fillText("Campo: "+(n.data.campo||"—"), x+12*sc, ty); ty+=14*sc;
+        const linhas=_wrap(ctx, n.data.text||"", maxW);
+        linhas.slice(0,2).forEach(ln=>{ctx.fillText(ln,x+12*sc,ty);ty+=13*sc;});
+      } else if(n.type==="agente") {
+        ctx.fillStyle="#fb923c";
+        ctx.fillText("👤 "+(n.data.text||"Qualquer agente"), x+12*sc, ty);
+      } else if(n.type==="depto") {
+        ctx.fillStyle="#34d399";
+        ctx.fillText("🏢 "+(n.data.text||"Departamento"), x+12*sc, ty);
+      } else if(n.type==="espera") {
+        ctx.fillStyle="#94a3b8";
+        ctx.fillText("⏱ "+(n.data.text||"Aguardando..."), x+12*sc, ty);
+      } else if(n.type==="start") {
+        ctx.fillStyle="#22c55e";
+        ctx.font=`600 ${10*sc}px 'Segoe UI',sans-serif`;
+        ctx.fillText("Início do fluxo", x+12*sc, ty);
       }
 
       // Porta saída
-      if (cfg.hasOut) {
-        ctx.strokeStyle = "#CEFF00"; ctx.lineWidth=2;
-        ctx.fillStyle   = "#0a0f1a";
-        ctx.beginPath(); ctx.arc(x+w, y+36, 6, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      if(cfg.hasOut && n.type!=="menu") {
+        ctx.strokeStyle="#CEFF00"; ctx.lineWidth=2*sc; ctx.fillStyle="#0a0f1a";
+        ctx.beginPath(); ctx.arc(x+w,y+36*sc,6*sc,0,Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle="rgba(206,255,0,0.3)";
+        ctx.beginPath(); ctx.arc(x+w,y+36*sc,3*sc,0,Math.PI*2); ctx.fill();
+      }
+      // Portas de opção (menu)
+      if(n.type==="menu") {
+        (n.data.opcoes||[]).forEach((op,i)=>{
+          const portY=(46+10+54+4+i*36+(36/2));
+          ctx.strokeStyle="#a78bfa"; ctx.lineWidth=2*sc; ctx.fillStyle="#0a0f1a";
+          ctx.beginPath(); ctx.arc(x+w,y+portY*sc,6*sc,0,Math.PI*2); ctx.fill(); ctx.stroke();
+          ctx.fillStyle="rgba(167,139,250,0.3)";
+          ctx.beginPath(); ctx.arc(x+w,y+portY*sc,3*sc,0,Math.PI*2); ctx.fill();
+        });
       }
       // Porta entrada
-      if (cfg.hasIn) {
-        ctx.strokeStyle = "#38bdf8"; ctx.lineWidth=2;
-        ctx.fillStyle   = "#0a0f1a";
-        ctx.beginPath(); ctx.arc(x, y+36, 6, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      if(cfg.hasIn) {
+        ctx.strokeStyle="#38bdf8"; ctx.lineWidth=2*sc; ctx.fillStyle="#0a0f1a";
+        ctx.beginPath(); ctx.arc(x,y+36*sc,6*sc,0,Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle="rgba(56,189,248,0.3)";
+        ctx.beginPath(); ctx.arc(x,y+36*sc,3*sc,0,Math.PI*2); ctx.fill();
       }
     });
 
-    // Comprime para JPEG 80% para caber no localStorage (PNG pode ser >5MB)
-    resolve(cv.toDataURL("image/jpeg", 0.82));
+    // Watermark
+    ctx.font=`${10*sc}px 'Segoe UI',sans-serif`;
+    ctx.fillStyle="rgba(206,255,0,0.3)";
+    ctx.textAlign="right";
+    ctx.fillText("Caderno de Parâmetros · SobreIP", cv.width-12*s, cv.height-8*s);
+
+    // JPEG 85% — bom equilíbrio qualidade/tamanho
+    const img = cv.toDataURL("image/jpeg", 0.85);
+    console.log("[Fluxo] Imagem gerada:", Math.round(img.length/1024)+"KB");
+    resolve(img);
   });
 }
 
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x+r, y);
-  ctx.lineTo(x+w-r, y); ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-  ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-  ctx.lineTo(x+r, y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-  ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
-  ctx.closePath();
+function _drawConn(ctx, x1,y1,x2,y2,col,sc) {
+  const dx=Math.abs(x2-x1)*0.5;
+  ctx.strokeStyle=col; ctx.lineWidth=1.8*sc;
+  ctx.setLineDash([]); ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.bezierCurveTo(x1+dx,y1, x2-dx,y2, x2,y2);
+  ctx.stroke();
+  // seta
+  const ang=Math.atan2(y2-(y1+(y2-y1)*0.9), x2-(x1+(x2-x1)*0.9));
+  ctx.save(); ctx.translate(x2,y2); ctx.rotate(ang);
+  ctx.fillStyle=col; ctx.beginPath();
+  ctx.moveTo(0,0); ctx.lineTo(-9*sc,-4*sc); ctx.lineTo(-9*sc,4*sc);
+  ctx.closePath(); ctx.fill(); ctx.restore();
 }
-function roundRectTop(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x+r, y);
-  ctx.lineTo(x+w-r, y); ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-  ctx.lineTo(x+w, y+h); ctx.lineTo(x, y+h);
-  ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
-  ctx.closePath();
+
+function _wrap(ctx, text, maxW) {
+  if(!text) return [];
+  const words=text.split(" "); const lines=[]; let cur="";
+  words.forEach(w=>{
+    const t=cur?cur+" "+w:w;
+    if(ctx.measureText(t).width>maxW){lines.push(cur);cur=w;}else cur=t;
+  });
+  if(cur) lines.push(cur);
+  return lines;
 }
+
+
+function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+function roundRectTop(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+function _rr(ctx,x,y,w,h,r){roundRect(ctx,x,y,w,h,r);}
+function _rrTop(ctx,x,y,w,h,r){roundRectTop(ctx,x,y,w,h,r);}
 function wrapText(ctx, text, maxW) {
   const words = text.split(" ");
   const lines = [];
