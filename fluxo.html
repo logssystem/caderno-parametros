@@ -204,9 +204,9 @@ let offsetX = 0;
 let offsetY = 0;
 let dragging = null;
 let dragOffX = 0, dragOffY = 0;
-let connectingFrom = null; // {nodeId, portKey}
+let connectingFrom = null;
 let selected       = null;
-let _connJustMade  = false; // evita cancelar conexão recém-feita no mouseup global
+let _connJustMade  = false;
 
 const wrap   = document.getElementById("canvasWrap");
 const canvas = document.getElementById("canvas");
@@ -231,7 +231,6 @@ function applyTransform() {
   canvas.style.transform = `translate(${offsetX}px,${offsetY}px) scale(${scale})`;
   canvas.style.transformOrigin = "0 0";
 }
-
 function zoom(factor) {
   scale = Math.max(0.3, Math.min(2.5, scale * factor));
   applyTransform();
@@ -249,13 +248,10 @@ wrap.addEventListener("mousedown", e => {
 });
 window.addEventListener("mousemove", e => {
   if (panning) { offsetX=panOX+(e.clientX-panX0); offsetY=panOY+(e.clientY-panY0); applyTransform(); }
-  // Helper: converte coordenadas de tela para coordenadas do canvas
+
   function toCanvas(cx, cy) {
     const rect = wrap.getBoundingClientRect();
-    return {
-      x: (cx - rect.left - offsetX) / scale,
-      y: (cy - rect.top  - offsetY) / scale
-    };
+    return { x: (cx - rect.left - offsetX) / scale, y: (cy - rect.top  - offsetY) / scale };
   }
 
   if (dragging) {
@@ -267,7 +263,6 @@ window.addEventListener("mousemove", e => {
     renderConnections();
   }
 
-  // Preview da linha de conexão — segue o mouse em tempo real
   if (connectingFrom !== null) {
     const p = toCanvas(e.clientX, e.clientY);
     renderConnections(p.x, p.y);
@@ -276,25 +271,15 @@ window.addEventListener("mousemove", e => {
 window.addEventListener("mouseup", e => {
   panning = false;
   dragging = null;
-
-  // Se onPortIn acabou de processar, não cancela
-  if (_connJustMade) {
-    _connJustMade = false;
-    return;
-  }
-
+  if (_connJustMade) { _connJustMade = false; return; }
   if (connectingFrom !== null) {
-    // Percorre elementos sob o cursor procurando port-in em qualquer profundidade
     let el = document.elementFromPoint(e.clientX, e.clientY);
     let emPortIn = false;
     while (el && el !== document.body) {
       if (el.classList && el.classList.contains("port-in")) { emPortIn = true; break; }
       el = el.parentElement;
     }
-    if (!emPortIn) {
-      connectingFrom = null;
-      renderConnections();
-    }
+    if (!emPortIn) { connectingFrom = null; renderConnections(); }
   }
 });
 wrap.addEventListener("wheel", e => {
@@ -304,9 +289,7 @@ wrap.addEventListener("wheel", e => {
 
 // ── DRAG FROM SIDEBAR ──
 document.querySelectorAll(".sb-node").forEach(el => {
-  el.addEventListener("dragstart", e => {
-    e.dataTransfer.setData("nodeType", el.dataset.type);
-  });
+  el.addEventListener("dragstart", e => { e.dataTransfer.setData("nodeType", el.dataset.type); });
 });
 wrap.addEventListener("dragover", e => e.preventDefault());
 wrap.addEventListener("drop", e => {
@@ -346,14 +329,12 @@ function renderNode(n) {
   if (selected === n.id) el.classList.add("selected");
   else el.classList.remove("selected");
 
-  // Header
   let body = `<div class="node-hdr" style="border-bottom-color:${cfg.color}22">
     <span class="node-icon">${cfg.icon}</span>
     <span class="node-type" style="color:${cfg.color}">${cfg.label}</span>
     <button class="node-del" onclick="delNode(${n.id})">✕</button>
   </div><div class="node-body">`;
 
-  // Body por tipo
   if (n.type === "start") {
     body += `<span style="color:var(--soft);font-size:11px;">Início do fluxo</span>`;
   } else if (n.type === "mensagem") {
@@ -415,21 +396,18 @@ function renderNode(n) {
   }
   body += `</div>`;
 
-  // Ports
   const midY = 36;
   if (cfg.hasIn) body += `<div class="port port-in" style="top:${midY - 10}px" onmouseup="onPortIn(${n.id}, event)" title="Clique aqui para receber conexão"></div>`;
 
   if (n.type === "menu" && (n.data.opcoes||[]).length > 0) {
-    // Uma porta de saída por opção — posicionadas ao lado de cada opt-row
-    // Header height ~46px + textarea ~54px + each opt-row ~36px
     const hdrH   = 46;
     const taH    = 54;
     const optH   = 36;
-    const padTop = 10; // node-body padding
+    const padTop = 10;
     (n.data.opcoes||[]).forEach((op, i) => {
       const portY = hdrH + padTop + taH + 4 + i * optH + (optH/2) - 10;
-      body += `<div class="port port-out port-opt" style="top:${portY}px" 
-        onmousedown="onPortOut(event,${n.id},'opt_${i}')" 
+      body += `<div class="port port-out port-opt" style="top:${portY}px"
+        onmousedown="onPortOut(event,${n.id},'opt_${i}')"
         title="Saída: Opção ${i+1}">
         <span class="port-opt-label">${i+1}</span>
       </div>`;
@@ -440,7 +418,6 @@ function renderNode(n) {
 
   el.innerHTML = body;
 
-  // Drag
   el.addEventListener("mousedown", e => {
     if (e.target.classList.contains("port") || e.target.tagName==="BUTTON" ||
         e.target.tagName==="INPUT" || e.target.tagName==="TEXTAREA" || e.target.tagName==="SELECT") return;
@@ -461,9 +438,7 @@ function renderAll() {
 }
 
 // ── NODE DATA HELPERS ──
-window.n_set = (id, key, val) => {
-  const n = nodes.find(x=>x.id===id); if(n) n.data[key]=val;
-};
+window.n_set = (id, key, val) => { const n = nodes.find(x=>x.id===id); if(n) n.data[key]=val; };
 window.n_add_opt = (id) => {
   const n = nodes.find(x=>x.id===id); if(!n) return;
   if (!n.data.opcoes) n.data.opcoes=[];
@@ -473,10 +448,7 @@ window.n_del_opt = (id, i) => {
   const n = nodes.find(x=>x.id===id); if(!n) return;
   n.data.opcoes.splice(i,1); renderNode(n); renderConnections();
 };
-window.n_opt = (id, i, val) => {
-  const n = nodes.find(x=>x.id===id); if(!n) return;
-  n.data.opcoes[i]=val;
-};
+window.n_opt = (id, i, val) => { const n = nodes.find(x=>x.id===id); if(!n) return; n.data.opcoes[i]=val; };
 window.delNode = (id) => {
   nodes = nodes.filter(x=>x.id!==id);
   conns = conns.filter(c=>c.from!==id && c.to!==id);
@@ -498,23 +470,30 @@ window.onPortIn = (nodeId, e) => {
     const dup = conns.find(c => c.from === from && c.to === nodeId && c.portKey === portKey);
     if (!dup) conns.push({ from, to: nodeId, portKey });
     connectingFrom = null;
-    _connJustMade  = true; // flag: não cancelar no mouseup global
+    _connJustMade  = true;
     renderConnections();
   }
 };
 
+// ── ✅ CORREÇÃO 3: getPortPos usa posição real do DOM ──
 function getPortPos(nodeId, side, portKey) {
   const n = nodes.find(x=>x.id===nodeId); if(!n) return null;
   const el = document.getElementById("n-"+nodeId); if(!el) return null;
   const w = el.offsetWidth;
 
-  if (side === "in")  return { x: n.x,     y: n.y + 36 };
+  if (side === "in") return { x: n.x, y: n.y + 36 };
 
-  // Per-option port for menu nodes
+  // Per-option port — usa posição real do DOM para alinhamento preciso
   if (side === "out" && n.type === "menu" && portKey && portKey.startsWith("opt_")) {
-    const i      = parseInt(portKey.replace("opt_", ""));
-    const hdrH   = 46, taH = 54, optH = 36, padTop = 10;
-    const portY  = hdrH + padTop + taH + 4 + i * optH + (optH/2);
+    const i = parseInt(portKey.replace("opt_", ""));
+    const optPorts = el.querySelectorAll(".port-opt");
+    if (optPorts[i]) {
+      const portY = optPorts[i].offsetTop + optPorts[i].offsetHeight / 2;
+      return { x: n.x + w, y: n.y + portY };
+    }
+    // fallback caso DOM ainda não tenha renderizado
+    const hdrH = 46, taH = 54, optH = 36, padTop = 10;
+    const portY = hdrH + padTop + taH + 4 + i * optH + (optH / 2);
     return { x: n.x + w, y: n.y + portY };
   }
 
@@ -522,22 +501,18 @@ function getPortPos(nodeId, side, portKey) {
 }
 
 function renderConnections(previewX, previewY) {
-  // Remove apenas path/line/text, preserva <defs> com o marcador de seta
   svgL.querySelectorAll("path,line,text,g.lbl").forEach(e => e.remove());
 
   conns.forEach(c => {
     const a = getPortPos(c.from, "out", c.portKey);
     const b = getPortPos(c.to,   "in");
     if (!a || !b) return;
-    // Cor da linha por portKey
     const col = c.portKey && c.portKey.startsWith("opt_") ? "#a78bfa" : "#38bdf8";
     drawCurve(a.x, a.y, b.x, b.y, "solid", col);
-    // Label da opção na linha
     if (c.portKey && c.portKey.startsWith("opt_")) {
       const i   = parseInt(c.portKey.replace("opt_","")) + 1;
       const mx  = (a.x + b.x) / 2;
       const my  = (a.y + b.y) / 2 - 8;
-      // Label com fundo para legibilidade
       const g = document.createElementNS("http://www.w3.org/2000/svg","g");
       g.setAttribute("class","lbl");
       const bg = document.createElementNS("http://www.w3.org/2000/svg","rect");
@@ -557,7 +532,6 @@ function renderConnections(previewX, previewY) {
     }
   });
 
-  // Preview
   if (connectingFrom !== null && previewX !== undefined) {
     const a = getPortPos(connectingFrom.nodeId, "out", connectingFrom.portKey);
     if (a) drawCurve(a.x, a.y, previewX, previewY, "dash", "#CEFF00");
@@ -583,7 +557,7 @@ function buildJSON() {
       id: n.id, tipo: n.type, posicao:{x:Math.round(n.x),y:Math.round(n.y)},
       dados: n.data
     })),
-    conexoes: conns.map(c => ({ de: c.from, para: c.to }))
+    conexoes: conns.map(c => ({ de: c.from, para: c.to, portKey: c.portKey }))
   };
 }
 
@@ -596,16 +570,14 @@ function copiarJSON() {
   navigator.clipboard.writeText(document.getElementById("jsonOutput").value);
   toast("JSON copiado!");
 }
-/* ── ID do fluxo sendo editado (null = novo) ── */
+
 let _fluxoEditandoId = null;
 
-/* Inicializa: verifica se veio editar um fluxo existente — roda depois do DOM */
 function initFluxoEdit() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
   if (!id) return;
   _fluxoEditandoId = id;
-  // Carrega o fluxo salvo
   try {
     const raw = localStorage.getItem("CONFIG_CADERNO");
     const cad = raw ? JSON.parse(raw) : {};
@@ -613,7 +585,6 @@ function initFluxoEdit() {
     const fluxo = fluxos.find(f => f.id === id);
     if (!fluxo) return;
     document.getElementById("flowName").value = fluxo.nome || "Fluxo";
-    // Restaura nós e conexões
     nodes = []; conns = []; nodesL.innerHTML = "";
     nodeId = 1;
     if (fluxo.nos) {
@@ -637,12 +608,9 @@ function salvarFluxo() {
   const nome = document.getElementById("flowName").value.trim() || "Fluxo sem nome";
   const data = buildJSON();
   data.nome = nome;
-
   toast("Gerando imagem...");
-
   capturarImagem().then(img => {
     try {
-      // Lê o caderno — tenta da janela pai primeiro
       let raw = null;
       if (window.opener && !window.opener.closed) {
         try { raw = window.opener.localStorage.getItem("CONFIG_CADERNO"); } catch(e) {}
@@ -651,15 +619,9 @@ function salvarFluxo() {
       const cad = raw && raw !== "null" ? JSON.parse(raw) : {};
       if (!cad.chat) cad.chat = {};
       if (!cad.chat.fluxos) cad.chat.fluxos = [];
-
-      // Gera ID se novo
       const fluxoId = _fluxoEditandoId || ("fluxo_" + Date.now());
       _fluxoEditandoId = fluxoId;
-
-      // Remove versão antiga se existir
       cad.chat.fluxos = cad.chat.fluxos.filter(f => f.id !== fluxoId);
-
-      // Adiciona atualizado
       cad.chat.fluxos.push({
         id:      fluxoId,
         nome:    nome,
@@ -668,37 +630,23 @@ function salvarFluxo() {
         conexoes: data.conexoes,
         savedAt: new Date().toISOString()
       });
-
-      // Mantém compatibilidade com campo único (primeiro fluxo)
       cad.chat.fluxo        = data;
       cad.chat.fluxo_imagem = img;
-
-      // Salva em ambos os locais
       const json = JSON.stringify(cad);
       localStorage.setItem("CONFIG_CADERNO", json);
-
-      // Salva também na janela pai SE disponível
       let salvouNaPai = false;
       if (window.opener && !window.opener.closed) {
         try {
           window.opener.localStorage.setItem("CONFIG_CADERNO", json);
           salvouNaPai = true;
-          console.log("[Fluxo] Sincronizado com janela pai. Fluxos:", cad.chat.fluxos?.length);
-        } catch(e) {
-          console.warn("[Fluxo] Erro ao sincronizar com pai:", e);
-        }
+        } catch(e) {}
       }
-
-      // Verifica se realmente foi salvo
       const verifica = JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}");
       const fluxosSalvos = verifica.chat?.fluxos?.length || 0;
       toast(`✓ ${nome} salvo! (${fluxosSalvos} fluxo${fluxosSalvos!==1?"s":""} no caderno)`);
-
-      // Volta para o formulário após 1.8s
       setTimeout(() => {
         if (window.opener && !window.opener.closed) {
           try {
-            // Atualiza a lista de fluxos na janela pai sem recarregar
             if (typeof window.opener.renderizarFluxosSalvos === "function") {
               window.opener.renderizarFluxosSalvos();
             }
@@ -709,7 +657,6 @@ function salvarFluxo() {
           window.location.href = "index.html";
         }
       }, 1800);
-
     } catch(err) {
       console.error("[Fluxo] Erro:", err);
       toast("Erro ao salvar: " + err.message, true);
@@ -717,12 +664,9 @@ function salvarFluxo() {
   });
 }
 
-/* Renderiza os nós e conexões num <canvas> offscreen e retorna base64 */
 function capturarImagem() {
   return new Promise(resolve => {
     if (!nodes.length) { resolve(null); return; }
-
-    // Bounding box
     let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
     nodes.forEach(n => {
       const el = document.getElementById("n-"+n.id);
@@ -731,32 +675,23 @@ function capturarImagem() {
       minX=Math.min(minX,n.x); minY=Math.min(minY,n.y);
       maxX=Math.max(maxX,n.x+w); maxY=Math.max(maxY,n.y+h);
     });
-
     const PAD  = 48;
-    const SCALE = 1.4; // qualidade boa mas não enorme
+    const SCALE = 1.4;
     const cW   = ((maxX-minX)+PAD*2) * SCALE;
     const cH   = ((maxY-minY)+PAD*2) * SCALE;
     const ox   = (PAD - minX) * SCALE;
     const oy   = (PAD - minY) * SCALE;
-
     const cv   = document.createElement("canvas");
-    cv.width   = Math.min(cW, 2400); // limita largura máxima
+    cv.width   = Math.min(cW, 2400);
     cv.height  = Math.min(cH, 1800);
-    const s    = Math.min(cv.width/cW, cv.height/cH, 1); // scale fit
+    const s    = Math.min(cv.width/cW, cv.height/cH, 1);
     const ctx  = cv.getContext("2d");
-
-    // Fundo escuro ERA
     ctx.fillStyle = "#0a0f1a";
     ctx.fillRect(0,0,cv.width,cv.height);
-
-    // Grid pontilhado
     ctx.fillStyle = "rgba(206,255,0,0.035)";
     for(let gx=0;gx<cv.width;gx+=20*s) for(let gy=0;gy<cv.height;gy+=20*s)
       ctx.fillRect(gx,gy,1.5*s,1.5*s);
-
     const sc = SCALE * s;
-
-    // ── Conexões ──
     ctx.save();
     conns.forEach(c => {
       const nA=nodes.find(x=>x.id===c.from), nB=nodes.find(x=>x.id===c.to);
@@ -765,34 +700,36 @@ function capturarImagem() {
       const wA=elA?elA.offsetWidth:220;
       const isOpt = c.portKey && c.portKey.startsWith("opt_");
       const col   = isOpt ? "#a78bfa" : "#38bdf8";
-      const x1 = nA.x*sc + ox*s + wA*sc;
-      const y1 = nA.y*sc + oy*s + 36*sc;
       const x2 = nB.x*sc + ox*s;
       const y2 = nB.y*sc + oy*s + 36*sc;
       if(isOpt && c.portKey) {
         const i=parseInt(c.portKey.replace("opt_",""));
-        const elAh=elA?elA.offsetHeight:140;
-        const portY=(46+10+54+4+i*36+(36/2));
+        // Usa posição real da porta no DOM
+        const optPorts = elA ? elA.querySelectorAll(".port-opt") : [];
+        let portY = 0;
+        if(optPorts[i]) {
+          portY = optPorts[i].offsetTop + optPorts[i].offsetHeight / 2;
+        } else {
+          portY = (46+10+54+4+i*36+(36/2));
+        }
         const py1 = nA.y*sc + oy*s + portY*sc;
-        _drawConn(ctx, nA.x*sc+ox*s+wA*sc, py1, x2, nB.y*sc+oy*s+36*sc, col, sc);
-        // Label da opção
+        _drawConn(ctx, nA.x*sc+ox*s+wA*sc, py1, x2, y2, col, sc);
         ctx.font = `bold ${10*sc}px 'Segoe UI',sans-serif`;
-        ctx.fillStyle = col;
         ctx.textAlign = "center";
         const mx=(nA.x*sc+ox*s+wA*sc+x2)/2;
-        const my=(py1+nB.y*sc+oy*s+36*sc)/2 - 6*sc;
+        const my=(py1+y2)/2 - 6*sc;
         ctx.fillStyle="rgba(10,15,26,0.75)";
-        const lw=ctx.measureText("Opção "+(i+1)).width+8*sc;
+        const lw=ctx.measureText("Op. "+(i+1)).width+8*sc;
         ctx.fillRect(mx-lw/2, my-9*sc, lw, 13*sc);
         ctx.fillStyle=col;
-        ctx.fillText("Opção "+(i+1), mx, my);
+        ctx.fillText("Op."+(i+1), mx, my);
       } else {
+        const x1 = nA.x*sc + ox*s + wA*sc;
+        const y1 = nA.y*sc + oy*s + 36*sc;
         _drawConn(ctx, x1, y1, x2, y2, col, sc);
       }
     });
     ctx.restore();
-
-    // ── Nós ──
     nodes.forEach(n => {
       const cfg = NODE_CFG[n.type];
       const el  = document.getElementById("n-"+n.id);
@@ -801,44 +738,29 @@ function capturarImagem() {
       const x   = n.x*sc + ox*s;
       const y   = n.y*sc + oy*s;
       const r   = 10*sc;
-
-      // Sombra
       ctx.shadowColor="rgba(0,0,0,0.55)"; ctx.shadowBlur=18*sc;
       ctx.fillStyle="#141c2e";
       _rr(ctx,x,y,w,h,r); ctx.fill();
       ctx.shadowBlur=0;
-
-      // Borda
       ctx.strokeStyle="#1e2d47"; ctx.lineWidth=1.5*sc;
       _rr(ctx,x,y,w,h,r); ctx.stroke();
-
-      // Faixa colorida lateral
       ctx.fillStyle=cfg.color;
       ctx.fillRect(x, y+r, 3.5*sc, 36*sc-r);
-
-      // Faixa topo colorida
       ctx.globalAlpha=0.15;
       ctx.fillStyle=cfg.color;
       _rrTop(ctx,x,y,w,36*sc,r); ctx.fill();
       ctx.globalAlpha=1;
-
-      // Separador
       ctx.strokeStyle=cfg.color+"88"; ctx.lineWidth=0.8*sc;
       ctx.beginPath(); ctx.moveTo(x+r,y+36*sc); ctx.lineTo(x+w-r,y+36*sc); ctx.stroke();
-
-      // Tipo
       ctx.font=`700 ${9*sc}px 'Segoe UI',sans-serif`;
       ctx.fillStyle=cfg.color;
       ctx.textAlign="left";
       ctx.textBaseline="middle";
       ctx.fillText(cfg.label.toUpperCase(), x+12*sc, y+18*sc);
-
-      // Conteúdo do nó
       ctx.fillStyle="#94a3b8";
       ctx.font=`${10*sc}px 'Segoe UI',sans-serif`;
       const maxW = w - 24*sc;
       let ty = y + 46*sc;
-
       if(n.type==="mensagem"||n.type==="finalizar") {
         const linhas=_wrap(ctx, n.data.text||"", maxW);
         linhas.slice(0,5).forEach(ln => { ctx.fillText(ln,x+12*sc,ty); ty+=14*sc; });
@@ -847,7 +769,6 @@ function capturarImagem() {
         linhas.slice(0,2).forEach(ln => { ctx.fillText(ln,x+12*sc,ty); ty+=13*sc; });
         ty+=2*sc;
         (n.data.opcoes||[]).forEach((op,i) => {
-          // Pill da opção
           const txt=`${i+1}. ${op||"Opção "+(i+1)}`;
           ctx.fillStyle="rgba(167,139,250,0.15)";
           const pw=Math.min(ctx.measureText(txt).width+16*sc, maxW);
@@ -882,25 +803,27 @@ function capturarImagem() {
         ctx.font=`600 ${10*sc}px 'Segoe UI',sans-serif`;
         ctx.fillText("Início do fluxo", x+12*sc, ty);
       }
-
-      // Porta saída
       if(cfg.hasOut && n.type!=="menu") {
         ctx.strokeStyle="#CEFF00"; ctx.lineWidth=2*sc; ctx.fillStyle="#0a0f1a";
         ctx.beginPath(); ctx.arc(x+w,y+36*sc,6*sc,0,Math.PI*2); ctx.fill(); ctx.stroke();
         ctx.fillStyle="rgba(206,255,0,0.3)";
         ctx.beginPath(); ctx.arc(x+w,y+36*sc,3*sc,0,Math.PI*2); ctx.fill();
       }
-      // Portas de opção (menu)
       if(n.type==="menu") {
         (n.data.opcoes||[]).forEach((op,i)=>{
-          const portY=(46+10+54+4+i*36+(36/2));
+          const optPorts = el ? el.querySelectorAll(".port-opt") : [];
+          let portY = 0;
+          if(optPorts[i]) {
+            portY = optPorts[i].offsetTop + optPorts[i].offsetHeight / 2;
+          } else {
+            portY = (46+10+54+4+i*36+(36/2));
+          }
           ctx.strokeStyle="#a78bfa"; ctx.lineWidth=2*sc; ctx.fillStyle="#0a0f1a";
           ctx.beginPath(); ctx.arc(x+w,y+portY*sc,6*sc,0,Math.PI*2); ctx.fill(); ctx.stroke();
           ctx.fillStyle="rgba(167,139,250,0.3)";
           ctx.beginPath(); ctx.arc(x+w,y+portY*sc,3*sc,0,Math.PI*2); ctx.fill();
         });
       }
-      // Porta entrada
       if(cfg.hasIn) {
         ctx.strokeStyle="#38bdf8"; ctx.lineWidth=2*sc; ctx.fillStyle="#0a0f1a";
         ctx.beginPath(); ctx.arc(x,y+36*sc,6*sc,0,Math.PI*2); ctx.fill(); ctx.stroke();
@@ -908,16 +831,11 @@ function capturarImagem() {
         ctx.beginPath(); ctx.arc(x,y+36*sc,3*sc,0,Math.PI*2); ctx.fill();
       }
     });
-
-    // Watermark
     ctx.font=`${10*sc}px 'Segoe UI',sans-serif`;
     ctx.fillStyle="rgba(206,255,0,0.3)";
     ctx.textAlign="right";
     ctx.fillText("Caderno de Parâmetros · SobreIP", cv.width-12*s, cv.height-8*s);
-
-    // JPEG 85% — bom equilíbrio qualidade/tamanho
     const img = cv.toDataURL("image/jpeg", 0.85);
-    console.log("[Fluxo] Imagem gerada:", Math.round(img.length/1024)+"KB");
     resolve(img);
   });
 }
@@ -929,7 +847,6 @@ function _drawConn(ctx, x1,y1,x2,y2,col,sc) {
   ctx.moveTo(x1,y1);
   ctx.bezierCurveTo(x1+dx,y1, x2-dx,y2, x2,y2);
   ctx.stroke();
-  // seta
   const ang=Math.atan2(y2-(y1+(y2-y1)*0.9), x2-(x1+(x2-x1)*0.9));
   ctx.save(); ctx.translate(x2,y2); ctx.rotate(ang);
   ctx.fillStyle=col; ctx.beginPath();
@@ -948,23 +865,11 @@ function _wrap(ctx, text, maxW) {
   return lines;
 }
 
-
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
 function roundRectTop(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
 function _rr(ctx,x,y,w,h,r){roundRect(ctx,x,y,w,h,r);}
 function _rrTop(ctx,x,y,w,h,r){roundRectTop(ctx,x,y,w,h,r);}
-function wrapText(ctx, text, maxW) {
-  const words = text.split(" ");
-  const lines = [];
-  let cur = "";
-  words.forEach(w => {
-    const test = cur ? cur+" "+w : w;
-    if (ctx.measureText(test).width > maxW) { lines.push(cur); cur=w; }
-    else cur = test;
-  });
-  if (cur) lines.push(cur);
-  return lines.slice(0, 4);
-}
+
 function confirmarLimpar() {
   if (!nodes.length || confirm("Limpar todo o fluxo?")) {
     nodes=[]; conns=[]; nodesL.innerHTML=""; renderConnections();
@@ -972,7 +877,6 @@ function confirmarLimpar() {
   }
 }
 
-// ── TOAST ──
 function toast(msg, err=false) {
   const t = document.getElementById("toast");
   t.textContent = msg;
@@ -981,48 +885,67 @@ function toast(msg, err=false) {
   t._t = setTimeout(()=>t.classList.remove("show"), 2500);
 }
 
-// ── ESC cancela conexão em andamento ──
 window.addEventListener("keydown", e => {
   if (e.key === "Escape" && connectingFrom !== null) {
-    connectingFrom = null;
-    renderConnections();
+    connectingFrom = null; renderConnections();
   }
-  // Delete/Backspace deleta nó selecionado
   if ((e.key === "Delete" || e.key === "Backspace") && selected) {
     const tag = document.activeElement?.tagName?.toLowerCase();
-    if (tag !== "input" && tag !== "textarea") {
-      delNode(selected);
-      selected = null;
-    }
+    if (tag !== "input" && tag !== "textarea") { delNode(selected); selected = null; }
   }
 });
-
-// Clique no canvas vazio também cancela conexão
 wrap.addEventListener("click", e => {
   if (e.target === wrap || e.target === canvas || e.target === svgL || e.target === nodesL) {
-    if (connectingFrom !== null) {
-      connectingFrom = null;
-      renderConnections();
-    }
+    if (connectingFrom !== null) { connectingFrom = null; renderConnections(); }
   }
 });
 
-// ── Lê dados do caderno (localStorage) para preencher selects ──
+// ── ✅ CORREÇÃO 2: getDadosCaderno lê DOM do pai diretamente ──
 function getDadosCaderno() {
   try {
-    // 1. Tenta ler direto do DOM da janela pai (dados não salvos ainda)
     if (window.opener && !window.opener.closed) {
+      // 1. Lê direto do DOM do formulário pai — funciona mesmo sem salvar
       try {
-        const explorar = window.opener.window.explorar;
-        if (typeof explorar === "function") {
-          window.opener.window._explorarSilencioso = true;
-          const dados = explorar();
-          window.opener.window._explorarSilencioso = false;
-          if (dados) return dados;
-        }
-      } catch(e) {}
+        const opDoc = window.opener.document;
+        const opLS  = window.opener.localStorage;
+        const base  = JSON.parse(opLS.getItem("CONFIG_CADERNO") || "{}");
+        if (!base.chat) base.chat = {};
+        if (!base.voz)  base.voz  = {};
 
-      // 2. Tenta pelo localStorage da janela pai
+        // Departamentos do DOM
+        const deps = [];
+        opDoc.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
+          const nome = d.querySelector(".campo-nome")?.value?.trim();
+          if (nome) deps.push({ nome, agentes: JSON.parse(d.dataset?.agentes || "[]") });
+        });
+        if (deps.length) base.chat.departamentos = deps;
+
+        // Regras de tempo do DOM (voz e chat)
+        const rt = [];
+        opDoc.querySelectorAll("#listaRegrasTempo .campo-descricao, #listaRegrasTempoChat .campo-descricao").forEach(r => {
+          const nome = r.querySelector(".campo-nome")?.value?.trim();
+          if (nome) rt.push({ nome });
+        });
+        if (rt.length) base.voz.regras_tempo = rt;
+
+        // Agentes do DOM (voz + chat)
+        const ags = [];
+        opDoc.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
+          const nome = a.querySelector(".campo-nome")?.value?.trim();
+          if (nome) ags.push({ nome });
+        });
+        opDoc.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
+          const nome = a.querySelector(".campo-nome")?.value?.trim();
+          if (nome && !ags.find(x => x.nome === nome)) ags.push({ nome });
+        });
+        if (ags.length) { base.voz.agentes = ags; base.chat.agentes = ags; }
+
+        return base;
+      } catch(e) {
+        console.warn("[Fluxo] Erro ao ler DOM do pai:", e);
+      }
+
+      // 2. Fallback: localStorage da janela pai
       try {
         const raw = window.opener.localStorage.getItem("CONFIG_CADERNO");
         if (raw) return JSON.parse(raw);
@@ -1035,7 +958,6 @@ function getDadosCaderno() {
   } catch(e) { return {}; }
 }
 
-/* Re-renderiza todos os nós para atualizar selects com dados do caderno */
 function atualizarDadosCaderno() {
   nodes.forEach(n => renderNode(n));
   renderConnections();
@@ -1051,12 +973,10 @@ function getRegrasTempo() {
   const chatRegras = (d.chat?.regras_tempo || []).map(r => r.nome).filter(Boolean);
   return [...new Set([...vozRegras, ...chatRegras])];
 }
-
 function getDepartamentos() {
   const d = getDadosCaderno();
   return (d.chat?.departamentos || []).map(dep => dep.nome).filter(Boolean);
 }
-
 function getAgentes() {
   const d = getDadosCaderno();
   const voz  = (d.voz?.agentes  || []).map(a => a.nome).filter(Boolean);
@@ -1064,27 +984,16 @@ function getAgentes() {
   return [...new Set([...voz, ...chat])];
 }
 
-function getFilas() {
-  const d = getDadosCaderno();
-  return (d.voz?.filas || []).map(f => f.nome).filter(Boolean);
-}
-
-function makeSelect(items, placeholder) {
-  if (!items.length) return `<input type="text" placeholder="${placeholder}" style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;outline:none;">`;
-  const opts = items.map(i => `<option value="${i}">${i}</option>`).join("");
-  return `<select style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;outline:none;">
-    <option value="">${placeholder}</option>${opts}
-  </select>`;
-}
-
-// ── INIT: Start node + carregar fluxo para edição ──
+// ── INIT ──
 const _params = new URLSearchParams(window.location.search);
 if (!_params.get("id")) {
   addNode("start", 60, 80);
 } else {
-  // Pequeno delay para garantir que o DOM está pronto
   setTimeout(initFluxoEdit, 100);
 }
+
+// Auto-carrega dados do formulário ao abrir
+setTimeout(atualizarDadosCaderno, 800);
 </script>
 </body>
 </html>
