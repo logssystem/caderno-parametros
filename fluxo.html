@@ -54,7 +54,11 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 .node-body select:focus{border-color:rgba(206,255,0,.3);}
 .node-hint{font-size:10px;color:#475569;margin-top:5px;line-height:1.55;padding:5px 6px;background:rgba(255,255,255,.02);border-radius:5px;border-left:2px solid rgba(206,255,0,.2);}
 /* ── OPT ROW ── */
-.opt-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;padding:5px 8px;background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.18);border-radius:8px;}
+.opt-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;padding:5px 8px;background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.18);border-radius:8px;position:relative;overflow:visible;}
+/* Port embutida dentro da opt-row — alinha perfeitamente com a linha */
+.port-opt-inline{position:absolute;right:-30px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;border:2.5px solid var(--purple);background:rgba(167,139,250,.12);cursor:crosshair;display:flex;align-items:center;justify-content:center;z-index:10;transition:transform .15s,box-shadow .15s;}
+.port-opt-inline:hover{transform:translateY(-50%) scale(1.35);box-shadow:0 0 10px var(--purple);background:rgba(167,139,250,.35);}
+.port-opt-inline .port-opt-lbl{font-size:9px;font-weight:800;color:var(--purple);line-height:1;pointer-events:none;}
 .opt-row input{flex:1;margin:0!important;background:transparent!important;border:none!important;color:var(--text);font-size:11px;padding:1px 3px!important;outline:none;}
 .opt-num{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;min-width:17px;border-radius:50%;background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.45);color:var(--purple);font-size:9px;font-weight:800;}
 .opt-del{background:transparent;border:none;color:rgba(239,68,68,.55);cursor:pointer;font-size:12px;padding:1px 4px;border-radius:4px;flex-shrink:0;line-height:1;transition:all .15s;}
@@ -224,6 +228,7 @@ function renderNode(n){
         <span class="opt-num">${i+1}</span>
         <input type="text" placeholder="Opção ${i+1}..." value="${(op||"").replace(/"/g,"&quot;")}" onchange="no(${n.id},${i},this.value)">
         <button class="opt-del" onclick="nd(${n.id},${i})">✕</button>
+        <div class="port-opt-inline" data-opt="${i}" onmousedown="pOut(event,${n.id},'opt_${i}')" title="Conectar saída da opção ${i+1}"><span class="port-opt-lbl">${i+1}</span></div>
       </div>`;
     });
     b+=`</div><button class="btn-add-opt" onclick="na(${n.id})">＋ Adicionar opção</button>`;
@@ -265,32 +270,11 @@ function renderNode(n){
   if(c.hasIn) b+=`<div class="port port-in" style="top:16px" onmouseup="pIn(${n.id},event)"></div>`;
   // Porta saída única (não-menu)
   if(c.hasOut) b+=`<div class="port port-out" style="top:16px" onmousedown="pOut(event,${n.id})"></div>`;
-  // Menu: uma porta por opção (posição ajustada por post-render)
-  if(n.type==="menu"){
-    (n.data.opcoes||[]).forEach((op,i)=>{
-      b+=`<div class="port port-opt" data-opt="${i}" onmousedown="pOut(event,${n.id},'opt_${i}')" title="Saída opção ${i+1}" style="top:16px"><span class="port-opt-lbl">${i+1}</span></div>`;
-    });
-  }
+  // Obs: Menu não tem port-out global — cada opt-row tem sua porta inline
 
   el.innerHTML=b;
 
-  // ✅ CORREÇÃO ALINHAMENTO: ajusta top das portas após DOM renderizar
-  if(n.type==="menu"&&(n.data.opcoes||[]).length>0){
-    requestAnimationFrame(()=>{
-      const body     = el.querySelector(".node-body");
-      const optRows  = el.querySelectorAll(".opt-row");
-      const optPorts = el.querySelectorAll(".port-opt");
-      if(!body) return;
-      optRows.forEach((row,i)=>{
-        const port=optPorts[i]; if(!port) return;
-        // Centro da opt-row relativo ao topo do nó
-        const rowTop    = body.offsetTop + row.offsetTop;
-        const rowCenter = rowTop + row.offsetHeight/2;
-        port.style.top  = (rowCenter - port.offsetHeight/2)+"px";
-      });
-      renderConnections();
-    });
-  }
+  // Portas inline nas opt-rows já estão no DOM — nenhum cálculo extra necessário
 
   el.addEventListener("mousedown",e=>{
     if(e.target.classList.contains("port")||e.target.tagName==="BUTTON"||e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT") return;
@@ -324,22 +308,25 @@ window.pIn=(nid,e)=>{
   }
 };
 
-// ✅ getPortPos usa posição real do DOM após post-render
+// ✅ getPortPos: menu opt usa getBoundingClientRect das portas inline
 function getPortPos(nid,side,pk){
   const n=nodes.find(x=>x.id===nid);if(!n)return null;
   const el=document.getElementById("n-"+nid);if(!el)return null;
-  const w=el.offsetWidth;
-  const HDR_MID=26; // centro do header (~header 36px / 2 + 8 top)
-  if(side==="in")  return{x:n.x,   y:n.y+HDR_MID};
+  const HDR_MID=26;
+  if(side==="in") return{x:n.x, y:n.y+HDR_MID};
   if(n.type==="menu"&&pk?.startsWith("opt_")){
     const i=parseInt(pk.replace("opt_",""));
-    const ports=el.querySelectorAll(".port-opt");
-    if(ports[i]){
-      const pTop=parseFloat(ports[i].style.top)||ports[i].offsetTop;
-      return{x:n.x+w, y:n.y+pTop+(ports[i].offsetHeight||20)/2};
+    const inlinePorts=el.querySelectorAll(".port-opt-inline");
+    if(inlinePorts[i]){
+      // Posição real na tela → converte para coordenadas do canvas
+      const pr=inlinePorts[i].getBoundingClientRect();
+      const wr=wrap.getBoundingClientRect();
+      const cx=(pr.left+pr.width/2-wr.left-offsetX)/scale;
+      const cy=(pr.top+pr.height/2-wr.top-offsetY)/scale;
+      return{x:cx, y:cy};
     }
   }
-  return{x:n.x+w, y:n.y+HDR_MID};
+  return{x:n.x+el.offsetWidth, y:n.y+HDR_MID};
 }
 
 function renderConnections(px,py){
@@ -431,13 +418,16 @@ function capturarImagem(){
       const x2=nB.x*sc+ox*s,y2=nB.y*sc+oy*s+26*sc;
       if(isO&&c.portKey){
         const i=parseInt(c.portKey.replace("opt_",""));
-        const ps=elA?elA.querySelectorAll(".port-opt"):[];
-        let pY=0;
-        if(ps[i]){const pTop=parseFloat(ps[i].style.top)||ps[i].offsetTop;pY=pTop+(ps[i].offsetHeight||20)/2;}
-        else pY=26+40+i*30+15;
-        _dc(ctx,nA.x*sc+ox*s+wA*sc,nA.y*sc+oy*s+pY*sc,x2,y2,col,sc);
+        // Calcula Y da porta usando body.offsetTop + row center (inline port)
+        const body=elA?elA.querySelector(".node-body"):null;
+        const rows=elA?elA.querySelectorAll(".opt-row"):[];
+        let pY=26+40+i*30+15; // fallback
+        if(body&&rows[i]) pY=body.offsetTop+rows[i].offsetTop+rows[i].offsetHeight/2;
+        const px1=nA.x*sc+ox*s+wA*sc; // linha sai da borda direita do nó
+        const py1=nA.y*sc+oy*s+pY*sc;
+        _dc(ctx,px1,py1,x2,y2,col,sc);
         ctx.font=`bold ${9*sc}px 'Segoe UI',sans-serif`;ctx.textAlign="center";
-        const mx2=(nA.x*sc+ox*s+wA*sc+x2)/2,my2=(nA.y*sc+oy*s+pY*sc+y2)/2-6*sc;
+        const mx2=(px1+x2)/2,my2=(py1+y2)/2-6*sc;
         ctx.fillStyle="rgba(10,15,26,0.85)";const lw=ctx.measureText("Op."+(i+1)).width+8*sc;
         ctx.fillRect(mx2-lw/2,my2-8*sc,lw,12*sc);ctx.fillStyle=col;ctx.fillText("Op."+(i+1),mx2,my2);
       }else{_dc(ctx,nA.x*sc+ox*s+wA*sc,nA.y*sc+oy*s+26*sc,x2,y2,col,sc);}
@@ -460,22 +450,31 @@ function capturarImagem(){
       else if(n.type==="menu"){
         _wt(ctx,n.data.text||"",mw).slice(0,2).forEach(l=>{ctx.fillText(l,x+12*sc,ty);ty+=12*sc;});ty+=3*sc;
         (n.data.opcoes||[]).forEach((op,i)=>{
-          const txt=`${i+1}. ${op||"Opção "+(i+1)}`;
+          const txt=`${i+1}. ${op||"Opcao "+(i+1)}`;
           ctx.fillStyle="rgba(167,139,250,0.1)";const pw=Math.min(ctx.measureText(txt).width+14*sc,mw);
           ctx.fillRect(x+10*sc,ty-8*sc,pw,17*sc);ctx.strokeStyle="rgba(167,139,250,0.28)";ctx.lineWidth=0.8*sc;ctx.strokeRect(x+10*sc,ty-8*sc,pw,17*sc);
           ctx.fillStyle="#a78bfa";ctx.font=`600 ${9*sc}px 'Segoe UI',sans-serif`;ctx.fillText(txt,x+17*sc,ty);
           ctx.font=`${10*sc}px 'Segoe UI',sans-serif`;ty+=19*sc;
         });
       }
-      else if(n.type==="horario"){ctx.fillStyle="#f59e0b";ctx.font=`600 ${10*sc}px 'Segoe UI',sans-serif`;ctx.fillText("⏰ "+(n.data.horario||"Horário Comercial"),x+12*sc,ty);}
-      else if(n.type==="dados"){ctx.fillText("📌 "+(n.data.campo||"—"),x+12*sc,ty);ty+=13*sc;_wt(ctx,n.data.text||"",mw).slice(0,2).forEach(l=>{ctx.fillText(l,x+12*sc,ty);ty+=12*sc;});}
-      else if(n.type==="agente"){ctx.fillStyle="#fb923c";ctx.fillText("👤 "+(n.data.text||"Qualquer agente"),x+12*sc,ty);}
-      else if(n.type==="depto"){ctx.fillStyle="#34d399";ctx.fillText("🏢 "+(n.data.text||"Departamento"),x+12*sc,ty);}
-      else if(n.type==="espera"){ctx.fillStyle="#94a3b8";ctx.fillText("⏱ "+(n.data.text||"Aguardando..."),x+12*sc,ty);}
-      else if(n.type==="start"){ctx.fillStyle="#22c55e";ctx.font=`600 ${10*sc}px 'Segoe UI',sans-serif`;ctx.fillText("▶  Início do fluxo",x+12*sc,ty);}
-      // Portas na imagem
+      else if(n.type==="horario"){ctx.fillStyle="#f59e0b";ctx.font=`600 ${10*sc}px 'Segoe UI',sans-serif`;ctx.fillText((n.data.horario||"Horario Comercial"),x+12*sc,ty);}
+      else if(n.type==="dados"){ctx.fillText("Campo: "+(n.data.campo||"—"),x+12*sc,ty);ty+=13*sc;_wt(ctx,n.data.text||"",mw).slice(0,2).forEach(l=>{ctx.fillText(l,x+12*sc,ty);ty+=12*sc;});}
+      else if(n.type==="agente"){ctx.fillStyle="#fb923c";ctx.fillText(n.data.text||"Qualquer agente",x+12*sc,ty);}
+      else if(n.type==="depto"){ctx.fillStyle="#34d399";ctx.fillText(n.data.text||"Departamento",x+12*sc,ty);}
+      else if(n.type==="espera"){ctx.fillStyle="#94a3b8";ctx.fillText(n.data.text||"Aguardando...",x+12*sc,ty);}
+      else if(n.type==="start"){ctx.fillStyle="#22c55e";ctx.font=`600 ${10*sc}px 'Segoe UI',sans-serif`;ctx.fillText("Inicio do fluxo",x+12*sc,ty);}
+      // Porta saída (não menu)
       if(c.hasOut&&n.type!=="menu"){_porto(ctx,x+w,y+26*sc,"#CEFF00",sc);}
-      if(n.type==="menu"){(n.data.opcoes||[]).forEach((op,i)=>{const ps=el?el.querySelectorAll(".port-opt"):[];let pY=0;if(ps[i]){const pt=parseFloat(ps[i].style.top)||ps[i].offsetTop;pY=pt+(ps[i].offsetHeight||20)/2;}else pY=26+40+i*30+15;_porto(ctx,x+w,y+pY*sc,"#a78bfa",sc);});}
+      // Menu: porta por opção alinhada com a linha
+      if(n.type==="menu"){
+        const body=el?el.querySelector(".node-body"):null;
+        const rows=el?el.querySelectorAll(".opt-row"):[];
+        (n.data.opcoes||[]).forEach((op,i)=>{
+          let pY=26+40+i*30+15;
+          if(body&&rows[i]) pY=body.offsetTop+rows[i].offsetTop+rows[i].offsetHeight/2;
+          _porto(ctx,x+w,y+pY*sc,"#a78bfa",sc);
+        });
+      }
       if(c.hasIn){_porto(ctx,x,y+26*sc,"#38bdf8",sc);}
     });
     ctx.font=`${9*sc}px 'Segoe UI',sans-serif`;ctx.fillStyle="rgba(206,255,0,0.25)";ctx.textAlign="right";
