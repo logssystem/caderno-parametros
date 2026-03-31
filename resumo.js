@@ -69,14 +69,11 @@ window.renderResumoChat = function (container, data) {
 /* ======================================================
    RESUMO – PRINCIPAL
 ====================================================== */
-/* ======================================================
-   ESTADO GLOBAL DO RESUMO
-====================================================== */
 let _dadosResumo   = {};
 let _modoCompacto  = false;
-let _paginasState  = {}; // { secaoId: paginaAtual }
+let _paginasState  = {};
 const PAGE_SIZE    = 9;
-/* ── Modo compacto / completo ── */
+
 window.toggleModoResumo = function () {
   _modoCompacto = !_modoCompacto;
   const btn   = document.getElementById("btnModoResumo");
@@ -91,7 +88,7 @@ window.toggleModoResumo = function () {
     card.classList.toggle("modo-compacto", _modoCompacto);
   });
 };
-/* ── Copiar para clipboard ── */
+
 window.copiarCampo = function (texto, btn) {
   navigator.clipboard.writeText(texto).then(() => {
     const orig = btn.innerHTML;
@@ -118,7 +115,7 @@ function campoCopia(label, valor, sensivel = false) {
   const cls = sensivel ? ' class="campo-sensivel"' : "";
   return `<div${cls}><strong>${label}:</strong> <span>${valor || "—"}</span>${btnCopiar(valor)}</div>`;
 }
-/* ── Busca ── */
+
 window.limparBusca = function () {
   const inp = document.getElementById("resumoBusca");
   if (inp) { inp.value = ""; inp.dispatchEvent(new Event("input")); }
@@ -134,7 +131,6 @@ function initBusca() {
       const txt = card.textContent.toLowerCase();
       card.style.display = (!q || txt.includes(q)) ? "" : "none";
     });
-    // Mostra seções que têm resultados
     document.querySelectorAll(".resumo-bloco").forEach(bloco => {
       if (bloco.classList.contains("modulo-titulo")) return;
       const cards = bloco.querySelectorAll(".resumo-card");
@@ -143,7 +139,7 @@ function initBusca() {
     });
   });
 }
-/* ── Paginação ── */
+
 function renderPaginado(itens, secaoId, renderFn) {
   if (!_paginasState[secaoId]) _paginasState[secaoId] = 1;
   const total  = Math.ceil(itens.length / PAGE_SIZE);
@@ -164,13 +160,12 @@ function renderPaginado(itens, secaoId, renderFn) {
 window.irPagina = function (secaoId, pagina) {
   _paginasState[secaoId] = pagina;
   renderResumoCompleto();
-  // Rola para a seção
   setTimeout(() => {
     const el = document.getElementById(secaoId);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   }, 60);
 };
-/* ── Sidebar nav ── */
+
 function buildNav(secoes) {
   const lista = document.getElementById("navLista");
   if (!lista) return;
@@ -181,7 +176,6 @@ function buildNav(secoes) {
       ${s.count ? `<span class="nav-badge">${s.count}</span>` : ""}
     </a></li>`
   ).join("");
-  // Observer para destacar seção ativa
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {
@@ -202,33 +196,27 @@ window.navClick = function (id, e) {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
 };
-/* ── Alertas ── */
+
 function buildAlertas(dados) {
   const voz  = dados.voz  || {};
   const alertas = [];
-  // Agentes sem ramal
   (voz.agentes || []).forEach(a => {
     if (!a.ramal) alertas.push({ tipo: "erro", msg: `Agente <strong>${a.nome}</strong> sem ramal vinculado` });
   });
-  // Filas sem agentes
   (voz.filas || []).forEach(f => {
     if (!f.agentes?.length) alertas.push({ tipo: "aviso", msg: `Fila <strong>${f.nome}</strong> sem agentes configurados` });
   });
-  // URAs com opções sem destino
   (voz.uras || []).forEach(u => {
     (u.opcoes || []).forEach(o => {
       if (!o.destino) alertas.push({ tipo: "aviso", msg: `URA <strong>${u.nome}</strong> — tecla ${o.tecla} sem destino definido` });
     });
   });
-  // Grupo de ring sem ramais
   (voz.grupo_ring || []).forEach(g => {
     if (!g.ramais?.length) alertas.push({ tipo: "aviso", msg: `Grupo de Ring <strong>${g.nome}</strong> sem ramais` });
   });
-  // Usuários sem permissão
   (voz.usuarios || []).forEach(u => {
     if (!u.permissao) alertas.push({ tipo: "info", msg: `Usuário <strong>${u.nome}</strong> sem permissão definida` });
   });
-  // Domínio inválido
   const dom = dados.cliente?.dominio || "";
   if (dom && !dom.endsWith(".sobreip.com.br"))
     alertas.push({ tipo: "erro", msg: `Domínio <strong>${dom}</strong> não termina com .sobreip.com.br` });
@@ -252,7 +240,7 @@ function buildAlertas(dados) {
       ${alertas.map(a => `<li class="alerta-item alerta-${a.tipo}">${icons[a.tipo]} ${a.msg}</li>`).join("")}
     </ul>`;
 }
-/* ── Render principal ── */
+
 function renderResumoCompleto() {
   const resumo = document.getElementById("resumo");
   if (!resumo) return;
@@ -260,8 +248,7 @@ function renderResumoCompleto() {
   const voz   = dados.voz  || {};
   const cli   = dados.cliente || {};
   resumo.innerHTML = "";
-  const secoes = []; // para a sidebar
-  // Mapa de secoes para âncoras no formulário principal
+  const secoes = [];
   const _EDIT_MAP = {
     "sec-cliente":       "#empresaCliente",
     "sec-usuarios":      "#listaUsuariosWeb",
@@ -305,10 +292,8 @@ function renderResumoCompleto() {
     return nome;
   }
   let html = "";
-  // ── Módulo Voz ──────────────────────────────────────
   const temVoz = voz.usuarios?.length || voz.ramais?.length || voz.agentes?.length || voz.filas?.length;
   if (temVoz) html += `<div class="modulo-titulo"><h1>📞 Voz / Call Center</h1></div>`;
-  // Cliente
   if (cli.empresa || cli.dominio || cli.cnpj) {
     html += secao("sec-cliente", "🏢", "Cliente");
     html += `<div class="resumo-card">
@@ -318,7 +303,6 @@ function renderResumoCompleto() {
     </div>`;
     html += fecharSecao();
   }
-  // Usuários Web
   if (voz.usuarios?.length) {
     html += secao("sec-usuarios", "👤", "Usuários Web", voz.usuarios.length);
     html += renderPaginado(voz.usuarios, "sec-usuarios", u => `
@@ -332,7 +316,6 @@ function renderResumoCompleto() {
       </div>`);
     html += fecharSecao();
   }
-  // Entradas
   if (voz.entradas?.length) {
     html += secao("sec-entradas", "📞", "Entradas / Números", voz.entradas.length);
     html += `<div class="resumo-grid">
@@ -342,7 +325,6 @@ function renderResumoCompleto() {
     </div>`;
     html += fecharSecao();
   }
-  // Ramais — paginado
   if (voz.ramais?.length) {
     html += secao("sec-ramais", "☎️", "Ramais", voz.ramais.length);
     html += renderPaginado(voz.ramais, "sec-ramais", r => `
@@ -352,7 +334,6 @@ function renderResumoCompleto() {
       </div>`);
     html += fecharSecao();
   }
-  // Agentes — paginado
   if (voz.agentes?.length) {
     html += secao("sec-agentes", "🎧", "Agentes", voz.agentes.length);
     html += renderPaginado(voz.agentes, "sec-agentes", a => `
@@ -363,7 +344,6 @@ function renderResumoCompleto() {
       </div>`);
     html += fecharSecao();
   }
-  // Regras de Tempo
   if (voz.regras_tempo?.length) {
     html += secao("sec-regras", "⏰", "Regras de Tempo", voz.regras_tempo.length);
     html += `<div class="resumo-grid">${voz.regras_tempo.map(r => {
@@ -379,7 +359,6 @@ function renderResumoCompleto() {
     }).join("")}</div>`;
     html += fecharSecao();
   }
-  // Grupo de Ring
   if (voz.grupo_ring?.length) {
     html += secao("sec-grupo-ring", "🔔", "Grupo de Ring", voz.grupo_ring.length);
     html += `<div class="resumo-grid">${voz.grupo_ring.map(g => `
@@ -390,7 +369,6 @@ function renderResumoCompleto() {
       </div>`).join("")}</div>`;
     html += fecharSecao();
   }
-  // Filas
   if (voz.filas?.length) {
     html += secao("sec-filas", "📋", "Filas", voz.filas.length);
     html += `<div class="resumo-grid">${voz.filas.map(f => `
@@ -403,7 +381,6 @@ function renderResumoCompleto() {
       </div>`).join("")}</div>`;
     html += fecharSecao();
   }
-  // URA
   if (voz.uras?.length) {
     html += secao("sec-ura", "🎙️", "URA", voz.uras.length);
     html += voz.uras.map(u => `
@@ -421,7 +398,6 @@ function renderResumoCompleto() {
       </div>`).join("");
     html += fecharSecao();
   }
-  // Pausas
   if (voz.pausas?.length) {
     html += secao("sec-pausas", "⏸️", "Pausas", voz.pausas.length);
     html += voz.pausas.map(p => `
@@ -433,7 +409,6 @@ function renderResumoCompleto() {
       </div>`).join("");
     html += fecharSecao();
   }
-  // Pesquisa
   if (voz.pesquisas?.length) {
     html += secao("sec-pesquisa", "⭐", "Pesquisa de Satisfação", voz.pesquisas.length);
     html += voz.pesquisas.map(p => `
@@ -447,7 +422,6 @@ function renderResumoCompleto() {
       </div>`).join("");
     html += fecharSecao();
   }
-  // ── Módulo Chat ──────────────────────────────────────
   const chat = dados.chat || {};
   if (chat.tipo || chat.usuarios?.length || chat.agentes?.length || chat.fluxo || chat.fluxo_imagem || chat.fluxos?.length || chat.regras_tempo?.length) {
     html += `<div class="modulo-titulo"><h1>💬 Chat / Omnichannel</h1></div>`;
@@ -502,9 +476,6 @@ function renderResumoCompleto() {
         </div>`).join("")}</div>`;
       html += fecharSecao();
     }
-
-    // ── Fluxo de Atendimento ─────────────────────────────
-    // ── Regras de Tempo Chat ──────────────────────────────────────────
     if (chat.regras_tempo?.length) {
       html += secao("sec-regras-chat", "⏰", "Regras de Tempo (Chat)", chat.regras_tempo.length);
       html += `<div class="resumo-grid">${chat.regras_tempo.map(r => {
@@ -520,16 +491,12 @@ function renderResumoCompleto() {
       }).join("")}</div>`;
       html += fecharSecao();
     }
-
-    // ── Fluxos de Atendimento ────────────────────────────────────────────
     const _fluxos = chat.fluxos?.length ? chat.fluxos
       : (chat.fluxo_imagem || chat.fluxo ? [{
           id: "legado", nome: chat.fluxo?.nome || "Fluxo de Atendimento",
           imagem: chat.fluxo_imagem, nos: chat.fluxo?.nos, conexoes: chat.fluxo?.conexoes
         }] : []);
-
     html += secao("sec-fluxo", "🔀", "Fluxos de Atendimento", _fluxos.length || null);
-
     if (_fluxos.length) {
       _fluxos.forEach(f => {
         html += `<div class="resumo-card" style="padding:14px;margin-bottom:12px;">
@@ -556,7 +523,6 @@ function renderResumoCompleto() {
     html += fecharSecao();
   }
   resumo.innerHTML = html;
-  // Aplica modo compacto se ativo
   if (_modoCompacto) {
     document.querySelectorAll(".campo-sensivel").forEach(el => el.style.display = "none");
   }
@@ -564,7 +530,7 @@ function renderResumoCompleto() {
   buildAlertas(dados);
   initBusca();
 }
-/* Baixa backup do JSON a partir do resumo */
+
 window.baixarBackupDoResumo = function() {
   const raw = localStorage.getItem("CONFIG_CADERNO");
   if (!raw || raw === "null") return;
@@ -591,33 +557,18 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
   try { _dadosResumo = JSON.parse(raw) || {}; } catch (e) { _dadosResumo = {}; }
-  // Mostra layout
   document.getElementById("resumoToolbar").style.display = "flex";
   document.getElementById("resumoLayout").style.display  = "flex";
-  const voz = _dadosResumo.voz || {};
-  if (voz.usuarios?.length || voz.ramais?.length || voz.agentes?.length || voz.filas?.length || voz.uras?.length || voz.grupo_ring?.length) {
-    resumo.innerHTML += `<section class="resumo-bloco modulo-titulo"><h1>📞 Voz / Call Center</h1></section>`;
-  }
-  function identificarDestino(nome) {
-    if (!nome) return "-";
-    if (voz.regras_tempo?.some(r => r.nome === nome)) return `⏰ Regra de Tempo — ${nome}`;
-    if (voz.filas?.some(f => f.nome === nome))        return `📞 Fila — ${nome}`;
-    if (voz.grupo_ring?.some(g => g.nome === nome))   return `🔔 Grupo de Ring — ${nome}`;
-    if (voz.uras?.some(u => u.nome === nome))         return `🎙️ URA — ${nome}`;
-    if (voz.ramais?.some(r => String(r.ramal) === String(nome))) return `☎️ Ramal — ${nome}`;
-    return nome;
-  }
   renderResumoCompleto();
 });
-/* ================= VOLTAR ================= */
+
 window.voltar = function () { window.location.href = "index.html"; };
 
-/* ================= EDITAR SEÇÃO ================= */
 window.editarSecao = function (ancora) {
-  // Salva âncora para scroll automático ao retornar ao index
   sessionStorage.setItem("CADERNO_EDIT_ANCORA", ancora);
   window.location.href = "index.html";
 };
+
 /* =======================================================
    GERAR PDF PROFISSIONAL
 ======================================================= */
@@ -638,7 +589,6 @@ window.confirmarConfiguracao = async function () {
   const PW = 210, PH = 297;
   const ML = 14, MR = 14, MT = 14;
   const CW = PW - ML - MR;
-  // ── PALETA ──────────────────────────────────────────
   const C = {
     primary:   [43,  54,  61],
     accent:    [43,  54,  61],
@@ -660,7 +610,7 @@ window.confirmarConfiguracao = async function () {
   const hoje = new Date().toLocaleDateString("pt-BR");
   let paginaAtual = 1;
   const paginas = [];
-  // ── HELPERS ─────────────────────────────────────────
+
   function rgb(arr) { return { r: arr[0], g: arr[1], b: arr[2] }; }
   function setFill(arr)   { doc.setFillColor(...arr); }
   function setDraw(arr)   { doc.setDrawColor(...arr); }
@@ -818,9 +768,8 @@ window.confirmarConfiguracao = async function () {
     }
     return y + 5;
   }
-  // ════════════════════════════════════════════════════
-  //  CAPA
-  // ════════════════════════════════════════════════════
+
+  // ── CAPA ──
   for (let i = 0; i < 60; i++) {
     const t = i / 60;
     doc.setFillColor(
@@ -886,12 +835,11 @@ window.confirmarConfiguracao = async function () {
     doc.text(label + ":  " + val, PW / 2, iy, { align: "center" });
     iy += 7;
   });
-  // Stats adaptativas por modo
+
   const temVozStats  = !!(voz.usuarios?.length || voz.ramais?.length || voz.agentes?.length);
   const temChatStats = !!(chat.usuarios?.length || chat.agentes?.length || chat.departamentos?.length);
   let stats;
   if (temVozStats && temChatStats) {
-    // Modo VOZ + CHAT: 3 voz / 3 chat
     stats = [
       { label: "Usu. Voz",  val: String(voz.usuarios?.length         || 0) },
       { label: "Ramais",    val: String(voz.ramais?.length           || 0) },
@@ -901,7 +849,6 @@ window.confirmarConfiguracao = async function () {
       { label: "Depto.",    val: String(chat.departamentos?.length   || 0) },
     ];
   } else if (temChatStats && !temVozStats) {
-    // Modo CHAT apenas: sem campo PABX/voz
     stats = [
       { label: "Usuarios",  val: String(chat.usuarios?.length        || 0) },
       { label: "Agentes",   val: String(chat.agentes?.length         || 0) },
@@ -911,7 +858,6 @@ window.confirmarConfiguracao = async function () {
       { label: "QR Code",   val: (chat.tipo === "qr"  || chat.tipo === "ambos") ? "Sim" : "Nao" },
     ];
   } else {
-    // Modo VOZ apenas: PABX Sim, Chat Nao
     stats = [
       { label: "Usuarios",  val: String(voz.usuarios?.length         || 0) },
       { label: "Ramais",    val: String(voz.ramais?.length           || 0) },
@@ -961,7 +907,8 @@ window.confirmarConfiguracao = async function () {
     "Documento gerado automaticamente pelo Caderno de Parametros SobreIP",
     PW / 2, PH - 5.5, { align: "center" }
   );
-  // ── Página 2: Índice ─────────────────────────────────
+
+  // ── Página 2: Índice ──
   doc.addPage();
   paginaAtual = 2;
   pageHeader();
@@ -1002,7 +949,8 @@ window.confirmarConfiguracao = async function () {
     y += 8.5;
   });
   pageFooter();
-  // ── NOVA PÁGINA: CONTEÚDO ────────────────────────────
+
+  // ── NOVA PÁGINA: CONTEÚDO ──
   doc.addPage();
   paginaAtual++;
   pageHeader();
@@ -1145,8 +1093,6 @@ window.confirmarConfiguracao = async function () {
     pageHeader();
     y = 22;
     y = sectionBar(y, "CHAT / OMNICHANNEL", C.accent2);
-
-    // ── Tipo de integração ──
     if (chat.tipo) {
       const tipoLabel = chat.tipo === "qr" ? "Integração via QR Code"
                       : chat.tipo === "ambos" ? "API Oficial + QR Code"
@@ -1164,8 +1110,6 @@ window.confirmarConfiguracao = async function () {
       }
       y = cardInfo(y, paresChat);
     }
-
-    // ── Canais ──
     if (chat.canais?.length) {
       y = checkY(y, 20);
       setTextC(C.primary);
@@ -1174,8 +1118,6 @@ window.confirmarConfiguracao = async function () {
       y += 4;
       y = chips(y, chat.canais);
     }
-
-    // ── Usuários do chat ──
     if (chat.usuarios?.length) {
       y = checkY(y, 30);
       y = sectionBar(y, "USUARIOS DO CHAT", C.accent2);
@@ -1183,8 +1125,6 @@ window.confirmarConfiguracao = async function () {
       const rowsUC = chat.usuarios.map(u => [u.nome || "—", u.email || "—", u.senha || "—", u.permissao || "—"]);
       y = tabelaAutoTable(y, ["Nome","E-mail","Senha","Permissão"], rowsUC, colsUC);
     }
-
-    // ── Agentes do chat ──
     if (chat.agentes?.length) {
       y = checkY(y, 30);
       y = sectionBar(y, "AGENTES DO CHAT", C.accent2);
@@ -1192,15 +1132,12 @@ window.confirmarConfiguracao = async function () {
       const rowsAC = chat.agentes.map(a => [a.nome || "—", (a.departamentos || []).join(", ") || "—"]);
       y = tabelaAutoTable(y, ["Agente","Departamentos"], rowsAC, colsAC);
     }
-
-    // ── Departamentos ──
     if (chat.departamentos?.length) {
       y = checkY(y, 30);
       y = sectionBar(y, "DEPARTAMENTOS", C.accent2);
       chat.departamentos.forEach(dep => {
         y = checkY(y, 24);
         const agentes = dep.agentes || [];
-        // Linha do nome do departamento
         setFill(C.primary);
         doc.rect(ML, y, CW, 9, "F");
         setFill([206, 255, 0]);
@@ -1216,10 +1153,7 @@ window.confirmarConfiguracao = async function () {
         doc.text(countLabel, PW - MR, y + 6.2, { align: "right" });
         y += 9;
         if (agentes.length) {
-          // Grid de agentes: 3 por linha
-          const cols3 = 3;
-          const colW3 = CW / cols3;
-          const rowH3 = 8;
+          const cols3 = 3, colW3 = CW / cols3, rowH3 = 8;
           for (let i = 0; i < agentes.length; i += cols3) {
             y = checkY(y, rowH3 + 1);
             const grupo = agentes.slice(i, i + cols3);
@@ -1256,29 +1190,24 @@ window.confirmarConfiguracao = async function () {
   }
   pageFooter();
 
-  // ── FLUXOS DE ATENDIMENTO NO PDF ─────────────────────
-  const _pdfFluxos = chat.fluxos?.length ? chat.fluxos
-    : (chat.fluxo_imagem ? [{ nome: chat.fluxo?.nome||"Fluxo de Atendimento",
-        imagem: chat.fluxo_imagem, nos: chat.fluxo?.nos, conexoes: chat.fluxo?.conexoes }] : []);
-
+  // ── ✅ CORREÇÃO 1: Imagem do fluxo com aspect ratio correto ──
   const NODE_LABEL_PDF = {
     start:"Inicio", mensagem:"Enviar Mensagem", menu:"Menu de Opcoes",
     horario:"Regra de Horario", dados:"Solicitar Dados", agente:"Transferir Agente",
     depto:"Departamento", espera:"Tempo de Espera", finalizar:"Finalizar"
   };
+  const _pdfFluxos = chat.fluxos?.length ? chat.fluxos
+    : (chat.fluxo_imagem ? [{ nome: chat.fluxo?.nome||"Fluxo de Atendimento",
+        imagem: chat.fluxo_imagem, nos: chat.fluxo?.nos, conexoes: chat.fluxo?.conexoes }] : []);
 
   if (_pdfFluxos.length) {
     _pdfFluxos.forEach((f, idx) => {
-      // Página separada para cada fluxo
       doc.addPage();
       paginaAtual++;
       pageHeader();
       let yf = 22;
 
-      // Barra do fluxo com nome
       yf = sectionBar(yf, "FLUXO: " + (f.nome || "Fluxo " + (idx+1)).toUpperCase(), C.accent2);
-
-      // Info resumida
       yf = cardInfo(yf, [
         ["Nome",     f.nome || "Fluxo " + (idx+1)],
         ["Nos",      String(f.nos?.length || 0)],
@@ -1286,13 +1215,34 @@ window.confirmarConfiguracao = async function () {
       ]);
       yf += 6;
 
-      // ── Imagem do fluxo ──────────────────────────────
+      // ✅ Correção: calcula proporção real da imagem antes de inserir
       if (f.imagem) {
         try {
-          const fmt  = f.imagem.startsWith("data:image/jpeg") ? "JPEG" : "PNG";
-          const maxH = Math.min(PH - yf - 70, 120); // espaço para tabela abaixo
-          doc.addImage(f.imagem, fmt, ML, yf, CW, maxH, undefined, "FAST");
-          yf += maxH + 8;
+          const fmt   = f.imagem.startsWith("data:image/jpeg") ? "JPEG" : "PNG";
+          const props = doc.getImageProperties(f.imagem);
+          const ratio = props.width / props.height;
+
+          // Espaço disponível na página (deixa 60mm para tabela abaixo)
+          const maxH = Math.min(PH - yf - 60, 130);
+          const maxW = CW;
+
+          // Calcula dimensões respeitando proporção
+          let imgW = maxW;
+          let imgH = imgW / ratio;
+          if (imgH > maxH) {
+            imgH = maxH;
+            imgW = imgH * ratio;
+          }
+          if (imgW > maxW) {
+            imgW = maxW;
+            imgH = imgW / ratio;
+          }
+
+          // Centraliza horizontalmente se for mais estreita que CW
+          const imgX = ML + (CW - imgW) / 2;
+
+          doc.addImage(f.imagem, fmt, imgX, yf, imgW, imgH, undefined, "FAST");
+          yf += imgH + 8;
         } catch(e) {
           console.warn("Erro imagem fluxo:", e);
           setTextC(C.textSoft); setFont(9,"normal");
@@ -1301,11 +1251,9 @@ window.confirmarConfiguracao = async function () {
         }
       }
 
-      // ── Tabela de nós com descrição ──────────────────
+      // Tabela de nós
       if (f.nos?.length) {
         yf = checkY(yf, 30);
-
-        // Header da tabela
         setFill(C.primary);
         doc.rect(ML, yf, CW, 8, "F");
         setFill([206,255,0]);
@@ -1340,15 +1288,10 @@ window.confirmarConfiguracao = async function () {
           setDraw(C.border);
           doc.setLineWidth(0.25);
           doc.rect(ML, yf, CW, 9, "S");
-          // Faixa vertical separadora
           doc.rect(ML+52, yf, 0.4, 9, "S");
-
-          // Tipo
           setTextC(C.primary);
           setFont(7.5, "bold");
           doc.text(tipo, ML+4, yf+6);
-
-          // Descrição
           setTextC(C.text);
           setFont(7.5, "normal");
           const descTxt = desc.length > 120 ? desc.substring(0,120)+"..." : desc;
@@ -1361,15 +1304,13 @@ window.confirmarConfiguracao = async function () {
     });
   }
 
-  // ── NOME DO ARQUIVO COM EMPRESA + DATA ───────────────
+  // ── SALVA ──
   const _empresa  = (cli.empresa || "caderno").replace(/[^a-zA-Z0-9À-ÿ ]/g, "").trim().replace(/\s+/g, "-");
-  const _hoje     = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+  const _hoje     = new Date().toISOString().slice(0,10);
   const nomeArq   = `${_empresa}-${_hoje}.pdf`;
-
-  // ── SALVA LOCALMENTE ─────────────────────────────────
   doc.save(nomeArq);
 
-  // ── ENVIA PARA API PHP ───────────────────────────────
+  // ── ENVIA PARA API PHP ──
   try {
     const res = await fetch("/app/caderno/api/salvar.php", {
       method: "POST",
@@ -1385,10 +1326,9 @@ window.confirmarConfiguracao = async function () {
     console.error("Erro ao enviar para API PHP:", e);
   }
 
-  // ── ENVIA PARA GOOGLE DRIVE ──────────────────────────
+  // ── ENVIA PARA GOOGLE DRIVE ──
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIa5t0aWJwqAOGVp0WXkoJhqZlGVdU4rhrBoInoKhd3ZS8rBBSr84tLi_BQutcVuV6Yg/exec";
 
-  /* ── Helper: toast robusto ── */
   function _driveToast(txt, erro) {
     const t = document.getElementById("toastGlobal");
     const m = document.getElementById("toastMessage");
@@ -1399,55 +1339,38 @@ window.confirmarConfiguracao = async function () {
     t._dt = setTimeout(() => t.classList.remove("show"), 5000);
   }
 
-  /* ── Envia via iframe form — bypassa CORS completamente ── */
   function _enviarDrive(url, nome, empresa, b64) {
     try {
-      // Cria iframe oculto que recebe o POST silenciosamente
       const iframeId = "_driveFrame_" + Date.now();
       const iframe   = document.createElement("iframe");
       iframe.name    = iframeId;
       iframe.style   = "display:none;width:0;height:0;border:none;position:absolute;top:-9999px";
       document.body.appendChild(iframe);
-
-      // Cria form oculto com campos individuais
       const form       = document.createElement("form");
       form.method      = "POST";
       form.action      = url;
       form.target      = iframeId;
       form.enctype     = "application/x-www-form-urlencoded";
       form.style       = "display:none";
-
       function addField(n, v) {
         const i = document.createElement("input");
         i.type  = "hidden"; i.name = n; i.value = v;
         form.appendChild(i);
       }
-
       addField("nome",    nome);
       addField("empresa", empresa);
       addField("pdf",     b64);
-
       document.body.appendChild(form);
       form.submit();
-
-      // Remove form após envio, mantém iframe por 15s para completar
-      setTimeout(() => {
-        try { document.body.removeChild(form); } catch(_) {}
-      }, 500);
-      setTimeout(() => {
-        try { document.body.removeChild(iframe); } catch(_) {}
-      }, 15000);
-
-      // Toast de sucesso 3s após submit (tempo estimado de processamento)
+      setTimeout(() => { try { document.body.removeChild(form); } catch(_) {} }, 500);
+      setTimeout(() => { try { document.body.removeChild(iframe); } catch(_) {} }, 15000);
       setTimeout(() => _driveToast("PDF enviado ao Drive com sucesso!"), 3000);
-
     } catch(err) {
       console.error("Drive: erro ao enviar —", err);
       _driveToast("Erro ao enviar para o Drive.", true);
     }
   }
 
-  // Gera base64 e dispara o envio
   _driveToast("Enviando PDF para o Drive...");
   try {
     const b64 = doc.output("datauristring").split(",")[1];
@@ -1457,7 +1380,8 @@ window.confirmarConfiguracao = async function () {
     _driveToast("Erro ao preparar PDF para o Drive.", true);
   }
 };
-/* ================= TEMA ================= */
+
+/* ── TEMA ── */
 (function initTema() {
   const btn = document.getElementById("toggleTheme");
   if (!btn) return;
@@ -1475,22 +1399,16 @@ window.confirmarConfiguracao = async function () {
     btn.textContent = isLight ? "🌙" : "☀️";
   });
 })();
-/* ================= PROTEÇÃO DE TECLADO ================= */
-/* Impede que atalhos do navegador naveguem para fora ou
-   abram ferramentas que limpam a tela no resumo.         */
+
+/* ── PROTEÇÃO DE TECLADO ── */
 document.addEventListener("contextmenu", e => e.preventDefault());
 document.addEventListener("keydown", e => {
-  // Bloqueia F12 (DevTools)
   if (e.key === "F12") { e.preventDefault(); return; }
-  // Bloqueia Ctrl+U (view-source — sai da página)
   if (e.ctrlKey && !e.shiftKey && e.key === "u") { e.preventDefault(); return; }
   if (e.ctrlKey && !e.shiftKey && e.key === "U") { e.preventDefault(); return; }
-  // Bloqueia Ctrl+Shift+I / Ctrl+Shift+J (DevTools)
   if (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i")) { e.preventDefault(); return; }
   if (e.ctrlKey && e.shiftKey && (e.key === "J" || e.key === "j")) { e.preventDefault(); return; }
-  // Bloqueia Ctrl+W (fecha a aba — perde os dados)
   if (e.ctrlKey && !e.shiftKey && (e.key === "w" || e.key === "W")) { e.preventDefault(); return; }
-  // Bloqueia Backspace fora de inputs (navega para a página anterior)
   if (e.key === "Backspace") {
     const tag = document.activeElement?.tagName?.toLowerCase();
     const editavel = (tag === "input" || tag === "textarea" || tag === "select"
@@ -1499,11 +1417,10 @@ document.addEventListener("keydown", e => {
   }
 });
 
-/* Avisa antes de sair da página por qualquer motivo */
 window.addEventListener("beforeunload", e => {
   const raw = localStorage.getItem("CONFIG_CADERNO");
   if (raw && raw !== "null") {
     e.preventDefault();
-    e.returnValue = "";   // Chrome exige que returnValue seja atribuído
+    e.returnValue = "";
   }
 });
