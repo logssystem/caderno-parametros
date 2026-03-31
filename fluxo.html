@@ -7,101 +7,81 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0a0f1a;--panel:#0f1623;--card:#141c2e;--border:#1e2d47;
-  --text:#e2e8f0;--soft:#64748b;--lime:#CEFF00;--lime2:#a8d400;
+  --text:#e2e8f0;--soft:#64748b;--lime:#CEFF00;
   --red:#ef4444;--blue:#38bdf8;--green:#22c55e;--amber:#f59e0b;
-  --purple:#a78bfa;--pink:#f472b6;--conn:#38bdf8;
+  --purple:#a78bfa;--conn:#38bdf8;
 }
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none;}
-
-/* ── HEADER ── */
 .hdr{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--border);z-index:100;flex-shrink:0;}
 .hdr-logo{font-size:13px;font-weight:800;color:var(--lime);letter-spacing:1px;opacity:.7;}
-.hdr-title{flex:1;text-align:center;font-size:14px;font-weight:700;color:var(--text);}
+.hdr-title{flex:1;text-align:center;}
 .hdr-title input{background:transparent;border:none;color:var(--text);font-size:14px;font-weight:700;text-align:center;width:200px;outline:none;}
 .hdr-title input:focus{border-bottom:1px solid var(--lime);}
 .hdr-btn{padding:7px 16px;border-radius:8px;border:none;font-size:12px;font-weight:700;cursor:pointer;transition:all .18s;}
-.btn-vars{background:var(--blue);color:#000;}
 .btn-limpar{background:transparent;border:1px solid var(--border);color:var(--soft);}
 .btn-limpar:hover{border-color:var(--red);color:var(--red);}
 .btn-pub{background:var(--green);color:#000;}
-.btn-pub:hover{filter:brightness(1.1);}
 .btn-refresh{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:var(--blue);}
-.btn-refresh:hover{background:rgba(56,189,248,.25);}
 .btn-exp{background:rgba(206,255,0,.12);border:1px solid rgba(206,255,0,.3);color:var(--lime);}
-.btn-exp:hover{background:rgba(206,255,0,.2);}
-
-/* ── LAYOUT ── */
+.btn-exp:hover,.btn-refresh:hover{filter:brightness(1.2);}
 .workspace{display:flex;flex:1;overflow:hidden;}
-
-/* ── SIDEBAR ── */
 .sidebar{width:200px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);overflow-y:auto;padding:8px;}
 .sidebar::-webkit-scrollbar{width:3px;}
 .sidebar::-webkit-scrollbar-thumb{background:var(--border);}
 .sb-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--soft);padding:8px 4px 6px;}
 .sb-node{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;border:1px solid var(--border);background:var(--card);margin-bottom:6px;cursor:grab;font-size:12px;font-weight:600;color:var(--text);transition:all .18s;}
 .sb-node:hover{border-color:var(--lime);color:var(--lime);transform:translateX(2px);}
-.sb-node:active{cursor:grabbing;}
-.sb-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-
-/* ── CANVAS ── */
-.canvas-wrap{flex:1;position:relative;overflow:hidden;background:var(--bg);} #canvas{overflow:visible;}
+.canvas-wrap{flex:1;position:relative;overflow:hidden;background:var(--bg);}
 .canvas-wrap::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,rgba(206,255,0,.04) 1px,transparent 1px);background-size:24px 24px;pointer-events:none;}
 #canvas{position:absolute;inset:0;width:100%;height:100%;}
 #svg-layer{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:visible;}
 #nodes-layer{position:absolute;inset:0;z-index:2;}
-
 /* ── NÓ ── */
-.node{position:absolute;min-width:180px;max-width:240px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.4);cursor:move;transition:border-color .15s,box-shadow .15s;}
-.node:hover{box-shadow:0 6px 28px rgba(0,0,0,.6);}
+.node{position:absolute;min-width:195px;max-width:255px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,.5);cursor:move;transition:border-color .15s,box-shadow .15s;}
+.node:hover{box-shadow:0 6px 30px rgba(0,0,0,.65);}
 .node.selected{border-color:var(--lime);box-shadow:0 0 0 2px rgba(206,255,0,.2);}
-.node-hdr{display:flex;align-items:center;gap:7px;padding:9px 12px 7px;border-bottom:1px solid var(--border);}
-.node-icon{font-size:14px;flex-shrink:0;}
-.node-type{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;flex:1;}
-.node-del{background:transparent;border:none;color:var(--soft);font-size:14px;cursor:pointer;padding:2px 4px;border-radius:4px;line-height:1;}
-.node-del:hover{color:var(--red);background:rgba(239,68,68,.1);}
-.node-body{padding:10px 12px;font-size:12px;color:var(--soft);}
-.node-body textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;resize:vertical;min-height:48px;padding:6px 8px;font-family:inherit;outline:none;}
-.node-body textarea:focus{border-color:rgba(206,255,0,.4);}
-.node-body input[type=text]{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;font-family:inherit;outline:none;margin-bottom:4px;}
-.node-body input:focus{border-color:rgba(206,255,0,.4);}
-.node-body select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;outline:none;}
-.node-body .opt-row{display:flex;gap:4px;margin-bottom:4px;}
-.node-body .opt-row input{flex:1;margin:0;}
-.node-body .opt-row button{background:transparent;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:2px;}
-.node-body .btn-add-opt{width:100%;background:rgba(206,255,0,.07);border:1px dashed rgba(206,255,0,.25);border-radius:6px;color:var(--lime);font-size:11px;font-weight:700;padding:5px;cursor:pointer;margin-top:4px;}
-.node-body .btn-add-opt:hover{background:rgba(206,255,0,.13);}
-
+.node-hdr{display:flex;align-items:center;gap:7px;padding:10px 12px 8px;border-bottom:1px solid var(--border);border-radius:13px 13px 0 0;}
+.node-icon{font-size:15px;flex-shrink:0;}
+.node-type{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;flex:1;}
+.node-del{background:transparent;border:none;color:var(--soft);font-size:13px;cursor:pointer;padding:2px 5px;border-radius:5px;line-height:1;transition:all .15s;}
+.node-del:hover{color:var(--red);background:rgba(239,68,68,.12);}
+.node-body{padding:10px 12px 12px;font-size:12px;color:var(--soft);}
+.node-body textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:11px;resize:vertical;min-height:42px;padding:6px 8px;font-family:inherit;outline:none;line-height:1.5;}
+.node-body textarea:focus{border-color:rgba(206,255,0,.3);}
+.node-body input[type=text]{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:11px;padding:6px 8px;font-family:inherit;outline:none;margin-bottom:5px;}
+.node-body input[type=text]:focus{border-color:rgba(206,255,0,.3);}
+.node-body select{width:100%;background:rgba(8,14,28,.95);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:11px;padding:6px 8px;outline:none;}
+.node-body select:focus{border-color:rgba(206,255,0,.3);}
+.node-hint{font-size:10px;color:#475569;margin-top:5px;line-height:1.55;padding:5px 6px;background:rgba(255,255,255,.02);border-radius:5px;border-left:2px solid rgba(206,255,0,.2);}
+/* ── OPT ROW ── */
+.opt-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;padding:5px 8px;background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.18);border-radius:8px;}
+.opt-row input{flex:1;margin:0!important;background:transparent!important;border:none!important;color:var(--text);font-size:11px;padding:1px 3px!important;outline:none;}
+.opt-num{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;min-width:17px;border-radius:50%;background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.45);color:var(--purple);font-size:9px;font-weight:800;}
+.opt-del{background:transparent;border:none;color:rgba(239,68,68,.55);cursor:pointer;font-size:12px;padding:1px 4px;border-radius:4px;flex-shrink:0;line-height:1;transition:all .15s;}
+.opt-del:hover{color:var(--red);background:rgba(239,68,68,.12);}
+.btn-add-opt{width:100%;background:rgba(206,255,0,.05);border:1px dashed rgba(206,255,0,.2);border-radius:7px;color:rgba(206,255,0,.65);font-size:11px;font-weight:700;padding:5px;cursor:pointer;margin-top:6px;transition:all .18s;}
+.btn-add-opt:hover{background:rgba(206,255,0,.1);border-color:rgba(206,255,0,.4);color:var(--lime);}
 /* ── PORTAS ── */
-.port{position:absolute;width:20px;height:20px;border-radius:50%;border:3px solid;cursor:crosshair;transition:transform .15s,box-shadow .15s,background .15s;z-index:10;display:flex;align-items:center;justify-content:center;}
-.port:hover{transform:scale(1.4);box-shadow:0 0 14px currentColor;}
-.port::after{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.5;}
-.port-out{border-color:var(--lime);color:var(--lime);background:rgba(206,255,0,.12);right:-11px;}
-.port-out:hover{background:rgba(206,255,0,.35);}
-.port-in{border-color:var(--blue);color:var(--blue);background:rgba(56,189,248,.12);left:-11px;}
-.port-in:hover{background:rgba(56,189,248,.35);}
-.port-out-bot{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,.12);bottom:-11px;left:50%;transform:translateX(-50%);}
-.port-opt{border-color:var(--purple)!important;color:var(--purple)!important;background:rgba(167,139,250,.15)!important;right:-11px;width:22px!important;height:22px!important;}
-.port-opt:hover{background:rgba(167,139,250,.4)!important;transform:scale(1.35);}
-.port-opt-label{font-size:9px;font-weight:900;color:var(--purple);line-height:1;pointer-events:none;}
-.opt-num{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.4);color:var(--purple);font-size:10px;font-weight:800;flex-shrink:0;margin-right:4px;}
-
-/* ── CONEXÃO ── */
+.port{position:absolute;width:20px;height:20px;border-radius:50%;border:2.5px solid;cursor:crosshair;transition:transform .15s,box-shadow .15s;z-index:10;display:flex;align-items:center;justify-content:center;}
+.port:hover{transform:scale(1.4);box-shadow:0 0 12px currentColor;}
+.port::after{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5;}
+.port-out{border-color:var(--lime);color:var(--lime);background:rgba(206,255,0,.1);right:-11px;}
+.port-in{border-color:var(--blue);color:var(--blue);background:rgba(56,189,248,.1);left:-11px;}
+.port-opt{border-color:var(--purple)!important;color:var(--purple)!important;background:rgba(167,139,250,.1)!important;right:-11px;width:20px!important;height:20px!important;}
+.port-opt:hover{background:rgba(167,139,250,.3)!important;transform:scale(1.35);}
+.port-opt::after{display:none;}
+.port-opt-lbl{font-size:9px;font-weight:800;color:var(--purple);line-height:1;pointer-events:none;}
+/* ── CONEXÕES ── */
 .conn-line{stroke:var(--conn);stroke-width:1.8;fill:none;stroke-dasharray:5 3;animation:dash 1.5s linear infinite;}
 @keyframes dash{to{stroke-dashoffset:-20;}}
 .conn-line.solid{stroke-dasharray:none;animation:none;}
 .conn-arrow{fill:var(--conn);}
-
-/* ── MINI-PAINEL ── */
 .mini-panel{position:absolute;bottom:16px;right:16px;display:flex;gap:8px;z-index:50;}
 .mp-btn{width:34px;height:34px;border-radius:8px;background:var(--panel);border:1px solid var(--border);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;}
 .mp-btn:hover{border-color:var(--lime);color:var(--lime);}
-
-/* ── TOAST ── */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green);color:#000;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:all .3s;z-index:999;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast.err{background:var(--red);color:#fff;}
-
-/* ── MODAL JSON ── */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
 .modal-bg.open{opacity:1;pointer-events:all;}
 .modal-box{background:var(--panel);border:1px solid var(--border);border-radius:16px;width:560px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;}
@@ -111,55 +91,33 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
 </style>
 </head>
 <body>
-
-<!-- HEADER -->
 <div class="hdr">
   <div class="hdr-logo">ERA</div>
   <div class="hdr-title"><input id="flowName" value="Fluxo de Atendimento" placeholder="Nome do fluxo"></div>
-  <button class="hdr-btn btn-refresh" onclick="atualizarDadosCaderno()" title="Recarrega agentes, departamentos e regras de tempo do formulário">🔄 Atualizar dados</button>
+  <button class="hdr-btn btn-refresh" onclick="atualizarDadosCaderno()">🔄 Atualizar dados</button>
   <button class="hdr-btn btn-exp" onclick="exportarJSON()">⬇ Exportar JSON</button>
   <button class="hdr-btn btn-limpar" onclick="confirmarLimpar()">Limpar</button>
   <button class="hdr-btn btn-pub" onclick="salvarFluxo()">✓ Salvar Fluxo</button>
 </div>
-
 <div class="workspace">
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sb-title">Nós do Fluxo</div>
-    <div class="sb-node" draggable="true" data-type="start">
-      <span class="sb-dot" style="background:#22c55e"></span>Start
-    </div>
-    <div class="sb-node" draggable="true" data-type="mensagem">
-      <span class="sb-dot" style="background:#38bdf8"></span>Enviar Mensagem
-    </div>
-    <div class="sb-node" draggable="true" data-type="menu">
-      <span class="sb-dot" style="background:#a78bfa"></span>Menu de Opções
-    </div>
-    <div class="sb-node" draggable="true" data-type="horario">
-      <span class="sb-dot" style="background:#f59e0b"></span>Regra de Horário
-    </div>
-    <div class="sb-node" draggable="true" data-type="dados">
-      <span class="sb-dot" style="background:#f472b6"></span>Solicitar Dados
-    </div>
-    <div class="sb-node" draggable="true" data-type="agente">
-      <span class="sb-dot" style="background:#fb923c"></span>Transferir Agente
-    </div>
-    <div class="sb-node" draggable="true" data-type="depto">
-      <span class="sb-dot" style="background:#34d399"></span>Departamento
-    </div>
-    <div class="sb-node" draggable="true" data-type="espera">
-      <span class="sb-dot" style="background:#94a3b8"></span>Tempo de Espera
-    </div>
-    <div class="sb-node" draggable="true" data-type="finalizar">
-      <span class="sb-dot" style="background:#ef4444"></span>Finalizar
-    </div>
-    <div class="sb-title" style="margin-top:12px">Dica</div>
-    <div style="font-size:11px;color:var(--soft);line-height:1.6;padding:4px;">
-      Arraste um nó para a tela. Clique na <span style="color:var(--lime)">●</span> saída e depois na <span style="color:var(--blue)">●</span> entrada para conectar.
+    <div class="sb-node" draggable="true" data-type="start"><span style="width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0;display:inline-block"></span>Start</div>
+    <div class="sb-node" draggable="true" data-type="mensagem"><span style="width:10px;height:10px;border-radius:50%;background:#38bdf8;flex-shrink:0;display:inline-block"></span>Enviar Mensagem</div>
+    <div class="sb-node" draggable="true" data-type="menu"><span style="width:10px;height:10px;border-radius:50%;background:#a78bfa;flex-shrink:0;display:inline-block"></span>Menu de Opções</div>
+    <div class="sb-node" draggable="true" data-type="horario"><span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;flex-shrink:0;display:inline-block"></span>Regra de Horário</div>
+    <div class="sb-node" draggable="true" data-type="dados"><span style="width:10px;height:10px;border-radius:50%;background:#f472b6;flex-shrink:0;display:inline-block"></span>Solicitar Dados</div>
+    <div class="sb-node" draggable="true" data-type="agente"><span style="width:10px;height:10px;border-radius:50%;background:#fb923c;flex-shrink:0;display:inline-block"></span>Transferir Agente</div>
+    <div class="sb-node" draggable="true" data-type="depto"><span style="width:10px;height:10px;border-radius:50%;background:#34d399;flex-shrink:0;display:inline-block"></span>Departamento</div>
+    <div class="sb-node" draggable="true" data-type="espera"><span style="width:10px;height:10px;border-radius:50%;background:#94a3b8;flex-shrink:0;display:inline-block"></span>Tempo de Espera</div>
+    <div class="sb-node" draggable="true" data-type="finalizar"><span style="width:10px;height:10px;border-radius:50%;background:#ef4444;flex-shrink:0;display:inline-block"></span>Finalizar</div>
+    <div class="sb-title" style="margin-top:12px">Como usar</div>
+    <div style="font-size:11px;color:var(--soft);line-height:1.7;padding:4px 2px;">
+      Arraste um nó para a tela.<br>
+      <span style="color:var(--lime)">●</span> saída → <span style="color:var(--blue)">●</span> entrada para conectar.<br>
+      <span style="color:var(--purple)">●</span> = saída de cada opção.
     </div>
   </div>
-
-  <!-- CANVAS -->
   <div class="canvas-wrap" id="canvasWrap">
     <div id="canvas">
       <svg id="svg-layer" xmlns="http://www.w3.org/2000/svg" overflow="visible" style="overflow:visible;">
@@ -171,18 +129,14 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
       </svg>
       <div id="nodes-layer"></div>
     </div>
-    <!-- Mini controles -->
     <div class="mini-panel">
-      <button class="mp-btn" onclick="zoom(1.15)" title="Zoom +">+</button>
-      <button class="mp-btn" onclick="zoom(0.87)" title="Zoom -">−</button>
-      <button class="mp-btn" onclick="resetView()" title="Reset">⊙</button>
+      <button class="mp-btn" onclick="zoom(1.15)">+</button>
+      <button class="mp-btn" onclick="zoom(0.87)">−</button>
+      <button class="mp-btn" onclick="resetView()">⊙</button>
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
-<!-- Modal JSON -->
 <div class="modal-bg" id="modalJSON">
   <div class="modal-box">
     <h3>📋 JSON do Fluxo</h3>
@@ -193,807 +147,388 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;he
     </div>
   </div>
 </div>
-
 <script>
-// ── STATE ──
-let nodes   = [];
-let conns   = [];
-let nodeId  = 1;
-let scale   = 1;
-let offsetX = 0;
-let offsetY = 0;
-let dragging = null;
-let dragOffX = 0, dragOffY = 0;
-let connectingFrom = null;
-let selected       = null;
-let _connJustMade  = false;
+let nodes=[],conns=[],nodeId=1,scale=1,offsetX=0,offsetY=0;
+let dragging=null,dragOffX=0,dragOffY=0,connectingFrom=null,selected=null,_connJustMade=false;
+const wrap=document.getElementById("canvasWrap"),canvas=document.getElementById("canvas");
+const svgL=document.getElementById("svg-layer"),nodesL=document.getElementById("nodes-layer");
 
-const wrap   = document.getElementById("canvasWrap");
-const canvas = document.getElementById("canvas");
-const svgL   = document.getElementById("svg-layer");
-const nodesL = document.getElementById("nodes-layer");
-
-// ── NODE CONFIGS ──
-const NODE_CFG = {
-  start:     { label:"Start",            icon:"🟢", color:"#22c55e", hasIn:false, hasOut:true  },
-  mensagem:  { label:"Enviar Mensagem",  icon:"✉️",  color:"#38bdf8", hasIn:true,  hasOut:true  },
-  menu:      { label:"Menu de Opções",   icon:"📋", color:"#a78bfa", hasIn:true,  hasOut:true  },
-  horario:   { label:"Regra de Horário", icon:"⏰", color:"#f59e0b", hasIn:true,  hasOut:true  },
-  dados:     { label:"Solicitar Dados",  icon:"📝", color:"#f472b6", hasIn:true,  hasOut:true  },
-  agente:    { label:"Transferir Agente",icon:"👤", color:"#fb923c", hasIn:true,  hasOut:false },
-  depto:     { label:"Departamento",     icon:"🏢", color:"#34d399", hasIn:true,  hasOut:false },
-  espera:    { label:"Tempo de Espera",  icon:"⏱️", color:"#94a3b8", hasIn:true,  hasOut:true  },
-  finalizar: { label:"Finalizar",        icon:"🔴", color:"#ef4444", hasIn:true,  hasOut:false },
+const CFG={
+  start:    {label:"Start",           icon:"🟢",color:"#22c55e",hasIn:false,hasOut:true },
+  mensagem: {label:"Enviar Mensagem", icon:"✉️", color:"#38bdf8",hasIn:true, hasOut:true },
+  menu:     {label:"Menu de Opções",  icon:"📋", color:"#a78bfa",hasIn:true, hasOut:false},
+  horario:  {label:"Regra de Horário",icon:"⏰", color:"#f59e0b",hasIn:true, hasOut:true },
+  dados:    {label:"Solicitar Dados", icon:"📝", color:"#f472b6",hasIn:true, hasOut:true },
+  agente:   {label:"Transf. Agente",  icon:"👤", color:"#fb923c",hasIn:true, hasOut:false},
+  depto:    {label:"Departamento",    icon:"🏢", color:"#34d399",hasIn:true, hasOut:false},
+  espera:   {label:"Tempo de Espera", icon:"⏱️", color:"#94a3b8",hasIn:true, hasOut:true },
+  finalizar:{label:"Finalizar",       icon:"🔴", color:"#ef4444",hasIn:true, hasOut:false},
 };
 
-// ── TRANSFORM ──
-function applyTransform() {
-  canvas.style.transform = `translate(${offsetX}px,${offsetY}px) scale(${scale})`;
-  canvas.style.transformOrigin = "0 0";
-}
-function zoom(factor) {
-  scale = Math.max(0.3, Math.min(2.5, scale * factor));
-  applyTransform();
-}
-function resetView() { scale=1; offsetX=0; offsetY=0; applyTransform(); }
+function applyT(){canvas.style.transform=`translate(${offsetX}px,${offsetY}px) scale(${scale})`;canvas.style.transformOrigin="0 0";}
+function zoom(f){scale=Math.max(0.3,Math.min(2.5,scale*f));applyT();}
+function resetView(){scale=1;offsetX=0;offsetY=0;applyT();}
+function toCV(cx,cy){const r=wrap.getBoundingClientRect();return{x:(cx-r.left-offsetX)/scale,y:(cy-r.top-offsetY)/scale};}
 
-// ── PAN ──
-let panning=false, panX0=0, panY0=0, panOX=0, panOY=0;
-wrap.addEventListener("mousedown", e => {
-  if (e.target === wrap || e.target === canvas || e.target === svgL || e.target === nodesL) {
-    panning=true; panX0=e.clientX; panY0=e.clientY; panOX=offsetX; panOY=offsetY;
-    selected=null; renderAll();
-    e.preventDefault();
+let pan=false,px0=0,py0=0,pox=0,poy=0;
+wrap.addEventListener("mousedown",e=>{
+  if(e.target===wrap||e.target===canvas||e.target===svgL||e.target===nodesL){
+    pan=true;px0=e.clientX;py0=e.clientY;pox=offsetX;poy=offsetY;
+    selected=null;renderAll();e.preventDefault();
   }
 });
-window.addEventListener("mousemove", e => {
-  if (panning) { offsetX=panOX+(e.clientX-panX0); offsetY=panOY+(e.clientY-panY0); applyTransform(); }
-
-  function toCanvas(cx, cy) {
-    const rect = wrap.getBoundingClientRect();
-    return { x: (cx - rect.left - offsetX) / scale, y: (cy - rect.top  - offsetY) / scale };
-  }
-
-  if (dragging) {
-    const p = toCanvas(e.clientX, e.clientY);
-    dragging.x = Math.max(0, p.x - dragOffX);
-    dragging.y = Math.max(0, p.y - dragOffY);
-    const el = document.getElementById("n-"+dragging.id);
-    if (el) { el.style.left = dragging.x+"px"; el.style.top = dragging.y+"px"; }
-    renderConnections();
-  }
-
-  if (connectingFrom !== null) {
-    const p = toCanvas(e.clientX, e.clientY);
-    renderConnections(p.x, p.y);
+window.addEventListener("mousemove",e=>{
+  if(pan){offsetX=pox+(e.clientX-px0);offsetY=poy+(e.clientY-py0);applyT();}
+  if(dragging){const p=toCV(e.clientX,e.clientY);dragging.x=Math.max(0,p.x-dragOffX);dragging.y=Math.max(0,p.y-dragOffY);const el=document.getElementById("n-"+dragging.id);if(el){el.style.left=dragging.x+"px";el.style.top=dragging.y+"px";}renderConnections();}
+  if(connectingFrom!=null){const p=toCV(e.clientX,e.clientY);renderConnections(p.x,p.y);}
+});
+window.addEventListener("mouseup",e=>{
+  pan=false;dragging=null;
+  if(_connJustMade){_connJustMade=false;return;}
+  if(connectingFrom!=null){
+    let el=document.elementFromPoint(e.clientX,e.clientY),hit=false;
+    while(el&&el!==document.body){if(el.classList?.contains("port-in")){hit=true;break;}el=el.parentElement;}
+    if(!hit){connectingFrom=null;renderConnections();}
   }
 });
-window.addEventListener("mouseup", e => {
-  panning = false;
-  dragging = null;
-  if (_connJustMade) { _connJustMade = false; return; }
-  if (connectingFrom !== null) {
-    let el = document.elementFromPoint(e.clientX, e.clientY);
-    let emPortIn = false;
-    while (el && el !== document.body) {
-      if (el.classList && el.classList.contains("port-in")) { emPortIn = true; break; }
-      el = el.parentElement;
-    }
-    if (!emPortIn) { connectingFrom = null; renderConnections(); }
-  }
-});
-wrap.addEventListener("wheel", e => {
-  e.preventDefault();
-  zoom(e.deltaY < 0 ? 1.08 : 0.93);
-}, { passive: false });
+wrap.addEventListener("wheel",e=>{e.preventDefault();zoom(e.deltaY<0?1.08:0.93);},{passive:false});
+document.querySelectorAll(".sb-node").forEach(el=>el.addEventListener("dragstart",e=>e.dataTransfer.setData("nodeType",el.dataset.type)));
+wrap.addEventListener("dragover",e=>e.preventDefault());
+wrap.addEventListener("drop",e=>{e.preventDefault();const t=e.dataTransfer.getData("nodeType");if(!t)return;const r=wrap.getBoundingClientRect();addNode(t,Math.max(10,(e.clientX-r.left-offsetX)/scale-95),Math.max(10,(e.clientY-r.top-offsetY)/scale-40));});
 
-// ── DRAG FROM SIDEBAR ──
-document.querySelectorAll(".sb-node").forEach(el => {
-  el.addEventListener("dragstart", e => { e.dataTransfer.setData("nodeType", el.dataset.type); });
-});
-wrap.addEventListener("dragover", e => e.preventDefault());
-wrap.addEventListener("drop", e => {
-  e.preventDefault();
-  const type = e.dataTransfer.getData("nodeType");
-  if (!type) return;
-  const rect = wrap.getBoundingClientRect();
-  const x = (e.clientX - rect.left - offsetX) / scale - 90;
-  const y = (e.clientY - rect.top  - offsetY) / scale - 40;
-  addNode(type, Math.max(10,x), Math.max(10,y));
-});
+function addNode(type,x,y){const c=CFG[type];if(!c)return;const n={id:nodeId++,type,x,y,data:{text:"",opcoes:[],campo:"",horario:""}};nodes.push(n);renderNode(n);renderConnections();return n;}
 
-// ── ADD NODE ──
-function addNode(type, x, y) {
-  const cfg = NODE_CFG[type];
-  if (!cfg) return;
-  const node = { id: nodeId++, type, x, y, label: cfg.label,
-    data: { text:"", opcoes:[], campo:"", horario:"comercial", espera:3 } };
-  nodes.push(node);
-  renderNode(node);
-  renderConnections();
-  return node;
-}
+// ✅ RENDER NODE com alinhamento real de portas para Menu
+function renderNode(n){
+  const c=CFG[n.type];
+  let el=document.getElementById("n-"+n.id);
+  if(!el){el=document.createElement("div");el.className="node";el.id="n-"+n.id;nodesL.appendChild(el);}
+  el.style.left=n.x+"px";el.style.top=n.y+"px";
+  el.classList.toggle("selected",selected===n.id);
 
-// ── RENDER NODE ──
-function renderNode(n) {
-  const cfg = NODE_CFG[n.type];
-  let el = document.getElementById("n-"+n.id);
-  if (!el) {
-    el = document.createElement("div");
-    el.className = "node";
-    el.id = "n-"+n.id;
-    nodesL.appendChild(el);
-  }
-  el.style.left = n.x+"px";
-  el.style.top  = n.y+"px";
-  if (selected === n.id) el.classList.add("selected");
-  else el.classList.remove("selected");
-
-  let body = `<div class="node-hdr" style="border-bottom-color:${cfg.color}22">
-    <span class="node-icon">${cfg.icon}</span>
-    <span class="node-type" style="color:${cfg.color}">${cfg.label}</span>
+  let b=`<div class="node-hdr" style="background:${c.color}18;border-bottom-color:${c.color}35;">
+    <span class="node-icon">${c.icon}</span>
+    <span class="node-type" style="color:${c.color}">${c.label}</span>
     <button class="node-del" onclick="delNode(${n.id})">✕</button>
   </div><div class="node-body">`;
 
-  if (n.type === "start") {
-    body += `<span style="color:var(--soft);font-size:11px;">Início do fluxo</span>`;
-  } else if (n.type === "mensagem") {
-    body += `<textarea placeholder="Digite a mensagem..." onchange="n_set(${n.id},'text',this.value)">${n.data.text||""}</textarea>`;
-  } else if (n.type === "menu") {
-    body += `<textarea placeholder="Mensagem do menu..." onchange="n_set(${n.id},'text',this.value)" style="min-height:36px">${n.data.text||""}</textarea>`;
-    body += `<div id="opts-${n.id}">`;
-    (n.data.opcoes||[]).forEach((op,i) => {
-      body += `<div class="opt-row" style="position:relative;">
+  if(n.type==="start"){
+    b+=`<div style="color:#22c55e;font-size:12px;font-weight:600;padding:3px 0;">▶ Início do fluxo</div>`;
+  } else if(n.type==="mensagem"){
+    b+=`<textarea placeholder="Mensagem enviada ao cliente..." onchange="ns(${n.id},'text',this.value)">${n.data.text||""}</textarea>`;
+  } else if(n.type==="menu"){
+    b+=`<textarea placeholder="Mensagem apresentada antes das opções..." onchange="ns(${n.id},'text',this.value)" style="min-height:36px;margin-bottom:7px;">${n.data.text||""}</textarea>`;
+    b+=`<div id="opts-${n.id}">`;
+    (n.data.opcoes||[]).forEach((op,i)=>{
+      b+=`<div class="opt-row" data-i="${i}">
         <span class="opt-num">${i+1}</span>
-        <input type="text" placeholder="Opção ${i+1}" value="${op||""}" onchange="n_opt(${n.id},${i},this.value)">
-        <button onclick="n_del_opt(${n.id},${i})">✕</button>
+        <input type="text" placeholder="Opção ${i+1}..." value="${(op||"").replace(/"/g,"&quot;")}" onchange="no(${n.id},${i},this.value)">
+        <button class="opt-del" onclick="nd(${n.id},${i})">✕</button>
       </div>`;
     });
-    body += `</div><button class="btn-add-opt" onclick="n_add_opt(${n.id})">+ Adicionar opção</button>`;
-  } else if (n.type === "horario") {
-    const _regras = getRegrasTempo();
-    if (_regras.length) {
-      body += `<select onchange="n_set(${n.id},'horario',this.value)" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;outline:none;">
-        <option value="">Selecione a regra...</option>
-        ${_regras.map(r => `<option value="${r}" ${n.data.horario===r?"selected":""}>${r}</option>`).join("")}
-      </select>`;
-      body += `<div style="font-size:10px;color:var(--soft);margin-top:4px;">Saída superior = dentro do horário &nbsp;·&nbsp; inferior = fora</div>`;
+    b+=`</div><button class="btn-add-opt" onclick="na(${n.id})">＋ Adicionar opção</button>`;
+  } else if(n.type==="horario"){
+    const _r=getRegrasTempo();
+    if(_r.length){
+      b+=`<select onchange="ns(${n.id},'horario',this.value)"><option value="">— Selecione a regra —</option>${_r.map(r=>`<option value="${r}" ${n.data.horario===r?"selected":""}>${r}</option>`).join("")}</select>`;
     } else {
-      body += `<select onchange="n_set(${n.id},'horario',this.value)" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;outline:none;">
-        <option value="comercial" ${n.data.horario==="comercial"?"selected":""}>Horário Comercial</option>
-        <option value="fora"      ${n.data.horario==="fora"?"selected":""}>Fora do Horário</option>
-      </select>`;
-      body += `<div style="font-size:10px;color:var(--soft);margin-top:4px;">Crie regras no formulário para listá-las aqui</div>`;
+      b+=`<select onchange="ns(${n.id},'horario',this.value)"><option value="comercial" ${n.data.horario==="comercial"?"selected":""}>Horário Comercial</option><option value="fora" ${n.data.horario==="fora"?"selected":""}>Fora do Horário</option></select>`;
     }
-  } else if (n.type === "dados") {
-    body += `<input type="text" placeholder="Nome do campo (ex: CPF, Nome...)" value="${n.data.campo||""}" onchange="n_set(${n.id},'campo',this.value)">
-    <input type="text" placeholder="Mensagem de solicitação..." value="${n.data.text||""}" onchange="n_set(${n.id},'text',this.value)">`;
-  } else if (n.type === "agente") {
-    const _agentes = getAgentes();
-    if (_agentes.length) {
-      body += `<select onchange="n_set(${n.id},'text',this.value)" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;outline:none;">
-        <option value="">Qualquer agente disponível</option>
-        ${_agentes.map(a => `<option value="${a}" ${n.data.text===a?"selected":""}>${a}</option>`).join("")}
-      </select>`;
+    b+=`<div class="node-hint">✅ Dentro do horário → saída direita<br>❌ Fora do horário → saída inferior</div>`;
+  } else if(n.type==="dados"){
+    b+=`<input type="text" placeholder="📌 Nome do campo (CPF, Nome...)" value="${(n.data.campo||"").replace(/"/g,"&quot;")}" onchange="ns(${n.id},'campo',this.value)">
+    <input type="text" placeholder="💬 Mensagem de solicitação..." value="${(n.data.text||"").replace(/"/g,"&quot;")}" onchange="ns(${n.id},'text',this.value)">`;
+  } else if(n.type==="agente"){
+    const _a=getAgentes();
+    if(_a.length){
+      b+=`<select onchange="ns(${n.id},'text',this.value)"><option value="">— Qualquer agente disponível —</option>${_a.map(a=>`<option value="${a}" ${n.data.text===a?"selected":""}>${a}</option>`).join("")}</select>`;
     } else {
-      body += `<input type="text" placeholder="Nome do agente (opcional)" value="${n.data.text||""}" onchange="n_set(${n.id},'text',this.value)">`;
+      b+=`<input type="text" placeholder="Nome do agente (opcional)" value="${(n.data.text||"").replace(/"/g,"&quot;")}" onchange="ns(${n.id},'text',this.value)">`;
+      b+=`<div class="node-hint">Cadastre agentes no formulário e clique 🔄</div>`;
     }
-  } else if (n.type === "depto") {
-    const _deptos = getDepartamentos();
-    if (_deptos.length) {
-      body += `<select onchange="n_set(${n.id},'text',this.value)" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:5px 8px;outline:none;">
-        <option value="">Selecione o departamento...</option>
-        ${_deptos.map(d => `<option value="${d}" ${n.data.text===d?"selected":""}>${d}</option>`).join("")}
-      </select>`;
+  } else if(n.type==="depto"){
+    const _d=getDepartamentos();
+    if(_d.length){
+      b+=`<select onchange="ns(${n.id},'text',this.value)" style="border-color:rgba(52,211,153,.3)"><option value="">— Selecione o departamento —</option>${_d.map(d=>`<option value="${d}" ${n.data.text===d?"selected":""}>${d}</option>`).join("")}</select>`;
     } else {
-      body += `<input type="text" placeholder="Nome do departamento" value="${n.data.text||""}" onchange="n_set(${n.id},'text',this.value)">`;
-      body += `<div style="font-size:10px;color:var(--soft);margin-top:4px;">Crie departamentos no formulário para listá-los aqui</div>`;
+      b+=`<input type="text" placeholder="Nome do departamento" value="${(n.data.text||"").replace(/"/g,"&quot;")}" onchange="ns(${n.id},'text',this.value)" style="border-color:rgba(52,211,153,.3)">`;
+      b+=`<div class="node-hint">Crie departamentos no formulário e clique 🔄</div>`;
     }
-  } else if (n.type === "espera") {
-    body += `<input type="text" placeholder="Tempo (ex: 30 seg)" value="${n.data.text||""}" onchange="n_set(${n.id},'text',this.value)">`;
-  } else if (n.type === "finalizar") {
-    body += `<textarea placeholder="Mensagem de encerramento..." onchange="n_set(${n.id},'text',this.value)">${n.data.text||""}</textarea>`;
+  } else if(n.type==="espera"){
+    b+=`<input type="text" placeholder="⏱ Ex: 30 segundos, 2 minutos..." value="${(n.data.text||"").replace(/"/g,"&quot;")}" onchange="ns(${n.id},'text',this.value)">`;
+  } else if(n.type==="finalizar"){
+    b+=`<textarea placeholder="👋 Mensagem de encerramento..." onchange="ns(${n.id},'text',this.value)">${n.data.text||""}</textarea>`;
   }
-  body += `</div>`;
+  b+=`</div>`;
 
-  const midY = 36;
-  if (cfg.hasIn) body += `<div class="port port-in" style="top:${midY - 10}px" onmouseup="onPortIn(${n.id}, event)" title="Clique aqui para receber conexão"></div>`;
-
-  if (n.type === "menu" && (n.data.opcoes||[]).length > 0) {
-    const hdrH   = 46;
-    const taH    = 54;
-    const optH   = 36;
-    const padTop = 10;
-    (n.data.opcoes||[]).forEach((op, i) => {
-      const portY = hdrH + padTop + taH + 4 + i * optH + (optH/2) - 10;
-      body += `<div class="port port-out port-opt" style="top:${portY}px"
-        onmousedown="onPortOut(event,${n.id},'opt_${i}')"
-        title="Saída: Opção ${i+1}">
-        <span class="port-opt-label">${i+1}</span>
-      </div>`;
+  // Porta entrada (meio do header)
+  if(c.hasIn) b+=`<div class="port port-in" style="top:16px" onmouseup="pIn(${n.id},event)"></div>`;
+  // Porta saída única (não-menu)
+  if(c.hasOut) b+=`<div class="port port-out" style="top:16px" onmousedown="pOut(event,${n.id})"></div>`;
+  // Menu: uma porta por opção (posição ajustada por post-render)
+  if(n.type==="menu"){
+    (n.data.opcoes||[]).forEach((op,i)=>{
+      b+=`<div class="port port-opt" data-opt="${i}" onmousedown="pOut(event,${n.id},'opt_${i}')" title="Saída opção ${i+1}" style="top:16px"><span class="port-opt-lbl">${i+1}</span></div>`;
     });
-  } else if (cfg.hasOut) {
-    body += `<div class="port port-out" style="top:${midY - 10}px" onmousedown="onPortOut(event,${n.id})" title="Saída"></div>`;
   }
 
-  el.innerHTML = body;
+  el.innerHTML=b;
 
-  el.addEventListener("mousedown", e => {
-    if (e.target.classList.contains("port") || e.target.tagName==="BUTTON" ||
-        e.target.tagName==="INPUT" || e.target.tagName==="TEXTAREA" || e.target.tagName==="SELECT") return;
-    selected = n.id;
-    dragging = n;
-    const rect = el.getBoundingClientRect();
-    const wRect = wrap.getBoundingClientRect();
-    dragOffX = (e.clientX - wRect.left - offsetX)/scale - n.x;
-    dragOffY = (e.clientY - wRect.top  - offsetY)/scale - n.y;
-    renderNode(n);
-    e.stopPropagation();
-  });
-}
-
-function renderAll() {
-  nodes.forEach(n => renderNode(n));
-  renderConnections();
-}
-
-// ── NODE DATA HELPERS ──
-window.n_set = (id, key, val) => { const n = nodes.find(x=>x.id===id); if(n) n.data[key]=val; };
-window.n_add_opt = (id) => {
-  const n = nodes.find(x=>x.id===id); if(!n) return;
-  if (!n.data.opcoes) n.data.opcoes=[];
-  n.data.opcoes.push(""); renderNode(n); renderConnections();
-};
-window.n_del_opt = (id, i) => {
-  const n = nodes.find(x=>x.id===id); if(!n) return;
-  n.data.opcoes.splice(i,1); renderNode(n); renderConnections();
-};
-window.n_opt = (id, i, val) => { const n = nodes.find(x=>x.id===id); if(!n) return; n.data.opcoes[i]=val; };
-window.delNode = (id) => {
-  nodes = nodes.filter(x=>x.id!==id);
-  conns = conns.filter(c=>c.from!==id && c.to!==id);
-  const el = document.getElementById("n-"+id); if(el) el.remove();
-  if(selected===id) selected=null;
-  renderConnections();
-};
-
-// ── CONNECTIONS ──
-function onPortOut(e, nodeId, portKey) {
-  connectingFrom = { nodeId, portKey: portKey || "default" };
-  e.stopPropagation();
-}
-window.onPortIn = (nodeId, e) => {
-  if (e) e.stopPropagation();
-  if (connectingFrom !== null && connectingFrom.nodeId !== nodeId) {
-    const from    = connectingFrom.nodeId;
-    const portKey = connectingFrom.portKey || "default";
-    const dup = conns.find(c => c.from === from && c.to === nodeId && c.portKey === portKey);
-    if (!dup) conns.push({ from, to: nodeId, portKey });
-    connectingFrom = null;
-    _connJustMade  = true;
-    renderConnections();
-  }
-};
-
-// ── ✅ CORREÇÃO 3: getPortPos usa posição real do DOM ──
-function getPortPos(nodeId, side, portKey) {
-  const n = nodes.find(x=>x.id===nodeId); if(!n) return null;
-  const el = document.getElementById("n-"+nodeId); if(!el) return null;
-  const w = el.offsetWidth;
-
-  if (side === "in") return { x: n.x, y: n.y + 36 };
-
-  // Per-option port — usa posição real do DOM para alinhamento preciso
-  if (side === "out" && n.type === "menu" && portKey && portKey.startsWith("opt_")) {
-    const i = parseInt(portKey.replace("opt_", ""));
-    const optPorts = el.querySelectorAll(".port-opt");
-    if (optPorts[i]) {
-      const portY = optPorts[i].offsetTop + optPorts[i].offsetHeight / 2;
-      return { x: n.x + w, y: n.y + portY };
-    }
-    // fallback caso DOM ainda não tenha renderizado
-    const hdrH = 46, taH = 54, optH = 36, padTop = 10;
-    const portY = hdrH + padTop + taH + 4 + i * optH + (optH / 2);
-    return { x: n.x + w, y: n.y + portY };
-  }
-
-  return { x: n.x + w, y: n.y + 36 };
-}
-
-function renderConnections(previewX, previewY) {
-  svgL.querySelectorAll("path,line,text,g.lbl").forEach(e => e.remove());
-
-  conns.forEach(c => {
-    const a = getPortPos(c.from, "out", c.portKey);
-    const b = getPortPos(c.to,   "in");
-    if (!a || !b) return;
-    const col = c.portKey && c.portKey.startsWith("opt_") ? "#a78bfa" : "#38bdf8";
-    drawCurve(a.x, a.y, b.x, b.y, "solid", col);
-    if (c.portKey && c.portKey.startsWith("opt_")) {
-      const i   = parseInt(c.portKey.replace("opt_","")) + 1;
-      const mx  = (a.x + b.x) / 2;
-      const my  = (a.y + b.y) / 2 - 8;
-      const g = document.createElementNS("http://www.w3.org/2000/svg","g");
-      g.setAttribute("class","lbl");
-      const bg = document.createElementNS("http://www.w3.org/2000/svg","rect");
-      bg.setAttribute("x", mx-18); bg.setAttribute("y", my-10);
-      bg.setAttribute("width","36"); bg.setAttribute("height","13");
-      bg.setAttribute("rx","4"); bg.setAttribute("fill","#0a0f1a");
-      bg.setAttribute("opacity","0.85");
-      const lbl = document.createElementNS("http://www.w3.org/2000/svg","text");
-      lbl.setAttribute("x", mx); lbl.setAttribute("y", my);
-      lbl.setAttribute("text-anchor","middle");
-      lbl.setAttribute("font-size","9");
-      lbl.setAttribute("fill","#a78bfa");
-      lbl.setAttribute("font-weight","bold");
-      lbl.textContent = `Op.${i}`;
-      g.appendChild(bg); g.appendChild(lbl);
-      svgL.appendChild(g);
-    }
-  });
-
-  if (connectingFrom !== null && previewX !== undefined) {
-    const a = getPortPos(connectingFrom.nodeId, "out", connectingFrom.portKey);
-    if (a) drawCurve(a.x, a.y, previewX, previewY, "dash", "#CEFF00");
-  }
-}
-
-function drawCurve(x1,y1,x2,y2,style,color) {
-  const dx = Math.abs(x2-x1)*0.5;
-  const d = `M${x1},${y1} C${x1+dx},${y1} ${x2-dx},${y2} ${x2},${y2}`;
-  const path = document.createElementNS("http://www.w3.org/2000/svg","path");
-  path.setAttribute("d", d);
-  path.setAttribute("class", "conn-line" + (style==="solid" ? " solid" : ""));
-  if (color) path.setAttribute("stroke", color);
-  path.setAttribute("marker-end","url(#arr)");
-  svgL.appendChild(path);
-}
-
-// ── EXPORT / SAVE ──
-function buildJSON() {
-  return {
-    nome: document.getElementById("flowName").value,
-    nos: nodes.map(n => ({
-      id: n.id, tipo: n.type, posicao:{x:Math.round(n.x),y:Math.round(n.y)},
-      dados: n.data
-    })),
-    conexoes: conns.map(c => ({ de: c.from, para: c.to, portKey: c.portKey }))
-  };
-}
-
-function exportarJSON() {
-  document.getElementById("jsonOutput").value = JSON.stringify(buildJSON(), null, 2);
-  document.getElementById("modalJSON").classList.add("open");
-}
-function fecharModal() { document.getElementById("modalJSON").classList.remove("open"); }
-function copiarJSON() {
-  navigator.clipboard.writeText(document.getElementById("jsonOutput").value);
-  toast("JSON copiado!");
-}
-
-let _fluxoEditandoId = null;
-
-function initFluxoEdit() {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
-  if (!id) return;
-  _fluxoEditandoId = id;
-  try {
-    const raw = localStorage.getItem("CONFIG_CADERNO");
-    const cad = raw ? JSON.parse(raw) : {};
-    const fluxos = cad.chat?.fluxos || [];
-    const fluxo = fluxos.find(f => f.id === id);
-    if (!fluxo) return;
-    document.getElementById("flowName").value = fluxo.nome || "Fluxo";
-    nodes = []; conns = []; nodesL.innerHTML = "";
-    nodeId = 1;
-    if (fluxo.nos) {
-      fluxo.nos.forEach(n => {
-        const novo = { id: n.id, type: n.tipo, x: n.posicao.x, y: n.posicao.y,
-          label: NODE_CFG[n.tipo]?.label || n.tipo, data: n.dados || {} };
-        nodes.push(novo);
-        if (n.id >= nodeId) nodeId = n.id + 1;
+  // ✅ CORREÇÃO ALINHAMENTO: ajusta top das portas após DOM renderizar
+  if(n.type==="menu"&&(n.data.opcoes||[]).length>0){
+    requestAnimationFrame(()=>{
+      const body     = el.querySelector(".node-body");
+      const optRows  = el.querySelectorAll(".opt-row");
+      const optPorts = el.querySelectorAll(".port-opt");
+      if(!body) return;
+      optRows.forEach((row,i)=>{
+        const port=optPorts[i]; if(!port) return;
+        // Centro da opt-row relativo ao topo do nó
+        const rowTop    = body.offsetTop + row.offsetTop;
+        const rowCenter = rowTop + row.offsetHeight/2;
+        port.style.top  = (rowCenter - port.offsetHeight/2)+"px";
       });
-    }
-    if (fluxo.conexoes) {
-      fluxo.conexoes.forEach(c => conns.push({ from: c.de, to: c.para, portKey: c.portKey || "default" }));
-    }
-    nodes.forEach(n => renderNode(n));
-    renderConnections();
-    toast("Fluxo carregado: " + fluxo.nome);
-  } catch(e) { console.error("Erro ao carregar fluxo:", e); }
+      renderConnections();
+    });
+  }
+
+  el.addEventListener("mousedown",e=>{
+    if(e.target.classList.contains("port")||e.target.tagName==="BUTTON"||e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT") return;
+    selected=n.id;dragging=n;
+    const wR=wrap.getBoundingClientRect();
+    dragOffX=(e.clientX-wR.left-offsetX)/scale-n.x;
+    dragOffY=(e.clientY-wR.top-offsetY)/scale-n.y;
+    renderNode(n);e.stopPropagation();
+  });
 }
 
-function salvarFluxo() {
-  const nome = document.getElementById("flowName").value.trim() || "Fluxo sem nome";
-  const data = buildJSON();
-  data.nome = nome;
+function renderAll(){nodes.forEach(n=>renderNode(n));renderConnections();}
+window.ns=(id,k,v)=>{const n=nodes.find(x=>x.id===id);if(n)n.data[k]=v;};
+window.na=(id)=>{const n=nodes.find(x=>x.id===id);if(!n)return;if(!n.data.opcoes)n.data.opcoes=[];n.data.opcoes.push("");renderNode(n);renderConnections();};
+window.nd=(id,i)=>{
+  const n=nodes.find(x=>x.id===id);if(!n)return;
+  n.data.opcoes.splice(i,1);
+  conns=conns.filter(c=>!(c.from===id&&c.portKey===`opt_${i}`));
+  conns=conns.map(c=>{if(c.from===id&&c.portKey?.startsWith("opt_")){const idx=parseInt(c.portKey.replace("opt_",""));if(idx>i)return{...c,portKey:`opt_${idx-1}`};}return c;});
+  renderNode(n);renderConnections();
+};
+window.no=(id,i,v)=>{const n=nodes.find(x=>x.id===id);if(n)n.data.opcoes[i]=v;};
+window.delNode=(id)=>{nodes=nodes.filter(x=>x.id!==id);conns=conns.filter(c=>c.from!==id&&c.to!==id);const el=document.getElementById("n-"+id);if(el)el.remove();if(selected===id)selected=null;renderConnections();};
+function pOut(e,nid,pk){connectingFrom={nodeId:nid,portKey:pk||"default"};e.stopPropagation();}
+window.pIn=(nid,e)=>{
+  if(e)e.stopPropagation();
+  if(connectingFrom!=null&&connectingFrom.nodeId!==nid){
+    const{nodeId:from,portKey}=connectingFrom;
+    if(!conns.find(c=>c.from===from&&c.to===nid&&c.portKey===portKey)) conns.push({from,to:nid,portKey});
+    connectingFrom=null;_connJustMade=true;renderConnections();
+  }
+};
+
+// ✅ getPortPos usa posição real do DOM após post-render
+function getPortPos(nid,side,pk){
+  const n=nodes.find(x=>x.id===nid);if(!n)return null;
+  const el=document.getElementById("n-"+nid);if(!el)return null;
+  const w=el.offsetWidth;
+  const HDR_MID=26; // centro do header (~header 36px / 2 + 8 top)
+  if(side==="in")  return{x:n.x,   y:n.y+HDR_MID};
+  if(n.type==="menu"&&pk?.startsWith("opt_")){
+    const i=parseInt(pk.replace("opt_",""));
+    const ports=el.querySelectorAll(".port-opt");
+    if(ports[i]){
+      const pTop=parseFloat(ports[i].style.top)||ports[i].offsetTop;
+      return{x:n.x+w, y:n.y+pTop+(ports[i].offsetHeight||20)/2};
+    }
+  }
+  return{x:n.x+w, y:n.y+HDR_MID};
+}
+
+function renderConnections(px,py){
+  svgL.querySelectorAll("path,g.lbl").forEach(e=>e.remove());
+  conns.forEach(c=>{
+    const a=getPortPos(c.from,"out",c.portKey),b=getPortPos(c.to,"in");
+    if(!a||!b)return;
+    const isO=c.portKey?.startsWith("opt_"),col=isO?"#a78bfa":"#38bdf8";
+    drawC(a.x,a.y,b.x,b.y,"solid",col);
+    if(isO){
+      const i=parseInt(c.portKey.replace("opt_",""))+1;
+      const mx=(a.x+b.x)/2,my=(a.y+b.y)/2-9;
+      const g=document.createElementNS("http://www.w3.org/2000/svg","g");g.setAttribute("class","lbl");
+      const bg=document.createElementNS("http://www.w3.org/2000/svg","rect");
+      bg.setAttribute("x",mx-16);bg.setAttribute("y",my-8);bg.setAttribute("width","32");bg.setAttribute("height","12");bg.setAttribute("rx","4");bg.setAttribute("fill","#0a0f1a");bg.setAttribute("opacity","0.9");
+      const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+      t.setAttribute("x",mx);t.setAttribute("y",my+1);t.setAttribute("text-anchor","middle");t.setAttribute("font-size","8");t.setAttribute("fill","#a78bfa");t.setAttribute("font-weight","bold");
+      t.textContent=`Op.${i}`;g.appendChild(bg);g.appendChild(t);svgL.appendChild(g);
+    }
+  });
+  if(connectingFrom!=null&&px!==undefined){const a=getPortPos(connectingFrom.nodeId,"out",connectingFrom.portKey);if(a)drawC(a.x,a.y,px,py,"dash","#CEFF00");}
+}
+function drawC(x1,y1,x2,y2,style,color){
+  const dx=Math.max(40,Math.abs(x2-x1)*0.5);
+  const d=`M${x1},${y1} C${x1+dx},${y1} ${x2-dx},${y2} ${x2},${y2}`;
+  const p=document.createElementNS("http://www.w3.org/2000/svg","path");
+  p.setAttribute("d",d);p.setAttribute("class","conn-line"+(style==="solid"?" solid":""));
+  if(color)p.setAttribute("stroke",color);p.setAttribute("marker-end","url(#arr)");svgL.appendChild(p);
+}
+function buildJSON(){return{nome:document.getElementById("flowName").value,nos:nodes.map(n=>({id:n.id,tipo:n.type,posicao:{x:Math.round(n.x),y:Math.round(n.y)},dados:n.data})),conexoes:conns.map(c=>({de:c.from,para:c.to,portKey:c.portKey}))};}
+function exportarJSON(){document.getElementById("jsonOutput").value=JSON.stringify(buildJSON(),null,2);document.getElementById("modalJSON").classList.add("open");}
+function fecharModal(){document.getElementById("modalJSON").classList.remove("open");}
+function copiarJSON(){navigator.clipboard.writeText(document.getElementById("jsonOutput").value);toast("JSON copiado!");}
+
+let _editId=null;
+function initFluxoEdit(){
+  const id=new URLSearchParams(window.location.search).get("id");if(!id)return;
+  _editId=id;
+  try{
+    const cad=JSON.parse(localStorage.getItem("CONFIG_CADERNO")||"{}");
+    const f=(cad.chat?.fluxos||[]).find(x=>x.id===id);if(!f)return;
+    document.getElementById("flowName").value=f.nome||"Fluxo";
+    nodes=[];conns=[];nodesL.innerHTML="";nodeId=1;
+    (f.nos||[]).forEach(n=>{const novo={id:n.id,type:n.tipo,x:n.posicao.x,y:n.posicao.y,label:CFG[n.tipo]?.label||n.tipo,data:n.dados||{}};nodes.push(novo);if(n.id>=nodeId)nodeId=n.id+1;});
+    (f.conexoes||[]).forEach(c=>conns.push({from:c.de,to:c.para,portKey:c.portKey||"default"}));
+    nodes.forEach(n=>renderNode(n));renderConnections();toast("Fluxo carregado: "+f.nome);
+  }catch(e){console.error(e);}
+}
+function salvarFluxo(){
+  const nome=document.getElementById("flowName").value.trim()||"Fluxo sem nome";
   toast("Gerando imagem...");
-  capturarImagem().then(img => {
-    try {
-      let raw = null;
-      if (window.opener && !window.opener.closed) {
-        try { raw = window.opener.localStorage.getItem("CONFIG_CADERNO"); } catch(e) {}
-      }
-      if (!raw) raw = localStorage.getItem("CONFIG_CADERNO");
-      const cad = raw && raw !== "null" ? JSON.parse(raw) : {};
-      if (!cad.chat) cad.chat = {};
-      if (!cad.chat.fluxos) cad.chat.fluxos = [];
-      const fluxoId = _fluxoEditandoId || ("fluxo_" + Date.now());
-      _fluxoEditandoId = fluxoId;
-      cad.chat.fluxos = cad.chat.fluxos.filter(f => f.id !== fluxoId);
-      cad.chat.fluxos.push({
-        id:      fluxoId,
-        nome:    nome,
-        imagem:  img,
-        nos:     data.nos,
-        conexoes: data.conexoes,
-        savedAt: new Date().toISOString()
-      });
-      cad.chat.fluxo        = data;
-      cad.chat.fluxo_imagem = img;
-      const json = JSON.stringify(cad);
-      localStorage.setItem("CONFIG_CADERNO", json);
-      let salvouNaPai = false;
-      if (window.opener && !window.opener.closed) {
-        try {
-          window.opener.localStorage.setItem("CONFIG_CADERNO", json);
-          salvouNaPai = true;
-        } catch(e) {}
-      }
-      const verifica = JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}");
-      const fluxosSalvos = verifica.chat?.fluxos?.length || 0;
-      toast(`✓ ${nome} salvo! (${fluxosSalvos} fluxo${fluxosSalvos!==1?"s":""} no caderno)`);
-      setTimeout(() => {
-        if (window.opener && !window.opener.closed) {
-          try {
-            if (typeof window.opener.renderizarFluxosSalvos === "function") {
-              window.opener.renderizarFluxosSalvos();
-            }
-          } catch(e) {}
-          window.opener.focus();
-          window.close();
-        } else {
-          window.location.href = "index.html";
-        }
-      }, 1800);
-    } catch(err) {
-      console.error("[Fluxo] Erro:", err);
-      toast("Erro ao salvar: " + err.message, true);
-    }
+  capturarImagem().then(img=>{
+    try{
+      let raw=null;
+      if(window.opener&&!window.opener.closed){try{raw=window.opener.localStorage.getItem("CONFIG_CADERNO");}catch(e){}}
+      if(!raw)raw=localStorage.getItem("CONFIG_CADERNO");
+      const cad=raw&&raw!=="null"?JSON.parse(raw):{};
+      if(!cad.chat)cad.chat={};if(!cad.chat.fluxos)cad.chat.fluxos=[];
+      const fid=_editId||("fluxo_"+Date.now());_editId=fid;
+      cad.chat.fluxos=cad.chat.fluxos.filter(x=>x.id!==fid);
+      const data=buildJSON();data.nome=nome;
+      cad.chat.fluxos.push({id:fid,nome,imagem:img,nos:data.nos,conexoes:data.conexoes,savedAt:new Date().toISOString()});
+      cad.chat.fluxo=data;cad.chat.fluxo_imagem=img;
+      const json=JSON.stringify(cad);localStorage.setItem("CONFIG_CADERNO",json);
+      if(window.opener&&!window.opener.closed){try{window.opener.localStorage.setItem("CONFIG_CADERNO",json);}catch(e){}}
+      const cnt=JSON.parse(localStorage.getItem("CONFIG_CADERNO")||"{}").chat?.fluxos?.length||0;
+      toast(`✓ ${nome} salvo! (${cnt} fluxo${cnt!==1?"s":""})`);
+      setTimeout(()=>{if(window.opener&&!window.opener.closed){try{if(typeof window.opener.renderizarFluxosSalvos==="function")window.opener.renderizarFluxosSalvos();}catch(e){}window.opener.focus();window.close();}else window.location.href="index.html";},1800);
+    }catch(err){toast("Erro: "+err.message,true);}
   });
 }
-
-function capturarImagem() {
-  return new Promise(resolve => {
-    if (!nodes.length) { resolve(null); return; }
-    let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
-    nodes.forEach(n => {
-      const el = document.getElementById("n-"+n.id);
-      const w  = el ? el.offsetWidth  : 220;
-      const h  = el ? el.offsetHeight : 140;
-      minX=Math.min(minX,n.x); minY=Math.min(minY,n.y);
-      maxX=Math.max(maxX,n.x+w); maxY=Math.max(maxY,n.y+h);
-    });
-    const PAD  = 48;
-    const SCALE = 1.4;
-    const cW   = ((maxX-minX)+PAD*2) * SCALE;
-    const cH   = ((maxY-minY)+PAD*2) * SCALE;
-    const ox   = (PAD - minX) * SCALE;
-    const oy   = (PAD - minY) * SCALE;
-    const cv   = document.createElement("canvas");
-    cv.width   = Math.min(cW, 2400);
-    cv.height  = Math.min(cH, 1800);
-    const s    = Math.min(cv.width/cW, cv.height/cH, 1);
-    const ctx  = cv.getContext("2d");
-    ctx.fillStyle = "#0a0f1a";
-    ctx.fillRect(0,0,cv.width,cv.height);
-    ctx.fillStyle = "rgba(206,255,0,0.035)";
-    for(let gx=0;gx<cv.width;gx+=20*s) for(let gy=0;gy<cv.height;gy+=20*s)
-      ctx.fillRect(gx,gy,1.5*s,1.5*s);
-    const sc = SCALE * s;
+function capturarImagem(){
+  return new Promise(resolve=>{
+    if(!nodes.length){resolve(null);return;}
+    let mx=Infinity,my=Infinity,Mx=-Infinity,My=-Infinity;
+    nodes.forEach(n=>{const el=document.getElementById("n-"+n.id);const w=el?el.offsetWidth:220,h=el?el.offsetHeight:140;mx=Math.min(mx,n.x);my=Math.min(my,n.y);Mx=Math.max(Mx,n.x+w);My=Math.max(My,n.y+h);});
+    const P=48,SC=1.4,cW=((Mx-mx)+P*2)*SC,cH=((My-my)+P*2)*SC;
+    const cv=document.createElement("canvas");cv.width=Math.min(cW,2400);cv.height=Math.min(cH,1800);
+    const s=Math.min(cv.width/cW,cv.height/cH,1),sc=SC*s,ox=(P-mx)*SC,oy=(P-my)*SC;
+    const ctx=cv.getContext("2d");
+    ctx.fillStyle="#0a0f1a";ctx.fillRect(0,0,cv.width,cv.height);
+    ctx.fillStyle="rgba(206,255,0,0.035)";
+    for(let gx=0;gx<cv.width;gx+=20*s)for(let gy=0;gy<cv.height;gy+=20*s)ctx.fillRect(gx,gy,1.5*s,1.5*s);
     ctx.save();
-    conns.forEach(c => {
-      const nA=nodes.find(x=>x.id===c.from), nB=nodes.find(x=>x.id===c.to);
-      if(!nA||!nB) return;
-      const elA=document.getElementById("n-"+nA.id), elB=document.getElementById("n-"+nB.id);
-      const wA=elA?elA.offsetWidth:220;
-      const isOpt = c.portKey && c.portKey.startsWith("opt_");
-      const col   = isOpt ? "#a78bfa" : "#38bdf8";
-      const x2 = nB.x*sc + ox*s;
-      const y2 = nB.y*sc + oy*s + 36*sc;
-      if(isOpt && c.portKey) {
+    conns.forEach(c=>{
+      const nA=nodes.find(x=>x.id===c.from),nB=nodes.find(x=>x.id===c.to);if(!nA||!nB)return;
+      const elA=document.getElementById("n-"+nA.id);const wA=elA?elA.offsetWidth:220;
+      const isO=c.portKey?.startsWith("opt_"),col=isO?"#a78bfa":"#38bdf8";
+      const x2=nB.x*sc+ox*s,y2=nB.y*sc+oy*s+26*sc;
+      if(isO&&c.portKey){
         const i=parseInt(c.portKey.replace("opt_",""));
-        // Usa posição real da porta no DOM
-        const optPorts = elA ? elA.querySelectorAll(".port-opt") : [];
-        let portY = 0;
-        if(optPorts[i]) {
-          portY = optPorts[i].offsetTop + optPorts[i].offsetHeight / 2;
-        } else {
-          portY = (46+10+54+4+i*36+(36/2));
-        }
-        const py1 = nA.y*sc + oy*s + portY*sc;
-        _drawConn(ctx, nA.x*sc+ox*s+wA*sc, py1, x2, y2, col, sc);
-        ctx.font = `bold ${10*sc}px 'Segoe UI',sans-serif`;
-        ctx.textAlign = "center";
-        const mx=(nA.x*sc+ox*s+wA*sc+x2)/2;
-        const my=(py1+y2)/2 - 6*sc;
-        ctx.fillStyle="rgba(10,15,26,0.75)";
-        const lw=ctx.measureText("Op. "+(i+1)).width+8*sc;
-        ctx.fillRect(mx-lw/2, my-9*sc, lw, 13*sc);
-        ctx.fillStyle=col;
-        ctx.fillText("Op."+(i+1), mx, my);
-      } else {
-        const x1 = nA.x*sc + ox*s + wA*sc;
-        const y1 = nA.y*sc + oy*s + 36*sc;
-        _drawConn(ctx, x1, y1, x2, y2, col, sc);
-      }
+        const ps=elA?elA.querySelectorAll(".port-opt"):[];
+        let pY=0;
+        if(ps[i]){const pTop=parseFloat(ps[i].style.top)||ps[i].offsetTop;pY=pTop+(ps[i].offsetHeight||20)/2;}
+        else pY=26+40+i*30+15;
+        _dc(ctx,nA.x*sc+ox*s+wA*sc,nA.y*sc+oy*s+pY*sc,x2,y2,col,sc);
+        ctx.font=`bold ${9*sc}px 'Segoe UI',sans-serif`;ctx.textAlign="center";
+        const mx2=(nA.x*sc+ox*s+wA*sc+x2)/2,my2=(nA.y*sc+oy*s+pY*sc+y2)/2-6*sc;
+        ctx.fillStyle="rgba(10,15,26,0.85)";const lw=ctx.measureText("Op."+(i+1)).width+8*sc;
+        ctx.fillRect(mx2-lw/2,my2-8*sc,lw,12*sc);ctx.fillStyle=col;ctx.fillText("Op."+(i+1),mx2,my2);
+      }else{_dc(ctx,nA.x*sc+ox*s+wA*sc,nA.y*sc+oy*s+26*sc,x2,y2,col,sc);}
     });
     ctx.restore();
-    nodes.forEach(n => {
-      const cfg = NODE_CFG[n.type];
-      const el  = document.getElementById("n-"+n.id);
-      const w   = (el ? el.offsetWidth  : 220) * sc;
-      const h   = (el ? el.offsetHeight : 140) * sc;
-      const x   = n.x*sc + ox*s;
-      const y   = n.y*sc + oy*s;
-      const r   = 10*sc;
-      ctx.shadowColor="rgba(0,0,0,0.55)"; ctx.shadowBlur=18*sc;
-      ctx.fillStyle="#141c2e";
-      _rr(ctx,x,y,w,h,r); ctx.fill();
-      ctx.shadowBlur=0;
-      ctx.strokeStyle="#1e2d47"; ctx.lineWidth=1.5*sc;
-      _rr(ctx,x,y,w,h,r); ctx.stroke();
-      ctx.fillStyle=cfg.color;
-      ctx.fillRect(x, y+r, 3.5*sc, 36*sc-r);
-      ctx.globalAlpha=0.15;
-      ctx.fillStyle=cfg.color;
-      _rrTop(ctx,x,y,w,36*sc,r); ctx.fill();
-      ctx.globalAlpha=1;
-      ctx.strokeStyle=cfg.color+"88"; ctx.lineWidth=0.8*sc;
-      ctx.beginPath(); ctx.moveTo(x+r,y+36*sc); ctx.lineTo(x+w-r,y+36*sc); ctx.stroke();
-      ctx.font=`700 ${9*sc}px 'Segoe UI',sans-serif`;
-      ctx.fillStyle=cfg.color;
-      ctx.textAlign="left";
-      ctx.textBaseline="middle";
-      ctx.fillText(cfg.label.toUpperCase(), x+12*sc, y+18*sc);
-      ctx.fillStyle="#94a3b8";
-      ctx.font=`${10*sc}px 'Segoe UI',sans-serif`;
-      const maxW = w - 24*sc;
-      let ty = y + 46*sc;
-      if(n.type==="mensagem"||n.type==="finalizar") {
-        const linhas=_wrap(ctx, n.data.text||"", maxW);
-        linhas.slice(0,5).forEach(ln => { ctx.fillText(ln,x+12*sc,ty); ty+=14*sc; });
-      } else if(n.type==="menu") {
-        const linhas=_wrap(ctx, n.data.text||"", maxW);
-        linhas.slice(0,2).forEach(ln => { ctx.fillText(ln,x+12*sc,ty); ty+=13*sc; });
-        ty+=2*sc;
-        (n.data.opcoes||[]).forEach((op,i) => {
-          const txt=`${i+1}. ${op||"Opção "+(i+1)}`;
-          ctx.fillStyle="rgba(167,139,250,0.15)";
-          const pw=Math.min(ctx.measureText(txt).width+16*sc, maxW);
-          ctx.fillRect(x+12*sc, ty-9*sc, pw, 18*sc);
-          ctx.strokeStyle="rgba(167,139,250,0.4)"; ctx.lineWidth=0.8*sc;
-          ctx.strokeRect(x+12*sc, ty-9*sc, pw, 18*sc);
-          ctx.fillStyle="#a78bfa";
-          ctx.font=`600 ${9*sc}px 'Segoe UI',sans-serif`;
-          ctx.fillText(txt, x+20*sc, ty);
-          ctx.font=`${10*sc}px 'Segoe UI',sans-serif`;
-          ty+=20*sc;
-        });
-      } else if(n.type==="horario") {
-        ctx.fillStyle="#f59e0b";
-        ctx.font=`600 ${10*sc}px 'Segoe UI',sans-serif`;
-        ctx.fillText("⏰ "+(n.data.horario||"Horário Comercial"), x+12*sc, ty);
-      } else if(n.type==="dados") {
-        ctx.fillText("Campo: "+(n.data.campo||"—"), x+12*sc, ty); ty+=14*sc;
-        const linhas=_wrap(ctx, n.data.text||"", maxW);
-        linhas.slice(0,2).forEach(ln=>{ctx.fillText(ln,x+12*sc,ty);ty+=13*sc;});
-      } else if(n.type==="agente") {
-        ctx.fillStyle="#fb923c";
-        ctx.fillText("👤 "+(n.data.text||"Qualquer agente"), x+12*sc, ty);
-      } else if(n.type==="depto") {
-        ctx.fillStyle="#34d399";
-        ctx.fillText("🏢 "+(n.data.text||"Departamento"), x+12*sc, ty);
-      } else if(n.type==="espera") {
-        ctx.fillStyle="#94a3b8";
-        ctx.fillText("⏱ "+(n.data.text||"Aguardando..."), x+12*sc, ty);
-      } else if(n.type==="start") {
-        ctx.fillStyle="#22c55e";
-        ctx.font=`600 ${10*sc}px 'Segoe UI',sans-serif`;
-        ctx.fillText("Início do fluxo", x+12*sc, ty);
-      }
-      if(cfg.hasOut && n.type!=="menu") {
-        ctx.strokeStyle="#CEFF00"; ctx.lineWidth=2*sc; ctx.fillStyle="#0a0f1a";
-        ctx.beginPath(); ctx.arc(x+w,y+36*sc,6*sc,0,Math.PI*2); ctx.fill(); ctx.stroke();
-        ctx.fillStyle="rgba(206,255,0,0.3)";
-        ctx.beginPath(); ctx.arc(x+w,y+36*sc,3*sc,0,Math.PI*2); ctx.fill();
-      }
-      if(n.type==="menu") {
+    nodes.forEach(n=>{
+      const c=CFG[n.type];const el=document.getElementById("n-"+n.id);
+      const w=(el?el.offsetWidth:220)*sc,h=(el?el.offsetHeight:140)*sc;
+      const x=n.x*sc+ox*s,y=n.y*sc+oy*s,r=10*sc;
+      ctx.shadowColor="rgba(0,0,0,0.55)";ctx.shadowBlur=18*sc;ctx.fillStyle="#141c2e";_rr(ctx,x,y,w,h,r);ctx.fill();ctx.shadowBlur=0;
+      ctx.globalAlpha=0.14;ctx.fillStyle=c.color;_rrTop(ctx,x,y,w,38*sc,r);ctx.fill();ctx.globalAlpha=1;
+      ctx.strokeStyle="#1e2d47";ctx.lineWidth=1.5*sc;_rr(ctx,x,y,w,h,r);ctx.stroke();
+      ctx.fillStyle=c.color;ctx.fillRect(x,y+r,3.5*sc,38*sc-r);
+      ctx.strokeStyle=c.color+"50";ctx.lineWidth=0.8*sc;ctx.beginPath();ctx.moveTo(x+r,y+38*sc);ctx.lineTo(x+w-r,y+38*sc);ctx.stroke();
+      ctx.font=`700 ${9*sc}px 'Segoe UI',sans-serif`;ctx.fillStyle=c.color;ctx.textAlign="left";ctx.textBaseline="middle";
+      ctx.fillText(c.label.toUpperCase(),x+12*sc,y+19*sc);
+      ctx.fillStyle="#94a3b8";ctx.font=`${10*sc}px 'Segoe UI',sans-serif`;
+      const mw=w-24*sc;let ty=y+48*sc;
+      if(n.type==="mensagem"||n.type==="finalizar"){_wt(ctx,n.data.text||"",mw).slice(0,5).forEach(l=>{ctx.fillText(l,x+12*sc,ty);ty+=13*sc;});}
+      else if(n.type==="menu"){
+        _wt(ctx,n.data.text||"",mw).slice(0,2).forEach(l=>{ctx.fillText(l,x+12*sc,ty);ty+=12*sc;});ty+=3*sc;
         (n.data.opcoes||[]).forEach((op,i)=>{
-          const optPorts = el ? el.querySelectorAll(".port-opt") : [];
-          let portY = 0;
-          if(optPorts[i]) {
-            portY = optPorts[i].offsetTop + optPorts[i].offsetHeight / 2;
-          } else {
-            portY = (46+10+54+4+i*36+(36/2));
-          }
-          ctx.strokeStyle="#a78bfa"; ctx.lineWidth=2*sc; ctx.fillStyle="#0a0f1a";
-          ctx.beginPath(); ctx.arc(x+w,y+portY*sc,6*sc,0,Math.PI*2); ctx.fill(); ctx.stroke();
-          ctx.fillStyle="rgba(167,139,250,0.3)";
-          ctx.beginPath(); ctx.arc(x+w,y+portY*sc,3*sc,0,Math.PI*2); ctx.fill();
+          const txt=`${i+1}. ${op||"Opção "+(i+1)}`;
+          ctx.fillStyle="rgba(167,139,250,0.1)";const pw=Math.min(ctx.measureText(txt).width+14*sc,mw);
+          ctx.fillRect(x+10*sc,ty-8*sc,pw,17*sc);ctx.strokeStyle="rgba(167,139,250,0.28)";ctx.lineWidth=0.8*sc;ctx.strokeRect(x+10*sc,ty-8*sc,pw,17*sc);
+          ctx.fillStyle="#a78bfa";ctx.font=`600 ${9*sc}px 'Segoe UI',sans-serif`;ctx.fillText(txt,x+17*sc,ty);
+          ctx.font=`${10*sc}px 'Segoe UI',sans-serif`;ty+=19*sc;
         });
       }
-      if(cfg.hasIn) {
-        ctx.strokeStyle="#38bdf8"; ctx.lineWidth=2*sc; ctx.fillStyle="#0a0f1a";
-        ctx.beginPath(); ctx.arc(x,y+36*sc,6*sc,0,Math.PI*2); ctx.fill(); ctx.stroke();
-        ctx.fillStyle="rgba(56,189,248,0.3)";
-        ctx.beginPath(); ctx.arc(x,y+36*sc,3*sc,0,Math.PI*2); ctx.fill();
-      }
+      else if(n.type==="horario"){ctx.fillStyle="#f59e0b";ctx.font=`600 ${10*sc}px 'Segoe UI',sans-serif`;ctx.fillText("⏰ "+(n.data.horario||"Horário Comercial"),x+12*sc,ty);}
+      else if(n.type==="dados"){ctx.fillText("📌 "+(n.data.campo||"—"),x+12*sc,ty);ty+=13*sc;_wt(ctx,n.data.text||"",mw).slice(0,2).forEach(l=>{ctx.fillText(l,x+12*sc,ty);ty+=12*sc;});}
+      else if(n.type==="agente"){ctx.fillStyle="#fb923c";ctx.fillText("👤 "+(n.data.text||"Qualquer agente"),x+12*sc,ty);}
+      else if(n.type==="depto"){ctx.fillStyle="#34d399";ctx.fillText("🏢 "+(n.data.text||"Departamento"),x+12*sc,ty);}
+      else if(n.type==="espera"){ctx.fillStyle="#94a3b8";ctx.fillText("⏱ "+(n.data.text||"Aguardando..."),x+12*sc,ty);}
+      else if(n.type==="start"){ctx.fillStyle="#22c55e";ctx.font=`600 ${10*sc}px 'Segoe UI',sans-serif`;ctx.fillText("▶  Início do fluxo",x+12*sc,ty);}
+      // Portas na imagem
+      if(c.hasOut&&n.type!=="menu"){_porto(ctx,x+w,y+26*sc,"#CEFF00",sc);}
+      if(n.type==="menu"){(n.data.opcoes||[]).forEach((op,i)=>{const ps=el?el.querySelectorAll(".port-opt"):[];let pY=0;if(ps[i]){const pt=parseFloat(ps[i].style.top)||ps[i].offsetTop;pY=pt+(ps[i].offsetHeight||20)/2;}else pY=26+40+i*30+15;_porto(ctx,x+w,y+pY*sc,"#a78bfa",sc);});}
+      if(c.hasIn){_porto(ctx,x,y+26*sc,"#38bdf8",sc);}
     });
-    ctx.font=`${10*sc}px 'Segoe UI',sans-serif`;
-    ctx.fillStyle="rgba(206,255,0,0.3)";
-    ctx.textAlign="right";
-    ctx.fillText("Caderno de Parâmetros · SobreIP", cv.width-12*s, cv.height-8*s);
-    const img = cv.toDataURL("image/jpeg", 0.85);
-    resolve(img);
+    ctx.font=`${9*sc}px 'Segoe UI',sans-serif`;ctx.fillStyle="rgba(206,255,0,0.25)";ctx.textAlign="right";
+    ctx.fillText("Caderno de Parâmetros · SobreIP",cv.width-10*s,cv.height-6*s);
+    resolve(cv.toDataURL("image/jpeg",0.85));
   });
 }
-
-function _drawConn(ctx, x1,y1,x2,y2,col,sc) {
-  const dx=Math.abs(x2-x1)*0.5;
-  ctx.strokeStyle=col; ctx.lineWidth=1.8*sc;
-  ctx.setLineDash([]); ctx.beginPath();
-  ctx.moveTo(x1,y1);
-  ctx.bezierCurveTo(x1+dx,y1, x2-dx,y2, x2,y2);
-  ctx.stroke();
-  const ang=Math.atan2(y2-(y1+(y2-y1)*0.9), x2-(x1+(x2-x1)*0.9));
-  ctx.save(); ctx.translate(x2,y2); ctx.rotate(ang);
-  ctx.fillStyle=col; ctx.beginPath();
-  ctx.moveTo(0,0); ctx.lineTo(-9*sc,-4*sc); ctx.lineTo(-9*sc,4*sc);
-  ctx.closePath(); ctx.fill(); ctx.restore();
-}
-
-function _wrap(ctx, text, maxW) {
-  if(!text) return [];
-  const words=text.split(" "); const lines=[]; let cur="";
-  words.forEach(w=>{
-    const t=cur?cur+" "+w:w;
-    if(ctx.measureText(t).width>maxW){lines.push(cur);cur=w;}else cur=t;
-  });
-  if(cur) lines.push(cur);
-  return lines;
-}
-
-function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
-function roundRectTop(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
-function _rr(ctx,x,y,w,h,r){roundRect(ctx,x,y,w,h,r);}
-function _rrTop(ctx,x,y,w,h,r){roundRectTop(ctx,x,y,w,h,r);}
-
-function confirmarLimpar() {
-  if (!nodes.length || confirm("Limpar todo o fluxo?")) {
-    nodes=[]; conns=[]; nodesL.innerHTML=""; renderConnections();
-    toast("Fluxo limpo");
-  }
-}
-
-function toast(msg, err=false) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.className = "toast show" + (err?" err":"");
-  clearTimeout(t._t);
-  t._t = setTimeout(()=>t.classList.remove("show"), 2500);
-}
-
-window.addEventListener("keydown", e => {
-  if (e.key === "Escape" && connectingFrom !== null) {
-    connectingFrom = null; renderConnections();
-  }
-  if ((e.key === "Delete" || e.key === "Backspace") && selected) {
-    const tag = document.activeElement?.tagName?.toLowerCase();
-    if (tag !== "input" && tag !== "textarea") { delNode(selected); selected = null; }
-  }
+function _porto(ctx,x,y,col,sc){ctx.strokeStyle=col;ctx.lineWidth=2*sc;ctx.fillStyle="#0a0f1a";ctx.beginPath();ctx.arc(x,y,5.5*sc,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle=col.replace(")",",0.3)").replace("rgb","rgba")||col+"44";ctx.beginPath();ctx.arc(x,y,2.5*sc,0,Math.PI*2);ctx.fill();}
+function _dc(ctx,x1,y1,x2,y2,col,sc){const dx=Math.max(40*sc,Math.abs(x2-x1)*0.5);ctx.strokeStyle=col;ctx.lineWidth=1.8*sc;ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(x1,y1);ctx.bezierCurveTo(x1+dx,y1,x2-dx,y2,x2,y2);ctx.stroke();const ang=Math.atan2(y2-y1,x2-x1);ctx.save();ctx.translate(x2,y2);ctx.rotate(ang);ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-9*sc,-4*sc);ctx.lineTo(-9*sc,4*sc);ctx.closePath();ctx.fill();ctx.restore();}
+function _wt(ctx,text,mw){if(!text)return[];const words=text.split(" "),lines=[];let cur="";words.forEach(w=>{const t=cur?cur+" "+w:w;if(ctx.measureText(t).width>mw){lines.push(cur);cur=w;}else cur=t;});if(cur)lines.push(cur);return lines;}
+function _rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+function _rrTop(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+function confirmarLimpar(){if(!nodes.length||confirm("Limpar todo o fluxo?")){nodes=[];conns=[];nodesL.innerHTML="";renderConnections();toast("Fluxo limpo");}}
+function toast(msg,err=false){const t=document.getElementById("toast");t.textContent=msg;t.className="toast show"+(err?" err":"");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2500);}
+window.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&connectingFrom!=null){connectingFrom=null;renderConnections();}
+  if((e.key==="Delete"||e.key==="Backspace")&&selected){const tag=document.activeElement?.tagName?.toLowerCase();if(tag!=="input"&&tag!=="textarea"){delNode(selected);selected=null;}}
 });
-wrap.addEventListener("click", e => {
-  if (e.target === wrap || e.target === canvas || e.target === svgL || e.target === nodesL) {
-    if (connectingFrom !== null) { connectingFrom = null; renderConnections(); }
-  }
-});
+wrap.addEventListener("click",e=>{if(e.target===wrap||e.target===canvas||e.target===svgL||e.target===nodesL){if(connectingFrom!=null){connectingFrom=null;renderConnections();}}});
 
-// ── ✅ CORREÇÃO 2: getDadosCaderno lê DOM do pai diretamente ──
-function getDadosCaderno() {
-  try {
-    if (window.opener && !window.opener.closed) {
-      // 1. Lê direto do DOM do formulário pai — funciona mesmo sem salvar
-      try {
-        const opDoc = window.opener.document;
-        const opLS  = window.opener.localStorage;
-        const base  = JSON.parse(opLS.getItem("CONFIG_CADERNO") || "{}");
-        if (!base.chat) base.chat = {};
-        if (!base.voz)  base.voz  = {};
-
-        // Departamentos do DOM
-        const deps = [];
-        opDoc.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d => {
-          const nome = d.querySelector(".campo-nome")?.value?.trim();
-          if (nome) deps.push({ nome, agentes: JSON.parse(d.dataset?.agentes || "[]") });
-        });
-        if (deps.length) base.chat.departamentos = deps;
-
-        // Regras de tempo do DOM (voz e chat)
-        const rt = [];
-        opDoc.querySelectorAll("#listaRegrasTempo .campo-descricao, #listaRegrasTempoChat .campo-descricao").forEach(r => {
-          const nome = r.querySelector(".campo-nome")?.value?.trim();
-          if (nome) rt.push({ nome });
-        });
-        if (rt.length) base.voz.regras_tempo = rt;
-
-        // Agentes do DOM (voz + chat)
-        const ags = [];
-        opDoc.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
-          const nome = a.querySelector(".campo-nome")?.value?.trim();
-          if (nome) ags.push({ nome });
-        });
-        opDoc.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
-          const nome = a.querySelector(".campo-nome")?.value?.trim();
-          if (nome && !ags.find(x => x.nome === nome)) ags.push({ nome });
-        });
-        if (ags.length) { base.voz.agentes = ags; base.chat.agentes = ags; }
-
+// ✅ getDadosCaderno lê DOM do pai diretamente
+function getDadosCaderno(){
+  try{
+    if(window.opener&&!window.opener.closed){
+      try{
+        const od=window.opener.document,ol=window.opener.localStorage;
+        const base=JSON.parse(ol.getItem("CONFIG_CADERNO")||"{}");
+        if(!base.chat)base.chat={};if(!base.voz)base.voz={};
+        const deps=[];
+        od.querySelectorAll("#listaDepartamentosChat .campo-descricao").forEach(d=>{const nome=d.querySelector(".campo-nome")?.value?.trim();if(nome)deps.push({nome,agentes:JSON.parse(d.dataset?.agentes||"[]")});});
+        if(deps.length)base.chat.departamentos=deps;
+        const rt=[];
+        od.querySelectorAll("#listaRegrasTempo .campo-descricao, #listaRegrasTempoChat .campo-descricao").forEach(r=>{const nome=r.querySelector(".campo-nome")?.value?.trim();if(nome)rt.push({nome});});
+        if(rt.length)base.voz.regras_tempo=rt;
+        const ags=[];
+        od.querySelectorAll("#listaAgentes .campo-descricao").forEach(a=>{const nome=a.querySelector(".campo-nome")?.value?.trim();if(nome)ags.push({nome});});
+        od.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a=>{const nome=a.querySelector(".campo-nome")?.value?.trim();if(nome&&!ags.find(x=>x.nome===nome))ags.push({nome});});
+        if(ags.length){base.voz.agentes=ags;base.chat.agentes=ags;}
         return base;
-      } catch(e) {
-        console.warn("[Fluxo] Erro ao ler DOM do pai:", e);
-      }
-
-      // 2. Fallback: localStorage da janela pai
-      try {
-        const raw = window.opener.localStorage.getItem("CONFIG_CADERNO");
-        if (raw) return JSON.parse(raw);
-      } catch(e) {}
+      }catch(e){}
+      try{const raw=window.opener.localStorage.getItem("CONFIG_CADERNO");if(raw)return JSON.parse(raw);}catch(e){}
     }
+    const raw=localStorage.getItem("CONFIG_CADERNO");return raw?JSON.parse(raw):{};
+  }catch(e){return{};}
+}
+function atualizarDadosCaderno(){nodes.forEach(n=>renderNode(n));renderConnections();toast(`✓ ${getRegrasTempo().length} regras · ${getDepartamentos().length} dep. · ${getAgentes().length} agentes`);}
+function getRegrasTempo(){const d=getDadosCaderno();return[...new Set([...(d.voz?.regras_tempo||[]).map(r=>r.nome),...(d.chat?.regras_tempo||[]).map(r=>r.nome)].filter(Boolean))];}
+function getDepartamentos(){return(getDadosCaderno().chat?.departamentos||[]).map(d=>d.nome).filter(Boolean);}
+function getAgentes(){const d=getDadosCaderno();return[...new Set([...(d.voz?.agentes||[]).map(a=>a.nome),...(d.chat?.agentes||[]).map(a=>a.nome)].filter(Boolean))];}
 
-    // 3. Fallback: localStorage local
-    const raw = localStorage.getItem("CONFIG_CADERNO");
-    return raw ? JSON.parse(raw) : {};
-  } catch(e) { return {}; }
-}
-
-function atualizarDadosCaderno() {
-  nodes.forEach(n => renderNode(n));
-  renderConnections();
-  toast("Dados atualizados! " +
-    getRegrasTempo().length + " regras · " +
-    getDepartamentos().length + " departamentos · " +
-    getAgentes().length + " agentes");
-}
-
-function getRegrasTempo() {
-  const d = getDadosCaderno();
-  const vozRegras  = (d.voz?.regras_tempo  || []).map(r => r.nome).filter(Boolean);
-  const chatRegras = (d.chat?.regras_tempo || []).map(r => r.nome).filter(Boolean);
-  return [...new Set([...vozRegras, ...chatRegras])];
-}
-function getDepartamentos() {
-  const d = getDadosCaderno();
-  return (d.chat?.departamentos || []).map(dep => dep.nome).filter(Boolean);
-}
-function getAgentes() {
-  const d = getDadosCaderno();
-  const voz  = (d.voz?.agentes  || []).map(a => a.nome).filter(Boolean);
-  const chat = (d.chat?.agentes || []).map(a => a.nome).filter(Boolean);
-  return [...new Set([...voz, ...chat])];
-}
-
-// ── INIT ──
-const _params = new URLSearchParams(window.location.search);
-if (!_params.get("id")) {
-  addNode("start", 60, 80);
-} else {
-  setTimeout(initFluxoEdit, 100);
-}
-
-// Auto-carrega dados do formulário ao abrir
-setTimeout(atualizarDadosCaderno, 800);
+const _p=new URLSearchParams(window.location.search);
+if(!_p.get("id")){addNode("start",60,80);}else{setTimeout(initFluxoEdit,100);}
+setTimeout(atualizarDadosCaderno,800);
 </script>
 </body>
 </html>
