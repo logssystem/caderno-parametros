@@ -339,7 +339,7 @@ function criarBlocoPesquisa() {
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
-  btn.style.cssText = "float:right;width:auto;min-height:auto;padding:4px 8px;font-size:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;border-radius:6px;";
+  btn.style.cssText = "float:right;width:auto;min-height:auto;padding:4px 8px;font-size:12px;background:#f3f4f6;border:1px solid #d1d5db;color:#6b7280;border-radius:6px;cursor:pointer;";
   btn.onclick = () => wrap.remove();
 
   wrap.append(nome, audioIntro, pergunta, listaRespostas, btnAddResposta, dica, audioFim, btn);
