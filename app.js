@@ -1923,21 +1923,8 @@ function coletarRegrasTempoChat() {
   return regras;
 }
 
-/* ================= PAUSAS E PESQUISA ================= */
-window.togglePausas              = togglePausas;
-window.togglePesquisaSatisfacao  = togglePesquisaSatisfacao;
-
-window.adicionarPausa = function () {
-  const container = document.getElementById("pausasConteudo");
-  if (!container) return;
-  const listaPausas = container.querySelector(".campo-descricao div");
-  if (listaPausas) listaPausas.appendChild(criarPausa());
-};
-
-window.adicionarRespostaPesquisa = function () {
-  const lista = document.getElementById("pesquisaSatisfacaoConteudo")
-    ?.querySelector(".listaRespostasPesquisa");
-  if (!lista) return;
+/* ================= RESPOSTA PESQUISA ================= */
+function criarRespostaPesquisa() {
   const wrap = document.createElement("div");
   wrap.className = "opcao-pesquisa";
   const nota = document.createElement("input");
@@ -1950,7 +1937,68 @@ window.adicionarRespostaPesquisa = function () {
   del.textContent = "✖";
   del.onclick = () => wrap.remove();
   wrap.append(nota, desc, del);
-  lista.appendChild(wrap);
+  return wrap;
+}
+
+/* ================= PAUSAS E PESQUISA ================= */
+window.togglePausas = function () {
+  const container = document.getElementById("pausasConteudo");
+  if (!container) return;
+  const modo = localStorage.getItem("modo_atendimento");
+  if (modo === "chat") {
+    mostrarToast("Pausas são exclusivas do Call Center (Voz)", true);
+    return;
+  }
+  if (container._iniciado) {
+    container.style.display = container.style.display === "none" ? "block" : "none";
+    return;
+  }
+  container._iniciado = true;
+  container.style.display = "block";
+  container.appendChild(criarBlocoPausas());
+};
+
+window.togglePesquisaSatisfacao = function () {
+  const container = document.getElementById("pesquisaSatisfacaoConteudo");
+  if (!container) return;
+  if (container._iniciado) {
+    container.style.display = container.style.display === "none" ? "block" : "none";
+    return;
+  }
+  container._iniciado = true;
+  container.style.display = "block";
+  const bloco = criarBlocoPesquisa();
+  // Quando o ✖ remover o bloco, reseta _iniciado para permitir reabrir
+  const btnFechar = bloco.querySelector("button");
+  if (btnFechar) {
+    const onclickOriginal = btnFechar.onclick;
+    btnFechar.onclick = () => {
+      onclickOriginal?.();
+      container._iniciado = false;
+      container.style.display = "none";
+    };
+  }
+  container.appendChild(bloco);
+};
+
+window.adicionarPausa = function () {
+  const lista = document.getElementById("pausasConteudo")?.querySelector(".opcao-pausa")
+    ?.parentElement
+    || document.getElementById("pausasConteudo")?.querySelector(".campo-descricao div:not(.opcao-pausa)");
+  // Busca a div que contém as pausas dentro do bloco criado
+  const wrap = document.getElementById("pausasConteudo")?.querySelector(".campo-descricao");
+  if (!wrap) return;
+  // A listaPausas é a div antes do botão +
+  const btns = wrap.querySelectorAll("button");
+  const btnAdd = [...btns].find(b => b.textContent.trim() === "+");
+  if (btnAdd) btnAdd.click();
+};
+
+window.adicionarRespostaPesquisa = function () {
+  const lista = document.getElementById("pesquisaSatisfacaoConteudo")
+    ?.querySelector(".listaRespostasPesquisa");
+  if (!lista) return;
+  lista.appendChild(criarRespostaPesquisa());
 };
 
 /* ================= MODO ESCURO ================= */
