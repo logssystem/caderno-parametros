@@ -296,27 +296,38 @@ let _pesquisaAberta = false;
 function togglePesquisaSatisfacao() {
   const bloco = document.getElementById("pesquisaSatisfacaoConteudo");
   if (!bloco) return;
-  _pesquisaAberta = !_pesquisaAberta;
-  bloco.style.display = _pesquisaAberta ? "block" : "none";
+
+  if (!_pesquisaAberta) {
+    bloco.style.display = "block";
+    _pesquisaAberta = true;
+  } else {
+    adicionarRespostaPesquisa();
+  }
 }
+
 function adicionarRespostaPesquisa() {
   const lista = document.getElementById("listaRespostasPesquisa");
   if (!lista) return;
   lista.appendChild(criarRespostaPesquisa());
 }
+
 function criarRespostaPesquisa() {
   const wrap = document.createElement("div");
   wrap.className = "opcao-pesquisa";
+
   const nota = document.createElement("input");
   nota.type = "number";
   nota.placeholder = "Nota";
   nota.style.width = "70px";
+
   const descricao = document.createElement("input");
   descricao.type = "text";
   descricao.placeholder = "Descrição da resposta (ex: Ruim, Regular, Bom, Excelente)";
+
   const del = document.createElement("button");
-  del.textContent = "🗑";
+  del.textContent = "✖";
   del.onclick = () => wrap.remove();
+
   wrap.append(nota, descricao, del);
   return wrap;
 }
@@ -327,25 +338,35 @@ let _pausasAberta = false;
 function togglePausas() {
   const bloco = document.getElementById("pausasConteudo");
   if (!bloco) return;
+
   const modo = localStorage.getItem("modo_atendimento");
   if (modo === "chat") {
     mostrarToast("Pausas são exclusivas do Call Center (Voz)", true);
     return;
   }
-  _pausasAberta = !_pausasAberta;
-  bloco.style.display = _pausasAberta ? "block" : "none";
+
+  if (!_pausasAberta) {
+    bloco.style.display = "block";
+    _pausasAberta = true;
+  } else {
+    adicionarPausa();
+  }
 }
+
 function adicionarPausa() {
   const lista = document.getElementById("listaPausas");
   if (!lista) return;
   lista.appendChild(criarPausa());
 }
+
 function criarPausa() {
   const wrap = document.createElement("div");
   wrap.className = "opcao-pausa";
+
   const nome = document.createElement("input");
   nome.type = "text";
   nome.placeholder = "Nome da pausa (ex: Almoço, Banheiro, Treinamento)";
+
   const timeout = document.createElement("select");
   for (let i = 0; i <= 240; i += 5) {
     const opt = document.createElement("option");
@@ -353,9 +374,11 @@ function criarPausa() {
     opt.textContent = i === 0 ? "Sem limite" : `${i} min`;
     timeout.appendChild(opt);
   }
+
   const del = document.createElement("button");
-  del.textContent = "🗑";
+  del.textContent = "✖";
   del.onclick = () => wrap.remove();
+
   wrap.append(nome, timeout, del);
   return wrap;
 }
