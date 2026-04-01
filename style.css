@@ -290,11 +290,12 @@ body.dark .card h2, body.dark .card h3 { color: #f8fafc; }
    INPUTS
 ====================================================== */
 input:not([type="checkbox"]), select, textarea {
-  width: 100%; padding: 10px 12px; border-radius: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
   border: 1px solid var(--field-border);
-  background: rgba(255,255,255,0.05); color: var(--text);
-  font-weight: 600; font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
 }
 input::placeholder, textarea::placeholder { color: #64748b; }
 input:hover:not([type="checkbox"]), select:hover, textarea:hover { border-color: rgba(255,255,255,0.2); }
@@ -306,8 +307,16 @@ body.light input:not([type="checkbox"]), body.light textarea, body.light select 
   background: #ffffff !important; color: #111827 !important; border: 1px solid #cbd5e1 !important;
 }
 body.light input::placeholder, body.light textarea::placeholder { color: #9ca3af !important; }
-body.dark  input:not([type="checkbox"]), body.dark textarea, body.dark select {
-  background: #020617; color: #f1f5f9; border-color: #334155;
+body.dark input:not([type="checkbox"]), 
+body.dark textarea, 
+body.dark select {
+  background: #020617;
+  color: #f1f5f9;
+}
+
+body.dark select option {
+  background: #0f172a;
+  color: #f1f5f9;
 }
 body.dark  input::placeholder, body.dark textarea::placeholder { color: #94a3b8; }
 input.campo-senha   { width: 280px !important; max-width: 280px !important; }
