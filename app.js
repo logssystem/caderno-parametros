@@ -309,11 +309,6 @@ function criarBlocoPesquisa() {
   const wrap = document.createElement("div");
   wrap.className = "campo-descricao";
 
-  const btn = document.createElement("button");
-  btn.textContent = "✖";
-  btn.style.cssText = "float:right;width:auto;min-height:auto;padding:4px 8px;font-size:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;border-radius:6px;";
-  btn.onclick = () => wrap.remove();
-
   const nome = document.createElement("input");
   nome.id = "pesquisaNome";
   nome.placeholder = "Ex: Pesquisa de Atendimento Telefônico";
@@ -341,6 +336,11 @@ function criarBlocoPesquisa() {
   const audioFim = document.createElement("textarea");
   audioFim.id = "pesquisaAudioFim";
   audioFim.placeholder = "Ex: Obrigado por participar da nossa pesquisa.";
+
+  const btn = document.createElement("button");
+  btn.textContent = "✖";
+  btn.style.cssText = "float:right;width:auto;min-height:auto;padding:4px 8px;font-size:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;border-radius:6px;";
+  btn.onclick = () => wrap.remove();
 
   wrap.append(btn, nome, audioIntro, pergunta, listaRespostas, btnAddResposta, dica, audioFim);
   return wrap;
