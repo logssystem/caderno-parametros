@@ -1924,10 +1924,34 @@ function coletarRegrasTempoChat() {
 }
 
 /* ================= PAUSAS E PESQUISA ================= */
-window.togglePausas             = togglePausas;
-window.adicionarPausa           = adicionarPausa;
-window.togglePesquisaSatisfacao = togglePesquisaSatisfacao;
-window.adicionarRespostaPesquisa = adicionarRespostaPesquisa;
+window.togglePausas              = togglePausas;
+window.togglePesquisaSatisfacao  = togglePesquisaSatisfacao;
+
+window.adicionarPausa = function () {
+  const container = document.getElementById("pausasConteudo");
+  if (!container) return;
+  const listaPausas = container.querySelector(".campo-descricao div");
+  if (listaPausas) listaPausas.appendChild(criarPausa());
+};
+
+window.adicionarRespostaPesquisa = function () {
+  const lista = document.getElementById("pesquisaSatisfacaoConteudo")
+    ?.querySelector(".listaRespostasPesquisa");
+  if (!lista) return;
+  const wrap = document.createElement("div");
+  wrap.className = "opcao-pesquisa";
+  const nota = document.createElement("input");
+  nota.type = "number"; nota.min = "0"; nota.max = "10";
+  nota.placeholder = "Nota";
+  const desc = document.createElement("input");
+  desc.type = "text";
+  desc.placeholder = "Descrição (ex: Ótimo)";
+  const del = document.createElement("button");
+  del.textContent = "✖";
+  del.onclick = () => wrap.remove();
+  wrap.append(nota, desc, del);
+  lista.appendChild(wrap);
+};
 
 /* ================= MODO ESCURO ================= */
 (function initTema() {
