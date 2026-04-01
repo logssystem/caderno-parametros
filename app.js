@@ -345,8 +345,8 @@ function criarBlocoPesquisa() {
 // FIX #1: Toggle mostra/oculta o bloco; não remove campos
 let _pausasAberta = false;
 function togglePausas() {
-  const bloco = document.getElementById("pausasConteudo");
-  if (!bloco) return;
+  const container = document.getElementById("pausasConteudo");
+  if (!container) return;
 
   const modo = localStorage.getItem("modo_atendimento");
   if (modo === "chat") {
@@ -354,18 +354,31 @@ function togglePausas() {
     return;
   }
 
-  if (!_pausasAberta) {
-    bloco.style.display = "block";
-    _pausasAberta = true;
-  } else {
-    adicionarPausa();
-  }
+  container.style.display = "block";
+  container.appendChild(criarBlocoPausas());
 }
 
-function adicionarPausa() {
-  const lista = document.getElementById("listaPausas");
-  if (!lista) return;
-  lista.appendChild(criarPausa());
+function criarBlocoPausas() {
+  const wrap = document.createElement("div");
+  wrap.className = "campo-descricao";
+
+  const btn = document.createElement("button");
+  btn.textContent = "✖";
+  btn.style.cssText = "float:right;";
+  btn.onclick = () => wrap.remove();
+
+  const nomeGrupo = document.createElement("input");
+  nomeGrupo.placeholder = "Ex: Pausas Operacionais";
+
+  const listaPausas = document.createElement("div");
+
+  const btnAddPausa = document.createElement("button");
+  btnAddPausa.className = "btn-add";
+  btnAddPausa.textContent = "+";
+  btnAddPausa.onclick = () => listaPausas.appendChild(criarPausa());
+
+  wrap.append(btn, nomeGrupo, listaPausas, btnAddPausa);
+  return wrap;
 }
 
 function criarPausa() {
