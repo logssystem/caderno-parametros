@@ -384,7 +384,7 @@ function criarBlocoPausas() {
   btnAddPausa.textContent = "+";
   btnAddPausa.onclick = () => listaPausas.appendChild(criarPausa());
 
-  wrap.append(btn, nomeGrupo, listaPausas, btnAddPausa);
+  wrap.append(nomeGrupo, listaPausas, btnAddPausa, btn);
   return wrap;
 }
 
