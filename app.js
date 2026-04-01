@@ -296,6 +296,11 @@ let _pesquisaAberta = false;
 function togglePesquisaSatisfacao() {
   const container = document.getElementById("pesquisaSatisfacaoConteudo");
   if (!container) return;
+  if (container._iniciado) {
+    container.style.display = container.style.display === "none" ? "block" : "none";
+    return;
+  }
+  container._iniciado = true;
   container.style.display = "block";
   container.appendChild(criarBlocoPesquisa());
 }
