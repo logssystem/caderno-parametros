@@ -121,31 +121,19 @@
       <div id="listaURAs"></div>
       <button class="btn-add" onclick="adicionarCampo('ura')">+</button>
     </section>
+
+    <!-- PESQUISA: div vazia, JS cria o conteúdo -->
     <section class="card">
       <h2>Pesquisa de Satisfação</h2>
       <button class="btn-add" onclick="togglePesquisaSatisfacao()">+</button>
-      <div id="pesquisaSatisfacaoConteudo" style="display:none">
-        <div class="campo-descricao">
-          <input id="pesquisaNome" placeholder="Ex: Pesquisa de Atendimento Telefônico">
-          <textarea id="pesquisaAudioIntro" placeholder="Ex: Sua opinião é muito importante para nós."></textarea>
-          <textarea id="pesquisaPergunta" placeholder="Ex: De 0 a 5, como você avalia nosso atendimento?"></textarea>
-          <div id="listaRespostasPesquisa"></div>
-          <button class="btn-add" onclick="adicionarRespostaPesquisa()">+ Adicionar resposta</button>
-          <p style="opacity:.7;font-size:13px">Ex: 0-Péssimo | 1-Ruim | 2-Regular | 3-Bom | 4-Muito Bom | 5-Excelente</p>
-          <textarea id="pesquisaAudioFim" placeholder="Ex: Obrigado por participar da nossa pesquisa."></textarea>
-        </div>
-      </div>
+      <div id="pesquisaSatisfacaoConteudo" style="display:none"></div>
     </section>
+
+    <!-- PAUSAS: div vazia, JS cria o conteúdo -->
     <section class="card">
       <h2>Pausas do Call Center</h2>
       <button class="btn-add" onclick="togglePausas()">+</button>
-      <div id="pausasConteudo" style="display:none">
-        <div class="campo-descricao">
-          <input id="nomeGrupoPausas" placeholder="Ex: Pausas Operacionais">
-          <div id="listaPausas"></div>
-          <button class="btn-add" onclick="adicionarPausa()">+</button>
-        </div>
-      </div>
+      <div id="pausasConteudo" style="display:none"></div>
     </section>
   </section>
 
