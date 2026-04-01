@@ -1376,6 +1376,55 @@ textarea {
 }
 
 /* ======================================================
+   URA – TIMEOUT ROW
+====================================================== */
+.ura-timeout-row,
+[class*="timeoutRow"] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(206,255,0,0.04);
+  border: 1px solid rgba(206,255,0,0.12);
+  border-radius: 10px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.ura-timeout-row:hover {
+  background: rgba(206,255,0,0.07);
+  border-color: rgba(206,255,0,0.22);
+}
+
+.ura-timeout-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #CEFF00;
+  white-space: nowrap;
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+
+.ura-timeout-sec {
+  width: 110px !important;
+  min-height: 36px !important;
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 8px !important;
+  color: #CEFF00 !important;
+  padding: 6px 10px !important;
+}
+
+.ura-timeout-select {
+  flex: 1;
+  min-height: 36px !important;
+  border-radius: 8px !important;
+  font-size: 13px;
+  padding: 6px 10px !important;
+}
+/* ======================================================
    REGRA DE TEMPO – REDESIGN
 ====================================================== */
 .regra-tempo-card {
