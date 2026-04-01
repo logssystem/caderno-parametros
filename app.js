@@ -347,29 +347,17 @@ function criarBlocoPesquisa() {
 }
 
 /* ================= PAUSAS DO CALL CENTER ================= */
-function togglePausas() {
+function adicionarBlocoPausas() {
   const container = document.getElementById("pausasConteudo");
   if (!container) return;
+
   const modo = localStorage.getItem("modo_atendimento");
   if (modo === "chat") {
     mostrarToast("Pausas são exclusivas do Call Center (Voz)", true);
     return;
   }
-  if (container._iniciado) {
-    container.style.display = container.style.display === "none" ? "block" : "none";
-    return;
-  }
-  container._iniciado = true;
-  container.style.display = "block";
 
-  // Botão para adicionar novos blocos de pausa
-  const btnNovoBloco = document.createElement("button");
-  btnNovoBloco.className = "btn-add";
-  btnNovoBloco.textContent = "+ Adicionar Grupo de Pausas";
-  btnNovoBloco.onclick = () => container.insertBefore(criarBlocoPausas(), btnNovoBloco);
-
-  container.appendChild(criarBlocoPausas()); // bloco inicial
-  container.appendChild(btnNovoBloco);       // botão sempre no final
+  container.appendChild(criarBlocoPausas());
 }
 
 function criarBlocoPausas() {
