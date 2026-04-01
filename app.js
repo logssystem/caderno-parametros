@@ -659,34 +659,58 @@ function criarCampo(tipo) {
         wrap.append(infoRamal);
     }
 
-    /* ===== URA (FIX #3: campo timeout) ===== */
+    /* ===== URA (restaurado com opções acima do timeout) ===== */
     if (tipo === "ura") {
         const msg = document.createElement("textarea");
         msg.placeholder = "Mensagem da URA Ex: Olá seja bem-vindo...";
         msg.style.marginTop = "12px";
         wrap.append(msg);
-
-        // Timeout destino
+    
+        // ⌨️ Opções da URA (agora ACIMA do timeout)
+        const secOpcoes = document.createElement("div");
+        secOpcoes.style.marginTop = "14px";
+        const titulo = document.createElement("div");
+        titulo.innerHTML = "⌨️ <strong>Opções da URA</strong>";
+        titulo.style.cssText = "font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text-soft)";
+        secOpcoes.append(titulo);
+        const hdr = document.createElement("div");
+        hdr.className = "ura-opcoes-header";
+        hdr.innerHTML = "<span>Tecla</span><span>Destino</span><span>Descrição</span><span></span>";
+        secOpcoes.append(hdr);
+        const listaOpcoes = document.createElement("div");
+        secOpcoes.append(listaOpcoes);
+        const btnNova = document.createElement("button");
+        btnNova.innerHTML = "+ Nova opção";
+        btnNova.className = "btn-add-faixa";
+        btnNova.onclick = () => listaOpcoes.appendChild(criarOpcaoURA());
+        secOpcoes.append(btnNova);
+        wrap.append(secOpcoes);
+    
+        // ⏱ Timeout (agora ABAIXO das opções)
         const timeoutRow = document.createElement("div");
-        timeoutRow.style.cssText = "margin-top:12px;";
-        
+        timeoutRow.style.cssText = "margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;";
         const timeoutLabel = document.createElement("label");
-        timeoutLabel.style.cssText = "font-size:12px;font-weight:700;color:var(--text-soft);display:block;margin-bottom:6px;";
-        timeoutLabel.textContent = "Caso nenhuma tecla seja pressionada, direcionar para:";
-        
+        timeoutLabel.style.cssText = "font-size:12px;font-weight:700;color:var(--text-soft);white-space:nowrap;margin:0;";
+        timeoutLabel.textContent = "⏱ Timeout (sem resposta):";
+        const timeoutSec = document.createElement("input");
+        timeoutSec.type = "number";
+        timeoutSec.min = "0";
+        timeoutSec.placeholder = "Seg. (ex: 10)";
+        timeoutSec.style.cssText = "width:110px;min-height:36px!important;";
         const timeoutDest = document.createElement("select");
         timeoutDest.className = "ura-timeout-select";
-        timeoutDest.style.cssText = "width:100%;min-height:36px;border-radius:8px;font-size:13px;padding:6px 10px;";
+        timeoutDest.style.flex = "1";
+        timeoutDest.style.minHeight = "36px";
         atualizarSelectTimeout(timeoutDest, "");
-        
-        timeoutRow.append(timeoutLabel, timeoutDest);
+        timeoutRow.append(timeoutLabel, timeoutSec, timeoutDest);
         wrap.append(timeoutRow);
-        
+    
+        // Métodos para coletar timeout
         wrap.getTimeout = () => ({
-          segundos: "0",
-          destino: timeoutDest.value || ""
+            segundos: timeoutSec.value || "0",
+            destino: timeoutDest.value || ""
         });
-      }
+    }
   
     /* ===== FILA (FIX #7: seleção de agentes corrigida) ===== */
     if (tipo === "fila") {
