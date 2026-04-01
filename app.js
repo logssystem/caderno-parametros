@@ -666,7 +666,7 @@ function criarCampo(tipo) {
         msg.style.marginTop = "12px";
         wrap.append(msg);
     
-        // ⌨️ Opções da URA (agora ACIMA do timeout)
+        // ⌨️ Opções da URA (acima do timeout)
         const secOpcoes = document.createElement("div");
         secOpcoes.style.marginTop = "14px";
         const titulo = document.createElement("div");
@@ -686,28 +686,24 @@ function criarCampo(tipo) {
         secOpcoes.append(btnNova);
         wrap.append(secOpcoes);
     
-        // ⏱ Timeout (agora ABAIXO das opções)
+        // Destino de timeout (sem campo de segundos)
         const timeoutRow = document.createElement("div");
-        timeoutRow.style.cssText = "margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;";
+        timeoutRow.style.cssText = "margin-top:12px;";
+    
         const timeoutLabel = document.createElement("label");
-        timeoutLabel.style.cssText = "font-size:12px;font-weight:700;color:var(--text-soft);white-space:nowrap;margin:0;";
-        timeoutLabel.textContent = "⏱ Timeout (sem resposta):";
-        const timeoutSec = document.createElement("input");
-        timeoutSec.type = "number";
-        timeoutSec.min = "0";
-        timeoutSec.placeholder = "Seg. (ex: 10)";
-        timeoutSec.style.cssText = "width:110px;min-height:36px!important;";
+        timeoutLabel.style.cssText = "font-size:12px;font-weight:700;color:var(--text-soft);display:block;margin-bottom:6px;";
+        timeoutLabel.textContent = "Caso nenhuma tecla seja pressionada, direcionar para:";
+    
         const timeoutDest = document.createElement("select");
         timeoutDest.className = "ura-timeout-select";
-        timeoutDest.style.flex = "1";
-        timeoutDest.style.minHeight = "36px";
+        timeoutDest.style.cssText = "width:100%;min-height:36px;border-radius:8px;font-size:13px;padding:6px 10px;";
         atualizarSelectTimeout(timeoutDest, "");
-        timeoutRow.append(timeoutLabel, timeoutSec, timeoutDest);
+    
+        timeoutRow.append(timeoutLabel, timeoutDest);
         wrap.append(timeoutRow);
     
-        // Métodos para coletar timeout
         wrap.getTimeout = () => ({
-            segundos: timeoutSec.value || "0",
+            segundos: "0",
             destino: timeoutDest.value || ""
         });
     }
