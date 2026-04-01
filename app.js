@@ -473,7 +473,7 @@ function atualizarTodosDestinosURA() {
 /* FIX #3: Timeout da URA */
 function atualizarSelectTimeout(select, valorAtual) {
   select.innerHTML = "";
-  select.add(new Option("Desconectar (padrão)", ""));
+  select.add(new Option("Selecione o Destino de Timeout", ""));
   const grupos = [
     { id: "listaRings",     label: "📞 Ramal",        prefix: "ramal::" },
     { id: "listaFilas",     label: "👥 Fila",          prefix: "fila::",  suffix: " (Fila)" },
