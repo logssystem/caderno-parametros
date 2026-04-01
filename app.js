@@ -311,7 +311,7 @@ function criarBlocoPesquisa() {
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
-  btn.style.cssText = "float:right;";
+  btn.style.cssText = "float:right;width:auto;min-height:auto;padding:4px 8px;font-size:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;border-radius:6px;";
   btn.onclick = () => wrap.remove();
 
   const nome = document.createElement("input");
@@ -1961,24 +1961,8 @@ window.togglePausas = function () {
 window.togglePesquisaSatisfacao = function () {
   const container = document.getElementById("pesquisaSatisfacaoConteudo");
   if (!container) return;
-  if (container._iniciado) {
-    container.style.display = container.style.display === "none" ? "block" : "none";
-    return;
-  }
-  container._iniciado = true;
   container.style.display = "block";
-  const bloco = criarBlocoPesquisa();
-  // Quando o ✖ remover o bloco, reseta _iniciado para permitir reabrir
-  const btnFechar = bloco.querySelector("button");
-  if (btnFechar) {
-    const onclickOriginal = btnFechar.onclick;
-    btnFechar.onclick = () => {
-      onclickOriginal?.();
-      container._iniciado = false;
-      container.style.display = "none";
-    };
-  }
-  container.appendChild(bloco);
+  container.appendChild(criarBlocoPesquisa());
 };
 
 window.adicionarPausa = function () {
