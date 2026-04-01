@@ -343,17 +343,19 @@ function criarBlocoPesquisa() {
 
 /* ================= PAUSAS DO CALL CENTER ================= */
 // FIX #1: Toggle mostra/oculta o bloco; não remove campos
-let _pausasAberta = false;
 function togglePausas() {
   const container = document.getElementById("pausasConteudo");
   if (!container) return;
-
   const modo = localStorage.getItem("modo_atendimento");
   if (modo === "chat") {
     mostrarToast("Pausas são exclusivas do Call Center (Voz)", true);
     return;
   }
-
+  if (container._iniciado) {
+    container.style.display = container.style.display === "none" ? "block" : "none";
+    return;
+  }
+  container._iniciado = true;
   container.style.display = "block";
   container.appendChild(criarBlocoPausas());
 }
