@@ -1,7 +1,8 @@
-console.log("APP.JS FINAL – CONSOLIDADO DEFINITIVO (URA + REGRA DE TEMPO + FILA + GRUPO RING + AGENTES)");
+console.log("APP.JS v2 – TODOS OS AJUSTES APLICADOS");
 window.addEventListener("error", (e) => {
   console.warn("Erro externo ignorado:", e.message);
 });
+
 /* ================= CONFIG ================= */
 const LIMITE = 600;
 const listas = {
@@ -66,7 +67,7 @@ const DUVIDAS = {
     blocos: [
       { tipo: "info",    texto: "Ramais são os pontos de atendimento telefônico utilizados para realizar e receber chamadas." },
       { tipo: "campo",   texto: "Número do ramal: deve conter apenas números e será usado para chamadas internas." },
-      { tipo: "campo",   texto: "Senha do ramal: utilizada para o registro SIP e deve seguir as regras de segurança." },
+      { tipo: "campo",   texto: "Senha do ramal: gerada automaticamente no padrão seguro. Você pode editá-la se necessário." },
       { tipo: "campo",   texto: "Grupo de chamada: permite organização e captura de chamadas entre ramais." },
       { tipo: "exemplo", texto: "Ramais no mesmo grupo permitem o uso do *8 para captura de chamadas." }
     ]
@@ -107,12 +108,13 @@ const DUVIDAS = {
         texto: "Destinos possíveis para cada opção:",
         itens: [
           "Ramal: direciona direto para um ramal específico.",
-          "Fila: distribui entre vários agentes.",
-          "Grupo de Ring: toca vários ramais simultaneamente ou em sequência.",
+          "Fila: distribui entre vários agentes. (aparece como 'Nome (Fila)')",
+          "Grupo de Ring: toca vários ramais simultaneamente ou em sequência. (aparece como 'Nome (Grupo)')",
           "Outra URA: encadeia menus.",
           "Regra de Tempo: define comportamento por horário."
         ]
       },
+      { tipo: "campo", texto: "Timeout: destino para quando o cliente não pressionar nenhuma tecla. Se não definido, a chamada será desconectada." },
       { tipo: "alerta", texto: "Toda opção de tecla precisa ter um destino configurado para funcionar." }
     ]
   },
@@ -124,6 +126,18 @@ const DUVIDAS = {
       { tipo: "campo",   texto: "Agentes omnichannel devem obrigatoriamente estar vinculados a um departamento." },
       { tipo: "alerta",  texto: "Sem departamento configurado, o agente não consegue atender chats." },
       { tipo: "exemplo", texto: "Exemplo: crie o departamento 'Suporte' e adicione os agentes responsáveis por atendimento digital." }
+    ]
+  },
+  fluxo: {
+    titulo: "Editor de Fluxo",
+    blocos: [
+      { tipo: "info",    texto: "O editor de fluxo permite visualizar graficamente as conexões entre URAs, filas, ramais e regras de tempo." },
+      { tipo: "campo",   texto: "Para adicionar um nó: arraste um elemento da barra lateral para a tela." },
+      { tipo: "campo",   texto: "Para conectar dois nós: clique no ponto de saída (●) de um nó e arraste até o ponto de entrada (●) de outro." },
+      { tipo: "campo",   texto: "Para excluir uma conexão: clique na linha de conexão e pressione Delete ou Backspace." },
+      { tipo: "campo",   texto: "Para mover um nó: clique e arraste o bloco para a posição desejada." },
+      { tipo: "alerta",  texto: "O fluxo é salvo automaticamente junto com as configurações. Não é necessário salvar separadamente." },
+      { tipo: "exemplo", texto: "Exemplo de fluxo: Entrada → URA Principal → Fila de Suporte → Agentes." }
     ]
   }
 };
@@ -138,6 +152,7 @@ const CATEGORIAS_DUVIDA = [
   { chave: "regrasTempo", icone: "⏰", label: "Reg. Tempo" },
   { chave: "ura",         icone: "☎️",  label: "URA"        },
   { chave: "chat",        icone: "💬", label: "Chat"       },
+  { chave: "fluxo",       icone: "🔀", label: "Fluxo"      },
 ];
 
 function renderizarBotoesCategorias() {
@@ -239,6 +254,25 @@ if (dominioInput) {
     dominioInput.addEventListener("input", window.validarDominioCliente);
 }
 
+/* ================= SENHA AUTOMÁTICA PARA RAMAIS ================= */
+function gerarSenhaRamal() {
+  const upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  const lower = "abcdefghjkmnpqrstuvwxyz";
+  const digits = "23456789";
+  const special = "@#$!";
+  const all = upper + lower + digits + special;
+  let senha = "";
+  senha += upper[Math.floor(Math.random() * upper.length)];
+  senha += lower[Math.floor(Math.random() * lower.length)];
+  senha += digits[Math.floor(Math.random() * digits.length)];
+  senha += digits[Math.floor(Math.random() * digits.length)];
+  senha += special[Math.floor(Math.random() * special.length)];
+  for (let i = 5; i < 11; i++) {
+    senha += all[Math.floor(Math.random() * all.length)];
+  }
+  return senha.split("").sort(() => Math.random() - 0.5).join("");
+}
+
 /* ================= ADICIONAR CAMPO ================= */
 window.adicionarCampo = function (tipo) {
     if (tipo === "agente") {
@@ -257,10 +291,13 @@ window.adicionarCampo = function (tipo) {
 };
 
 /* ================= PESQUISA DE SATISFAÇÃO ================= */
+// FIX #1: Toggle mostra/oculta o bloco; campos ficam sempre dentro
+let _pesquisaAberta = false;
 function togglePesquisaSatisfacao() {
   const bloco = document.getElementById("pesquisaSatisfacaoConteudo");
   if (!bloco) return;
-  bloco.style.display = bloco.style.display === "none" ? "block" : "none";
+  _pesquisaAberta = !_pesquisaAberta;
+  bloco.style.display = _pesquisaAberta ? "block" : "none";
 }
 function adicionarRespostaPesquisa() {
   const lista = document.getElementById("listaRespostasPesquisa");
@@ -285,6 +322,8 @@ function criarRespostaPesquisa() {
 }
 
 /* ================= PAUSAS DO CALL CENTER ================= */
+// FIX #1: Toggle mostra/oculta o bloco; não remove campos
+let _pausasAberta = false;
 function togglePausas() {
   const bloco = document.getElementById("pausasConteudo");
   if (!bloco) return;
@@ -293,7 +332,8 @@ function togglePausas() {
     mostrarToast("Pausas são exclusivas do Call Center (Voz)", true);
     return;
   }
-  bloco.style.display = bloco.style.display === "none" ? "block" : "none";
+  _pausasAberta = !_pausasAberta;
+  bloco.style.display = _pausasAberta ? "block" : "none";
 }
 function adicionarPausa() {
   const lista = document.getElementById("listaPausas");
@@ -320,34 +360,95 @@ function criarPausa() {
   return wrap;
 }
 
-/* ================= DESTINOS URA ================= */
+/* ================= DESTINOS URA (FIX #8: diferenciar Fila vs Grupo) ================= */
 function atualizarDestinosURA(select) {
   if (!select) return;
   select.innerHTML = "";
   select.add(new Option("Selecione o destino", ""));
+
+  // Ramais
+  const grpRamal = document.createElement("optgroup");
+  grpRamal.label = "📞 Ramal";
+  document.querySelectorAll(`#listaRings .campo-descricao`).forEach(el => {
+    const nome = el.getNome?.() || el.querySelector(".campo-nome")?.value;
+    if (nome) grpRamal.appendChild(new Option(nome, `ramal::${nome}`));
+  });
+  if (grpRamal.children.length) select.appendChild(grpRamal);
+
+  // Filas — label com "(Fila)" para diferenciar
+  const grpFila = document.createElement("optgroup");
+  grpFila.label = "👥 Fila";
+  document.querySelectorAll(`#listaFilas .campo-descricao`).forEach(el => {
+    const nome = el.getNome?.() || el.querySelector(".campo-nome")?.value;
+    if (nome) grpFila.appendChild(new Option(`${nome} (Fila)`, `fila::${nome}`));
+  });
+  if (grpFila.children.length) select.appendChild(grpFila);
+
+  // Grupos de Ring — label com "(Grupo)" para diferenciar
+  const grpRing = document.createElement("optgroup");
+  grpRing.label = "🔔 Grupo de Ring";
+  document.querySelectorAll(`#listaGrupoRing .campo-descricao`).forEach(el => {
+    const nome = el.getNome?.() || el.querySelector(".campo-nome")?.value;
+    if (nome) grpRing.appendChild(new Option(`${nome} (Grupo)`, `grupo::${nome}`));
+  });
+  if (grpRing.children.length) select.appendChild(grpRing);
+
+  // URAs
+  const grpURA = document.createElement("optgroup");
+  grpURA.label = "☎ URA";
+  document.querySelectorAll(`#listaURAs .campo-descricao`).forEach(el => {
+    const nome = el.getNome?.() || el.querySelector(".campo-nome")?.value;
+    if (nome) grpURA.appendChild(new Option(nome, `ura::${nome}`));
+  });
+  if (grpURA.children.length) select.appendChild(grpURA);
+
+  // Regras de Tempo
+  const grpRT = document.createElement("optgroup");
+  grpRT.label = "⏰ Regra de Tempo";
+  document.querySelectorAll(`#listaRegrasTempo .campo-descricao`).forEach(el => {
+    const nome = el.getNome?.() || el.querySelector(".campo-nome")?.value;
+    if (nome) grpRT.appendChild(new Option(nome, `regra::${nome}`));
+  });
+  if (grpRT.children.length) select.appendChild(grpRT);
+}
+
+function atualizarTodosDestinosURA() {
+    document.querySelectorAll(".opcao-ura select, .ura-destino, .ura-timeout-select").forEach(select => {
+        const atual = select.value;
+        // Para timeout select, adicionar opção "Desconectar"
+        if (select.classList.contains("ura-timeout-select")) {
+            atualizarSelectTimeout(select, atual);
+        } else {
+            atualizarDestinosURA(select);
+            select.value = atual;
+        }
+    });
+}
+
+/* FIX #3: Timeout da URA */
+function atualizarSelectTimeout(select, valorAtual) {
+  select.innerHTML = "";
+  select.add(new Option("Desconectar (padrão)", ""));
   const grupos = [
-    { id: "listaRings",       label: "📞 Ramal"          },
-    { id: "listaFilas",       label: "👥 Fila"            },
-    { id: "listaGrupoRing",   label: "🔔 Grupo de Ring"   },
-    { id: "listaURAs",        label: "☎ URA"             },
-    { id: "listaRegrasTempo", label: "⏰ Regra de Tempo"  }
+    { id: "listaRings",     label: "📞 Ramal",        prefix: "ramal::" },
+    { id: "listaFilas",     label: "👥 Fila",          prefix: "fila::",  suffix: " (Fila)" },
+    { id: "listaGrupoRing", label: "🔔 Grupo de Ring", prefix: "grupo::", suffix: " (Grupo)" },
+    { id: "listaURAs",      label: "☎ URA",           prefix: "ura::" },
+    { id: "listaRegrasTempo", label: "⏰ Regra de Tempo", prefix: "regra::" },
   ];
   grupos.forEach(g => {
     const optgroup = document.createElement("optgroup");
     optgroup.label = g.label;
     document.querySelectorAll(`#${g.id} .campo-descricao`).forEach(el => {
       const nome = el.getNome?.() || el.querySelector(".campo-nome")?.value;
-      if (nome) optgroup.appendChild(new Option(nome, nome));
+      if (nome) {
+        const label = nome + (g.suffix || "");
+        optgroup.appendChild(new Option(label, g.prefix + nome));
+      }
     });
     if (optgroup.children.length) select.appendChild(optgroup);
   });
-}
-function atualizarTodosDestinosURA() {
-    document.querySelectorAll(".opcao-ura select").forEach(select => {
-        const atual = select.value;
-        atualizarDestinosURA(select);
-        select.value = atual;
-    });
+  if (valorAtual) select.value = valorAtual;
 }
 
 /* ================= CRIAR CAMPO ================= */
@@ -359,6 +460,7 @@ function ramalJaExiste(valor, atual) {
     });
     return existe;
 }
+
 function criarCampo(tipo) {
     const wrap = document.createElement("div");
     wrap.className = "campo-descricao";
@@ -443,7 +545,7 @@ function criarCampo(tipo) {
         senhaInput.oninput = () => validarSenha(senhaInput, regras);
     }
 
-    /* ===== RAMAL ===== */
+    /* ===== RAMAL (FIX #2: senha automática) ===== */
     if (tipo === "ring") {
         nome.style.width = "260px";
         nome.style.maxWidth = "100%";
@@ -494,24 +596,50 @@ function criarCampo(tipo) {
             infoRamal.className = "regra-ok";
             infoRamal.textContent = "Ramal válido.";
         });
+
+        // FIX #2: Gerar senha automática
         senhaInput = document.createElement("input");
         senhaInput.placeholder = "Senha do ramal";
         senhaInput.classList.add("campo-senha");
         senhaInput.style.marginTop = "12px";
+        senhaInput.value = gerarSenhaRamal(); // Senha auto
         wrap.append(senhaInput);
+
         regras = document.createElement("div");
         regras.style.marginTop = "8px";
         wrap.append(regras);
+        // Validar a senha gerada automaticamente
+        validarSenha(senhaInput, regras);
         senhaInput.oninput = () => validarSenha(senhaInput, regras);
         wrap.append(infoRamal);
     }
 
-    /* ===== URA ===== */
+    /* ===== URA (FIX #3: campo timeout) ===== */
     if (tipo === "ura") {
         const msg = document.createElement("textarea");
         msg.placeholder = "Mensagem da URA Ex: Olá seja bem-vindo...";
         msg.style.marginTop = "12px";
         wrap.append(msg);
+
+        // Timeout
+        const timeoutRow = document.createElement("div");
+        timeoutRow.style.cssText = "margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;";
+        const timeoutLabel = document.createElement("label");
+        timeoutLabel.style.cssText = "font-size:12px;font-weight:700;color:var(--text-soft);white-space:nowrap;margin:0;";
+        timeoutLabel.textContent = "⏱ Timeout (sem resposta):";
+        const timeoutSec = document.createElement("input");
+        timeoutSec.type = "number";
+        timeoutSec.min = "0";
+        timeoutSec.placeholder = "Seg. (ex: 10)";
+        timeoutSec.style.cssText = "width:110px;min-height:36px!important;";
+        const timeoutDest = document.createElement("select");
+        timeoutDest.className = "ura-timeout-select";
+        timeoutDest.style.flex = "1";
+        timeoutDest.style.minHeight = "36px";
+        atualizarSelectTimeout(timeoutDest, "");
+        timeoutRow.append(timeoutLabel, timeoutSec, timeoutDest);
+        wrap.append(timeoutRow);
+
         const secOpcoes = document.createElement("div");
         secOpcoes.style.marginTop = "14px";
         const titulo = document.createElement("div");
@@ -530,30 +658,44 @@ function criarCampo(tipo) {
         btnNova.onclick = () => listaOpcoes.appendChild(criarOpcaoURA());
         secOpcoes.append(btnNova);
         wrap.append(secOpcoes);
+
+        // Métodos para coletar timeout
+        wrap.getTimeout = () => ({
+          segundos: timeoutSec.value || "0",
+          destino:  timeoutDest.value || ""
+        });
     }
 
-    /* ===== FILA — com filtro de agentes já adicionados ===== */
+    /* ===== FILA (FIX #7: seleção de agentes corrigida) ===== */
     if (tipo === "fila") {
         const titulo = document.createElement("h4");
         titulo.textContent = "Agentes da fila";
         titulo.style.marginTop = "12px";
         wrap.append(titulo);
 
+        const linhaAdd = document.createElement("div");
+        linhaAdd.style.cssText = "display:flex;gap:8px;margin-bottom:8px;";
         const select = document.createElement("select");
+        select.style.flex = "1";
         select.innerHTML = `<option value="">Selecione um agente</option>`;
-        wrap.append(select);
-
         const btnAdd = document.createElement("button");
         btnAdd.textContent = "Adicionar agente";
-        wrap.append(btnAdd);
+        btnAdd.style.whiteSpace = "nowrap";
+        linhaAdd.append(select, btnAdd);
+        wrap.append(linhaAdd);
 
         const lista = document.createElement("div");
+        lista.className = "fila-agentes-lista";
         wrap.append(lista);
         wrap.dataset.agentes = "[]";
 
-        /* Reconstrói o select excluindo quem já foi adicionado */
+        function getJaAdicionados() {
+            return JSON.parse(wrap.dataset.agentes || "[]");
+        }
+
         function refreshSelect() {
-            const jaAdicionados = JSON.parse(wrap.dataset.agentes);
+            const jaAdicionados = getJaAdicionados();
+            const valorAtual = select.value;
             select.innerHTML = `<option value="">Selecione um agente</option>`;
             document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
                 const nomeA = a.querySelector(".campo-nome")?.value;
@@ -563,37 +705,44 @@ function criarCampo(tipo) {
                     select.add(new Option(label, nomeA));
                 }
             });
+            if ([...select.options].some(o => o.value === valorAtual)) {
+                select.value = valorAtual;
+            }
         }
-
-        btnAdd.onclick = () => {
-            if (!select.value) return;
-            const arr = JSON.parse(wrap.dataset.agentes);
-            if (!arr.includes(select.value)) arr.push(select.value);
-            wrap.dataset.agentes = JSON.stringify(arr);
-            render();
-        };
 
         function render() {
             lista.innerHTML = "";
-            JSON.parse(wrap.dataset.agentes).forEach((a, i) => {
+            getJaAdicionados().forEach((a, i) => {
                 const d = document.createElement("div");
+                d.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(0,255,163,0.06);border:1px solid rgba(0,255,163,0.15);border-radius:8px;margin-bottom:6px;font-size:13px;";
                 d.textContent = a;
                 const x = document.createElement("button");
                 x.textContent = "✖";
+                x.style.cssText = "background:transparent;border:none;color:#fca5a5;cursor:pointer;min-height:auto;padding:2px 6px;";
                 x.onclick = () => {
                     const arr = JSON.parse(wrap.dataset.agentes);
                     arr.splice(i, 1);
                     wrap.dataset.agentes = JSON.stringify(arr);
-                    render(); // render já chama refreshSelect
+                    render();
                 };
                 d.append(x);
                 lista.append(d);
             });
-            refreshSelect(); // ← atualiza select após cada render
+            refreshSelect();
         }
 
-        /* Expõe para atualizarSelectAgentesFila */
+        btnAdd.onclick = () => {
+            if (!select.value) return mostrarToast("Selecione um agente", true);
+            const arr = JSON.parse(wrap.dataset.agentes);
+            if (!arr.includes(select.value)) {
+                arr.push(select.value);
+                wrap.dataset.agentes = JSON.stringify(arr);
+            }
+            render();
+        };
+
         wrap.refreshFilaSelect = refreshSelect;
+        wrap.getNome = () => nome.value;
     }
 
     /* ===== GRUPO DE RING ===== */
@@ -735,6 +884,19 @@ function criarCampo(tipo) {
     return wrap;
 }
 
+/* ================= HELPER: extrair nome real do valor prefixado ================= */
+function extrairNomeDestino(valor) {
+    if (!valor) return "";
+    if (valor.includes("::")) return valor.split("::")[1];
+    return valor; // Compatibilidade com dados antigos
+}
+
+function extrairTipoDestino(valor) {
+    if (!valor) return "";
+    if (valor.includes("::")) return valor.split("::")[0];
+    return ""; // sem prefixo = desconhecido
+}
+
 /* ================= OPÇÃO URA ================= */
 function criarOpcaoURA() {
     const wrap = document.createElement("div");
@@ -864,23 +1026,8 @@ function gerarAgentesChatAPartirUsuarios() {
 /* ================= SELECTS DINÂMICOS ================= */
 function atualizarSelectAgentesFila() {
     document.querySelectorAll("#listaFilas .campo-descricao").forEach(fila => {
-        /* Usa refreshFilaSelect se disponível (mantém filtro de já-adicionados) */
         if (typeof fila.refreshFilaSelect === "function") {
             fila.refreshFilaSelect();
-        } else {
-            const select = fila.querySelector("select");
-            if (!select) return;
-            const atual = select.value;
-            select.innerHTML = `<option value="">Selecione um agente</option>`;
-            document.querySelectorAll("#listaAgentes .campo-descricao").forEach(a => {
-                const nome  = a.querySelector(".campo-nome")?.value;
-                const ramal = a.getRamal ? a.getRamal() : "";
-                if (nome) {
-                    const label = ramal ? `${nome} (${ramal})` : `${nome} (sem ramal)`;
-                    select.add(new Option(label, nome));
-                }
-            });
-            select.value = atual;
         }
     });
 }
@@ -1093,22 +1240,48 @@ function coletarPesquisaSatisfacao() {
   if (!nome || !pergunta || respostas.length === 0) return { ativa: false, nome, introducao, pergunta, encerramento, respostas };
   return { ativa: true, nome, introducao, pergunta, encerramento, respostas };
 }
+
+/* FIX #8: Coleta URAs com destino prefixado + timeout */
 function coletarURAs() {
   const uras = [];
   document.querySelectorAll("#listaURAs .campo-descricao").forEach(ura => {
     const nome     = ura.querySelector(".campo-nome")?.value || "";
     const mensagem = ura.querySelector("textarea")?.value    || "";
     const opcoes   = [];
-    ura.querySelectorAll(".opcao-ura-row, .opcao-ura").forEach(o => {
-      const tecla   = o.querySelector(".ura-tecla,   input:first-child")?.value   || "";
-      const destino = o.querySelector(".ura-destino, select")?.value               || "";
-      const descricao = o.querySelector(".ura-desc, input:last-of-type")?.value   || "";
-      if (tecla || destino) opcoes.push({ tecla, destino, descricao });
+    ura.querySelectorAll(".opcao-ura-row").forEach(o => {
+      const tecla   = o.querySelector(".ura-tecla")?.value   || "";
+      const destinoRaw = o.querySelector(".ura-destino")?.value || "";
+      const descricao = o.querySelector(".ura-desc")?.value   || "";
+      if (tecla || destinoRaw) {
+        opcoes.push({
+          tecla,
+          destino: destinoRaw,               // valor prefixado (fila::nome)
+          destinoDisplay: formatarDestinoDisplay(destinoRaw), // para exibição no PDF
+          descricao
+        });
+      }
     });
-    if (nome) uras.push({ nome, mensagem, opcoes });
+    // Timeout
+    const timeout = ura.getTimeout ? ura.getTimeout() : { segundos: "0", destino: "" };
+    if (nome) uras.push({ nome, mensagem, opcoes, timeout });
   });
   return uras;
 }
+
+function formatarDestinoDisplay(valorPrefixado) {
+  if (!valorPrefixado) return "";
+  if (!valorPrefixado.includes("::")) return valorPrefixado;
+  const [tipo, nome] = valorPrefixado.split("::");
+  switch(tipo) {
+    case "fila":   return `${nome} (Fila)`;
+    case "grupo":  return `${nome} (Grupo)`;
+    case "ramal":  return nome;
+    case "ura":    return nome;
+    case "regra":  return nome;
+    default:       return nome;
+  }
+}
+
 function coletarGrupoRing() {
   const grupos = [];
   document.querySelectorAll("#listaGrupoRing .campo-descricao").forEach(g => {
@@ -1239,7 +1412,10 @@ function processarCSV(tipo, texto) {
                 campo.querySelector("input[type=checkbox]").checked = true;
             }
         }
-        if (tipo === "ring") campo.querySelector(".campo-senha").value = d.senha || "";
+        if (tipo === "ring") {
+          // Na importação CSV, se a senha estiver no CSV use ela, senão mantém a gerada
+          if (d.senha) campo.querySelector(".campo-senha").value = d.senha;
+        }
         container.appendChild(campo);
     });
     syncTudo();
@@ -1256,22 +1432,19 @@ function mostrarToast(msg, error = false) {
 }
 
 /* =======================================================
-   LIMPAR TUDO — reseta caderno e volta para a intro
+   LIMPAR TUDO
 ======================================================= */
 function _limparTudoInterno() {
-  // Remove dados do localStorage
   localStorage.removeItem("CONFIG_CADERNO");
   localStorage.removeItem("CONFIG_CADERNO_BACKUPS");
   localStorage.removeItem("modo_atendimento");
   sessionStorage.removeItem("CADERNO_EDIT_ANCORA");
 
-  // Limpa campos do formulário
   ["empresaCliente","dominioCliente","cnpjCliente"].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.value = ""; el.dispatchEvent(new Event("input")); }
   });
 
-  // Limpa todas as listas dinâmicas
   ["listaUsuariosWeb","listaRings","listaEntradas","listaAgentes",
    "listaFilas","listaGrupoRing","listaURAs","listaRegrasTempo","listaRegrasTempoChat",
    "listaPausas","listaRespostasPesquisa",
@@ -1281,24 +1454,22 @@ function _limparTudoInterno() {
     if (el) el.innerHTML = "";
   });
 
-  // Fecha seções opcionais
   const blPausas = document.getElementById("pausasConteudo");
   const blPesq   = document.getElementById("pesquisaSatisfacaoConteudo");
   if (blPausas) blPausas.style.display = "none";
   if (blPesq)   blPesq.style.display   = "none";
+  _pesquisaAberta = false;
+  _pausasAberta = false;
 
-  // Reseta campos de pesquisa
   ["pesquisaNome","pesquisaAudioIntro","pesquisaPergunta","pesquisaAudioFim",
    "nomeGrupoPausas"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = "";
   });
 
-  // Reseta chatState
   window.chatState = { tipo: null, api: null, conta: null, canais: [], usuarios: [], agentes: [], departamentos: [] };
   window._tiposAtivos = new Set();
 
-  // Reseta cards de chat (remove classe active)
   document.querySelectorAll(".chat-card.active").forEach(c => c.classList.remove("active"));
   document.querySelectorAll(".chat-tipo-bloco").forEach(b => b.style.display = "none");
   const blocoApi = document.getElementById("bloco-conta-api");
@@ -1307,13 +1478,10 @@ function _limparTudoInterno() {
   if (blocoCanais) blocoCanais.style.display = "none";
 }
 
-/* Chamado ao clicar "Voltar ao início" — pede confirmação e limpa */
 window.resetarIntro = function () {
   const raw = localStorage.getItem("CONFIG_CADERNO");
   const temDados = raw && raw !== "null" && raw !== "{}";
-
   if (temDados) {
-    // Abre modal de confirmação antes de limpar
     _abrirModalLimpar();
   } else {
     _executarResetarIntro();
@@ -1322,7 +1490,6 @@ window.resetarIntro = function () {
 
 function _executarResetarIntro() {
   _limparTudoInterno();
-  // Volta para a tela de intro (função do intro.js se disponível)
   if (typeof window._irParaIntro === "function") {
     window._irParaIntro();
     return;
@@ -1334,13 +1501,11 @@ function _executarResetarIntro() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-/* Botão "Limpar tudo" — confirmação antes de apagar */
 window.limparTudoCaderno = function () {
   _abrirModalLimpar();
 };
 
 function _abrirModalLimpar() {
-  // Cria modal se não existir
   let modal = document.getElementById("modalLimpar");
   if (!modal) {
     modal = document.createElement("div");
@@ -1404,7 +1569,7 @@ window._confirmarLimpar = function () {
   }, 200);
 };
 
-/* ================= SALVAR / EXPLORAR ================= */
+/* ================= EXPLORAR / SALVAR ================= */
 window.explorar = function () {
   try {
     window.chatState = window.chatState || {};
@@ -1467,12 +1632,10 @@ window.explorar = function () {
       dados.chat = chat;
     }
 
-    // ── Sempre preserva fluxos e dados extras do chat anterior ──
     try {
       const anterior = JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}");
       if (anterior.chat) {
         if (!dados.chat) dados.chat = {};
-        // Preserva fluxos
         if (anterior.chat.fluxos?.length) {
           dados.chat.fluxos       = anterior.chat.fluxos;
           dados.chat.fluxo        = anterior.chat.fluxo;
@@ -1480,18 +1643,17 @@ window.explorar = function () {
         }
       }
     } catch(_e) {}
-    // JSON gerado — mantido oculto para o cliente
-    // mostrarToast só se chamado pelo formulário, não externamente
-    if (!window._explorarSilencioso) mostrarToast("JSON gerado com sucesso!");
+
+    if (!window._explorarSilencioso) mostrarToast("Configuração gerada com sucesso!");
     return dados;
   } catch (e) {
     console.error(e);
-    mostrarToast("Erro ao gerar JSON", true);
+    mostrarToast("Erro ao gerar configuração", true);
     return null;
   }
 };
 
-/* ================= CHAT – TIPO / API / CONTA / CANAL ================= */
+/* ================= CHAT TIPO / API / CONTA / CANAL ================= */
 window._tiposAtivos = window._tiposAtivos || new Set();
 
 function _atualizarBlocosTipo() {
@@ -1613,11 +1775,7 @@ window.toggleCanal = function (el) {
 window.informarAgenteChat = function () {
     mostrarToast("Os agentes omnichannel são gerados automaticamente a partir dos usuários marcados como agente.", true);
 };
-function salvarConfiguracao() {
-  const dados = explorar();
-  localStorage.setItem("CONFIG_CADERNO", JSON.stringify(dados));
-  window.location.href = "resumo.html";
-}
+
 function atualizarModuloChat() {
     const moduloChat = document.getElementById("modulochat");
     if (!moduloChat) return;
@@ -1651,7 +1809,6 @@ window.excluirFluxo = function(id) {
   const cad = raw ? JSON.parse(raw) : {};
   if (cad.chat?.fluxos) {
     cad.chat.fluxos = cad.chat.fluxos.filter(f => f.id !== id);
-    // Atualiza fluxo principal se era esse
     if (cad.chat.fluxo?.id === id || !cad.chat.fluxos.length) {
       cad.chat.fluxo = cad.chat.fluxos[0] || null;
       cad.chat.fluxo_imagem = cad.chat.fluxos[0]?.imagem || null;
@@ -1698,16 +1855,11 @@ function renderizarFluxosSalvos() {
   `).join("");
 }
 
-/* Atualiza lista de fluxos ao carregar dados salvos */
-function _renderizarFluxosAposCarregar() {
-  setTimeout(renderizarFluxosSalvos, 700);
-}
-
 /* ================= REGRAS DE TEMPO – CHAT ================= */
 window.adicionarRegraTempoChat = function () {
   const container = document.getElementById("listaRegrasTempoChat");
   if (!container) return mostrarToast("Lista não encontrada", true);
-  container.appendChild(criarRegraTempo()); // reutiliza o mesmo componente do PBX
+  container.appendChild(criarRegraTempo());
   syncTudo();
 };
 
@@ -1788,14 +1940,11 @@ window.initCaderno = function () {
     if (modo === "chat" || modo === "ambos") {
       setTimeout(gerarAgentesChatAPartirUsuarios, 150);
     }
-    // Recarrega dados salvos no localStorage
     _carregarDadosSalvos();
   }, 200);
 };
 
-/* =======================================================
-   RECARREGAR DADOS DO LOCALSTORAGE NO FORMULÁRIO
-======================================================= */
+/* ================= RECARREGAR DADOS DO LOCALSTORAGE ================= */
 function _carregarDadosSalvos() {
   const raw = localStorage.getItem("CONFIG_CADERNO");
   if (!raw || raw === "null") return;
@@ -1807,7 +1956,6 @@ function _carregarDadosSalvos() {
   const cli = dados.cliente || {};
   const chat = dados.chat || {};
 
-  // ── Cliente ──────────────────────────────────────────
   const fEmp = document.getElementById("empresaCliente");
   const fDom = document.getElementById("dominioCliente");
   const fCnpj = document.getElementById("cnpjCliente");
@@ -1815,7 +1963,6 @@ function _carregarDadosSalvos() {
   if (fDom  && cli.dominio)  { fDom.value  = cli.dominio;  fDom.dispatchEvent(new Event("input")); }
   if (fCnpj && cli.cnpj)     { fCnpj.value = cli.cnpj;     fCnpj.dispatchEvent(new Event("input")); }
 
-  // ── Usuários Web ─────────────────────────────────────
   const listaUW = document.getElementById("listaUsuariosWeb");
   if (listaUW && voz.usuarios?.length) {
     listaUW.innerHTML = "";
@@ -1829,19 +1976,12 @@ function _carregarDadosSalvos() {
       const perm = campo.querySelector("select");
       if (perm && u.permissao) perm.value = u.permissao;
       const chks = campo.querySelectorAll("input[type=checkbox]");
-      if (chks[0]) {
-        chks[0].checked = !!u.agente_callcenter;
-        chks[0].dispatchEvent(new Event("change")); // dispara syncTudo → gera agentes
-      }
-      if (chks[1]) {
-        chks[1].checked = !!u.agente_omnichannel;
-        chks[1].dispatchEvent(new Event("change"));
-      }
+      if (chks[0]) { chks[0].checked = !!u.agente_callcenter; chks[0].dispatchEvent(new Event("change")); }
+      if (chks[1]) { chks[1].checked = !!u.agente_omnichannel; chks[1].dispatchEvent(new Event("change")); }
       listaUW.appendChild(campo);
     });
   }
 
-  // ── Ramais ───────────────────────────────────────────
   const listaR = document.getElementById("listaRings");
   if (listaR && voz.ramais?.length) {
     listaR.innerHTML = "";
@@ -1854,7 +1994,6 @@ function _carregarDadosSalvos() {
     });
   }
 
-  // ── Entradas ─────────────────────────────────────────
   const listaE = document.getElementById("listaEntradas");
   if (listaE && voz.entradas?.length) {
     listaE.innerHTML = "";
@@ -1866,22 +2005,17 @@ function _carregarDadosSalvos() {
     });
   }
 
-  // ── Regras de Tempo ──────────────────────────────────
   const listaRT = document.getElementById("listaRegrasTempo");
   if (listaRT && voz.regras_tempo?.length) {
     listaRT.innerHTML = "";
     voz.regras_tempo.forEach(r => {
       const card = criarRegraTempo();
       card.querySelector(".campo-nome").value = r.nome || "";
-      // Marca dias
       const diasBtns = card.querySelectorAll(".btn-dia");
       const diasCompletos = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
       diasBtns.forEach((btn, idx) => {
-        if ((r.dias || []).includes(diasCompletos[idx])) {
-          btn.click();
-        }
+        if ((r.dias || []).includes(diasCompletos[idx])) btn.click();
       });
-      // Faixas de horário
       const faixas = r.faixas?.length ? r.faixas
         : (r.hora_inicio ? [{ inicio: r.hora_inicio, fim: r.hora_fim }] : []);
       const faixaContainer = card.querySelector(".faixas-container");
@@ -1899,7 +2033,6 @@ function _carregarDadosSalvos() {
     });
   }
 
-  // ── Filas ────────────────────────────────────────────
   const listaF = document.getElementById("listaFilas");
   if (listaF && voz.filas?.length) {
     listaF.innerHTML = "";
@@ -1907,27 +2040,10 @@ function _carregarDadosSalvos() {
       const campo = criarCampo("fila");
       campo.querySelector(".campo-nome").value = f.nome || "";
       campo.dataset.agentes = JSON.stringify(f.agentes || []);
-      // Renderiza lista de agentes
-      const lista = campo.querySelectorAll("div")[0];
-      (f.agentes || []).forEach(a => {
-        const d = document.createElement("div");
-        d.textContent = a;
-        const x = document.createElement("button");
-        x.textContent = "✖";
-        x.onclick = () => {
-          const arr = JSON.parse(campo.dataset.agentes);
-          arr.splice(arr.indexOf(a), 1);
-          campo.dataset.agentes = JSON.stringify(arr);
-          d.remove();
-        };
-        d.append(x);
-        if (lista) lista.append(d);
-      });
       listaF.appendChild(campo);
     });
   }
 
-  // ── Grupo de Ring ────────────────────────────────────
   const listaGR = document.getElementById("listaGrupoRing");
   if (listaGR && voz.grupo_ring?.length) {
     listaGR.innerHTML = "";
@@ -1941,7 +2057,6 @@ function _carregarDadosSalvos() {
     });
   }
 
-  // ── URAs ─────────────────────────────────────────────
   const listaURA = document.getElementById("listaURAs");
   if (listaURA && voz.uras?.length) {
     listaURA.innerHTML = "";
@@ -1956,7 +2071,6 @@ function _carregarDadosSalvos() {
         const row = criarOpcaoURA();
         row.querySelector(".ura-tecla").value = o.tecla || "";
         row.querySelector(".ura-desc").value  = o.descricao || "";
-        // Set destino after a small delay so options are populated
         setTimeout(() => {
           const sel = row.querySelector(".ura-destino");
           if (sel) sel.value = o.destino || "";
@@ -1967,7 +2081,6 @@ function _carregarDadosSalvos() {
     });
   }
 
-  // ── Pausas ───────────────────────────────────────────
   if (voz.pausas?.length && voz.pausas[0]) {
     const p = voz.pausas[0];
     const nomeGrupo = document.getElementById("nomeGrupoPausas");
@@ -1975,27 +2088,23 @@ function _carregarDadosSalvos() {
     const listaPausas = document.getElementById("listaPausas");
     const bloco = document.getElementById("pausasConteudo");
     if (listaPausas && p.itens?.length) {
-      if (bloco) bloco.style.display = "block";
+      if (bloco) { bloco.style.display = "block"; _pausasAberta = true; }
       listaPausas.innerHTML = "";
       p.itens.forEach(item => {
         const el = criarPausa();
         el.querySelector("input[type=text]").value = item.nome || "";
         const sel = el.querySelector("select");
-        if (sel) {
-          const mins = parseInt(item.tempo) || 0;
-          sel.value = mins;
-        }
+        if (sel) { const mins = parseInt(item.tempo) || 0; sel.value = mins; }
         listaPausas.appendChild(el);
       });
     }
   }
 
-  // ── Pesquisa de Satisfação ───────────────────────────
   if (voz.pesquisas?.length && voz.pesquisas[0]) {
     const p = voz.pesquisas[0];
     const bloco = document.getElementById("pesquisaSatisfacaoConteudo");
     if (bloco && (p.nome || p.pergunta)) {
-      bloco.style.display = "block";
+      bloco.style.display = "block"; _pesquisaAberta = true;
       const fn1 = document.getElementById("pesquisaNome");
       const fn2 = document.getElementById("pesquisaAudioIntro");
       const fn3 = document.getElementById("pesquisaPergunta");
@@ -2017,9 +2126,7 @@ function _carregarDadosSalvos() {
     }
   }
 
-  // ── Chat ─────────────────────────────────────────────
   if (chat && (chat.tipo || chat.usuarios?.length || chat.departamentos?.length)) {
-    // Tipo
     if (chat.tipo) {
       const tipos = chat.tipo === "ambos" ? ["api","qr"] : [chat.tipo];
       tipos.forEach(t => {
@@ -2027,23 +2134,19 @@ function _carregarDadosSalvos() {
         if (btn) window.toggleTipoChat(btn, t);
       });
     }
-    // API
     if (chat.api) {
       const btnApi = document.querySelector(`[data-api="${chat.api}"]`);
       if (btnApi) window.selecionarApi(btnApi, chat.api);
     }
-    // Conta
     const contaVal = typeof chat.conta === "object" ? chat.conta?.api : chat.conta;
     if (contaVal) {
       const btnConta = document.querySelector(`[data-conta="${contaVal}"]`);
       if (btnConta) window.selecionarConta(btnConta, contaVal);
     }
-    // Canais
     (chat.canais || []).forEach(canal => {
       const btnCanal = document.querySelector(`[data-canal="${canal}"]`);
       if (btnCanal && !btnCanal.classList.contains("active")) window.toggleCanal(btnCanal);
     });
-    // Números QR
     if (chat.numero_qr?.length) {
       const listaQr = document.getElementById("listaNumeroQr");
       if (listaQr) {
@@ -2056,15 +2159,15 @@ function _carregarDadosSalvos() {
         });
       }
     }
-    // ── Regras de Tempo Chat ────────────────────────────────────────────
+
     const listaRTC = document.getElementById("listaRegrasTempoChat");
     if (listaRTC && chat.regras_tempo?.length) {
       listaRTC.innerHTML = "";
       chat.regras_tempo.forEach(r => {
         const card = criarRegraTempo();
         card.querySelector(".campo-nome").value = r.nome || "";
-        const diasBtns   = card.querySelectorAll(".btn-dia");
-        const diasComp   = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+        const diasBtns = card.querySelectorAll(".btn-dia");
+        const diasComp = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
         diasBtns.forEach((btn, idx) => {
           if ((r.dias || []).includes(diasComp[idx])) btn.click();
         });
@@ -2085,8 +2188,6 @@ function _carregarDadosSalvos() {
       });
     }
 
-    // ── Usuários Chat ──────────────────────────────────────────────────
-    // Adiciona todos SEM disparar change (evita gerar agentes parcialmente)
     const listaUC = document.getElementById("listaUsuariosChat");
     const _usuariosChat = chat.usuarios || [];
     if (listaUC && _usuariosChat.length) {
@@ -2095,24 +2196,17 @@ function _carregarDadosSalvos() {
         if (typeof window.adicionarUsuarioChat !== "function") return;
         const wrap = window.adicionarUsuarioChat();
         if (!wrap) return;
-        // Nome
         const nomeEl = wrap.querySelector(".campo-nome");
         if (nomeEl) nomeEl.value = u.nome || "";
-        // Email
         const emailEl = wrap.querySelector("input[type=email]");
         if (emailEl) emailEl.value = u.email || "";
-        // Senha
         const senhaEl = wrap.querySelector(".campo-senha");
         if (senhaEl) senhaEl.value = u.senha || "";
-        // Permissão
         const permEl = wrap.querySelector("select");
         if (permEl && u.permissao) permEl.value = u.permissao;
-        // Checkbox agente — marca SEM disparar onchange ainda
-        // O chat.js usa closure interna; o checkbox fica dentro do <label>
         const chk = wrap.querySelector("input[type=checkbox]");
         if (chk) {
           const deveSerAgente = u.agente === true || u.agente_omnichannel === true;
-          // Temporariamente desconecta o onchange para não gerar agentes em loop
           const origOnchange = chk.onchange;
           chk.onchange = null;
           chk.checked = deveSerAgente;
@@ -2122,89 +2216,60 @@ function _carregarDadosSalvos() {
     }
   }
 
-  // ── CASCATA DE SINCRONIZAÇÃO ────────────────────────────────────────
-  // Passo 1 (300ms): gera agentes de voz + campos básicos prontos
   setTimeout(() => {
     syncTudo();
     atualizarTodosDestinosURA();
-    renderizarFluxosSalvos(); // mostra fluxos salvos na lista
+    renderizarFluxosSalvos();
   }, 300);
 
-  // Passo 2 (700ms): gera agentes de chat (lê checkboxes já marcados)
   setTimeout(() => {
     if (typeof gerarAgentesChatAPartirUsuarios === "function") {
       gerarAgentesChatAPartirUsuarios();
     }
   }, 700);
 
-  // Passo 3 (1200ms): preenche departamentos com agentes já no DOM
   setTimeout(() => {
     const _depsSalvos = (JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}").chat || {}).departamentos || [];
     if (!_depsSalvos.length) return;
-
     const listaDC = document.getElementById("listaDepartamentosChat");
     if (!listaDC) return;
     listaDC.innerHTML = "";
-
-    // Coleta nomes dos agentes que estão no DOM agora
     const _agentesNoDOM = [];
     document.querySelectorAll("#listaAgentesChat .campo-descricao").forEach(a => {
       const n = a.querySelector(".campo-nome")?.value?.trim();
       if (n) _agentesNoDOM.push(n);
     });
-
     _depsSalvos.forEach(dep => {
       if (typeof window.adicionarDepartamentoChat !== "function") return;
-
-      // Cria o card do departamento via função original (preserva closure)
       window.adicionarDepartamentoChat();
-
       const cards = listaDC.querySelectorAll(".campo-descricao");
       const card  = cards[cards.length - 1];
       if (!card) return;
-
-      // Nome
       const nomeEl = card.querySelector(".campo-nome");
       if (nomeEl) nomeEl.value = dep.nome || "";
-
-      // Botão "+ Adicionar agente" — existe no card criado pelo chat.js
       const addBtn = [...card.querySelectorAll("button")]
         .find(b => b.textContent.trim().includes("Adicionar agente"));
       if (!addBtn) return;
-
-      // Para cada agente do departamento: clica no botão e seta imediatamente
       (dep.agentes || []).forEach(agNome => {
-        // Desconecta onchange temporariamente do select mais recente antes de clicar
         addBtn.click();
-
-        // O click adiciona um novo select — pega o último
         const selects = card.querySelectorAll("select");
         const sel = selects[selects.length - 1];
         if (!sel) return;
-
-        // Garante que a opção existe
         const jaTemOpcao = [...sel.options].some(o => o.value === agNome);
-        if (!jaTemOpcao) {
-          sel.add(new Option(agNome, agNome));
-        }
+        if (!jaTemOpcao) sel.add(new Option(agNome, agNome));
         sel.value = agNome;
-        // Não dispara onchange para evitar refreshSelects em loop
       });
     });
-
-    console.log("[Caderno] Dados recarregados. Departamentos:", _depsSalvos.length);
   }, 1200);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   if (typeof window.initCaderno === "function") window.initCaderno();
 
-  // ── Atualiza lista de fluxos quando a janela recebe foco (voltando do editor) ──
   window.addEventListener("focus", () => {
     setTimeout(renderizarFluxosSalvos, 300);
   });
 
-  // ── Scroll + destaque ao voltar do resumo (botão Editar) ──
   const ancora = sessionStorage.getItem("CADERNO_EDIT_ANCORA");
   if (ancora) {
     sessionStorage.removeItem("CADERNO_EDIT_ANCORA");
@@ -2220,9 +2285,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-/* ======================================================
-   MELHORIAS DE VALIDAÇÃO – v2
-====================================================== */
+/* ================= VALIDAÇÕES V2 ================= */
 window.validarCNPJReal = function(cnpj) {
   cnpj = cnpj.replace(/\D/g, "");
   if (cnpj.length !== 14) return false;
@@ -2439,12 +2502,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-/* =======================================================
-   BACKUP LOCAL AUTOMÁTICO
-======================================================= */
+/* ================= BACKUP LOCAL AUTOMÁTICO ================= */
 const BACKUP_KEY    = "CONFIG_CADERNO_BACKUPS";
 const BACKUP_MAX    = 5;
-const BACKUP_INTERVALO = 60 * 1000; // 60 segundos
+const BACKUP_INTERVALO = 60 * 1000;
 
 function _fazerBackup(dados) {
   if (!dados) return;
@@ -2453,13 +2514,11 @@ function _fazerBackup(dados) {
     backups.unshift({ ts: new Date().toISOString(), dados });
     if (backups.length > BACKUP_MAX) backups.length = BACKUP_MAX;
     localStorage.setItem(BACKUP_KEY, JSON.stringify(backups));
-    console.log("[Backup] salvo em", new Date().toLocaleTimeString("pt-BR"));
   } catch(e) {
     console.warn("[Backup] erro:", e);
   }
 }
 
-// Auto-backup a cada 60s se houver dados no formulário
 setInterval(() => {
   const empresa = document.getElementById("empresaCliente")?.value.trim();
   if (!empresa) return;
@@ -2469,7 +2528,6 @@ setInterval(() => {
   } catch(_) {}
 }, BACKUP_INTERVALO);
 
-/* Baixa o JSON atual como arquivo .json */
 window.baixarBackupJSON = function () {
   try {
     const dados = window.explorar?.();
@@ -2490,7 +2548,6 @@ window.baixarBackupJSON = function () {
   }
 };
 
-/* Restaura backup — abre seletor de arquivo .json */
 window.restaurarBackupJSON = function () {
   const input = document.createElement("input");
   input.type  = "file";
@@ -2515,9 +2572,7 @@ window.restaurarBackupJSON = function () {
   input.click();
 };
 
-/* =======================================================
-   MODAL DE VALIDAÇÃO ANTES DE SALVAR
-======================================================= */
+/* ================= MODAL DE VALIDAÇÃO ANTES DE SALVAR ================= */
 function _criarModalValidacao() {
   if (document.getElementById("modalValidacao")) return;
 
@@ -2565,7 +2620,6 @@ function _criarModalValidacao() {
   `;
 
   document.body.appendChild(overlay);
-
   overlay.addEventListener("click", e => {
     if (e.target === overlay) fecharModalValidacao();
   });
@@ -2611,7 +2665,6 @@ function _abrirModalValidacao(erros, avisos) {
     lista.appendChild(el);
   });
 
-  // Botões: se só avisos, mostra "Continuar" + "Corrigir"; se erros, só "Corrigir"
   btnCont.style.display = (!temErros && temAvisos) ? "block" : "none";
   btnOk.style.display   = (!temErros && !temAvisos) ? "block" : "none";
 
@@ -2626,7 +2679,6 @@ function _confirmarSalvar() {
   const dados = window.explorar?.();
   if (!dados) return;
 
-  // ── Preserva fluxos salvos pelo editor (não sobrescrever) ──
   try {
     const anterior = JSON.parse(localStorage.getItem("CONFIG_CADERNO") || "{}");
     if (anterior.chat?.fluxos?.length) {
@@ -2642,11 +2694,11 @@ function _confirmarSalvar() {
   window.location.href = "resumo.html";
 }
 
+/* FIX #5 & #6: salvarConfiguracao — botão renomeado para "Salvar Configurações" */
 window.salvarConfiguracao = function () {
   const erros  = [];
   const avisos = [];
 
-  // ── ERROS (impedem salvar) ──────────────────────────
   const empresa = document.getElementById("empresaCliente")?.value.trim();
   if (!empresa) erros.push("Nome da empresa é obrigatório.");
 
@@ -2673,7 +2725,6 @@ window.salvarConfiguracao = function () {
       erros.push(`E-mail do usuário ${i + 1} inválido: "${el.value}"`);
   });
 
-  // ── AVISOS (permitem continuar) ─────────────────────
   const modo = localStorage.getItem("modo_atendimento");
 
   if (modo === "voz" || modo === "ambos") {
@@ -2699,12 +2750,10 @@ window.salvarConfiguracao = function () {
       avisos.push("Nenhum departamento de chat cadastrado.");
   }
 
-  // ── Decide o que fazer ──────────────────────────────
   if (erros.length || avisos.length) {
     _abrirModalValidacao(erros, avisos);
     return;
   }
 
-  // Sem problemas → salva direto
   _confirmarSalvar();
 };
