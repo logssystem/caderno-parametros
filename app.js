@@ -294,41 +294,50 @@ window.adicionarCampo = function (tipo) {
 // FIX #1: Toggle mostra/oculta o bloco; campos ficam sempre dentro
 let _pesquisaAberta = false;
 function togglePesquisaSatisfacao() {
-  const bloco = document.getElementById("pesquisaSatisfacaoConteudo");
-  if (!bloco) return;
-
-  if (!_pesquisaAberta) {
-    bloco.style.display = "block";
-    _pesquisaAberta = true;
-  } else {
-    adicionarRespostaPesquisa();
-  }
+  const container = document.getElementById("pesquisaSatisfacaoConteudo");
+  if (!container) return;
+  container.style.display = "block";
+  container.appendChild(criarBlocoPesquisa());
 }
 
-function adicionarRespostaPesquisa() {
-  const lista = document.getElementById("listaRespostasPesquisa");
-  if (!lista) return;
-  lista.appendChild(criarRespostaPesquisa());
-}
-
-function criarRespostaPesquisa() {
+function criarBlocoPesquisa() {
   const wrap = document.createElement("div");
-  wrap.className = "opcao-pesquisa";
+  wrap.className = "campo-descricao";
 
-  const nota = document.createElement("input");
-  nota.type = "number";
-  nota.placeholder = "Nota";
-  nota.style.width = "70px";
+  const btn = document.createElement("button");
+  btn.textContent = "✖";
+  btn.style.cssText = "float:right;";
+  btn.onclick = () => wrap.remove();
 
-  const descricao = document.createElement("input");
-  descricao.type = "text";
-  descricao.placeholder = "Descrição da resposta (ex: Ruim, Regular, Bom, Excelente)";
+  const nome = document.createElement("input");
+  nome.id = "pesquisaNome";
+  nome.placeholder = "Ex: Pesquisa de Atendimento Telefônico";
 
-  const del = document.createElement("button");
-  del.textContent = "✖";
-  del.onclick = () => wrap.remove();
+  const audioIntro = document.createElement("textarea");
+  audioIntro.id = "pesquisaAudioIntro";
+  audioIntro.placeholder = "Ex: Sua opinião é muito importante para nós.";
 
-  wrap.append(nota, descricao, del);
+  const pergunta = document.createElement("textarea");
+  pergunta.id = "pesquisaPergunta";
+  pergunta.placeholder = "Ex: De 0 a 5, como você avalia nosso atendimento?";
+
+  const listaRespostas = document.createElement("div");
+  listaRespostas.className = "listaRespostasPesquisa";
+
+  const btnAddResposta = document.createElement("button");
+  btnAddResposta.className = "btn-add";
+  btnAddResposta.textContent = "+";
+  btnAddResposta.onclick = () => listaRespostas.appendChild(criarRespostaPesquisa());
+
+  const dica = document.createElement("p");
+  dica.style.cssText = "opacity:.7;font-size:13px";
+  dica.textContent = "Ex: 0-Péssimo | 1-Ruim | 2-Regular | 3-Bom | 4-Muito Bom | 5-Excelente";
+
+  const audioFim = document.createElement("textarea");
+  audioFim.id = "pesquisaAudioFim";
+  audioFim.placeholder = "Ex: Obrigado por participar da nossa pesquisa.";
+
+  wrap.append(btn, nome, audioIntro, pergunta, listaRespostas, btnAddResposta, dica, audioFim);
   return wrap;
 }
 
