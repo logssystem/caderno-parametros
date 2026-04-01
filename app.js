@@ -347,7 +347,6 @@ function criarBlocoPesquisa() {
 }
 
 /* ================= PAUSAS DO CALL CENTER ================= */
-// FIX #1: Toggle mostra/oculta o bloco; não remove campos
 function togglePausas() {
   const container = document.getElementById("pausasConteudo");
   if (!container) return;
@@ -362,7 +361,15 @@ function togglePausas() {
   }
   container._iniciado = true;
   container.style.display = "block";
-  container.appendChild(criarBlocoPausas());
+
+  // Botão para adicionar novos blocos de pausa
+  const btnNovoBloco = document.createElement("button");
+  btnNovoBloco.className = "btn-add";
+  btnNovoBloco.textContent = "+ Adicionar Grupo de Pausas";
+  btnNovoBloco.onclick = () => container.insertBefore(criarBlocoPausas(), btnNovoBloco);
+
+  container.appendChild(criarBlocoPausas()); // bloco inicial
+  container.appendChild(btnNovoBloco);       // botão sempre no final
 }
 
 function criarBlocoPausas() {
@@ -371,7 +378,7 @@ function criarBlocoPausas() {
 
   const btn = document.createElement("button");
   btn.textContent = "✖";
-  btn.style.cssText = "float:right;";
+  btn.style.cssText = "float:right;width:auto;min-height:auto;padding:4px 8px;font-size:12px;background:#f3f4f6;border:1px solid #d1d5db;color:#6b7280;border-radius:6px;cursor:pointer;";
   btn.onclick = () => wrap.remove();
 
   const nomeGrupo = document.createElement("input");
@@ -381,10 +388,10 @@ function criarBlocoPausas() {
 
   const btnAddPausa = document.createElement("button");
   btnAddPausa.className = "btn-add";
-  btnAddPausa.textContent = "+";
+  btnAddPausa.textContent = "+ Pausa";
   btnAddPausa.onclick = () => listaPausas.appendChild(criarPausa());
 
-  wrap.append(nomeGrupo, listaPausas, btnAddPausa, btn);
+  wrap.append(btn, nomeGrupo, listaPausas, btnAddPausa);
   return wrap;
 }
 
@@ -406,6 +413,7 @@ function criarPausa() {
 
   const del = document.createElement("button");
   del.textContent = "✖";
+  del.style.cssText = "width:auto;min-height:auto;padding:4px 8px;font-size:12px;background:#f3f4f6;border:1px solid #d1d5db;color:#6b7280;border-radius:6px;cursor:pointer;";
   del.onclick = () => wrap.remove();
 
   wrap.append(nome, timeout, del);
