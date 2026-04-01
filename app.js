@@ -686,7 +686,8 @@ function criarCampo(tipo) {
           segundos: "0",
           destino: timeoutDest.value || ""
         });
-
+      }
+  
     /* ===== FILA (FIX #7: seleção de agentes corrigida) ===== */
     if (tipo === "fila") {
         const titulo = document.createElement("h4");
