@@ -324,6 +324,16 @@ select.campo-permissao { width: 280px !important; }
 #empresaCliente, #dominioCliente { width: 100%; max-width: 520px; font-size: 14px; }
 .campo-obrigatorio-erro { border: 2px solid #ef4444 !important; background: rgba(239,68,68,0.08); }
 
+select option {
+  background: #0f172a !important;
+  color: #f1f5f9 !important;
+}
+
+select:focus option:checked {
+  background: #1e40af !important;
+  color: #fff !important;
+}
+
 /* ======================================================
    BOTÕES – BASE
 ====================================================== */
