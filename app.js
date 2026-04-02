@@ -133,20 +133,11 @@ const DUVIDAS = {
     blocos: [
       { tipo: "info",    texto: "O editor de fluxo permite visualizar graficamente as conexões entre URAs, filas, ramais e regras de tempo." },
       { tipo: "campo",   texto: "Para adicionar um nó: arraste um elemento da barra lateral para a tela." },
-      {
-        tipo: "lista",
-        texto: "Como criar conexões entre nós:",
-        itens: [
-          "Passe o mouse sobre um nó até aparecer a bolinha (●) na borda.",
-          "Clique na bolinha (●) de saída de um nó e segure o botão do mouse.",
-          "Arraste até o nó de destino desejado e solte — a conexão será criada automaticamente.",
-          "Para excluir uma conexão: clique na linha de conexão e pressione Delete ou Backspace.",
-          "Para mover um nó: clique e arraste o bloco para a posição desejada."
-        ]
-      },
-      { tipo: "exemplo", texto: "Exemplo: clique na bolinha do nó 'URA Principal' e arraste até o nó 'Fila de Suporte' para conectá-los." },
+      { tipo: "campo",   texto: "Para conectar dois nós: clique no ponto de saída (●) de um nó e arraste até o ponto de entrada (●) de outro." },
+      { tipo: "campo",   texto: "Para excluir uma conexão: clique na linha de conexão e pressione Delete ou Backspace." },
+      { tipo: "campo",   texto: "Para mover um nó: clique e arraste o bloco para a posição desejada." },
       { tipo: "alerta",  texto: "O fluxo é salvo automaticamente junto com as configurações. Não é necessário salvar separadamente." },
-      { tipo: "exemplo", texto: "Exemplo de fluxo completo: Entrada → URA Principal → Fila de Suporte → Agentes." }
+      { tipo: "exemplo", texto: "Exemplo de fluxo: Entrada → URA Principal → Fila de Suporte → Agentes." }
     ]
   }
 };
@@ -300,105 +291,61 @@ window.adicionarCampo = function (tipo) {
 };
 
 /* ================= PESQUISA DE SATISFAÇÃO ================= */
+// FIX #1: Toggle mostra/oculta o bloco; campos ficam sempre dentro
 let _pesquisaAberta = false;
 function togglePesquisaSatisfacao() {
-  const container = document.getElementById("pesquisaSatisfacaoConteudo");
-  if (!container) return;
-  if (container._iniciado) {
-    container.style.display = container.style.display === "none" ? "block" : "none";
-    return;
-  }
-  container._iniciado = true;
-  container.style.display = "block";
-  container.appendChild(criarBlocoPesquisa());
+  const bloco = document.getElementById("pesquisaSatisfacaoConteudo");
+  if (!bloco) return;
+  _pesquisaAberta = !_pesquisaAberta;
+  bloco.style.display = _pesquisaAberta ? "block" : "none";
 }
-
-function criarBlocoPesquisa() {
+function adicionarRespostaPesquisa() {
+  const lista = document.getElementById("listaRespostasPesquisa");
+  if (!lista) return;
+  lista.appendChild(criarRespostaPesquisa());
+}
+function criarRespostaPesquisa() {
   const wrap = document.createElement("div");
-  wrap.className = "campo-descricao";
-
-  const nome = document.createElement("input");
-  nome.id = "pesquisaNome";
-  nome.placeholder = "Ex: Pesquisa de Atendimento Telefônico";
-
-  const audioIntro = document.createElement("textarea");
-  audioIntro.id = "pesquisaAudioIntro";
-  audioIntro.placeholder = "Ex: Sua opinião é muito importante para nós.";
-
-  const pergunta = document.createElement("textarea");
-  pergunta.id = "pesquisaPergunta";
-  pergunta.placeholder = "Ex: De 0 a 5, como você avalia nosso atendimento?";
-
-  const listaRespostas = document.createElement("div");
-  listaRespostas.className = "listaRespostasPesquisa";
-
-  const btnAddResposta = document.createElement("button");
-  btnAddResposta.className = "btn-add";
-  btnAddResposta.textContent = "+";
-  btnAddResposta.onclick = () => listaRespostas.appendChild(criarRespostaPesquisa());
-
-  const dica = document.createElement("p");
-  dica.style.cssText = "opacity:.7;font-size:13px";
-  dica.textContent = "Ex: 0-Péssimo | 1-Ruim | 2-Regular | 3-Bom | 4-Muito Bom | 5-Excelente";
-
-  const audioFim = document.createElement("textarea");
-  audioFim.id = "pesquisaAudioFim";
-  audioFim.placeholder = "Ex: Obrigado por participar da nossa pesquisa.";
-
-  const btn = document.createElement("button");
-  btn.textContent = "✖";
-  btn.style.cssText = "float:right;width:auto;min-height:auto;padding:4px 8px;font-size:12px;background:#f3f4f6;border:1px solid #d1d5db;color:#6b7280;border-radius:6px;cursor:pointer;";
-  btn.onclick = () => wrap.remove();
-
-  wrap.append(nome, audioIntro, pergunta, listaRespostas, btnAddResposta, dica, audioFim, btn);
+  wrap.className = "opcao-pesquisa";
+  const nota = document.createElement("input");
+  nota.type = "number";
+  nota.placeholder = "Nota";
+  nota.style.width = "70px";
+  const descricao = document.createElement("input");
+  descricao.type = "text";
+  descricao.placeholder = "Descrição da resposta (ex: Ruim, Regular, Bom, Excelente)";
+  const del = document.createElement("button");
+  del.textContent = "🗑";
+  del.onclick = () => wrap.remove();
+  wrap.append(nota, descricao, del);
   return wrap;
 }
 
 /* ================= PAUSAS DO CALL CENTER ================= */
-function adicionarBlocoPausas() {
-  const container = document.getElementById("pausasConteudo");
-  if (!container) return;
-
+// FIX #1: Toggle mostra/oculta o bloco; não remove campos
+let _pausasAberta = false;
+function togglePausas() {
+  const bloco = document.getElementById("pausasConteudo");
+  if (!bloco) return;
   const modo = localStorage.getItem("modo_atendimento");
   if (modo === "chat") {
     mostrarToast("Pausas são exclusivas do Call Center (Voz)", true);
     return;
   }
-
-  container.appendChild(criarBlocoPausas());
+  _pausasAberta = !_pausasAberta;
+  bloco.style.display = _pausasAberta ? "block" : "none";
 }
-
-function criarBlocoPausas() {
-  const wrap = document.createElement("div");
-  wrap.className = "campo-descricao";
-
-  const btn = document.createElement("button");
-  btn.textContent = "✖";
-  btn.style.cssText = "float:right;width:auto;min-height:auto;padding:4px 8px;font-size:12px;background:#f3f4f6;border:1px solid #d1d5db;color:#6b7280;border-radius:6px;cursor:pointer;";
-  btn.onclick = () => wrap.remove();
-
-  const nomeGrupo = document.createElement("input");
-  nomeGrupo.placeholder = "Ex: Pausas Operacionais";
-
-  const listaPausas = document.createElement("div");
-
-  const btnAddPausa = document.createElement("button");
-  btnAddPausa.className = "btn-add";
-  btnAddPausa.textContent = "+ Pausa";
-  btnAddPausa.onclick = () => listaPausas.appendChild(criarPausa());
-
-  wrap.append(nomeGrupo, listaPausas, btnAddPausa, btn);
-  return wrap;
+function adicionarPausa() {
+  const lista = document.getElementById("listaPausas");
+  if (!lista) return;
+  lista.appendChild(criarPausa());
 }
-
 function criarPausa() {
   const wrap = document.createElement("div");
   wrap.className = "opcao-pausa";
-
   const nome = document.createElement("input");
   nome.type = "text";
   nome.placeholder = "Nome da pausa (ex: Almoço, Banheiro, Treinamento)";
-
   const timeout = document.createElement("select");
   for (let i = 0; i <= 240; i += 5) {
     const opt = document.createElement("option");
@@ -406,22 +353,20 @@ function criarPausa() {
     opt.textContent = i === 0 ? "Sem limite" : `${i} min`;
     timeout.appendChild(opt);
   }
-
   const del = document.createElement("button");
-  del.textContent = "✖";
-  del.style.cssText = "width:auto;min-height:auto;padding:4px 8px;font-size:12px;background:#f3f4f6;border:1px solid #d1d5db;color:#6b7280;border-radius:6px;cursor:pointer;";
+  del.textContent = "🗑";
   del.onclick = () => wrap.remove();
-
   wrap.append(nome, timeout, del);
   return wrap;
 }
 
-/* ================= DESTINOS URA (diferenciar Fila vs Grupo) ================= */
+/* ================= DESTINOS URA (FIX #8: diferenciar Fila vs Grupo) ================= */
 function atualizarDestinosURA(select) {
   if (!select) return;
   select.innerHTML = "";
   select.add(new Option("Selecione o destino", ""));
 
+  // Ramais
   const grpRamal = document.createElement("optgroup");
   grpRamal.label = "📞 Ramal";
   document.querySelectorAll(`#listaRings .campo-descricao`).forEach(el => {
@@ -430,6 +375,7 @@ function atualizarDestinosURA(select) {
   });
   if (grpRamal.children.length) select.appendChild(grpRamal);
 
+  // Filas — label com "(Fila)" para diferenciar
   const grpFila = document.createElement("optgroup");
   grpFila.label = "👥 Fila";
   document.querySelectorAll(`#listaFilas .campo-descricao`).forEach(el => {
@@ -438,6 +384,7 @@ function atualizarDestinosURA(select) {
   });
   if (grpFila.children.length) select.appendChild(grpFila);
 
+  // Grupos de Ring — label com "(Grupo)" para diferenciar
   const grpRing = document.createElement("optgroup");
   grpRing.label = "🔔 Grupo de Ring";
   document.querySelectorAll(`#listaGrupoRing .campo-descricao`).forEach(el => {
@@ -446,6 +393,7 @@ function atualizarDestinosURA(select) {
   });
   if (grpRing.children.length) select.appendChild(grpRing);
 
+  // URAs
   const grpURA = document.createElement("optgroup");
   grpURA.label = "☎ URA";
   document.querySelectorAll(`#listaURAs .campo-descricao`).forEach(el => {
@@ -454,6 +402,7 @@ function atualizarDestinosURA(select) {
   });
   if (grpURA.children.length) select.appendChild(grpURA);
 
+  // Regras de Tempo
   const grpRT = document.createElement("optgroup");
   grpRT.label = "⏰ Regra de Tempo";
   document.querySelectorAll(`#listaRegrasTempo .campo-descricao`).forEach(el => {
@@ -466,6 +415,7 @@ function atualizarDestinosURA(select) {
 function atualizarTodosDestinosURA() {
     document.querySelectorAll(".opcao-ura select, .ura-destino, .ura-timeout-select").forEach(select => {
         const atual = select.value;
+        // Para timeout select, adicionar opção "Desconectar"
         if (select.classList.contains("ura-timeout-select")) {
             atualizarSelectTimeout(select, atual);
         } else {
@@ -475,15 +425,16 @@ function atualizarTodosDestinosURA() {
     });
 }
 
+/* FIX #3: Timeout da URA */
 function atualizarSelectTimeout(select, valorAtual) {
   select.innerHTML = "";
-  select.add(new Option("Selecione o Destino de Timeout", ""));
+  select.add(new Option("Desconectar (padrão)", ""));
   const grupos = [
-    { id: "listaRings",       label: "📞 Ramal",          prefix: "ramal::" },
-    { id: "listaFilas",       label: "👥 Fila",            prefix: "fila::",  suffix: " (Fila)" },
-    { id: "listaGrupoRing",   label: "🔔 Grupo de Ring",   prefix: "grupo::", suffix: " (Grupo)" },
-    { id: "listaURAs",        label: "☎ URA",             prefix: "ura::" },
-    { id: "listaRegrasTempo", label: "⏰ Regra de Tempo",  prefix: "regra::" },
+    { id: "listaRings",     label: "📞 Ramal",        prefix: "ramal::" },
+    { id: "listaFilas",     label: "👥 Fila",          prefix: "fila::",  suffix: " (Fila)" },
+    { id: "listaGrupoRing", label: "🔔 Grupo de Ring", prefix: "grupo::", suffix: " (Grupo)" },
+    { id: "listaURAs",      label: "☎ URA",           prefix: "ura::" },
+    { id: "listaRegrasTempo", label: "⏰ Regra de Tempo", prefix: "regra::" },
   ];
   grupos.forEach(g => {
     const optgroup = document.createElement("optgroup");
@@ -545,6 +496,7 @@ function criarCampo(tipo) {
     let chkAgente  = null;
     let chkAgenteOmni = null;
 
+    /* ===== USUÁRIO WEB ===== */
     if (tipo === "usuario_web") {
         const linhaCred = document.createElement("div");
         linhaCred.className = "linha-principal";
@@ -593,6 +545,7 @@ function criarCampo(tipo) {
         senhaInput.oninput = () => validarSenha(senhaInput, regras);
     }
 
+    /* ===== RAMAL (FIX #2: senha automática) ===== */
     if (tipo === "ring") {
         nome.style.width = "260px";
         nome.style.maxWidth = "100%";
@@ -644,27 +597,49 @@ function criarCampo(tipo) {
             infoRamal.textContent = "Ramal válido.";
         });
 
+        // FIX #2: Gerar senha automática
         senhaInput = document.createElement("input");
         senhaInput.placeholder = "Senha do ramal";
         senhaInput.classList.add("campo-senha");
         senhaInput.style.marginTop = "12px";
-        senhaInput.value = gerarSenhaRamal();
+        senhaInput.value = gerarSenhaRamal(); // Senha auto
         wrap.append(senhaInput);
 
         regras = document.createElement("div");
         regras.style.marginTop = "8px";
         wrap.append(regras);
+        // Validar a senha gerada automaticamente
         validarSenha(senhaInput, regras);
         senhaInput.oninput = () => validarSenha(senhaInput, regras);
         wrap.append(infoRamal);
     }
 
+    /* ===== URA (FIX #3: campo timeout) ===== */
     if (tipo === "ura") {
         const msg = document.createElement("textarea");
         msg.placeholder = "Mensagem da URA Ex: Olá seja bem-vindo...";
         msg.style.marginTop = "12px";
         wrap.append(msg);
-    
+
+        // Timeout
+        const timeoutRow = document.createElement("div");
+        timeoutRow.style.cssText = "margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;";
+        const timeoutLabel = document.createElement("label");
+        timeoutLabel.style.cssText = "font-size:12px;font-weight:700;color:var(--text-soft);white-space:nowrap;margin:0;";
+        timeoutLabel.textContent = "⏱ Timeout (sem resposta):";
+        const timeoutSec = document.createElement("input");
+        timeoutSec.type = "number";
+        timeoutSec.min = "0";
+        timeoutSec.placeholder = "Seg. (ex: 10)";
+        timeoutSec.style.cssText = "width:110px;min-height:36px!important;";
+        const timeoutDest = document.createElement("select");
+        timeoutDest.className = "ura-timeout-select";
+        timeoutDest.style.flex = "1";
+        timeoutDest.style.minHeight = "36px";
+        atualizarSelectTimeout(timeoutDest, "");
+        timeoutRow.append(timeoutLabel, timeoutSec, timeoutDest);
+        wrap.append(timeoutRow);
+
         const secOpcoes = document.createElement("div");
         secOpcoes.style.marginTop = "14px";
         const titulo = document.createElement("div");
@@ -683,28 +658,15 @@ function criarCampo(tipo) {
         btnNova.onclick = () => listaOpcoes.appendChild(criarOpcaoURA());
         secOpcoes.append(btnNova);
         wrap.append(secOpcoes);
-    
-        const timeoutRow = document.createElement("div");
-        timeoutRow.style.cssText = "margin-top:12px;";
-    
-        const timeoutLabel = document.createElement("label");
-        timeoutLabel.style.cssText = "font-size:12px;font-weight:700;color:var(--text-soft);display:block;margin-bottom:6px;";
-        timeoutLabel.textContent = "Caso nenhuma tecla seja pressionada, direcionar para:";
-    
-        const timeoutDest = document.createElement("select");
-        timeoutDest.className = "ura-timeout-select";
-        timeoutDest.style.cssText = "width:100%;min-height:36px;border-radius:8px;font-size:13px;padding:6px 10px;";
-        atualizarSelectTimeout(timeoutDest, "");
-    
-        timeoutRow.append(timeoutLabel, timeoutDest);
-        wrap.append(timeoutRow);
-    
+
+        // Métodos para coletar timeout
         wrap.getTimeout = () => ({
-            segundos: "0",
-            destino: timeoutDest.value || ""
+          segundos: timeoutSec.value || "0",
+          destino:  timeoutDest.value || ""
         });
     }
-  
+
+    /* ===== FILA (FIX #7: seleção de agentes corrigida) ===== */
     if (tipo === "fila") {
         const titulo = document.createElement("h4");
         titulo.textContent = "Agentes da fila";
@@ -783,6 +745,7 @@ function criarCampo(tipo) {
         wrap.getNome = () => nome.value;
     }
 
+    /* ===== GRUPO DE RING ===== */
     if (tipo === "grupo_ring") {
         const estr = document.createElement("select");
         estr.innerHTML = `
@@ -828,6 +791,7 @@ function criarCampo(tipo) {
         }
     }
 
+    /* ===== NÚMERO DE ENTRADA ===== */
     if (tipo === "entrada") {
         nome.placeholder = "Ex: (11) 3000-1000 ou (11) 99999-0000";
         nome.inputMode   = "numeric";
@@ -924,13 +888,13 @@ function criarCampo(tipo) {
 function extrairNomeDestino(valor) {
     if (!valor) return "";
     if (valor.includes("::")) return valor.split("::")[1];
-    return valor;
+    return valor; // Compatibilidade com dados antigos
 }
 
 function extrairTipoDestino(valor) {
     if (!valor) return "";
     if (valor.includes("::")) return valor.split("::")[0];
-    return "";
+    return ""; // sem prefixo = desconhecido
 }
 
 /* ================= OPÇÃO URA ================= */
@@ -1277,6 +1241,7 @@ function coletarPesquisaSatisfacao() {
   return { ativa: true, nome, introducao, pergunta, encerramento, respostas };
 }
 
+/* FIX #8: Coleta URAs com destino prefixado + timeout */
 function coletarURAs() {
   const uras = [];
   document.querySelectorAll("#listaURAs .campo-descricao").forEach(ura => {
@@ -1284,18 +1249,19 @@ function coletarURAs() {
     const mensagem = ura.querySelector("textarea")?.value    || "";
     const opcoes   = [];
     ura.querySelectorAll(".opcao-ura-row").forEach(o => {
-      const tecla      = o.querySelector(".ura-tecla")?.value   || "";
+      const tecla   = o.querySelector(".ura-tecla")?.value   || "";
       const destinoRaw = o.querySelector(".ura-destino")?.value || "";
-      const descricao  = o.querySelector(".ura-desc")?.value    || "";
+      const descricao = o.querySelector(".ura-desc")?.value   || "";
       if (tecla || destinoRaw) {
         opcoes.push({
           tecla,
-          destino:        destinoRaw,
-          destinoDisplay: formatarDestinoDisplay(destinoRaw),
+          destino: destinoRaw,               // valor prefixado (fila::nome)
+          destinoDisplay: formatarDestinoDisplay(destinoRaw), // para exibição no PDF
           descricao
         });
       }
     });
+    // Timeout
     const timeout = ura.getTimeout ? ura.getTimeout() : { segundos: "0", destino: "" };
     if (nome) uras.push({ nome, mensagem, opcoes, timeout });
   });
@@ -1447,6 +1413,7 @@ function processarCSV(tipo, texto) {
             }
         }
         if (tipo === "ring") {
+          // Na importação CSV, se a senha estiver no CSV use ela, senão mantém a gerada
           if (d.senha) campo.querySelector(".campo-senha").value = d.senha;
         }
         container.appendChild(campo);
@@ -1464,7 +1431,9 @@ function mostrarToast(msg, error = false) {
     setTimeout(() => t.classList.remove("show"), 3000);
 }
 
-/* ================= LIMPAR TUDO ================= */
+/* =======================================================
+   LIMPAR TUDO
+======================================================= */
 function _limparTudoInterno() {
   localStorage.removeItem("CONFIG_CADERNO");
   localStorage.removeItem("CONFIG_CADERNO_BACKUPS");
@@ -1905,62 +1874,11 @@ function coletarRegrasTempoChat() {
   return regras;
 }
 
-/* ================= RESPOSTA PESQUISA ================= */
-function criarRespostaPesquisa() {
-  const wrap = document.createElement("div");
-  wrap.className = "opcao-pesquisa";
-  const nota = document.createElement("input");
-  nota.type = "number"; nota.min = "0"; nota.max = "10";
-  nota.placeholder = "Nota";
-  const desc = document.createElement("input");
-  desc.type = "text";
-  desc.placeholder = "Descrição (ex: Ótimo)";
-  const del = document.createElement("button");
-  del.textContent = "✖";
-  del.onclick = () => wrap.remove();
-  wrap.append(nota, desc, del);
-  return wrap;
-}
-
 /* ================= PAUSAS E PESQUISA ================= */
-window.togglePausas = function () {
-  const container = document.getElementById("pausasConteudo");
-  if (!container) return;
-  const modo = localStorage.getItem("modo_atendimento");
-  if (modo === "chat") {
-    mostrarToast("Pausas são exclusivas do Call Center (Voz)", true);
-    return;
-  }
-  if (container._iniciado) {
-    container.style.display = container.style.display === "none" ? "block" : "none";
-    return;
-  }
-  container._iniciado = true;
-  container.style.display = "block";
-  container.appendChild(criarBlocoPausas());
-};
-
-window.togglePesquisaSatisfacao = function () {
-  const container = document.getElementById("pesquisaSatisfacaoConteudo");
-  if (!container) return;
-  container.style.display = "block";
-  container.appendChild(criarBlocoPesquisa());
-};
-
-window.adicionarPausa = function () {
-  const wrap = document.getElementById("pausasConteudo")?.querySelector(".campo-descricao");
-  if (!wrap) return;
-  const btns = wrap.querySelectorAll("button");
-  const btnAdd = [...btns].find(b => b.textContent.trim() === "+");
-  if (btnAdd) btnAdd.click();
-};
-
-window.adicionarRespostaPesquisa = function () {
-  const lista = document.getElementById("pesquisaSatisfacaoConteudo")
-    ?.querySelector(".listaRespostasPesquisa");
-  if (!lista) return;
-  lista.appendChild(criarRespostaPesquisa());
-};
+window.togglePausas             = togglePausas;
+window.adicionarPausa           = adicionarPausa;
+window.togglePesquisaSatisfacao = togglePesquisaSatisfacao;
+window.adicionarRespostaPesquisa = adicionarRespostaPesquisa;
 
 /* ================= MODO ESCURO ================= */
 (function initTema() {
@@ -2776,7 +2694,7 @@ function _confirmarSalvar() {
   window.location.href = "resumo.html";
 }
 
-/* ================= SALVAR CONFIGURAÇÕES (botão principal) ================= */
+/* FIX #5 & #6: salvarConfiguracao — botão renomeado para "Salvar Configurações" */
 window.salvarConfiguracao = function () {
   const erros  = [];
   const avisos = [];
