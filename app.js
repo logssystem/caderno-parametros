@@ -133,11 +133,20 @@ const DUVIDAS = {
     blocos: [
       { tipo: "info",    texto: "O editor de fluxo permite visualizar graficamente as conexões entre URAs, filas, ramais e regras de tempo." },
       { tipo: "campo",   texto: "Para adicionar um nó: arraste um elemento da barra lateral para a tela." },
-      { tipo: "campo",   texto: "Para conectar dois nós: clique no ponto de saída (●) de um nó e arraste até o ponto de entrada (●) de outro." },
-      { tipo: "campo",   texto: "Para excluir uma conexão: clique na linha de conexão e pressione Delete ou Backspace." },
-      { tipo: "campo",   texto: "Para mover um nó: clique e arraste o bloco para a posição desejada." },
+      {
+        tipo: "lista",
+        texto: "Como criar conexões entre nós:",
+        itens: [
+          "Passe o mouse sobre um nó até aparecer a bolinha (●) na borda.",
+          "Clique na bolinha (●) de saída de um nó e segure o botão do mouse.",
+          "Arraste até o nó de destino desejado e solte — a conexão será criada automaticamente.",
+          "Para excluir uma conexão: clique na linha de conexão e pressione Delete ou Backspace.",
+          "Para mover um nó: clique e arraste o bloco para a posição desejada."
+        ]
+      },
+      { tipo: "exemplo", texto: "Exemplo: clique na bolinha do nó 'URA Principal' e arraste até o nó 'Fila de Suporte' para conectá-los." },
       { tipo: "alerta",  texto: "O fluxo é salvo automaticamente junto com as configurações. Não é necessário salvar separadamente." },
-      { tipo: "exemplo", texto: "Exemplo de fluxo: Entrada → URA Principal → Fila de Suporte → Agentes." }
+      { tipo: "exemplo", texto: "Exemplo de fluxo completo: Entrada → URA Principal → Fila de Suporte → Agentes." }
     ]
   }
 };
@@ -291,7 +300,6 @@ window.adicionarCampo = function (tipo) {
 };
 
 /* ================= PESQUISA DE SATISFAÇÃO ================= */
-// FIX #1: Toggle mostra/oculta o bloco; campos ficam sempre dentro
 let _pesquisaAberta = false;
 function togglePesquisaSatisfacao() {
   const container = document.getElementById("pesquisaSatisfacaoConteudo");
@@ -408,13 +416,12 @@ function criarPausa() {
   return wrap;
 }
 
-/* ================= DESTINOS URA (FIX #8: diferenciar Fila vs Grupo) ================= */
+/* ================= DESTINOS URA (diferenciar Fila vs Grupo) ================= */
 function atualizarDestinosURA(select) {
   if (!select) return;
   select.innerHTML = "";
   select.add(new Option("Selecione o destino", ""));
 
-  // Ramais
   const grpRamal = document.createElement("optgroup");
   grpRamal.label = "📞 Ramal";
   document.querySelectorAll(`#listaRings .campo-descricao`).forEach(el => {
@@ -423,7 +430,6 @@ function atualizarDestinosURA(select) {
   });
   if (grpRamal.children.length) select.appendChild(grpRamal);
 
-  // Filas — label com "(Fila)" para diferenciar
   const grpFila = document.createElement("optgroup");
   grpFila.label = "👥 Fila";
   document.querySelectorAll(`#listaFilas .campo-descricao`).forEach(el => {
@@ -432,7 +438,6 @@ function atualizarDestinosURA(select) {
   });
   if (grpFila.children.length) select.appendChild(grpFila);
 
-  // Grupos de Ring — label com "(Grupo)" para diferenciar
   const grpRing = document.createElement("optgroup");
   grpRing.label = "🔔 Grupo de Ring";
   document.querySelectorAll(`#listaGrupoRing .campo-descricao`).forEach(el => {
@@ -441,7 +446,6 @@ function atualizarDestinosURA(select) {
   });
   if (grpRing.children.length) select.appendChild(grpRing);
 
-  // URAs
   const grpURA = document.createElement("optgroup");
   grpURA.label = "☎ URA";
   document.querySelectorAll(`#listaURAs .campo-descricao`).forEach(el => {
@@ -450,7 +454,6 @@ function atualizarDestinosURA(select) {
   });
   if (grpURA.children.length) select.appendChild(grpURA);
 
-  // Regras de Tempo
   const grpRT = document.createElement("optgroup");
   grpRT.label = "⏰ Regra de Tempo";
   document.querySelectorAll(`#listaRegrasTempo .campo-descricao`).forEach(el => {
@@ -463,7 +466,6 @@ function atualizarDestinosURA(select) {
 function atualizarTodosDestinosURA() {
     document.querySelectorAll(".opcao-ura select, .ura-destino, .ura-timeout-select").forEach(select => {
         const atual = select.value;
-        // Para timeout select, adicionar opção "Desconectar"
         if (select.classList.contains("ura-timeout-select")) {
             atualizarSelectTimeout(select, atual);
         } else {
@@ -473,16 +475,15 @@ function atualizarTodosDestinosURA() {
     });
 }
 
-/* FIX #3: Timeout da URA */
 function atualizarSelectTimeout(select, valorAtual) {
   select.innerHTML = "";
   select.add(new Option("Selecione o Destino de Timeout", ""));
   const grupos = [
-    { id: "listaRings",     label: "📞 Ramal",        prefix: "ramal::" },
-    { id: "listaFilas",     label: "👥 Fila",          prefix: "fila::",  suffix: " (Fila)" },
-    { id: "listaGrupoRing", label: "🔔 Grupo de Ring", prefix: "grupo::", suffix: " (Grupo)" },
-    { id: "listaURAs",      label: "☎ URA",           prefix: "ura::" },
-    { id: "listaRegrasTempo", label: "⏰ Regra de Tempo", prefix: "regra::" },
+    { id: "listaRings",       label: "📞 Ramal",          prefix: "ramal::" },
+    { id: "listaFilas",       label: "👥 Fila",            prefix: "fila::",  suffix: " (Fila)" },
+    { id: "listaGrupoRing",   label: "🔔 Grupo de Ring",   prefix: "grupo::", suffix: " (Grupo)" },
+    { id: "listaURAs",        label: "☎ URA",             prefix: "ura::" },
+    { id: "listaRegrasTempo", label: "⏰ Regra de Tempo",  prefix: "regra::" },
   ];
   grupos.forEach(g => {
     const optgroup = document.createElement("optgroup");
@@ -544,7 +545,6 @@ function criarCampo(tipo) {
     let chkAgente  = null;
     let chkAgenteOmni = null;
 
-    /* ===== USUÁRIO WEB ===== */
     if (tipo === "usuario_web") {
         const linhaCred = document.createElement("div");
         linhaCred.className = "linha-principal";
@@ -593,7 +593,6 @@ function criarCampo(tipo) {
         senhaInput.oninput = () => validarSenha(senhaInput, regras);
     }
 
-    /* ===== RAMAL (FIX #2: senha automática) ===== */
     if (tipo === "ring") {
         nome.style.width = "260px";
         nome.style.maxWidth = "100%";
@@ -645,31 +644,27 @@ function criarCampo(tipo) {
             infoRamal.textContent = "Ramal válido.";
         });
 
-        // FIX #2: Gerar senha automática
         senhaInput = document.createElement("input");
         senhaInput.placeholder = "Senha do ramal";
         senhaInput.classList.add("campo-senha");
         senhaInput.style.marginTop = "12px";
-        senhaInput.value = gerarSenhaRamal(); // Senha auto
+        senhaInput.value = gerarSenhaRamal();
         wrap.append(senhaInput);
 
         regras = document.createElement("div");
         regras.style.marginTop = "8px";
         wrap.append(regras);
-        // Validar a senha gerada automaticamente
         validarSenha(senhaInput, regras);
         senhaInput.oninput = () => validarSenha(senhaInput, regras);
         wrap.append(infoRamal);
     }
 
-    /* ===== URA (restaurado com opções acima do timeout) ===== */
     if (tipo === "ura") {
         const msg = document.createElement("textarea");
         msg.placeholder = "Mensagem da URA Ex: Olá seja bem-vindo...";
         msg.style.marginTop = "12px";
         wrap.append(msg);
     
-        // ⌨️ Opções da URA (acima do timeout)
         const secOpcoes = document.createElement("div");
         secOpcoes.style.marginTop = "14px";
         const titulo = document.createElement("div");
@@ -689,7 +684,6 @@ function criarCampo(tipo) {
         secOpcoes.append(btnNova);
         wrap.append(secOpcoes);
     
-        // Destino de timeout (sem campo de segundos)
         const timeoutRow = document.createElement("div");
         timeoutRow.style.cssText = "margin-top:12px;";
     
@@ -711,7 +705,6 @@ function criarCampo(tipo) {
         });
     }
   
-    /* ===== FILA (FIX #7: seleção de agentes corrigida) ===== */
     if (tipo === "fila") {
         const titulo = document.createElement("h4");
         titulo.textContent = "Agentes da fila";
@@ -790,7 +783,6 @@ function criarCampo(tipo) {
         wrap.getNome = () => nome.value;
     }
 
-    /* ===== GRUPO DE RING ===== */
     if (tipo === "grupo_ring") {
         const estr = document.createElement("select");
         estr.innerHTML = `
@@ -836,7 +828,6 @@ function criarCampo(tipo) {
         }
     }
 
-    /* ===== NÚMERO DE ENTRADA ===== */
     if (tipo === "entrada") {
         nome.placeholder = "Ex: (11) 3000-1000 ou (11) 99999-0000";
         nome.inputMode   = "numeric";
@@ -933,13 +924,13 @@ function criarCampo(tipo) {
 function extrairNomeDestino(valor) {
     if (!valor) return "";
     if (valor.includes("::")) return valor.split("::")[1];
-    return valor; // Compatibilidade com dados antigos
+    return valor;
 }
 
 function extrairTipoDestino(valor) {
     if (!valor) return "";
     if (valor.includes("::")) return valor.split("::")[0];
-    return ""; // sem prefixo = desconhecido
+    return "";
 }
 
 /* ================= OPÇÃO URA ================= */
@@ -1286,7 +1277,6 @@ function coletarPesquisaSatisfacao() {
   return { ativa: true, nome, introducao, pergunta, encerramento, respostas };
 }
 
-/* FIX #8: Coleta URAs com destino prefixado + timeout */
 function coletarURAs() {
   const uras = [];
   document.querySelectorAll("#listaURAs .campo-descricao").forEach(ura => {
@@ -1294,19 +1284,18 @@ function coletarURAs() {
     const mensagem = ura.querySelector("textarea")?.value    || "";
     const opcoes   = [];
     ura.querySelectorAll(".opcao-ura-row").forEach(o => {
-      const tecla   = o.querySelector(".ura-tecla")?.value   || "";
+      const tecla      = o.querySelector(".ura-tecla")?.value   || "";
       const destinoRaw = o.querySelector(".ura-destino")?.value || "";
-      const descricao = o.querySelector(".ura-desc")?.value   || "";
+      const descricao  = o.querySelector(".ura-desc")?.value    || "";
       if (tecla || destinoRaw) {
         opcoes.push({
           tecla,
-          destino: destinoRaw,               // valor prefixado (fila::nome)
-          destinoDisplay: formatarDestinoDisplay(destinoRaw), // para exibição no PDF
+          destino:        destinoRaw,
+          destinoDisplay: formatarDestinoDisplay(destinoRaw),
           descricao
         });
       }
     });
-    // Timeout
     const timeout = ura.getTimeout ? ura.getTimeout() : { segundos: "0", destino: "" };
     if (nome) uras.push({ nome, mensagem, opcoes, timeout });
   });
@@ -1458,7 +1447,6 @@ function processarCSV(tipo, texto) {
             }
         }
         if (tipo === "ring") {
-          // Na importação CSV, se a senha estiver no CSV use ela, senão mantém a gerada
           if (d.senha) campo.querySelector(".campo-senha").value = d.senha;
         }
         container.appendChild(campo);
@@ -1476,9 +1464,7 @@ function mostrarToast(msg, error = false) {
     setTimeout(() => t.classList.remove("show"), 3000);
 }
 
-/* =======================================================
-   LIMPAR TUDO
-======================================================= */
+/* ================= LIMPAR TUDO ================= */
 function _limparTudoInterno() {
   localStorage.removeItem("CONFIG_CADERNO");
   localStorage.removeItem("CONFIG_CADERNO_BACKUPS");
@@ -1962,13 +1948,8 @@ window.togglePesquisaSatisfacao = function () {
 };
 
 window.adicionarPausa = function () {
-  const lista = document.getElementById("pausasConteudo")?.querySelector(".opcao-pausa")
-    ?.parentElement
-    || document.getElementById("pausasConteudo")?.querySelector(".campo-descricao div:not(.opcao-pausa)");
-  // Busca a div que contém as pausas dentro do bloco criado
   const wrap = document.getElementById("pausasConteudo")?.querySelector(".campo-descricao");
   if (!wrap) return;
-  // A listaPausas é a div antes do botão +
   const btns = wrap.querySelectorAll("button");
   const btnAdd = [...btns].find(b => b.textContent.trim() === "+");
   if (btnAdd) btnAdd.click();
@@ -2795,7 +2776,7 @@ function _confirmarSalvar() {
   window.location.href = "resumo.html";
 }
 
-/* FIX #5 & #6: salvarConfiguracao — botão renomeado para "Salvar Configurações" */
+/* ================= SALVAR CONFIGURAÇÕES (botão principal) ================= */
 window.salvarConfiguracao = function () {
   const erros  = [];
   const avisos = [];
